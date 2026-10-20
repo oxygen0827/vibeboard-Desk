@@ -236,6 +236,8 @@ class RelayTests(unittest.TestCase):
             self.assertEqual(request('POST', '/v1/clients/register', '{}')[0], 415)
             self.assertEqual(request('POST', '/v1/clients/register', '{', {'Content-Type':'application/json'})[0], 400)
             self.assertEqual(request('POST', '/v1/clients/register', 'x'*131073, {'Content-Type':'application/json'})[0], 413)
+            server.rate_buckets = {('127.0.0.1', '/v1/clients/register'): (module.time.monotonic()-120, 10)}
+            self.assertEqual(request('POST', '/v1/clients/register', '{"role":"device","name":"x"}', {'Content-Type':'application/json'})[0], 429, 'registration window is hourly, not per minute')
             server.rate_buckets = {('127.0.0.1', '/v1/pair/claim'): (module.time.monotonic(), 30)}
             self.assertEqual(request('POST', '/v1/pair/claim', '{}', {'Content-Type':'application/json'})[0], 429)
             spoof = {'Content-Type':'application/json', 'X-Real-IP':'203.0.113.9'}

@@ -30,6 +30,8 @@ MAX_COMMANDS = 100000
 MAX_PAIR_REQUESTS = 50000
 MAX_TASK_EVENTS = 4096
 MAX_TASK_EVENT_BYTES = 8 * 1024 * 1024
+# Per-peer (count, window seconds). A client registers once, so open enrollment cannot cheaply exhaust MAX_CLIENTS.
+PEER_LIMITS = {'/v1/clients/register': (10, 3600), '/v1/pair/claim': (30, 60)}
 
 
 def url_is_market(target):
@@ -380,14 +382,14 @@ class Handler(BaseHTTPRequestHandler):
             self.connection.settimeout(10)
             require(length == 0 or self.headers.get('Content-Type', '').split(';')[0].strip() == 'application/json', 'JSON content type required', 415)
             peer = self.peer()
-            if self.path in ('/v1/clients/register', '/v1/pair/claim'):
+            if self.path in PEER_LIMITS:
                 with self.server.relay.lock:
                     stamp = time.monotonic()
                     buckets = getattr(self.server, 'rate_buckets', {})
-                    buckets = {k: v for k, v in buckets.items() if stamp-v[0] < 60}
+                    buckets = {k: v for k, v in buckets.items() if stamp-v[0] < PEER_LIMITS[k[1]][1]}
                     key = (peer, self.path)
                     start, count = buckets.get(key, (stamp, 0))
-                    require(count < 30 and (key in buckets or len(buckets) < 10000), 'Please retry later', 429)
+                    require(count < PEER_LIMITS[self.path][0] and (key in buckets or len(buckets) < 10000), 'Please retry later', 429)
                     buckets[key] = (start, count+1)
                     self.server.rate_buckets = buckets
             body = json.loads(self.rfile.read(length).decode('utf-8')) if length else {}
