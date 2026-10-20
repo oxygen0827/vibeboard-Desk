@@ -15,4 +15,4 @@
 
 `node atom/official/clients.test.cjs` 额外覆盖今日的离线重载、重连、冲突原子保存失败保护与账号隔离；声音实验室使用真实 Chrome 原生 WebAudio 验证启动/暂停、快速启动防重入、保存重载、读取失败保护与退出清理。父桥为测试 fixtures，不冒充真实服务器或扬声器听感。
 
-设备客户端构建还包括 `python3 atom/market-app/build.py`（市场/随手记）、`python3 atom/library-app/build.py`（应用库）与 `python3 atom/computer-app/build.py`（我的电脑）。受保护 ID 必须走经审核的 `client-update`，其余普通作品使用标准安装/更新；更新保留安装时间、桌面位置、原有用户图标和来源记录，应用数据位于独立存储，不随资源更新删除。
+设备客户端构建还包括 `python3 atom/market-app/build.py`（市场/随手记）与 `python3 atom/computer-app/build.py`（我的电脑）。受保护 ID 必须走经审核的 `client-update`，其余普通作品使用标准安装/更新；更新保留安装时间、桌面位置、原有用户图标和来源记录，应用数据位于独立存储，不随资源更新删除。

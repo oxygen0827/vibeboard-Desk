@@ -24,7 +24,7 @@ from relay_bridge import DeviceBridge, BridgeError
 MAX_BODY = 2 * 1024 * 1024
 ID = re.compile(r'^[a-z][a-z0-9_-]{0,47}$')
 BUILTINS = [dict(id='clock', name='时钟', description='桌面时钟', entry='/#clock'), dict(id='timer', name='计时器', description='倒计时提醒', entry='/#timer'), dict(id='status', name='设备状态', description='系统与连接状态', entry='/#status')]
-TRUSTED_CLIENT_IDS = {'my-computer', 'market', 'quick-notes', 'today', 'task-pal', 'app-library'}
+TRUSTED_CLIENT_IDS = {'my-computer', 'market', 'quick-notes', 'today', 'task-pal'}
 RESERVED_IDS = {a['id'] for a in BUILTINS} | {'notes', 'settings', 'developer', 'manager', 'home', 'widgets', 'workshop', 'themes', 'my-computer', 'connect-preview', 'market', 'quick-notes', 'today', 'task-pal', 'app-library'}
 LOCK = threading.Lock()
 FEATURE_LOCK = threading.Lock()
