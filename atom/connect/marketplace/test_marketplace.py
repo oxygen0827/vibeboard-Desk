@@ -229,6 +229,16 @@ class MarketplaceTests(unittest.TestCase):
             source=bundle();source['manifest']['capabilities']=caps
             self.denied(400,lambda:self.draft(source=source))
 
+    def test_seed_metadata_ignored_but_invalid_bundle_rejected(self):
+        self.seeds.mkdir(parents=True, exist_ok=True)
+        (self.seeds/'verification.json').write_text(json.dumps({'updated':['today'],'order_preserved':True}))
+        (self.seeds/'sample.json').write_text(json.dumps(bundle()))
+        self.market.import_official()
+        self.assertEqual(len(self.call('/catalog')['works']),1)
+        invalid=self.seeds/'broken';invalid.mkdir()
+        (invalid/'bundle.json').write_text('{}')
+        with self.assertRaises(m.MarketError):self.market.import_official()
+
     def test_current_official_sources_cover_five_categories(self):
         source_root=Path(__file__).resolve().parents[2]/'official'
         current=m.Marketplace(str(Path(self.tmp.name)/'official-live.db'),seeds=source_root)

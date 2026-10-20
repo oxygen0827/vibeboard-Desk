@@ -228,7 +228,12 @@ class Marketplace:
             paths=sorted(list(self.seed_root.glob('*/bundle.json'))+list(self.seed_root.glob('*.json')))
             require(len(paths)<=100, 'Too many official seed sources')
             for source in paths:
-                bundle = validate_bundle(json.loads(source.read_text(encoding='utf-8')), official=True)
+                candidate = json.loads(source.read_text(encoding='utf-8'))
+                # Top-level JSON may be an audit report, not an installable seed.
+                # Explicit bundle.json and partial bundle schemas must still fail validation.
+                if source.name != 'bundle.json' and isinstance(candidate, dict) and not ({'manifest', 'files'} & set(candidate)):
+                    continue
+                bundle = validate_bundle(candidate, official=True)
                 scan_publish(bundle)
                 aid=bundle['manifest']['id']
                 canonical = packed(bundle)
