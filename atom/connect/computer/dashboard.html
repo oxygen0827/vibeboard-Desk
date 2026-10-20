@@ -1,5 +1,210 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ATOM Connect</title><link rel="stylesheet" href="/dashboard.css"></head><body><aside class="sidebar"><div class="brand"><span class="brand-icon">↗</span><div>ATOM<span>CONNECT</span></div></div><div class="nav-label">工作空间</div><nav aria-label="主导航"><button data-page="overview" class="selected"><span>◉</span>概览</button><button data-page="devices"><span>▣</span>我的设备<i id="device-count">0</i></button><button data-page="projects"><span>▤</span>授权项目</button><button data-page="market"><span>▦</span>应用市场</button><button data-page="creations"><span>✎</span>我的创作</button><button data-page="notes"><span>▧</span>便签</button><button data-page="agenda"><span>▢</span>今日</button><button data-page="agents"><span>⌘</span>电脑 Agent</button></nav><div class="sidebar-bottom"><div class="local-note"><span class="status-dot"></span>在这台电脑执行</div><button data-page="settings"><span>⚙</span>连接设置</button><small>ATOM Connect · 个人电脑伴侣</small></div></aside><main><header class="topbar"><span id="breadcrumb">工作空间 / 概览</span><span id="server-state" class="pill">正在检查连接</span></header><div class="content"><div id="notice" role="status" hidden></div><section data-panel="overview"><div class="page-heading"><div><p class="eyebrow">YOUR PERSONAL WORKSPACE</p><h1>电脑的能力，<br>就在手边。</h1><p class="subtitle">让 ATOM 把想法带过来，由这台电脑完成。</p></div><span class="hero-mark" aria-hidden="true">↗</span></div><div id="setup-steps" class="steps"></div><div class="section-heading"><h2>连接状态</h2><button class="text-button" data-page="devices">管理设备 ↗</button></div><div class="summary-grid"><article class="card"><div class="card-icon">▣</div><span class="caption">我的设备</span><strong id="device-summary">尚未配对</strong><p id="device-detail">连接你的第一台 ATOM</p></article><article class="card"><div class="card-icon">⌘</div><span class="caption">电脑 Agent</span><strong id="agent-summary">正在检测</strong><p id="agent-detail">使用本机的模型账号</p></article></div><div class="section-heading"><h2>最近任务</h2><span class="caption">在电脑上执行 · 结果回到 ATOM</span></div><div id="recent-tasks" class="list-card"></div><div class="footnote">模型账号保留在电脑上。ATOM Connect 管理自己的会话。</div></section><section data-panel="devices" hidden><div class="page-heading compact"><div><p class="eyebrow">DEVICES</p><h1>我的设备</h1><p class="subtitle">从桌面小电脑，连接这台电脑的能力。</p></div></div><div id="paired" class="list-card"></div><div class="form-card"><h2>配对新设备</h2><p>在 ATOM「我的电脑」中生成配对码，输入后在 ATOM 上确认。</p><form id="pair"><label>配对码<input name="code" class="pair-code" placeholder="输入设备上的配对码" autocomplete="off" required maxlength="64"></label><button class="primary">请求配对</button></form></div></section><section data-panel="projects" hidden><div class="page-heading compact"><div><p class="eyebrow">PROJECTS</p><h1>授权项目</h1><p class="subtitle">选择可以接收 ATOM 任务的文件夹。</p></div></div><div id="projects" class="list-card"></div><div class="form-card"><h2>添加项目</h2><p>默认只读。需要改代码时，可以明确允许项目内修改。</p><form id="project"><label>项目文件夹<div class="input-action"><input name="path" placeholder="/Users/you/Projects/demo" required><button id="choose-folder" type="button" class="secondary" hidden>选择文件夹…</button></div></label><label>项目名称<input name="name" placeholder="例如：我的网站"></label><label class="check"><input type="checkbox" name="write"><span>允许修改此项目内的文件<small>Agent 的操作仍遵循审批与沙箱策略。</small></span></label><button class="primary">添加项目</button></form></div><p class="footnote">项目选择用于任务路由与写入授权，不代表操作系统级的全部读取隔离。</p></section><section data-panel="agents" hidden><div class="page-heading compact"><div><p class="eyebrow">AGENTS</p><h1>电脑 Agent</h1><p class="subtitle">沿用本机的开发工具与登录状态。</p></div><button id="diagnostics" class="secondary">重新检测</button></div><div id="agents" class="list-card"></div><div class="form-card"><h2>准备好 Codex</h2><p>安装官方 Codex CLI，并在终端运行 <code>codex login</code>，完成后重新检测。</p><p>连接程序会创建独立会话，不接管已打开的 Codex 桌面聊天窗口。</p><p class="caption">Claude Agent 为可选接入，需要官方 SDK 和 ANTHROPIC_API_KEY。</p></div></section><section data-panel="settings" hidden><div class="page-heading compact"><div><p class="eyebrow">CONNECTION</p><h1>连接设置</h1><p class="subtitle">电脑与 ATOM 使用同一个中继服务。</p></div></div><div class="form-card"><h2>中继服务</h2><form id="config"><label>服务器地址<input name="relay_url" type="url" placeholder="https://connect.example.com" required></label><label>电脑名称<input name="name" placeholder="我的 Mac" required></label><button class="primary">保存连接</button></form><p id="connection" class="connection-detail"></p></div><div class="info-note">任务内容经中继转发。请使用你信任的服务器；电脑端控制台仅监听本机。</div></section><section data-panel="market" hidden><div class="page-heading compact"><div><p class="eyebrow">DISCOVER & REMIX</p><h1>应用市场</h1><p class="subtitle">打开完整源码，让好想法继续生长。</p></div><button class="secondary" id="studio-account">创作账号</button></div><form id="market-search" class="market-search"><input name="q" placeholder="搜索应用、用途或灵感"><select name="category"><option value="">全部分类</option><option value="life">日常生活</option><option value="companion">陪伴</option><option value="sound">声音</option><option value="play">互动玩具</option><option value="connect">连接</option></select><button class="primary">搜索</button></form><div id="market-catalog" class="studio-scroll market-grid"></div><p class="footnote">应用包含完整安装资源与来源信息。先查看源码，再在 ATOM 上安装。</p></section>
-<section data-panel="creations" hidden><div class="page-heading compact"><div><p class="eyebrow">MAKE IT YOURS</p><h1>我的创作</h1><p class="subtitle">完整源码、本地快照和 AI 改造，都在这里。</p></div><button class="secondary" id="creations-refresh">刷新</button></div><div id="creations-list" class="studio-scroll"></div><div id="studio-editor" class="studio-editor" hidden><div class="editor-toolbar"><button class="text-button" id="editor-back">← 创作列表</button><strong id="editor-title"></strong><span id="editor-dirty" class="tag"></span><button class="secondary" id="editor-open-preview">预览</button><button class="secondary" id="editor-save">保存本机</button><button class="primary" id="editor-sync">同步草稿</button></div><div class="editor-body"><div class="file-rail"><div id="editor-files"></div><button class="text-button" id="editor-add-file">＋ 新文件</button><button class="text-button" id="editor-delete-file">删除文件</button></div><div class="source-pane"><textarea id="editor-source" spellcheck="false" aria-label="源码编辑器"></textarea></div><div class="preview-pane"><div class="preview-caption">本机预览 · 480 × 360</div><iframe id="editor-preview" sandbox="allow-scripts" title="应用预览"></iframe><small>网络与设备能力禁用；预览保存仅暂存。</small><button class="text-button" id="editor-preview-refresh">刷新预览</button></div></div><div class="editor-bottom"><div class="ai-row"><input id="ai-change" placeholder="例如：增加一个可重置的每日计数器"><button class="primary" id="ai-modify">AI 修改</button><button class="secondary" id="ai-cancel" hidden>停止</button></div><div id="ai-state" role="status"></div><div class="snapshot-row"><select id="editor-snapshots" aria-label="历史快照"></select><button class="secondary" id="editor-snapshot">创建快照</button><button class="secondary" id="editor-diff">查看差异</button><button class="secondary" id="editor-restore">恢复快照</button><button class="primary" id="editor-publish">发布作品</button></div><small id="editor-lineage"></small></div></div></section>
-<section data-panel="notes" hidden><div class="page-heading compact"><div><p class="eyebrow">CAPTURE YOUR THOUGHTS</p><h1>便签</h1><p class="subtitle">与 ATOM 同步；离线编辑保存在这台电脑。</p></div><div class="button-row"><button class="primary" id="notes-organize">AI 整理</button><button class="secondary" id="notes-sync">同步</button></div></div><div class="notes-layout"><div id="notes-list" class="studio-scroll"></div><form id="note-editor" class="note-editor"><input name="id" type="hidden"><textarea name="text" maxlength="4000" placeholder="记下一个想法…" required aria-label="便签内容"></textarea><label class="check"><input type="checkbox" name="pinned">置顶</label><div class="button-row"><button class="primary">保存便签</button><button class="secondary" type="button" id="note-new">新建</button><button class="secondary" type="button" id="note-delete">删除 / 恢复</button></div><small id="note-status"></small><div id="note-conflict"></div></form></div></section>
-<section data-panel="agenda" hidden><div class="page-heading compact"><div><p class="eyebrow">A LITTLE MORE ORGANIZED</p><h1>今日</h1><p class="subtitle">日程与待办，在电脑和 ATOM 之间接续。</p></div><button class="secondary" id="agenda-sync">同步</button></div><form id="agenda-add" class="agenda-add"><input name="title" placeholder="添加一件要做的事" maxlength="200" required><select name="kind"><option value="todo">待办</option><option value="event">日程</option></select><input name="starts_at" type="datetime-local" aria-label="时间"><button class="primary">添加</button></form><div id="agenda-list" class="studio-scroll"></div></section>
-</div></main><dialog id="studio-dialog"><div class="dialog-header"><h2 id="dialog-title"></h2><button id="dialog-close" class="secondary">关闭</button></div><div id="dialog-content" class="dialog-content"></div></dialog><script src="/dashboard.js"></script><script src="/studio.js"></script></body></html>
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>ATOM Connect</title>
+<link rel="stylesheet" href="/dashboard.css">
+</head>
+<body>
+<svg class="sprite" aria-hidden="true">
+  <symbol id="i-overview" viewBox="0 0 20 20"><rect x="3" y="3" width="6" height="6" rx="1.5"/><rect x="11" y="3" width="6" height="6" rx="1.5"/><rect x="3" y="11" width="6" height="6" rx="1.5"/><rect x="11" y="11" width="6" height="6" rx="1.5"/></symbol>
+  <symbol id="i-link" viewBox="0 0 20 20"><circle cx="5" cy="10" r="2.2"/><circle cx="15" cy="5" r="2.2"/><circle cx="15" cy="15" r="2.2"/><path d="M7 9l6-3M7 11l6 3"/></symbol>
+  <symbol id="i-tasks" viewBox="0 0 20 20"><rect x="2.5" y="3.5" width="15" height="13" rx="2"/><path d="M6 8l2.5 2L6 12M10.5 12.5H14"/></symbol>
+  <symbol id="i-agent" viewBox="0 0 20 20"><rect x="5" y="5" width="10" height="10" rx="2"/><path d="M8 2.5V5M12 2.5V5M8 15v2.5M12 15v2.5M2.5 8H5M2.5 12H5M15 8h2.5M15 12h2.5"/><path d="M8.5 10h3"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 20 20"><path d="M2.5 6a1.5 1.5 0 011.5-1.5h3.6l1.8 2H16A1.5 1.5 0 0117.5 8v6.5A1.5 1.5 0 0116 16H4a1.5 1.5 0 01-1.5-1.5z"/></symbol>
+  <symbol id="i-note" viewBox="0 0 20 20"><path d="M4.5 3h8l3 3v11h-11z"/><path d="M12.5 3v3h3M7 10h6M7 13h4"/></symbol>
+  <symbol id="i-today" viewBox="0 0 20 20"><rect x="3" y="4.5" width="14" height="12.5" rx="2"/><path d="M3 8.5h14M7 2.5v4M13 2.5v4"/><path d="M7.5 12.5l1.8 1.6 3.2-3.4"/></symbol>
+  <symbol id="i-market" viewBox="0 0 20 20"><path d="M3.5 7.5h13l-1 9h-11z"/><path d="M7 7.5V6a3 3 0 016 0v1.5"/></symbol>
+  <symbol id="i-pencil" viewBox="0 0 20 20"><path d="M13.5 3.5l3 3-9 9H4.5v-3z"/><path d="M11.5 5.5l3 3"/></symbol>
+  <symbol id="i-mac" viewBox="0 0 20 20"><rect x="3.5" y="4" width="13" height="9" rx="1.5"/><path d="M1.5 15.5h17"/></symbol>
+  <symbol id="i-server" viewBox="0 0 20 20"><rect x="3" y="3" width="14" height="6" rx="1.5"/><rect x="3" y="11" width="14" height="6" rx="1.5"/><path d="M6 6h.01M6 14h.01"/></symbol>
+  <symbol id="i-device" viewBox="0 0 20 20"><rect x="2.5" y="4" width="15" height="11" rx="2"/><path d="M7 17.5h6"/><circle cx="10" cy="9.5" r="1.2"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 20 20"><path d="M16 10a6 6 0 11-1.8-4.3M16 3.5v3h-3"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 20 20"><path d="M10 4v12M4 10h12"/></symbol>
+  <symbol id="i-search" viewBox="0 0 20 20"><circle cx="9" cy="9" r="5"/><path d="M13 13l4 4"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 20 20"><path d="M10 2.5l1.7 4.3 4.3 1.7-4.3 1.7L10 14.5l-1.7-4.3L4 8.5l4.3-1.7z"/><path d="M15.5 13.5l.7 1.6 1.6.7-1.6.7-.7 1.6-.7-1.6-1.6-.7 1.6-.7z"/></symbol>
+  <symbol id="i-user" viewBox="0 0 20 20"><circle cx="10" cy="7" r="3.2"/><path d="M3.5 17a6.5 6.5 0 0113 0"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 20 20"><path d="M8 5l5 5-5 5"/></symbol>
+  <symbol id="i-back" viewBox="0 0 20 20"><path d="M12 5l-5 5 5 5"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 20 20"><path d="M4 6h12M8 6V4h4v2M5.5 6l.8 10.5h7.4L14.5 6"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 20 20"><path d="M7 3h6l-1 5 3 3H5l3-3zM10 11v6"/></symbol>
+  <symbol id="i-check" viewBox="0 0 20 20"><path d="M4.5 10.5l3.5 3.5 7.5-8"/></symbol>
+  <symbol id="i-sync" viewBox="0 0 20 20"><path d="M4 8a6 6 0 0110.5-2.5L16 7M16 12a6 6 0 01-10.5 2.5L4 13M16 3.5V7h-3.5M4 16.5V13h3.5"/></symbol>
+</svg>
+
+<aside class="sidebar">
+  <div class="brand"><span class="brand-mark">A</span><div><strong>ATOM Connect</strong><small id="brand-host">个人电脑伴侣</small></div></div>
+  <nav aria-label="主导航">
+    <button data-page="overview"><svg><use href="#i-overview"/></svg>概览</button>
+    <div class="nav-group">互联</div>
+    <button data-page="devices"><svg><use href="#i-link"/></svg>设备与连接<i class="nav-dot" id="nav-devices"></i></button>
+    <div class="nav-group">电脑 Agent</div>
+    <button data-page="tasks"><svg><use href="#i-tasks"/></svg>任务<i class="nav-count" id="nav-tasks"></i></button>
+    <button data-page="agents"><svg><use href="#i-agent"/></svg>Agent<i class="nav-dot" id="nav-agents"></i></button>
+    <button data-page="projects"><svg><use href="#i-folder"/></svg>授权项目</button>
+    <div class="nav-group">同步应用</div>
+    <button data-page="notes"><svg><use href="#i-note"/></svg>随手记<i class="nav-count" id="nav-notes"></i></button>
+    <button data-page="agenda"><svg><use href="#i-today"/></svg>今日<i class="nav-count" id="nav-agenda"></i></button>
+    <div class="nav-group">应用市场</div>
+    <button data-page="market"><svg><use href="#i-market"/></svg>发现</button>
+    <button data-page="creations"><svg><use href="#i-pencil"/></svg>我的创作</button>
+  </nav>
+  <div class="sidebar-foot">
+    <button id="studio-account" class="account"><span class="avatar" id="account-avatar"><svg><use href="#i-user"/></svg></span><span><strong id="account-name">未登录</strong><small id="account-detail">登录市场账号以同步</small></span></button>
+    <div class="link-state" id="link-state"><i class="dot"></i><span>正在检查连接</span></div>
+  </div>
+</aside>
+
+<main>
+<!-- 概览 -->
+<section data-panel="overview">
+  <header class="page-head"><div><h1>概览</h1><p id="overview-sub">这台电脑与 ATOM 的连接情况</p></div></header>
+  <div class="topology card" id="topology">
+    <div class="node" id="node-mac"><span class="node-icon"><svg><use href="#i-mac"/></svg></span><strong>这台 Mac</strong><small></small><span class="badge"></span></div>
+    <div class="wire" id="wire-relay"><i></i></div>
+    <div class="node" id="node-relay"><span class="node-icon"><svg><use href="#i-server"/></svg></span><strong>中继服务器</strong><small></small><span class="badge"></span></div>
+    <div class="wire" id="wire-device"><i></i></div>
+    <div class="node" id="node-device"><span class="node-icon"><svg><use href="#i-device"/></svg></span><strong>ATOM 设备</strong><small></small><span class="badge"></span></div>
+  </div>
+  <div class="health" id="health"></div>
+  <div class="tiles">
+    <button class="tile" data-page="agents"><span class="tile-head"><svg><use href="#i-agent"/></svg>电脑 Agent</span><strong id="tile-agent">—</strong><small id="tile-agent-sub"></small></button>
+    <button class="tile" data-page="notes"><span class="tile-head"><svg><use href="#i-note"/></svg>同步应用</span><strong id="tile-sync">—</strong><small id="tile-sync-sub"></small></button>
+    <button class="tile" data-page="market"><span class="tile-head"><svg><use href="#i-market"/></svg>应用市场</span><strong id="tile-market">—</strong><small id="tile-market-sub"></small></button>
+  </div>
+  <div class="section-head"><h2>最近活动</h2><button class="link" data-page="tasks">全部任务<svg><use href="#i-chevron"/></svg></button></div>
+  <div class="list card" id="activity"></div>
+</section>
+
+<!-- 设备与连接 -->
+<section data-panel="devices" hidden>
+  <header class="page-head"><div><h1>设备与连接</h1><p>这台电脑和 ATOM 通过同一个中继服务器连接</p></div></header>
+  <div class="section-head"><h2>中继服务器</h2></div>
+  <div class="card server-card">
+    <div class="row"><span class="row-icon"><svg><use href="#i-server"/></svg></span><div class="row-main"><strong id="server-url">未配置</strong><small id="server-detail"></small></div><span class="pill" id="server-pill"></span><button class="btn" id="server-edit">修改</button></div>
+    <form id="config" class="inline-form" hidden>
+      <label>服务器地址<input name="relay_url" type="url" placeholder="https://ldcx.tech/atom" required></label>
+      <label>电脑名称<input name="name" placeholder="我的 Mac" required maxlength="80"></label>
+      <div class="form-actions"><button type="button" class="btn" id="server-cancel">取消</button><button class="btn primary">保存并连接</button></div>
+      <p class="hint">更换服务器后需要在 ATOM 上重新配对。任务内容经中继转发，请使用你信任的服务器。</p>
+    </form>
+  </div>
+  <div class="section-head"><h2>已配对设备</h2><span class="muted" id="paired-count"></span></div>
+  <div class="list card" id="paired"></div>
+  <div class="section-head"><h2>配对新设备</h2></div>
+  <div class="card pair-card">
+    <ol class="steps"><li>在 ATOM 上打开「我的电脑」，生成配对码</li><li>在这里输入配对码</li><li>回到 ATOM 确认配对</li></ol>
+    <form id="pair" class="pair-form"><input name="code" class="code" placeholder="配对码" autocomplete="off" required maxlength="64" spellcheck="false"><button class="btn primary">请求配对</button></form>
+  </div>
+</section>
+
+<!-- 任务 -->
+<section data-panel="tasks" hidden>
+  <header class="page-head"><div><h1>任务</h1><p>ATOM 发来、在这台电脑上执行的任务</p></div>
+    <div class="segmented" id="task-filter"><button data-filter="all" class="on">全部</button><button data-filter="active">进行中</button><button data-filter="done">已完成</button><button data-filter="problem">未完成</button></div></header>
+  <div class="list card" id="task-list"></div>
+</section>
+
+<!-- Agent -->
+<section data-panel="agents" hidden>
+  <header class="page-head"><div><h1>Agent</h1><p>使用这台电脑上已登录的开发工具执行任务</p></div><button class="btn" id="diagnostics"><svg><use href="#i-refresh"/></svg>重新检测</button></header>
+  <div class="agent-grid" id="agents"></div>
+  <div class="card help">
+    <h3>准备 Codex</h3>
+    <p>安装官方 Codex CLI，在终端运行 <code>codex login</code>，完成后点「重新检测」。ATOM Connect 会创建独立会话，不接管已打开的 Codex 窗口。</p>
+    <h3>Claude Agent（可选）</h3>
+    <p>需要官方 SDK 和 <code>ANTHROPIC_API_KEY</code> 环境变量。</p>
+  </div>
+</section>
+
+<!-- 授权项目 -->
+<section data-panel="projects" hidden>
+  <header class="page-head"><div><h1>授权项目</h1><p>ATOM 只能在这些文件夹里发起任务</p></div></header>
+  <div class="list card" id="projects"></div>
+  <div class="section-head"><h2>添加项目</h2></div>
+  <form id="project" class="card form-card">
+    <label>项目文件夹<span class="input-action"><input name="path" placeholder="/Users/you/Projects/demo" required spellcheck="false"><button id="choose-folder" type="button" class="btn" hidden>选择…</button></span></label>
+    <label>显示名称<input name="name" placeholder="例如：我的网站" maxlength="80"></label>
+    <label class="check"><input type="checkbox" name="write"><span>允许修改此项目内的文件<small>默认只读。Agent 的操作仍遵循审批与沙箱策略。</small></span></label>
+    <div class="form-actions"><button class="btn primary">添加项目</button></div>
+  </form>
+</section>
+
+<!-- 随手记 -->
+<section data-panel="notes" hidden class="fill">
+  <header class="page-head"><div><h1>随手记</h1><p id="notes-sub">与 ATOM 同步，离线编辑会先保存在这台电脑</p></div>
+    <div class="actions"><button class="btn" id="notes-sync"><svg><use href="#i-sync"/></svg>同步</button><button class="btn" id="notes-organize"><svg><use href="#i-spark"/></svg>AI 整理</button><button class="btn primary" id="note-new"><svg><use href="#i-plus"/></svg>新建</button></div></header>
+  <div class="split card">
+    <div class="split-list"><div class="search"><svg><use href="#i-search"/></svg><input id="notes-filter" placeholder="搜索便签"></div><div id="notes-list" class="scroll"></div></div>
+    <form id="note-editor" class="split-detail">
+      <input name="id" type="hidden">
+      <textarea name="text" maxlength="4000" placeholder="记下一个想法…" required aria-label="便签内容"></textarea>
+      <div id="note-conflict"></div>
+      <footer class="detail-bar"><label class="check compact"><input type="checkbox" name="pinned"><span>置顶</span></label><small id="note-status"></small><span class="spacer"></span><button type="button" class="btn" id="note-delete">删除</button><button class="btn primary">保存</button></footer>
+    </form>
+  </div>
+</section>
+
+<!-- 今日 -->
+<section data-panel="agenda" hidden>
+  <header class="page-head"><div><h1>今日</h1><p id="agenda-sub">日程与待办，在电脑和 ATOM 之间接续</p></div><button class="btn" id="agenda-sync"><svg><use href="#i-sync"/></svg>同步</button></header>
+  <form id="agenda-add" class="card agenda-add">
+    <div class="segmented small" id="agenda-kind"><button type="button" data-kind="todo" class="on">待办</button><button type="button" data-kind="event">日程</button></div>
+    <input name="kind" type="hidden" value="todo">
+    <input name="title" placeholder="添加一件要做的事" maxlength="200" required>
+    <input name="starts_at" type="datetime-local" aria-label="时间">
+    <button class="btn primary">添加</button>
+  </form>
+  <div id="agenda-list"></div>
+</section>
+
+<!-- 发现 -->
+<section data-panel="market" hidden>
+  <header class="page-head"><div><h1>发现</h1><p>完整开源的 ATOM 应用，查看源码、安装或基于它创作</p></div></header>
+  <form id="market-search" class="market-bar">
+    <div class="search"><svg><use href="#i-search"/></svg><input name="q" placeholder="搜索应用、用途或灵感"></div>
+    <input name="category" type="hidden" value="">
+    <div class="chips" id="market-chips"><button type="button" data-category="" class="on">全部</button><button type="button" data-category="life">日常生活</button><button type="button" data-category="companion">陪伴</button><button type="button" data-category="sound">声音</button><button type="button" data-category="play">互动玩具</button><button type="button" data-category="connect">连接</button></div>
+  </form>
+  <div id="market-catalog" class="work-grid"></div>
+</section>
+
+<!-- 我的创作 -->
+<section data-panel="creations" hidden class="fill">
+  <div id="creations-home">
+    <header class="page-head"><div><h1>我的创作</h1><p>从市场作品派生的草稿，在这台电脑上编辑、AI 改造和发布</p></div><button class="btn" id="creations-refresh"><svg><use href="#i-refresh"/></svg>刷新</button></header>
+    <div id="creations-list" class="draft-grid"></div>
+  </div>
+  <div id="studio-editor" class="editor" hidden>
+    <header class="editor-bar">
+      <button class="btn ghost" id="editor-back"><svg><use href="#i-back"/></svg>创作</button>
+      <div class="editor-title"><strong id="editor-title"></strong><span id="editor-dirty" class="pill"></span></div>
+      <span class="spacer"></span>
+      <button class="btn" id="editor-open-preview">大预览</button>
+      <button class="btn" id="editor-save">保存本机</button>
+      <button class="btn" id="editor-sync">同步草稿</button>
+      <button class="btn primary" id="editor-publish">发布</button>
+    </header>
+    <div class="editor-body">
+      <div class="file-rail"><div class="rail-head">文件</div><div id="editor-files"></div><div class="rail-actions"><button class="btn ghost small" id="editor-add-file"><svg><use href="#i-plus"/></svg>新文件</button><button class="btn ghost small" id="editor-delete-file"><svg><use href="#i-trash"/></svg>删除</button></div></div>
+      <textarea id="editor-source" spellcheck="false" aria-label="源码编辑器"></textarea>
+      <div class="preview-pane"><div class="rail-head">预览 · 480 × 360<button class="btn ghost small" id="editor-preview-refresh"><svg><use href="#i-refresh"/></svg></button></div><div class="preview-frame"><iframe id="editor-preview" sandbox="allow-scripts" title="应用预览"></iframe></div><small class="muted">网络与设备能力已禁用；预览中的保存只是暂存。</small>
+        <div class="rail-head">快照</div>
+        <select id="editor-snapshots" aria-label="历史快照"></select>
+        <div class="snap-actions"><button class="btn small" id="editor-snapshot">创建</button><button class="btn small" id="editor-diff">差异</button><button class="btn small" id="editor-restore">恢复</button></div>
+        <small id="editor-lineage" class="muted lineage"></small>
+      </div>
+    </div>
+    <footer class="ai-bar"><svg><use href="#i-spark"/></svg><input id="ai-change" placeholder="告诉 AI 要怎么改，例如：增加一个可重置的每日计数器"><button class="btn primary" id="ai-modify">AI 修改</button><button class="btn" id="ai-cancel" hidden>停止</button><div id="ai-state" role="status"></div></footer>
+  </div>
+</section>
+</main>
+
+<div id="toast" role="status" hidden></div>
+<dialog id="studio-dialog"><header class="dialog-head"><h2 id="dialog-title"></h2><button id="dialog-close" class="btn ghost" aria-label="关闭">关闭</button></header><div id="dialog-content" class="dialog-body"></div></dialog>
+<script src="/dashboard.js"></script>
+<script src="/studio.js"></script>
+</body>
+</html>

@@ -16,9 +16,9 @@ final class ConnectApplication: NSObject, NSApplicationDelegate, WKNavigationDel
         web = WKWebView(frame: .zero, configuration: config)
         web.navigationDelegate = self
         web.uiDelegate = self
-        window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 1000, height: 760), styleMask: [.titled,.closable,.miniaturizable,.resizable], backing: .buffered, defer: false)
-        window.title = "ATOM Connect · 我的电脑"
-        window.minSize = NSSize(width: 640, height: 520)
+        window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 1200, height: 800), styleMask: [.titled,.closable,.miniaturizable,.resizable], backing: .buffered, defer: false)
+        window.title = "ATOM Connect"
+        window.minSize = NSSize(width: 820, height: 560)
         window.contentView = web
         window.center()
         window.makeKeyAndOrderFront(nil)
