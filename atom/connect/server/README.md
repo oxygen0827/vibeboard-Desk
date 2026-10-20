@@ -34,10 +34,12 @@
    OSS_ACCESS_KEY_ID=...
    OSS_ACCESS_KEY_SECRET=...
    OSS_BUCKET=...
-   OSS_ENDPOINT=http://oss-cn-shanghai-internal.aliyuncs.com
+   OSS_ENDPOINT=https://oss-cn-shanghai.aliyuncs.com
    OSS_REGION=cn-shanghai
    OSS_PREFIX=atom/backups
    ```
+
+   ldcx 主机不能用内网 endpoint：Tailscale 防火墙（`ts-input`）丢弃从 eth0 进入、源地址属于 100.64.0.0/10 的包，而 OSS 内网地址是 100.118.x.x，连接会一直挂起。公网 HTTPS endpoint 上传不收流量费。
 
    然后 `systemctl enable --now atom-connect-backup.timer`，并用 `systemctl start atom-connect-backup.service && journalctl -u atom-connect-backup -n 20` 验证一次。
 

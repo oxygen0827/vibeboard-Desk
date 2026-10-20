@@ -4,6 +4,8 @@ After=atom-connect.service
 
 [Service]
 Type=oneshot
+# A stalled upload must not block later runs.
+TimeoutStartSec=10min
 User=atom
 Group=atom
 # Root-only file with OSS_ACCESS_KEY_ID, OSS_ACCESS_KEY_SECRET, OSS_BUCKET, OSS_ENDPOINT, OSS_REGION, OSS_PREFIX.
