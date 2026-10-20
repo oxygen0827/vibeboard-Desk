@@ -1,0 +1,67 @@
+features {
+  '2d_canvas': 'enabled',
+  gpu_compositing: 'enabled',
+  multiple_raster_threads: 'enabled_on',
+  oop_rasterization: 'enabled',
+  opengl: 'enabled_on',
+  rasterization: 'enabled_force',
+  skia_renderer: 'enabled_on',
+  video_decode: 'enabled',
+  vulkan: 'disabled_off',
+  webgl: 'enabled',
+  webgl2: 'enabled'
+} decodecaps [
+  {
+    profile: 'h264 baseline',
+    maxResolution: { width: 3840, height: 2160 },
+    minResolution: { width: 48, height: 48 }
+  },
+  {
+    profile: 'h264 main',
+    maxResolution: { width: 3840, height: 2160 },
+    minResolution: { width: 48, height: 48 }
+  },
+  {
+    profile: 'h264 high',
+    maxResolution: { width: 3840, height: 2160 },
+    minResolution: { width: 48, height: 48 }
+  },
+  {
+    profile: 'vp8',
+    maxResolution: { width: 3840, height: 2160 },
+    minResolution: { width: 48, height: 48 }
+  },
+  {
+    profile: 'vp9 profile0',
+    maxResolution: { width: 3840, height: 2176 },
+    minResolution: { width: 48, height: 48 }
+  }
+]
+properties [
+  { name: 'kFrameUrl', value: 'http://127.0.0.1:8770/' },
+  { name: 'kFrameTitle', value: 'ATOM' },
+  { name: 'kTextTracks', value: '[]' },
+  { name: 'kTotalBytes', value: '14290.0' },
+  { name: 'kIsStreaming', value: 'false' },
+  { name: 'kIsSingleOrigin', value: 'true' },
+  { name: 'kIsRangeHeaderSupported', value: 'true' },
+  { name: 'kAudioTracks', value: '[]' },
+  {
+    name: 'kVideoTracks',
+    value: '[{"alpha mode":"is_opaque","codec":"h264","coded size":"1920x1080","color space":"{primaries:BT709, transfer:BT709, matrix:BT709, range:LIMITED}","encryption scheme":"Unencrypted","has extra data":true,"hdr metadata":"unset","natural size":"1920x1080","orientation":"0°","profile":"h264 high","visible rect":"0,0 1920x1080"}]'
+  },
+  { name: 'kMaxDuration', value: '5.0' },
+  { name: 'kStartTime', value: '0.0' },
+  { name: 'kBitrate', value: '22864' },
+  { name: 'kIsVideoDecryptingDemuxerStream', value: 'false' },
+  { name: 'kVideoDecoderName', value: 'VDAVideoDecoder' },
+  { name: 'kIsPlatformVideoDecoder', value: 'true' },
+  { name: 'kResolution', value: '1920x1080' }
+]
+playback {
+  width: 1920,
+  height: 1080,
+  time: 0,
+  quality: { total: 450, dropped: 1 },
+  error: null
+}

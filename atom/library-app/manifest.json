@@ -1,0 +1,8 @@
+{
+  "id": "app-library",
+  "name": "应用库",
+  "description": "浏览全部已安装应用，选择放在桌面的作品，不删除应用或数据。",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "theme_ui": "controls"
+}

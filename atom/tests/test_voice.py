@@ -65,3 +65,9 @@ class VoiceTests(unittest.TestCase):
             with mock.patch.object(s,'_run',return_value=''),mock.patch.object(s,'_fan',return_value={'quiet':True}) as fan:
                 with self.assertRaises(ValueError):s.start(quiet_fan=True)
                 self.assertEqual(fan.call_args,mock.call('auto'))
+
+    def test_targeted_stop_cannot_stop_newer_recording(self):
+        with tempfile.TemporaryDirectory() as d:
+            s=voice.VoiceRecorder(d);s.recording_id='b'*32;s.process=mock.Mock();s.timer=mock.Mock()
+            self.assertTrue(s.stop('a'*32)['ignored'])
+            s.process.terminate.assert_not_called();s.timer.cancel.assert_not_called()

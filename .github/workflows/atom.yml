@@ -1,0 +1,36 @@
+name: ATOM checks
+on:
+  push:
+    paths: ['atom/**', 'README.md', 'AGENTS.md', '.github/workflows/atom.yml']
+  pull_request:
+    paths: ['atom/**', 'README.md', 'AGENTS.md', '.github/workflows/atom.yml']
+permissions:
+  contents: read
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: atom/package-lock.json
+      - run: npm --prefix atom ci
+      - run: cd atom && npx playwright install --with-deps chromium
+      - name: Device service
+        run: python3 -m unittest discover -s atom/tests
+      - name: Relay and source marketplace
+        run: |
+          python3 -m unittest discover -s atom/connect/relay -p 'test_*.py'
+          python3 -m unittest discover -s atom/connect/marketplace -p 'test_*.py'
+      - name: Computer companion and application runtime
+        run: |
+          npm --prefix atom run test:computer
+          npm --prefix atom run test:runtime
+      - name: Browser applications (fixture APIs)
+        run: npm --prefix atom run test:ui

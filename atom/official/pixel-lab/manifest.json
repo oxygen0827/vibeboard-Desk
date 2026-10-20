@@ -1,0 +1,1 @@
+{"id": "pixel-lab", "name": "像素实验室", "description": "亲手绘制生命细胞、重力沙粒与涟漪水面，探索真实规则的点阵世界。", "category": "play", "license": "MIT", "author": "ATOM", "entry": "index.html", "layout": "fullscreen", "icon": "icon.svg", "theme_ui": "controls"}

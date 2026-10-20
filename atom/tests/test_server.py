@@ -23,6 +23,12 @@ class APITests(unittest.TestCase):
         self.thread = threading.Thread(target=self.http.serve_forever, daemon=True); self.thread.start()
         self.url = 'http://127.0.0.1:' + str(self.http.server_port)
 
+    def test_expired_workshop_job_is_not_a_retryable_bad_request(self):
+        code,body=self.request('/api/workshop/jobs/'+'a'*32)
+        self.assertEqual(code,404)
+        self.assertIn('error',json.loads(body))
+        self.assertEqual(self.request('/api/workshop/jobs/invalid')[0],400)
+
     def tearDown(self):
         self.http.shutdown(); self.http.server_close(); self.temp.cleanup()
 
@@ -142,16 +148,16 @@ class APITests(unittest.TestCase):
 
     def test_workshop_and_theme_http_integration(self):
         import time
-        self.assertEqual(self.request('/api/workshop/generate', {'prompt':'make a timer','theme_id':'paper'})[0], 400)
+        self.assertEqual(self.request('/api/workshop/generate', {'prompt':'make a timer','theme_id':'system'})[0], 400)
         self.assertEqual(self.request('/api/workshop/jobs/unknown')[0], 400)
         self.assertEqual(self.request('/api/model-config', {'provider':'custom','base_url':'https://example.com/v1','model':'test','api_key':'test-only-secret'})[0], 200)
         public = self.request('/api/model-config')[1]
         self.assertNotIn(b'test-only-secret', public)
         self.assertTrue(json.loads(public)['api_key_set'])
-        self.assertEqual(self.request('/api/themes/activate', {'id':'terminal'})[0], 200)
+        self.assertEqual(self.request('/api/themes/activate', {'id':'system'})[0], 200)
         service = server.features(self.http)
         with mock.patch.object(service.workshop, '_call_model', return_value=json.dumps(self.package())):
-            code, body = self.request('/api/workshop/generate', {'prompt':'make demo','theme_id':'terminal'})
+            code, body = self.request('/api/workshop/generate', {'prompt':'make demo','theme_id':'system'})
             self.assertEqual(code, 200)
             job_id = json.loads(body)['job_id']
             for _ in range(100):
@@ -161,9 +167,9 @@ class APITests(unittest.TestCase):
             self.assertEqual(job['status'], 'ready')
         self.request('/api/developer', {'enabled':False})
         self.assertEqual(self.request('/api/workshop/install', {'job_id':job_id})[0], 200)
-        self.request('/api/themes/activate', {'id':'blueprint'})
+        self.request('/api/themes/activate', {'id':'system'})
         html = self.request('/user-apps/demo/index.html')[1]
-        self.assertIn(b'#101913', html)
+        self.assertIn(b'#f2f2f7', html)
         self.assertIn(b'data-atom-theme', html)
         self.assertEqual(self.request('/api/voice/transcribe', {'recording_id':'../../bad'})[0], 400)
 

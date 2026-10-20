@@ -1,50 +1,29 @@
-# Dependencies
-node_modules/
-
-# Database (runtime data)
-vibeboard.db
-
-# Logs
-*.log
-error.log
-output.log
-server.log
-
-# Test scripts (temporary)
-test-api.ps1
-test-ssh.py
-deploy-test.ps1
-verify-ui-click.mjs
-
-# Generated output (recreated by build)
-generated/
-runtime/*
-!runtime/start-kiosk.sh
-
-# Previews (generated at runtime)
-previews/
-
-# Debug screenshots
-*.png
-!mac-frame.png
-!market-apps/**/*.png
-ui-previews/
-
-# Test scripts
-test-*.ps1
-test-*.cjs
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# ATOM private runtime data and source caches
 __pycache__/
 *.pyc
 atom/apps/
 atom/state/
-atom/vendor/
 ._*
 
-# Bundled ATOM art and verification images are part of the release
-!atom/**/*.png
+atom/vendor/
+
+# ATOM Connect generated desktop packages and private test state
+atom/connect/dist/
+*.sqlite3
+*.sqlite3-wal
+*.sqlite3-shm
+
+# Per-developer dependencies, private configuration and recoverable device state
+node_modules/
+.env
+.env.*
+!.env.example
+*.sqlite
+*.db
+*.key
+*.pem
+*.p12
+*.pfx
+*.tar.gz
+*.tgz
+*.backup
+.DS_Store

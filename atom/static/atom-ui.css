@@ -1,19 +1,19 @@
 /* ATOM shared application primitives. No network fonts or decorative effects. */
-:root{--atom-paper:#f3f0e8;--atom-ink:#242622;--atom-accent:#df5038;--atom-muted:#787a70;--atom-action:#b53c28;--atom-secondary-text:#62665d;--atom-line:#d5d3c8;--atom-space:8px;--atom-radius:6px;--atom-font:system-ui,-apple-system,BlinkMacSystemFont,"Noto Sans CJK SC","Microsoft YaHei",sans-serif;--atom-mono:ui-monospace,SFMono-Regular,Consolas,monospace}
+:root{--atom-paper:#f2f2f7;--atom-ink:#1c1c1e;--atom-accent:#007aff;--atom-muted:#6c6c70;--atom-action:#0066d6;--atom-secondary-text:#6c6c70;--atom-line:#d9d9df;--atom-space:8px;--atom-radius:13px;--atom-font:system-ui,-apple-system,BlinkMacSystemFont,"Noto Sans CJK SC","Microsoft YaHei",sans-serif;--atom-mono:ui-monospace,SFMono-Regular,Consolas,monospace}
 html,body{width:100%;height:100%;margin:0;overflow:hidden}
 .atom-app{box-sizing:border-box;background:var(--atom-paper);color:var(--atom-ink);font:400 16px/1.5 var(--atom-font);padding:16px;margin:0;height:100vh;min-height:0;overflow:hidden;display:flex;flex-direction:column}
 .atom-scroll,[data-atom-scroll]{min-height:0;overflow:auto;overscroll-behavior:contain;flex:1;touch-action:pan-y}
 .atom-app *{box-sizing:border-box}
-.atom-app h1{font-size:24px;line-height:1.25;margin:0 0 16px;font-weight:600}
+.atom-app h1{font-size:24px;line-height:1.25;margin:0 0 16px;font-weight:700}
 .atom-app p{margin:0 0 16px}
-.atom-button{appearance:none;font:600 16px/1.25 var(--atom-font);min-height:48px;padding:8px 16px;border:1px solid var(--atom-ink);border-radius:var(--atom-radius);background:transparent;color:var(--atom-ink);cursor:pointer;touch-action:manipulation}
+.atom-button{appearance:none;font:600 16px/1.25 var(--atom-font);min-height:48px;padding:8px 16px;border:0;border-radius:var(--atom-radius);background:var(--atom-card,#fff);color:var(--atom-accent);cursor:pointer;touch-action:manipulation}
 .atom-button:focus-visible{outline:2px solid var(--atom-accent);outline-offset:3px}
 .atom-button:active{background:var(--atom-line)}
 .atom-button:disabled{opacity:.45;cursor:default}
 .atom-button-primary{background:var(--atom-action);color:var(--atom-paper);border-color:var(--atom-action)}
 .atom-button-primary:active{background:var(--atom-ink);border-color:var(--atom-ink)}
 .atom-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0}
-.atom-panel{border:1px solid var(--atom-line);border-radius:0;padding:16px;margin:16px 0}
+.atom-panel{border:0;background:var(--atom-card,#fff);border-radius:16px;padding:16px;margin:16px 0}
 .atom-label{color:var(--atom-secondary-text);font:400 12px/1.5 var(--atom-font)}
 .atom-number{font-family:var(--atom-mono);font-variant-numeric:tabular-nums;line-height:1.1}
 .atom-message{font-size:14px;line-height:1.5;border-left:2px solid var(--atom-accent);padding:8px 0 8px 8px;margin:16px 0}

@@ -1,0 +1,352 @@
+{
+  "pages": [
+    {
+      "page": "PAGE 01 / 09",
+      "tiles": [
+        {
+          "id": "clock",
+          "tone": "silver",
+          "bg": "linear-gradient(145deg, rgb(255, 255, 255), rgb(247, 248, 251))"
+        },
+        {
+          "id": "timer",
+          "tone": "orange",
+          "bg": "linear-gradient(145deg, rgb(255, 188, 80), rgb(248, 137, 32))"
+        },
+        {
+          "id": "notes",
+          "tone": "yellow",
+          "bg": "linear-gradient(145deg, rgb(255, 218, 98), rgb(239, 182, 41))"
+        },
+        {
+          "id": "workshop",
+          "tone": "violet",
+          "bg": "linear-gradient(145deg, rgb(160, 148, 255), rgb(115, 96, 221))"
+        },
+        {
+          "id": "themes",
+          "tone": "pink",
+          "bg": "linear-gradient(145deg, rgb(251, 162, 189), rgb(222, 109, 157))"
+        },
+        {
+          "id": "status",
+          "tone": "cyan",
+          "bg": "linear-gradient(145deg, rgb(101, 214, 219), rgb(38, 159, 174))"
+        }
+      ],
+      "animation": "none"
+    },
+    {
+      "page": "PAGE 02 / 09",
+      "tiles": [
+        {
+          "id": "settings",
+          "tone": "silver",
+          "bg": "linear-gradient(145deg, rgb(245, 247, 252), rgb(215, 224, 237))"
+        },
+        {
+          "id": "developer",
+          "tone": "indigo",
+          "bg": "linear-gradient(145deg, rgb(132, 159, 241), rgb(81, 109, 197))"
+        },
+        {
+          "id": "manager",
+          "tone": "blue",
+          "bg": "linear-gradient(145deg, rgb(64, 159, 255), rgb(22, 101, 227))"
+        },
+        {
+          "id": "breathe",
+          "tone": "green",
+          "bg": "linear-gradient(145deg, rgb(105, 212, 143), rgb(32, 166, 104))"
+        },
+        {
+          "id": "focus-studio",
+          "tone": "orange",
+          "bg": "linear-gradient(145deg, rgb(255, 188, 80), rgb(248, 137, 32))"
+        },
+        {
+          "id": "idea-card",
+          "tone": "violet",
+          "bg": "linear-gradient(145deg, rgb(160, 148, 255), rgb(115, 96, 221))"
+        }
+      ],
+      "animation": "none"
+    },
+    {
+      "page": "PAGE 03 / 09",
+      "tiles": [
+        {
+          "id": "local-music",
+          "tone": "pink",
+          "bg": "linear-gradient(145deg, rgb(251, 162, 189), rgb(222, 109, 157))"
+        },
+        {
+          "id": "particle-lab",
+          "tone": "pink",
+          "bg": "linear-gradient(145deg, rgb(251, 162, 189), rgb(222, 109, 157))"
+        },
+        {
+          "id": "tea-brew-timer",
+          "tone": "green",
+          "bg": "linear-gradient(145deg, rgb(105, 212, 143), rgb(32, 166, 104))"
+        },
+        {
+          "id": "template-info",
+          "tone": "blue",
+          "bg": "linear-gradient(145deg, rgb(64, 159, 255), rgb(22, 101, 227))"
+        },
+        {
+          "id": "template-music",
+          "tone": "pink",
+          "bg": "linear-gradient(145deg, rgb(251, 162, 189), rgb(222, 109, 157))"
+        },
+        {
+          "id": "template-playful",
+          "tone": "cyan",
+          "bg": "linear-gradient(145deg, rgb(101, 214, 219), rgb(38, 159, 174))"
+        }
+      ],
+      "animation": "none"
+    },
+    {
+      "page": "PAGE 04 / 09",
+      "tiles": [
+        {
+          "id": "template-tool",
+          "tone": "green",
+          "bg": "linear-gradient(145deg, rgb(105, 212, 143), rgb(32, 166, 104))"
+        },
+        {
+          "id": "water-counter-demo",
+          "tone": "cyan",
+          "bg": "linear-gradient(145deg, rgb(101, 214, 219), rgb(38, 159, 174))"
+        },
+        {
+          "id": "cosmic-window",
+          "tone": "violet",
+          "bg": "linear-gradient(145deg, rgb(160, 148, 255), rgb(115, 96, 221))"
+        },
+        {
+          "id": "alien-creature",
+          "tone": "orange",
+          "bg": "linear-gradient(145deg, rgb(255, 188, 80), rgb(248, 137, 32))"
+        },
+        {
+          "id": "fluid-atlas",
+          "tone": "cyan",
+          "bg": "linear-gradient(145deg, rgb(101, 214, 219), rgb(38, 159, 174))"
+        },
+        {
+          "id": "planetarium",
+          "tone": "violet",
+          "bg": "linear-gradient(145deg, rgb(160, 148, 255), rgb(115, 96, 221))"
+        }
+      ],
+      "animation": "none"
+    },
+    {
+      "page": "PAGE 05 / 09",
+      "tiles": [
+        {
+          "id": "water-pool",
+          "tone": "cyan",
+          "bg": "linear-gradient(145deg, rgb(101, 214, 219), rgb(38, 159, 174))"
+        },
+        {
+          "id": "fluid-paint",
+          "tone": "cyan",
+          "bg": "linear-gradient(145deg, rgb(101, 214, 219), rgb(38, 159, 174))"
+        },
+        {
+          "id": "volume-flow",
+          "tone": "blue",
+          "bg": "linear-gradient(145deg, rgb(64, 159, 255), rgb(22, 101, 227))"
+        },
+        {
+          "id": "living-pattern",
+          "tone": "cyan",
+          "bg": "linear-gradient(145deg, rgb(101, 214, 219), rgb(38, 159, 174))"
+        },
+        {
+          "id": "moon-ocean",
+          "tone": "cyan",
+          "bg": "linear-gradient(145deg, rgb(101, 214, 219), rgb(38, 159, 174))"
+        },
+        {
+          "id": "physics-playground",
+          "tone": "indigo",
+          "bg": "linear-gradient(145deg, rgb(132, 159, 241), rgb(81, 109, 197))"
+        }
+      ],
+      "animation": "none"
+    },
+    {
+      "page": "PAGE 06 / 09",
+      "tiles": [
+        {
+          "id": "pocket-studio",
+          "tone": "pink",
+          "bg": "linear-gradient(145deg, rgb(251, 162, 189), rgb(222, 109, 157))"
+        },
+        {
+          "id": "model-viewer",
+          "tone": "cyan",
+          "bg": "linear-gradient(145deg, rgb(101, 214, 219), rgb(38, 159, 174))"
+        },
+        {
+          "id": "math-playground",
+          "tone": "cyan",
+          "bg": "linear-gradient(145deg, rgb(101, 214, 219), rgb(38, 159, 174))"
+        },
+        {
+          "id": "music-vision",
+          "tone": "pink",
+          "bg": "linear-gradient(145deg, rgb(251, 162, 189), rgb(222, 109, 157))"
+        },
+        {
+          "id": "rhythm-orbits",
+          "tone": "pink",
+          "bg": "linear-gradient(145deg, rgb(251, 162, 189), rgb(222, 109, 157))"
+        },
+        {
+          "id": "clay-studio",
+          "tone": "violet",
+          "bg": "linear-gradient(145deg, rgb(160, 148, 255), rgb(115, 96, 221))"
+        }
+      ],
+      "animation": "none"
+    },
+    {
+      "page": "PAGE 07 / 09",
+      "tiles": [
+        {
+          "id": "parametric-maker",
+          "tone": "pink",
+          "bg": "linear-gradient(145deg, rgb(251, 162, 189), rgb(222, 109, 157))"
+        },
+        {
+          "id": "circuit-lab",
+          "tone": "orange",
+          "bg": "linear-gradient(145deg, rgb(255, 188, 80), rgb(248, 137, 32))"
+        },
+        {
+          "id": "material-world",
+          "tone": "pink",
+          "bg": "linear-gradient(145deg, rgb(251, 162, 189), rgb(222, 109, 157))"
+        },
+        {
+          "id": "fold-lab",
+          "tone": "blue",
+          "bg": "linear-gradient(145deg, rgb(64, 159, 255), rgb(22, 101, 227))"
+        },
+        {
+          "id": "dot-life",
+          "tone": "green",
+          "bg": "linear-gradient(145deg, rgb(105, 212, 143), rgb(32, 166, 104))"
+        },
+        {
+          "id": "dot-image",
+          "tone": "indigo",
+          "bg": "linear-gradient(145deg, rgb(132, 159, 241), rgb(81, 109, 197))"
+        }
+      ],
+      "animation": "none"
+    },
+    {
+      "page": "PAGE 08 / 09",
+      "tiles": [
+        {
+          "id": "dot-waves",
+          "tone": "indigo",
+          "bg": "linear-gradient(145deg, rgb(132, 159, 241), rgb(81, 109, 197))"
+        },
+        {
+          "id": "dot-theater",
+          "tone": "indigo",
+          "bg": "linear-gradient(145deg, rgb(132, 159, 241), rgb(81, 109, 197))"
+        },
+        {
+          "id": "robo-face",
+          "tone": "orange",
+          "bg": "linear-gradient(145deg, rgb(255, 188, 80), rgb(248, 137, 32))"
+        },
+        {
+          "id": "kaia-face",
+          "tone": "orange",
+          "bg": "linear-gradient(145deg, rgb(255, 188, 80), rgb(248, 137, 32))"
+        },
+        {
+          "id": "pixel-companion",
+          "tone": "orange",
+          "bg": "linear-gradient(145deg, rgb(255, 188, 80), rgb(248, 137, 32))"
+        },
+        {
+          "id": "snappy-face",
+          "tone": "orange",
+          "bg": "linear-gradient(145deg, rgb(255, 188, 80), rgb(248, 137, 32))"
+        }
+      ],
+      "animation": "none"
+    },
+    {
+      "page": "PAGE 09 / 09",
+      "tiles": [
+        {
+          "id": "practice-seven",
+          "tone": "orange",
+          "bg": "linear-gradient(145deg, rgb(255, 188, 80), rgb(248, 137, 32))"
+        },
+        {
+          "id": "weather-poster",
+          "tone": "pink",
+          "bg": "linear-gradient(145deg, rgb(251, 162, 189), rgb(222, 109, 157))"
+        },
+        {
+          "id": "mic-test",
+          "tone": "indigo",
+          "bg": "linear-gradient(145deg, rgb(132, 159, 241), rgb(81, 109, 197))"
+        },
+        {
+          "id": "tomato-focus-timer",
+          "tone": "orange",
+          "bg": "linear-gradient(145deg, rgb(255, 188, 80), rgb(248, 137, 32))"
+        },
+        {
+          "id": "cool-digital-clock",
+          "tone": "cyan",
+          "bg": "linear-gradient(145deg, rgb(101, 214, 219), rgb(38, 159, 174))"
+        },
+        {
+          "id": "stickman-dance",
+          "tone": "cyan",
+          "bg": "linear-gradient(145deg, rgb(101, 214, 219), rgb(38, 159, 174))"
+        }
+      ],
+      "animation": "none"
+    }
+  ],
+  "apps": [
+    {
+      "id": "practice-seven",
+      "home": {
+        "renders": 1,
+        "page": "PAGE 09 / 09"
+      }
+    },
+    {
+      "id": "fluid-atlas",
+      "home": {
+        "renders": 1,
+        "page": "PAGE 04 / 09"
+      }
+    },
+    {
+      "id": "pixel-companion",
+      "home": {
+        "renders": 1,
+        "page": "PAGE 08 / 09"
+      }
+    }
+  ],
+  "errors": []
+}

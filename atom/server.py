@@ -20,18 +20,45 @@ from urllib.parse import urlsplit, unquote
 BASE = Path(__file__).resolve().parent
 if str(BASE) not in sys.path: sys.path.insert(0, str(BASE))
 from app_icons import ensure_icon, validate_svg, theme_glyph
+from relay_bridge import DeviceBridge, BridgeError
 MAX_BODY = 2 * 1024 * 1024
 ID = re.compile(r'^[a-z][a-z0-9_-]{0,47}$')
 BUILTINS = [dict(id='clock', name='时钟', description='桌面时钟', entry='/#clock'), dict(id='timer', name='计时器', description='倒计时提醒', entry='/#timer'), dict(id='status', name='设备状态', description='系统与连接状态', entry='/#status')]
-RESERVED_IDS = {a['id'] for a in BUILTINS} | {'notes', 'settings', 'developer', 'manager', 'home', 'widgets', 'workshop', 'themes'}
+TRUSTED_CLIENT_IDS = {'my-computer', 'market', 'quick-notes', 'today', 'task-pal', 'app-library'}
+RESERVED_IDS = {a['id'] for a in BUILTINS} | {'notes', 'settings', 'developer', 'manager', 'home', 'widgets', 'workshop', 'themes', 'my-computer', 'connect-preview', 'market', 'quick-notes', 'today', 'task-pal', 'app-library'}
 LOCK = threading.Lock()
 FEATURE_LOCK = threading.Lock()
 
 
-def validate_generated(bundle):
+def validate_generated(bundle, trusted_connect=False):
     with tempfile.TemporaryDirectory() as folder:
-        install_app(Path(folder).resolve() / 'apps', bundle)
+        install_app(Path(folder).resolve() / 'apps', bundle, trusted_connect=trusted_connect)
     return bundle
+
+
+def connect_app_bundle(bridge, data):
+    result = bridge.execute('artifact', {'task_id': data.get('task_id')})
+    return validate_delivery_bundle(result.get('artifact'))
+
+def validate_delivery_bundle(bundle, trusted_connect=False, maximum=96*1024):
+    bundle = json.loads(json.dumps(bundle))
+    if not isinstance(bundle, dict) or not isinstance(bundle.get('manifest'), dict) or not isinstance(bundle.get('files'), dict):
+        raise ValueError('电脑尚未提供可安装的应用')
+    if len(json.dumps(bundle, ensure_ascii=False).encode('utf-8')) > maximum:
+        raise ValueError('应用交付包过大')
+    manifest = bundle['manifest']
+    if manifest.get('icon') != 'icon.svg': raise ValueError('应用必须包含自己的图标')
+    icon = bundle['files'].get('icon.svg')
+    validate_svg(icon)
+    import xml.etree.ElementTree as ET
+    root = ET.fromstring(icon)
+    if root.get('viewBox') != '0 0 64 64': raise ValueError('应用图标必须使用 64×64 画布')
+    for node in root.iter():
+        for key in ('fill','stroke','color'):
+            if key in node.attrib and node.attrib[key] not in ('none','currentColor'): raise ValueError('应用图标颜色应跟随系统主题')
+    manifest.pop('theme_mode', None)
+    manifest.pop('theme_id', None)
+    return validate_generated(bundle, trusted_connect=trusted_connect)
 
 
 def features(http):
@@ -46,6 +73,11 @@ def features(http):
             http.workshop = Workshop(state, validate_generated, http.theme_store.css)
             http.voice = VoiceRecorder(state)
             http.speech = SpeechPlayer(state)
+            http.connect = DeviceBridge(state)
+            from market_client import MarketClient
+            http.market = MarketClient(state, http.connect)
+            from release_store import ReleaseStore
+            http.releases = ReleaseStore(state / 'app-releases')
     return http
 
 
@@ -113,10 +145,10 @@ def relative_path(value):
     return path
 
 
-def validate_manifest(value):
+def validate_manifest(value, trusted_connect=False):
     if not isinstance(value, dict) or not isinstance(value.get('id'), str) or not ID.fullmatch(value['id']):
         raise ValueError('invalid app id')
-    if value['id'] in RESERVED_IDS:
+    if value['id'] in RESERVED_IDS and not (trusted_connect and value['id'] in TRUSTED_CLIENT_IDS):
         raise ValueError('reserved app id')
     if not isinstance(value.get('name'), str) or not 1 <= len(value['name']) <= 80:
         raise ValueError('invalid app name')
@@ -127,6 +159,10 @@ def validate_manifest(value):
     if 'icon' in value and value['icon'] != 'icon.svg': raise ValueError('icon must be icon.svg')
     result = dict(id=value['id'], name=value['name'], description=value.get('description', ''), entry='index.html')
     if 'icon' in value: result['icon'] = value['icon']
+    if 'capabilities' in value:
+        caps = value['capabilities']
+        if not isinstance(caps,list) or len(caps)>3 or any(not isinstance(c,str) or c not in ('notes','agenda','task-state') for c in caps) or len(set(caps))!=len(caps): raise ValueError('invalid app capabilities')
+        result['capabilities'] = caps
     if 'theme_ui' in value:
         if value['theme_ui'] != 'controls': raise ValueError('invalid theme_ui')
         result['theme_ui'] = 'controls'
@@ -148,10 +184,10 @@ def ensure_safe_root(root):
         raise ValueError('symlink parent')
 
 
-def install_app(root, data, update=False):
+def install_app(root, data, update=False, trusted_connect=False):
     provided_icon = isinstance(data,dict) and isinstance(data.get('manifest'),dict) and 'icon' in data['manifest']
     data = ensure_icon(data)
-    manifest = validate_manifest(data.get('manifest'))
+    manifest = validate_manifest(data.get('manifest'), trusted_connect=trusted_connect)
     files = data.get('files')
     if not isinstance(files, dict) or not 1 <= len(files) <= 100 or 'index.html' not in files:
         raise ValueError('files must include index.html')
@@ -232,7 +268,7 @@ def apps(root):
                 if path.is_symlink() or path.stat().st_size > 4096:
                     continue
                 raw = json.loads(path.read_text(encoding='utf-8'))
-                item = validate_manifest(raw)
+                item = validate_manifest(raw, trusted_connect=child.name in TRUSTED_CLIENT_IDS)
                 stamp = raw.get('_installed_at_ns', path.stat().st_mtime_ns)
                 if not isinstance(stamp, int): stamp = path.stat().st_mtime_ns
                 if item['id'] != child.name:
@@ -243,6 +279,7 @@ def apps(root):
                     if not icon_file.is_symlink() and icon_file.is_file() and icon_file.stat().st_size <= 32768:
                         item['icon_svg'] = theme_glyph(icon_file.read_text(encoding='utf-8'))
                     item['icon'] = '/user-apps/' + item['id'] + '/icon.svg'
+                item['installation_id'] = str(stamp)
                 installed.append((stamp, item))
             except (ValueError, OSError, TypeError):
                 continue
@@ -306,7 +343,7 @@ def system_status():
 class Handler(SimpleHTTPRequestHandler):
     def end_headers(self):
         # System shell changes must not retain an obsolete bridge or keyboard handler.
-        if urlsplit(self.path).path in ('/', '/index.html', '/app.js', '/home-key.js', '/style.css', '/app-runtime.js', '/app-host.js', '/companion.js'):
+        if urlsplit(self.path).path in ('/', '/index.html', '/app.js', '/home-key.js', '/style.css', '/app-runtime.js', '/app-host.js', '/companion.js', '/system-appearance.css', '/app-appearance.css', '/theme-controls.css', '/atom-ui.css'):
             self.send_header('Cache-Control', 'no-store')
         # Public application assets must load inside opaque-origin sandbox frames.
         if self.command in ('GET', 'HEAD') and urlsplit(self.path).path.startswith('/user-apps/'):
@@ -332,10 +369,11 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         path = urlsplit(self.path).path
-        if path in ('/api/themes', '/api/model-config', '/api/voice/status', '/api/voice/speech-status') or path.startswith('/api/workshop/jobs/'):
+        if path in ('/api/themes', '/api/model-config', '/api/voice/status', '/api/voice/speech-status', '/api/connect/state') or path.startswith('/api/workshop/jobs/'):
             service = features(self.server)
             try:
-                if path == '/api/themes': result = service.theme_store.list_themes()
+                if path == '/api/connect/state': result = service.connect.state()
+                elif path == '/api/themes': result = service.theme_store.list_themes()
                 elif path == '/api/model-config': result = service.workshop.public_config()
                 elif path == '/api/voice/speech-status': result = service.speech.public_status()
                 elif path == '/api/voice/status':
@@ -346,7 +384,8 @@ class Handler(SimpleHTTPRequestHandler):
                     result['tts_configured'] = bool(config['tts_api_key_set'] and config['tts_base_url'] and config['tts_model'])
                 else: result = service.workshop.get_job(path.rsplit('/', 1)[-1])
                 self.json_response(200, result)
-            except (ValueError, KeyError, TypeError): self.json_response(400, dict(error='请求无效或任务不存在'))
+            except KeyError: self.json_response(404, dict(error='生成任务不存在或已失效'))
+            except (ValueError, TypeError): self.json_response(400, dict(error='请求无效'))
         elif path == '/api/health':
             self.json_response(200, dict(ok=True, service='atom', version='0.5.0'))
         elif path == '/api/status':
@@ -396,7 +435,8 @@ class Handler(SimpleHTTPRequestHandler):
                 try: css = service.theme_store.css(theme_id)
                 except ValueError: css = service.theme_store.css()
                 policy = 'html,body{height:100%!important;max-width:100%;margin:0;overflow:hidden!important;box-sizing:border-box}.atom-scroll,[data-atom-scroll]{min-height:0;overflow-y:auto;overscroll-behavior:contain}'
-                if manifest.get('theme_ui') == 'controls': policy += (BASE / 'static' / 'theme-controls.css').read_text(encoding='utf-8')
+                appearance = 'theme-controls.css' if manifest.get('theme_ui') == 'controls' else 'app-appearance.css'
+                policy += (BASE / 'static' / appearance).read_text(encoding='utf-8')
                 style = '<style data-atom-theme>' + css + policy + '</style>'
                 content = content.replace('</head>', style + '</head>', 1) if '</head>' in content else style + content
                 runtime = '<script src="/app-runtime.js"></script>'
@@ -426,7 +466,67 @@ class Handler(SimpleHTTPRequestHandler):
             if not isinstance(data, dict):
                 raise ValueError('JSON object required')
             path = urlsplit(self.path).path
-            if path.startswith('/api/themes/') or path.startswith('/api/workshop/') or path.startswith('/api/voice/') or path == '/api/model-config':
+            if path.startswith('/api/market/'):
+                action = path.rsplit('/', 1)[-1]
+                service = features(self.server)
+                if action == 'rollback':
+                    if not read_settings(self.server.settings_path)['enabled']:
+                        self.json_response(403, dict(error='请先开启开发模式')); return
+                    if data.get('confirm') is not True: raise ValueError('请确认恢复应用资源')
+                    app_id = data.get('app_id')
+                    if app_id in TRUSTED_CLIENT_IDS and app_id not in ('today','task-pal'): raise ValueError('系统入口不能通过市场回滚')
+                    previous = service.releases.read(app_id, data.get('release_id'))
+                    if previous.get('manifest', {}).get('id') != app_id: raise ValueError('恢复副本与应用不匹配')
+                    bundle = validate_delivery_bundle(previous, trusted_connect=app_id in ('today','task-pal'), maximum=2*1024*1024)
+                    service.releases.capture(self.server.apps_root, app_id)
+                    result = dict(ok=True, app=install_app(self.server.apps_root, bundle, update=True, trusted_connect=app_id in ('today','task-pal')))
+                elif action in ('preview','install','install-state'):
+
+                    if action == 'install' and not read_settings(self.server.settings_path)['enabled']:
+                        self.json_response(403, dict(error='请先在系统设置中开启开发模式')); return
+                    source = service.market.execute('source', data)
+                    source_id = source.get('bundle', {}).get('manifest', {}).get('id')
+                    trusted = source.get('official') is True and source_id in {'today','task-pal'}
+                    bundle = validate_delivery_bundle(source.get('bundle'), trusted_connect=trusted, maximum=1024*1024)
+                    if action == 'preview': result = dict(bundle=bundle)
+                    elif action == 'install-state': result = dict(installed=(self.server.apps_root / bundle['manifest']['id']).is_dir(), app_id=bundle['manifest']['id'], history=service.releases.history(bundle['manifest']['id']))
+                    else:
+
+                        if data.get('confirm') is not True: raise ValueError('请确认安装应用')
+                        app_id = bundle['manifest']['id']
+                        if data.get('update') is True:
+                            installed_source = self.server.apps_root / app_id / 'ATOM-SOURCE.json'
+                            if installed_source.is_symlink(): raise ValueError('应用来源路径无效')
+                            if installed_source.is_file():
+                                origin = json.loads(installed_source.read_text(encoding='utf-8'))
+                                if origin.get('version', {}).get('work_id') != source.get('version', {}).get('work_id'): raise ValueError('此应用来自其他作品，不能覆盖')
+                            elif not trusted: raise ValueError('已有应用没有此作品的来源记录，不能覆盖')
+                            service.releases.capture(self.server.apps_root, app_id)
+                        bundle['files']['ATOM-SOURCE.json'] = json.dumps({k:source.get(k) for k in ('version','license','author','parent_id','parent_version_id','official')}, ensure_ascii=False)
+                        result = dict(ok=True, app=install_app(self.server.apps_root, bundle, update=data.get('update') is True, trusted_connect=trusted))
+                else: result = service.market.execute(action, data)
+                self.json_response(200, result)
+            elif path.startswith('/api/connect/'):
+
+                action = path.rsplit('/',1)[-1]
+                bridge = features(self.server).connect
+                if action == 'client-update':
+                    if not read_settings(self.server.settings_path)['enabled']:
+                        self.json_response(403, dict(error='developer mode required')); return
+                    if not isinstance(data.get('bundle'), dict) or data['bundle'].get('manifest', {}).get('id') not in TRUSTED_CLIENT_IDS:
+                        raise ValueError('only reviewed Connect client updates are accepted here')
+                    result = dict(ok=True, app=install_app(self.server.apps_root, data['bundle'], update=data.get('update') is not False, trusted_connect=True))
+                elif action in ('preview-app','install-app'):
+                    if action == 'install-app' and not read_settings(self.server.settings_path)['enabled']:
+                        self.json_response(403, dict(error='请先在系统设置中开启开发模式')); return
+                    bundle = connect_app_bundle(bridge, data)
+                    if action == 'preview-app': result = dict(bundle=bundle)
+                    else:
+                        if data.get('update'): raise ValueError('已有应用不会被自动覆盖，请使用新的应用名称和标识')
+                        result = dict(ok=True, app=install_app(self.server.apps_root, bundle, update=False))
+                else: result = bridge.execute(action, data)
+                self.json_response(200, result)
+            elif path.startswith('/api/themes/') or path.startswith('/api/workshop/') or path.startswith('/api/voice/') or path == '/api/model-config':
                 service = features(self.server)
                 if path == '/api/themes/activate': result = service.theme_store.activate(data.get('id'))
                 elif path == '/api/themes/install':
@@ -463,7 +563,7 @@ class Handler(SimpleHTTPRequestHandler):
                     if service.voice.public_status()['recording']: raise ValueError('请先结束录音再朗读')
                     result = service.speech.start(service.workshop.read_private_config(), data.get('text'))
                 elif path == '/api/voice/speech-stop': result = service.speech.stop(data.get('speech_id'))
-                elif path == '/api/voice/stop': result = service.voice.stop()
+                elif path == '/api/voice/stop': result = service.voice.stop(data.get('recording_id'))
                 elif path == '/api/voice/transcribe':
                     from stt import transcribe
                     recording = service.voice.recording_path(data.get('recording_id'))
@@ -498,6 +598,8 @@ class Handler(SimpleHTTPRequestHandler):
                 self.json_response(200, dict(ok=True, volume=volume))
             else:
                 self.json_response(404, dict(error='unknown endpoint'))
+        except BridgeError as exc:
+            self.json_response(exc.status, dict(error=str(exc), code=exc.code, **({'current':exc.current} if hasattr(exc,'current') else {})))
         except (KeyError, TypeError):
             self.json_response(400, dict(error='请求参数无效或任务不存在'))
         except (ValueError, UnicodeDecodeError) as exc:

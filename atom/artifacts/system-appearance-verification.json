@@ -1,0 +1,50 @@
+{
+  "themes": {
+    "active": "system",
+    "themes": [
+      {
+        "id": "system",
+        "name": "系统外观",
+        "description": "清晰排版、圆润控件与统一应用体验",
+        "tokens": {
+          "bg": "#f2f2f7",
+          "ink": "#1c1c1e",
+          "accent": "#007aff",
+          "action": "#0066d6",
+          "muted": "#6c6c70",
+          "line": "#d9d9df",
+          "card": "#ffffff"
+        },
+        "builtin": true,
+        "icons": {
+          "surface": "card",
+          "foreground": "accent",
+          "border": "transparent",
+          "radius": 16,
+          "stroke": 2.2,
+          "border_style": "none",
+          "overrides": {}
+        }
+      }
+    ]
+  },
+  "pages": [
+    {
+      "id": "settings",
+      "fit": true
+    },
+    {
+      "id": "themes",
+      "fit": true
+    },
+    {
+      "id": "workshop",
+      "fit": true
+    },
+    {
+      "id": "status",
+      "fit": true
+    }
+  ],
+  "errors": []
+}

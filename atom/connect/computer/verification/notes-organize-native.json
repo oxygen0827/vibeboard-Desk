@@ -1,0 +1,21 @@
+{
+  "origin": "http://127.0.0.1:64879",
+  "native": true,
+  "model": "actual Codex",
+  "job_id": "1ed7c9c2-f31a-45fd-9c9c-196e965f0160",
+  "status": "completed",
+  "boundary": {
+    "tools": [],
+    "additional_tools": 0,
+    "tool_choice": "none",
+    "model": "gpt-6.1-sol"
+  },
+  "source_note_unchanged": true,
+  "source_revision_unchanged": true,
+  "todo_candidates": 2,
+  "event_candidates": 1,
+  "selected_count": 2,
+  "apply_idempotent": true,
+  "agenda_synced": true,
+  "source_sha256": "f61e4d9a278eca7e23e89e3b4bbeeaf17ddef9dbfc699c0f421ece6cc2953d8f"
+}

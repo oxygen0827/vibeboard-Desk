@@ -1,0 +1,1 @@
+{"id": "quick-notes", "name": "随手记", "description": "随手记录，离线保留修改，登录后与电脑工作台同步。", "entry": "index.html", "layout": "fullscreen", "icon": "icon.svg", "theme_ui": "controls", "capabilities": ["notes"]}

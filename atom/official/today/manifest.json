@@ -1,0 +1,12 @@
+{
+  "id": "today",
+  "name": "今日",
+  "description": "电脑与设备共享日程和待办，支持本机离线队列与修改冲突处理。",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "theme_ui": "controls",
+  "layout": "fullscreen",
+  "capabilities": [
+    "agenda"
+  ]
+}

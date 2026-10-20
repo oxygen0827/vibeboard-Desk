@@ -1,0 +1,9 @@
+{
+  "id": "sound-lab",
+  "name": "声音实验室",
+  "description": "四轨十六步节拍器，轻点编排，保存自己的声音实验。",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "theme_ui": "controls",
+  "layout": "fullscreen"
+}

@@ -1,0 +1,1 @@
+{"id": "task-pal", "name": "任务伙伴", "description": "以可爱的状态伙伴呈现电脑任务的真实执行、审批与完成状态。", "category": "connect", "license": "MIT", "author": "ATOM", "entry": "index.html", "layout": "fullscreen", "icon": "icon.svg", "theme_ui": "controls", "capabilities": ["task-state"]}

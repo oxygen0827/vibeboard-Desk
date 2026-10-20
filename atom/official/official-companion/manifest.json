@@ -1,0 +1,1 @@
+{"id": "official-companion", "name": "云朵伙伴", "description": "会跟随视线、回应轻点的原创桌面表情。三种心情，安静陪伴。", "category": "companion", "license": "MIT", "author": "ATOM", "entry": "index.html", "layout": "fullscreen", "icon": "icon.svg", "theme_ui": "controls"}

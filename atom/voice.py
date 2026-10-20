@@ -96,8 +96,11 @@ class VoiceRecorder:
         with self.lock:
             if self.recording_id==recording_id: self.stop()
 
-    def stop(self):
+    def stop(self, recording_id=None):
         with self.lock:
+            if recording_id is not None:
+                if not isinstance(recording_id,str) or not RECORDING_ID.fullmatch(recording_id):raise ValueError('invalid recording id')
+                if recording_id!=self.recording_id:return dict(recording=self.process is not None,recording_id=self.recording_id,ignored=True)
             if self.timer: self.timer.cancel(); self.timer=None
             process=self.process
             if process:

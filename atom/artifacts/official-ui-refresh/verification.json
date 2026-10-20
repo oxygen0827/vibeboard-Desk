@@ -1,0 +1,78 @@
+{
+  "apps": [
+    {
+      "id": "today",
+      "width": 480,
+      "height": 360,
+      "bar": "none",
+      "region": [
+        "list"
+      ]
+    },
+    {
+      "id": "quick-notes",
+      "width": 480,
+      "height": 360,
+      "bar": "none",
+      "region": [
+        "scroll"
+      ]
+    },
+    {
+      "id": "official-companion",
+      "width": 480,
+      "height": 360,
+      "bar": "none",
+      "region": []
+    },
+    {
+      "id": "sound-lab",
+      "width": 480,
+      "height": 360,
+      "bar": "none",
+      "region": []
+    },
+    {
+      "id": "pixel-lab",
+      "width": 480,
+      "height": 360,
+      "bar": "none",
+      "region": []
+    },
+    {
+      "id": "task-pal",
+      "width": 480,
+      "height": 360,
+      "bar": "none",
+      "region": [
+        "scroll"
+      ]
+    },
+    {
+      "id": "market",
+      "width": 480,
+      "height": 360,
+      "bar": "none",
+      "region": [
+        "scroll"
+      ]
+    },
+    {
+      "id": "my-computer",
+      "width": 480,
+      "height": 360,
+      "bar": "none",
+      "region": []
+    },
+    {
+      "id": "app-library",
+      "width": 480,
+      "height": 360,
+      "bar": "none",
+      "region": [
+        "list"
+      ]
+    }
+  ],
+  "errors": []
+}

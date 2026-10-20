@@ -1,0 +1,11 @@
+{
+  "builtinProtected": true,
+  "homeDismisses": true,
+  "dragCancelsHold": true,
+  "cancelKeepsApp": true,
+  "shortClickOpens": true,
+  "failureRetry": true,
+  "uninstall": true,
+  "remainingOrderPreserved": true,
+  "errors": []
+}

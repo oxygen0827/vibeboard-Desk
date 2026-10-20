@@ -1,0 +1,2360 @@
+[
+  {
+    "id": "clock",
+    "name": "时钟",
+    "timedout": false,
+    "metrics": {
+      "title": "ATOM",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": []
+    },
+    "errors": []
+  },
+  {
+    "id": "timer",
+    "name": "计时器",
+    "timedout": false,
+    "metrics": {
+      "title": "ATOM",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "5 分",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "15 分",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "25 分",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "设定",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "开始",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "重置",
+          "radius": "13px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "notes",
+    "name": "便签",
+    "timedout": false,
+    "metrics": {
+      "title": "ATOM",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": []
+    },
+    "errors": []
+  },
+  {
+    "id": "workshop",
+    "name": "工作坊",
+    "timedout": false,
+    "metrics": {
+      "title": "ATOM",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "模型配置",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "说出想法",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "生成",
+          "radius": "13px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "themes",
+    "name": "外观",
+    "timedout": false,
+    "metrics": {
+      "title": "ATOM",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "导入主题",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "当前",
+          "radius": "13px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "status",
+    "name": "系统信息",
+    "timedout": false,
+    "metrics": {
+      "title": "ATOM",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": []
+    },
+    "errors": []
+  },
+  {
+    "id": "settings",
+    "name": "设置",
+    "timedout": false,
+    "metrics": {
+      "title": "ATOM",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "声音与显示 音量 · 亮度",
+          "radius": "0px",
+          "out": false
+        },
+        {
+          "text": "桌面与常驻 主题 · 组件",
+          "radius": "0px",
+          "out": false
+        },
+        {
+          "text": "陪伴与交互 操作反馈 · 动画",
+          "radius": "0px",
+          "out": false
+        },
+        {
+          "text": "开发模式 应用安装权限",
+          "radius": "0px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "developer",
+    "name": "开发者",
+    "timedout": false,
+    "metrics": {
+      "title": "ATOM",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "已开启",
+          "radius": "13px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "manager",
+    "name": "应用管理",
+    "timedout": false,
+    "metrics": {
+      "title": "ATOM",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "安装应用",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "导入更新",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        },
+        {
+          "text": "卸载",
+          "radius": "13px",
+          "out": true
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "breathe",
+    "name": "呼吸一下呼吸一下",
+    "timedout": false,
+    "metrics": {
+      "title": "",
+      "rootScroll": false,
+      "bodyScroll": true,
+      "buttons": [
+        {
+          "text": "开始",
+          "radius": "13px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "focus-studio",
+    "name": "专注工作台专注工作台",
+    "timedout": false,
+    "metrics": {
+      "title": "专注工作台",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "任务",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "统计",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "开始",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "重置",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "完成任务",
+          "radius": "13px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "idea-card",
+    "name": "灵感卡灵感卡",
+    "timedout": false,
+    "metrics": {
+      "title": "",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "换一张",
+          "radius": "13px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "local-music",
+    "name": "随身唱片随身唱片",
+    "timedout": false,
+    "metrics": {
+      "title": "随身唱片",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "歌单",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "上一首",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "播放",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "下一首",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "顺序播放",
+          "radius": "13px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "particle-lab",
+    "name": "粒子实验室粒子实验室",
+    "timedout": false,
+    "metrics": {
+      "title": "粒子实验室",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "暂停",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "重置",
+          "radius": "13px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "tea-brew-timer",
+    "name": "煮茶计时器煮茶计时器",
+    "timedout": false,
+    "metrics": {
+      "title": "煮茶计时器",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "1 分钟",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "3 分钟",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "5 分钟",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "开始",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "重置",
+          "radius": "13px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "template-info",
+    "name": "今日计划样例今日计划样例",
+    "timedout": false,
+    "metrics": {
+      "title": "今日计划样例",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "○ 写下今天最重要的一件事",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "○ 留出二十分钟专注时间",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "○ 整理桌面",
+          "radius": "13px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "template-music",
+    "name": "音乐播放器示例音乐播放器示例",
+    "timedout": false,
+    "metrics": {
+      "title": "音乐播放器示例",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "播放说明",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "歌曲列表",
+          "radius": "13px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "template-playful",
+    "name": "点阵伙伴点阵伙伴",
+    "timedout": false,
+    "metrics": {
+      "title": "点阵伙伴",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "换个心情",
+          "radius": "13px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "template-tool",
+    "name": "饮水计数器饮水计数器",
+    "timedout": false,
+    "metrics": {
+      "title": "饮水计数器",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "喝了一杯",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "撤销",
+          "radius": "13px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "water-counter-demo",
+    "name": "饮水计数饮水计数",
+    "timedout": false,
+    "metrics": {
+      "title": "饮水计数",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "＋ 加一杯",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "撤销",
+          "radius": "13px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "cosmic-window",
+    "name": "宇宙橱窗宇宙橱窗",
+    "timedout": false,
+    "metrics": {
+      "title": "宇宙橱窗",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "火星",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "太阳系",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "黑洞",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "暂停",
+          "radius": "13px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "alien-creature",
+    "name": "异星生物异星生物",
+    "timedout": false,
+    "metrics": {
+      "title": "异星生物",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "水母",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "机械花",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "星际蠕虫",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "换色",
+          "radius": "13px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "fluid-atlas",
+    "name": "流体画布流体画布",
+    "timedout": false,
+    "metrics": {
+      "title": "",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "迸发",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "暂停",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "精细",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "清空",
+          "radius": "12px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "planetarium",
+    "name": "天体观测台天体观测台",
+    "timedout": false,
+    "metrics": {
+      "title": "",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "地球",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "木星",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "土星",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "暂停巡航",
+          "radius": "12px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "water-pool",
+    "name": "光影水池光影水池",
+    "timedout": false,
+    "metrics": {
+      "title": "WebGL Water",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "暂停",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "重力：关",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "雨滴",
+          "radius": "12px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "fluid-paint",
+    "name": "颜料画室颜料画室",
+    "timedout": false,
+    "metrics": {
+      "title": "Fluid Paint",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "细笔",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "撤销",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "重做",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "清空",
+          "radius": "12px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "volume-flow",
+    "name": "体积流场体积流场",
+    "timedout": false,
+    "metrics": {
+      "title": "",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "4千粒子",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "换色",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "变换流场",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "暂停",
+          "radius": "12px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "living-pattern",
+    "name": "生命纹理生命纹理",
+    "timedout": false,
+    "metrics": {
+      "title": "Reaction-diffusion",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "纹理：波纹",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "暂停",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "重新生长",
+          "radius": "12px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "moon-ocean",
+    "name": "月光海洋月光海洋",
+    "timedout": false,
+    "metrics": {
+      "title": "A trip under the moonlight",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "月夜",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "白昼",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "日落",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "风力",
+          "radius": "12px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "physics-playground",
+    "name": "物理实验台物理实验台",
+    "timedout": false,
+    "metrics": {
+      "title": "",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "碰撞",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "多米诺",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "悬索桥",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "弹弓",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "添物体",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "重力：开",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "暂停",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "重置",
+          "radius": "12px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "pocket-studio",
+    "name": "口袋音乐工作站口袋音乐工作站",
+    "timedout": false,
+    "metrics": {
+      "title": "",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "播放",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "变奏",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "清空",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "保存",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "恢复",
+          "radius": "12px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "model-viewer",
+    "name": "模型检视台模型检视台",
+    "timedout": false,
+    "metrics": {
+      "title": "",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "打开模型",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "线框",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "巡航",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "归位",
+          "radius": "12px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "math-playground",
+    "name": "数学游乐场",
+    "timedout": false,
+    "metrics": {
+      "title": "数学游乐场",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "复数分形",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "光线包络",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "三角几何",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "重置",
+          "radius": "12px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "music-vision",
+    "name": "音乐幻境",
+    "timedout": false,
+    "metrics": {
+      "title": "音乐幻境",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "播放节拍",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "本地音乐",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "换一幅",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "自动：关",
+          "radius": "12px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "rhythm-orbits",
+    "name": "节奏轨道",
+    "timedout": false,
+    "metrics": {
+      "title": "节奏轨道",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "开始演奏",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "变换节奏",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "静音轨道",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "旋转一格",
+          "radius": "12px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "clay-studio",
+    "name": "黏土工坊",
+    "timedout": false,
+    "metrics": {
+      "title": "",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "堆土",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "凸起",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "撤销",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "重置",
+          "radius": "12px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "parametric-maker",
+    "name": "参数造物",
+    "timedout": false,
+    "metrics": {
+      "title": "",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "生成",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "线框",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "归位",
+          "radius": "12px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "circuit-lab",
+    "name": "电路实验室",
+    "timedout": false,
+    "metrics": {
+      "title": "LRC Circuit - Circuit Simulator",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "暂停",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "电阻×1",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "重置",
+          "radius": "12px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "material-world",
+    "name": "材料世界",
+    "timedout": false,
+    "metrics": {
+      "title": "",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "笔刷：小",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "暂停",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "撤销",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "清空",
+          "radius": "12px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "fold-lab",
+    "name": "折纸实验室",
+    "timedout": false,
+    "metrics": {
+      "title": "Origami Simulator",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "暂停",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "复位",
+          "radius": "12px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "dot-life",
+    "name": "点阵生命",
+    "timedout": false,
+    "metrics": {
+      "title": "点阵生命",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "暂停",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "单步",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "12代/秒",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "清空",
+          "radius": "12px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "dot-image",
+    "name": "点阵影像",
+    "timedout": false,
+    "metrics": {
+      "title": "",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "导入图片",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "细度：中",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "换示例",
+          "radius": "12px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "dot-waves",
+    "name": "点阵波场",
+    "timedout": false,
+    "metrics": {
+      "title": "点阵波场",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "暂停",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "重置",
+          "radius": "12px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "dot-theater",
+    "name": "点阵剧场",
+    "timedout": false,
+    "metrics": {
+      "title": "点阵剧场",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "上一帧",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "下一帧",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "加一帧",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "播放",
+          "radius": "12px",
+          "out": false
+        },
+        {
+          "text": "工具",
+          "radius": "12px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "robo-face",
+    "name": "机器人眼睛",
+    "timedout": false,
+    "metrics": {
+      "title": "机器人眼睛",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "···",
+          "radius": "12px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "kaia-face",
+    "name": "表情星球",
+    "timedout": false,
+    "metrics": {
+      "title": "表情星球",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "···",
+          "radius": "12px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "pixel-companion",
+    "name": "口袋小猫",
+    "timedout": false,
+    "metrics": {
+      "title": "口袋小猫",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "···",
+          "radius": "12px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "snappy-face",
+    "name": "卡通伙伴",
+    "timedout": false,
+    "metrics": {
+      "title": "卡通伙伴",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "···",
+          "radius": "12px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "practice-seven",
+    "name": "七次练习\n  \n  \n  \n  \n  \n  \n  \n  \n  \n七次练习",
+    "timedout": false,
+    "metrics": {
+      "title": "七次练习",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "撤销",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "完成一次",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "重新开始",
+          "radius": "13px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "weather-poster",
+    "name": "天气小红书\n  一本书上方有太阳和云朵，表示记录天气的分享卡片。\n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n天气小红书",
+    "timedout": false,
+    "metrics": {
+      "title": "天气小红书",
+      "rootScroll": false,
+      "bodyScroll": true,
+      "buttons": [
+        {
+          "text": "晴",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "多云",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "阴",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "小雨",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "大雨",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "雷阵雨",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "雪",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "雾",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "大风",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "冰雹",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "保存到记录",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "随机一下",
+          "radius": "13px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "mic-test",
+    "name": "麦克风测试",
+    "timedout": false,
+    "metrics": {
+      "title": "",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "暂停风扇",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "开始录音",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "回放录音",
+          "radius": "13px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "tomato-focus-timer",
+    "name": "番茄钟\n\n  \n  \n  \n  \n  \n\n番茄钟",
+    "timedout": false,
+    "metrics": {
+      "title": "番茄钟",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "开始",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "",
+          "radius": "13px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  },
+  {
+    "id": "cool-digital-clock",
+    "name": "酷炫电子钟",
+    "timedout": false,
+    "metrics": {
+      "title": "酷炫电子钟",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": []
+    },
+    "errors": []
+  },
+  {
+    "id": "stickman-dance",
+    "name": "火柴人跳舞",
+    "timedout": false,
+    "metrics": {
+      "title": "火柴人跳舞",
+      "rootScroll": false,
+      "bodyScroll": false,
+      "buttons": [
+        {
+          "text": "开始跳舞",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "重置",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "律动",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "波浪",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "机械",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "旋转",
+          "radius": "13px",
+          "out": false
+        },
+        {
+          "text": "滑步",
+          "radius": "13px",
+          "out": false
+        }
+      ]
+    },
+    "errors": []
+  }
+]

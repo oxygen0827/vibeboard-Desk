@@ -53,7 +53,10 @@ def main():
                 data = json.loads(Path(args.bundle).read_text(encoding='utf-8'))
                 if not isinstance(data, dict):
                     raise ValueError('bundle 必须为 JSON 对象。')
-            result = request(base, '/api/apps/' + args.command, data)
+            if args.command in ('install', 'update') and data.get('manifest', {}).get('id') in {'my-computer', 'market', 'quick-notes', 'today', 'task-pal', 'app-library'}:
+                result = request(base, '/api/connect/client-update', {'bundle': data, 'update': args.command == 'update'})
+            else:
+                result = request(base, '/api/apps/' + args.command, data)
         print(json.dumps(result, ensure_ascii=False, indent=2))
         return 0
     except (ValueError, OSError, UnicodeError) as exc:

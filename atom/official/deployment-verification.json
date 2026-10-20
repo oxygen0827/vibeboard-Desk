@@ -1,0 +1,32 @@
+{
+  "updated": [
+    "market",
+    "quick-notes",
+    "app-library",
+    "my-computer",
+    "official-companion",
+    "pixel-lab",
+    "task-pal",
+    "today",
+    "sound-lab"
+  ],
+  "app_count": 60,
+  "order_preserved": true,
+  "timestamps_preserved": true,
+  "existing_icons_preserved": true,
+  "existing_sources_preserved": true,
+  "reviewed_client_update": [
+    "market",
+    "quick-notes",
+    "app-library",
+    "my-computer",
+    "task-pal",
+    "today"
+  ],
+  "browser_restart": "left to root",
+  "tests": [
+    "atom/market-app/ui.test.cjs",
+    "atom/official/clients.test.cjs",
+    "atom/computer-app/ui.test.cjs"
+  ]
+}

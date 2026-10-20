@@ -1,0 +1,344 @@
+[
+  [
+    {
+      "id": "clock",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "timer",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "notes",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "workshop",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "themes",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "status",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    }
+  ],
+  [
+    {
+      "id": "settings",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "developer",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "manager",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "breathe",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "focus-studio",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "idea-card",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    }
+  ],
+  [
+    {
+      "id": "local-music",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "particle-lab",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "tea-brew-timer",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "template-info",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "template-music",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "template-playful",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    }
+  ],
+  [
+    {
+      "id": "template-tool",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "water-counter-demo",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "cosmic-window",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "alien-creature",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "fluid-atlas",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "planetarium",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    }
+  ],
+  [
+    {
+      "id": "water-pool",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "fluid-paint",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "volume-flow",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "living-pattern",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "moon-ocean",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "physics-playground",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    }
+  ],
+  [
+    {
+      "id": "pocket-studio",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "model-viewer",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "math-playground",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "music-vision",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "rhythm-orbits",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "clay-studio",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    }
+  ],
+  [
+    {
+      "id": "parametric-maker",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "circuit-lab",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "material-world",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "fold-lab",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "dot-life",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "dot-image",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    }
+  ],
+  [
+    {
+      "id": "dot-waves",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "dot-theater",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "robo-face",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "kaia-face",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "pixel-companion",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "snappy-face",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    }
+  ],
+  [
+    {
+      "id": "practice-seven",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "weather-poster",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "mic-test",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "tomato-focus-timer",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "cool-digital-clock",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    },
+    {
+      "id": "stickman-dance",
+      "w": 104,
+      "h": 104,
+      "inside": true
+    }
+  ]
+]

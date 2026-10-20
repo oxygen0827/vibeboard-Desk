@@ -38,11 +38,11 @@ def theme(id, name, description, colors, icons=None):
     return dict(id=id, name=name, description=description, tokens=dict(zip(KEYS, colors)), builtin=True,icons=icons or icon_style())
 
 
-BUILTINS = [
-    theme('paper', '纸与朱红', '暖白纸面与克制的朱红操作', ['#f3f0e8','#242622','#df5038','#b53c28','#62665d','#d5d3c8','#ebe8df'],icon_style('transparent','ink','line',4,2.2)),
-    theme('terminal', '终端', '深色底与绿色字符', ['#101913','#bce8c7','#59ca83','#24643c','#91b29b','#365940','#16251b'],icon_style('card','accent','accent',0,1.7)),
-    theme('sunshine', '晴天', '暖黄色与深墨色', ['#ffe49b','#302c22','#e27328','#9b431d','#685738','#c6ad6b','#ffedbd'],icon_style('card','ink','transparent',16,2.9,'none')),
-    theme('blueprint', '蓝图', '蓝色底与白色线条', ['#143d6b','#f0f6ff','#87c8ff','#215e99','#b7cce2','#6283a6','#1b4778'],icon_style('transparent','ink','accent',2,1.6,'dashed'))]
+# One system foundation replaces the retired theme collection.
+BUILTINS = [theme('system', '系统外观', '清晰排版、圆润控件与统一应用体验',
+    ['#f2f2f7','#1c1c1e','#007aff','#0066d6','#6c6c70','#d9d9df','#ffffff'],
+    icon_style('card','accent','transparent',16,2.2,'none'))]
+
 
 
 class ThemeStore:
@@ -51,14 +51,15 @@ class ThemeStore:
         self.lock = threading.RLock()
         self.path = self.root / 'themes.json'
         self.custom = []
-        self.active = 'paper'
+        self.active = 'system'
         try:
             saved = json.loads(self.path.read_text(encoding='utf-8'))
-            self.custom = [self._validate(t) for t in saved.get('themes', [])]
-            if saved.get('active') in [t['id'] for t in BUILTINS + self.custom]:
+            self.custom = [self._validate(t) for t in saved.get('themes', [])] if saved.get('appearance_generation') == 2 else []
+            if saved.get('appearance_generation') == 2 and saved.get('active') in [t['id'] for t in BUILTINS + self.custom]:
                 self.active = saved['active']
         except (OSError, ValueError, TypeError, AttributeError):
             self.custom = []
+        self._save()
 
     def _validate(self, data):
         if not isinstance(data, dict) or set(data) - {'id','name','description','tokens','builtin','icons'}:
@@ -76,7 +77,7 @@ class ThemeStore:
     def _save(self):
         self.root.mkdir(parents=True, exist_ok=True)
         tmp = self.path.with_suffix('.tmp')
-        tmp.write_text(json.dumps(dict(active=self.active,themes=self.custom),ensure_ascii=False),encoding='utf-8')
+        tmp.write_text(json.dumps(dict(active=self.active,themes=self.custom,appearance_generation=2),ensure_ascii=False),encoding='utf-8')
         tmp.replace(self.path)
 
     def list_themes(self):
