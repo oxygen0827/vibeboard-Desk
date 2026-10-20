@@ -8,6 +8,8 @@ User=atom
 Group=atom
 WorkingDirectory=/opt/atom
 # Bind the Docker bridge gateway: reachable by the nginx container via host.docker.internal, not from the internet.
+# Optional SMTP settings for email verification, password reset and alerts (root-only file).
+EnvironmentFile=-/etc/atom/smtp.env
 ExecStart=/usr/bin/python3 /opt/atom/connect/relay/server.py --host 172.17.0.1 --port 9092 --db /var/lib/atom/relay.sqlite3 --trusted-proxy 172.17.0.0/16
 Restart=always
 RestartSec=3

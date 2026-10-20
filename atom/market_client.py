@@ -74,6 +74,21 @@ class MarketClient:
                 if not isinstance(result.get('token'),str) or not isinstance(result.get('user'),dict):raise BridgeError('账号响应无效',502)
                 self.save(dict(relay_url=self.base(),token=result['token'],user={k:result['user'][k] for k in ('id','username') if k in result['user']}))
             return self.execute('state',{})
+        if action=='me':return self.request('me',authenticated=True)
+        if action=='email-start':return self.request('email/start',{'email':str(data.get('email',''))[:254]},True)
+        if action=='email-verify':return self.request('email/verify',{'code':str(data.get('code',''))[:12]},True)
+        if action=='password-forgot':return self.request('password/forgot',{'username':str(data.get('username',''))[:32]})
+        if action=='password-change':
+            if not isinstance(data.get('old_password'),str) or not isinstance(data.get('new_password'),str):raise BridgeError('请输入当前密码和新密码')
+            return self.request('password/change',{'old_password':data['old_password'],'new_password':data['new_password']},True)
+        if action=='password-reset':
+            values={k:data.get(k) for k in ('username','code','new_password')}
+            if not all(isinstance(v,str) and v for v in values.values()):raise BridgeError('请输入账号、验证码和新密码')
+            with self.lock:
+                result=self.request('password/reset',values)
+                if not isinstance(result.get('token'),str) or not isinstance(result.get('user'),dict):raise BridgeError('账号响应无效',502)
+                self.save(dict(relay_url=self.base(),token=result['token'],user={k:result['user'][k] for k in ('id','username') if k in result['user']}))
+            return self.execute('state',{})
         if action=='logout':
             revoked=True
             with self.lock:

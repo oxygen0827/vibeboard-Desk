@@ -330,4 +330,73 @@ class MarketplaceTests(unittest.TestCase):
         self.call('/register',dict(username='carol',password='long-test-password-c'))
         self.assertEqual(seen,[True,True,True])
 
+    def mailbox(self):
+        sent=[]
+        mailer=m.Mailer({'host':'smtp.test','port':465,'user':'u','password':'p','sender':'noreply@atom.test','alert_to':''},transport=sent.append)
+        mailer.send=lambda to,subject,body,wait=False:sent.append((to,subject,body)) or True
+        self.market.mailer=mailer
+        return sent
+
+    @staticmethod
+    def code_from(mail):
+        import re as _re
+        return _re.search(r'\b(\d{6})\b',mail[2]).group(1)
+
+    def test_email_verification_and_password_reset(self):
+        self.denied(503,lambda:self.call('/email/start',{'email':'alice@example.com'},self.a))
+        sent=self.mailbox()
+        self.denied(400,lambda:self.call('/email/start',{'email':'not-an-email'},self.a))
+        self.call('/email/start',{'email':'alice@example.com'},self.a)
+        code=self.code_from(sent[-1])
+        self.assertEqual(sent[-1][0],'alice@example.com')
+        self.assertNotIn(code,str([tuple(r) for r in self.market.rows('SELECT * FROM verifications')]),'codes are stored hashed')
+        self.denied(400,lambda:self.call('/email/verify',{'code':'000000' if code!='000000' else '111111'},self.a))
+        self.call('/email/verify',{'code':code},self.a)
+        self.assertEqual(self.call('/me',who=self.a)['user'],{'id':self.a['user']['id'],'username':'alice','email':'alice@example.com','email_verified':True})
+        # Forgot: same response for unknown, unverified and verified accounts; only verified gets mail.
+        before=len(sent)
+        self.assertEqual(self.call('/password/forgot',{'username':'nobody'}),{'ok':True})
+        self.assertEqual(self.call('/password/forgot',{'username':'bobby'}),{'ok':True})
+        self.assertEqual(len(sent),before)
+        self.assertEqual(self.call('/password/forgot',{'username':'alice'}),{'ok':True})
+        reset=self.code_from(sent[-1])
+        self.denied(400,lambda:self.call('/password/reset',{'username':'alice','code':reset,'new_password':'short'}))
+        result=self.call('/password/reset',{'username':'alice','code':reset,'new_password':'brand-new-password-a'})
+        self.denied(401,lambda:self.call('/me',who=self.a))
+        self.call('/me',who=result)
+        self.denied(401,lambda:self.call('/login',dict(username='alice',password='long-test-password-a')))
+        self.call('/login',dict(username='alice',password='brand-new-password-a'))
+        self.denied(400,lambda:self.call('/password/reset',{'username':'alice','code':reset,'new_password':'another-password-aa'}))
+
+    def test_reset_code_attempts_are_limited(self):
+        sent=self.mailbox()
+        self.call('/email/start',{'email':'alice@example.com'},self.a)
+        self.call('/email/verify',{'code':self.code_from(sent[-1])},self.a)
+        self.call('/password/forgot',{'username':'alice'})
+        code=self.code_from(sent[-1])
+        wrong='000000' if code!='000000' else '111111'
+        for _ in range(5):
+            self.denied(400,lambda:self.call('/password/reset',{'username':'alice','code':wrong,'new_password':'brand-new-password-a'}))
+        self.denied(400,lambda:self.call('/password/reset',{'username':'alice','code':code,'new_password':'brand-new-password-a'}))
+
+    def test_change_password_keeps_current_session_only(self):
+        other=self.call('/login',dict(username='alice',password='long-test-password-a'))
+        self.denied(401,lambda:self.call('/password/change',{'old_password':'wrong-password-xx','new_password':'brand-new-password-a'},self.a))
+        self.call('/password/change',{'old_password':'long-test-password-a','new_password':'brand-new-password-a'},self.a)
+        self.call('/me',who=self.a)
+        self.denied(401,lambda:self.call('/me',who=other))
+        self.call('/login',dict(username='alice',password='brand-new-password-a'))
+
+    def test_mailer_settings_and_message(self):
+        self.assertIsNone(m.Mailer({}).config)
+        env={'SMTP_HOST':'smtp.example.com','SMTP_USER':'u','SMTP_PASSWORD':'p','SMTP_FROM':'noreply@example.com','SMTP_TLS':'off'}
+        self.assertFalse(m.mailer_settings(env)['plain'],'plain SMTP is refused for remote hosts')
+        self.assertEqual(m.mailer_settings(env)['port'],465)
+        self.assertTrue(m.mailer_settings(dict(env,SMTP_HOST='127.0.0.1'))['plain'])
+        sent=[]
+        mailer=m.Mailer(m.mailer_settings(env),transport=sent.append)
+        self.assertTrue(mailer.send('a@example.com','主题','正文 123456',wait=True))
+        self.assertEqual((sent[0]['To'],sent[0]['From']),('a@example.com','ATOM <noreply@example.com>'))
+        self.assertIn('123456',sent[0].get_content())
+
 if __name__=='__main__':unittest.main()

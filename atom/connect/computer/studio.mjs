@@ -28,8 +28,8 @@ export class Studio {
  activitySummary(){let account;try{account=this.account();}catch{return null;}if(!account)return null;const jobs=Object.values(this.data.jobs).filter(j=>j.scope===this.scope());const j=jobs.find(j=>this.active?.id===j.id)||jobs.slice(-1)[0];if(!j)return null;const status=['saving','waiting_approval'].includes(j.status)?'running':j.status==='conflict'?'failed':j.status;return {id:j.id,type:j.kind==='notes-organize'?'notes-organize':'app-modify',status,updated_at:Math.floor((['queued','running'].includes(status)?Date.now():Date.parse(j.finished_at||j.created_at)||Date.now())/1000)};}
  state(){let account=null,configured=false;try{configured=!!this.url();account=this.account();}catch{}const profile=account?this.profile():null;return {configured,authenticated:!!account,user:account?.user||null,pending_notes:profile?.pending.length||0,jobs:Object.values(this.data.jobs).filter(j=>account&&j.scope===this.scope()).map(({id,draft_id,kind,status,created_at,finished_at,error})=>({id,draft_id,kind:kind||'app-modify',status,created_at,finished_at,error}))};}
  async remote(route,{method='GET',body,publicRead=false,token}={}){
-  if(!/^\/(?:register|login|logout|me|catalog|works(?:\/[A-Za-z0-9_-]+)?|versions\/[A-Za-z0-9_-]+|forks|drafts(?:\/[A-Za-z0-9_-]+(?:\/(?:save|publish))?)?|notes|agenda|health)(?:\?[^#]*)?$/.test(route))throw problem('不支持的市场接口');
-  const relay=this.url();const account=this.account();const auth=token||(publicRead?null:account?.token);if(!publicRead&&!auth&&!['/register','/login'].includes(route))throw problem('请先登录创作账号',401);
+  if(!/^\/(?:register|login|logout|me|email\/(?:start|verify)|password\/(?:forgot|reset|change)|catalog|works(?:\/[A-Za-z0-9_-]+)?|versions\/[A-Za-z0-9_-]+|forks|drafts(?:\/[A-Za-z0-9_-]+(?:\/(?:save|publish))?)?|notes|agenda|health)(?:\?[^#]*)?$/.test(route))throw problem('不支持的市场接口');
+  const relay=this.url();const account=this.account();const auth=token||(publicRead?null:account?.token);if(!publicRead&&!auth&&!['/register','/login','/password/forgot','/password/reset'].includes(route))throw problem('请先登录创作账号',401);
   let response;try{response=await this.transport(relay+'/market/v1'+route,{method,headers:{'Content-Type':'application/json',...(auth?{Authorization:'Bearer '+auth}:{})},body:body===undefined?undefined:JSON.stringify(body),signal:AbortSignal.timeout(20000),redirect:'error'});}catch{throw problem('市场暂时无法连接，内容已保留在本机',503,'offline');}
   let result;try{result=await response.json();}catch{throw problem('市场返回无效响应',502);}
   if(this.url()!==relay||(!publicRead&&account?.token!==this.account()?.token))throw problem('账号或服务器已改变，请重新打开内容',409);
@@ -84,7 +84,9 @@ export class Studio {
  async applyJob(jobId){const job=this.data.jobs[id(jobId)];this.jobView(jobId);if(!job.artifact)throw problem('任务没有可恢复的产物');const server=await this.remote('/drafts/'+id(job.draft_id));this.localSave(job.draft_id,job.artifact,'明确应用保留的 AI 产物');return this.saveDraft(job.draft_id,{revision:server.draft.revision});}
  async handle(method,route,body={}){
   if(route==='/state')return this.state();
-  if(method==='POST'&&['/register','/login'].includes(route))return this.login(route,body);
+  if(method==='POST'&&['/register','/login','/password/reset'].includes(route))return this.login(route,body);
+  if(method==='POST'&&route==='/password/forgot')return this.remote(route,{method:'POST',body,publicRead:true});
+  if(method==='POST'&&['/email/start','/email/verify','/password/change'].includes(route))return this.remote(route,{method:'POST',body});
   if(method==='POST'&&route==='/logout')return this.logout();
   if(route==='/me'){const result=await this.remote('/me');return {user:result.user};}
   if(method==='GET'&&route.startsWith('/catalog'))return this.remote(route,{publicRead:true});

@@ -19,17 +19,41 @@ async function studioState(){const s=await call('/state');account=s.user;window.
   el('account-detail').textContent=!account?'登录市场账号以同步':s.pending_notes?s.pending_notes+' 条便签待同步':'市场账号 · 已同步';
   window.renderActivity?.();return s;}
 async function needAccount(){await studioState();if(!account){accountDialog();return false;}return true;}
+function field(label,attrs){const input=h('input',attrs);return [h('label',{},label,input),input];}
 function accountDialog(){const box=clearDialog(account?'市场账号':'登录市场账号');
-  if(account){box.append(h('div',{class:'row'},h('span',{class:'avatar on',text:account.username.slice(0,1).toUpperCase()}),h('div',{class:'row-main'},h('strong',{text:account.username}),h('small',{text:'草稿、随手记和今日属于此账号'}))),text('p','退出后，离线未同步的内容仍保存在这台电脑，不会被删除。','muted'),h('div',{class:'button-row'},button('退出登录',async()=>{await call('/logout',{});account=null;editing=null;dialog.close();await studioState();note('已退出市场账号');})));return;}
+  if(account){const status=text('p','正在读取邮箱状态…','muted'),panel=h('div'),
+      head=h('div',{class:'row'},h('span',{class:'avatar on',text:account.username.slice(0,1).toUpperCase()}),h('div',{class:'row-main'},h('strong',{text:account.username}),status));
+    let me=null;
+    const actions=()=>h('div',{class:'button-row'},button(me?.email_verified?'更换邮箱':'绑定邮箱',()=>emailForm()),button('修改密码',()=>passwordForm()),button('退出登录',async()=>{await call('/logout',{});account=null;editing=null;dialog.close();await studioState();note('已退出市场账号');},'btn ghost'));
+    const show=()=>{status.textContent=me?.email?me.email+(me.email_verified?' · 已验证，可用于找回密码':' · 未验证'):'还没有绑定邮箱，绑定后忘记密码可以用邮件找回';panel.replaceChildren(actions());};
+    function emailForm(){const [emailLabel,email]=field('邮箱',{type:'email',maxlength:'254',value:me?.email||'',required:true}),[codeLabel,code]=field('邮件里的 6 位验证码',{inputmode:'numeric',maxlength:'6'});codeLabel.hidden=true;
+      const send=h('button',{type:'submit',class:'btn primary',text:'发送验证码'}),form=h('form',{},emailLabel,codeLabel,h('div',{class:'form-actions'},button('取消',show,'btn ghost'),send));
+      form.onsubmit=async e=>{e.preventDefault();send.disabled=true;try{if(codeLabel.hidden){await call('/email/start',{email:email.value.trim()});codeLabel.hidden=false;email.readOnly=true;send.textContent='验证';code.focus();note('验证码已发送到 '+email.value.trim());}else{await call('/email/verify',{code:code.value.trim()});me=(await call('/me')).user;show();note('邮箱已验证');}}catch(err){error(err);}finally{send.disabled=false;}};
+      panel.replaceChildren(form);email.focus();}
+    function passwordForm(){const [oldLabel,old]=field('当前密码',{type:'password',autocomplete:'current-password',required:true}),[newLabel,fresh]=field('新密码（至少 12 位）',{type:'password',autocomplete:'new-password',minlength:'12',required:true});
+      const save=h('button',{type:'submit',class:'btn primary',text:'保存新密码'}),form=h('form',{},oldLabel,newLabel,text('p','修改后，其他设备上的登录会失效，需要重新登录。','muted'),h('div',{class:'form-actions'},button('取消',show,'btn ghost'),save));
+      form.onsubmit=async e=>{e.preventDefault();save.disabled=true;try{await call('/password/change',{old_password:old.value,new_password:fresh.value});old.value=fresh.value='';show();note('密码已修改');}catch(err){error(err);}finally{save.disabled=false;}};
+      panel.replaceChildren(form);old.focus();}
+    box.append(head,panel);show();call('/me').then(r=>{me=r.user;show();}).catch(()=>{status.textContent='暂时无法读取邮箱状态';});return;}
   let mode='login';
-  const seg=h('div',{class:'segmented'},...[['login','登录'],['register','创建账号']].map(([v,l])=>h('button',{type:'button',class:v===mode?'on':'',text:l,onclick:e=>{mode=v;seg.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b===e.currentTarget));password.autocomplete=v==='login'?'current-password':'new-password';submit.textContent=v==='login'?'登录':'创建并登录';}})));
-  const user=h('input',{placeholder:'用户名',name:'username',autocomplete:'username',required:true});
-  const password=h('input',{type:'password',name:'password',placeholder:'密码（至少 12 位）',autocomplete:'current-password',required:true,minlength:'12'});
-  const submit=h('button',{class:'btn primary',text:'登录'});
-  const status=text('p','市场账号与 Codex 等模型账号相互独立；密码不会发送给 AI。','muted');
-  const form=h('form',{},seg,h('label',{},'用户名',user),h('label',{},'密码',password),submit,status);
-  form.onsubmit=async e=>{e.preventDefault();submit.disabled=true;try{await call('/'+mode,{username:user.value,password:password.value});password.value='';dialog.close();await studioState();note('市场账号已连接');window.dispatchEvent(new CustomEvent('atom:page',{detail:currentPage}));}catch(err){status.textContent=err.message;status.className='';}finally{submit.disabled=false;}};
-  box.append(form);user.focus();}
+  const [userLabel,user]=field('用户名',{name:'username',autocomplete:'username',required:true});
+  const [passLabel,password]=field('密码',{type:'password',name:'password',placeholder:'至少 12 位',autocomplete:'current-password',minlength:'12'});
+  const [codeLabel,code]=field('邮件里的 6 位验证码',{inputmode:'numeric',maxlength:'6'});
+  const submit=h('button',{class:'btn primary',text:'登录'}),status=text('p','','muted');
+  let codeSent=false;
+  const labels={login:['登录','市场账号与 Codex 等模型账号相互独立；密码不会发送给 AI。'],register:['创建并登录','用户名 3–32 位字母、数字、下划线或连字符；密码至少 12 位。'],forgot:['发送验证码','验证码会发到这个账号已验证的邮箱。没有绑定邮箱的账号请联系管理员。']};
+  function sync(){const [action,hint]=labels[mode];submit.textContent=mode==='forgot'&&codeSent?'重置密码并登录':action;status.textContent=hint;status.className='muted';
+    passLabel.hidden=mode==='forgot'&&!codeSent;codeLabel.hidden=!(mode==='forgot'&&codeSent);user.readOnly=mode==='forgot'&&codeSent;
+    passLabel.firstChild.textContent=mode==='forgot'?'新密码':'密码';password.autocomplete=mode==='login'?'current-password':'new-password';password.required=!passLabel.hidden;}
+  const seg=h('div',{class:'segmented'},...[['login','登录'],['register','创建账号'],['forgot','忘记密码']].map(([v,l])=>h('button',{type:'button',class:v===mode?'on':'',text:l,onclick:e=>{mode=v;codeSent=false;seg.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b===e.currentTarget));sync();}})));
+  const form=h('form',{},seg,userLabel,codeLabel,passLabel,submit,status);
+  form.onsubmit=async e=>{e.preventDefault();submit.disabled=true;
+    try{if(mode==='forgot'&&!codeSent){await call('/password/forgot',{username:user.value.trim()});codeSent=true;sync();status.textContent='如果这个账号绑定了已验证的邮箱，验证码已经发出。';code.focus();return;}
+      if(mode==='forgot')await call('/password/reset',{username:user.value.trim(),code:code.value.trim(),new_password:password.value});
+      else await call('/'+mode,{username:user.value,password:password.value});
+      password.value='';dialog.close();await studioState();note(mode==='forgot'?'密码已重置并登录':'市场账号已连接');window.dispatchEvent(new CustomEvent('atom:page',{detail:currentPage}));}
+    catch(err){status.textContent=err.message;status.className='';}finally{submit.disabled=false;}};
+  box.append(form);sync();user.focus();}
 el('studio-account').onclick=async()=>{try{await studioState();accountDialog();}catch(e){error(e);}};
 
 // Source viewer shared by market and dialogs

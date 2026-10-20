@@ -7,11 +7,15 @@ import os
 import re
 import secrets
 import sqlite3
+import sys
 import threading
 import time
 import xml.etree.ElementTree as ET
 from pathlib import Path, PurePosixPath
 from urllib.parse import urlsplit, parse_qs
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from mailer import Mailer, settings as mailer_settings
 
 CATEGORIES = {'life', 'companion', 'sound', 'play', 'connect'}
 LICENSES = {'MIT', 'Apache-2.0', 'BSD-2-Clause', 'BSD-3-Clause', 'CC0-1.0', 'MPL-2.0', 'GPL-3.0-only', 'GPL-3.0-or-later'}
@@ -19,6 +23,8 @@ RESERVED = {'clock','timer','notes','status','settings','developer','manager','h
 APP_ID = re.compile(r'^[a-z][a-z0-9_-]{0,47}$')
 ID = re.compile(r'^[A-Za-z0-9_-]{1,100}$')
 MAX_BUNDLE = 1024 * 1024
+EMAIL = re.compile(r'^[^@\s]{1,64}@[A-Za-z0-9.-]{1,189}\.[A-Za-z]{2,24}$')
+CODE_TTL, CODE_ATTEMPTS = 900, 5
 
 
 class MarketError(Exception):
@@ -96,8 +102,9 @@ def scan_publish(bundle):
 
 
 class Marketplace:
-    def __init__(self, db_path, clock=time.time, seeds=None):
+    def __init__(self, db_path, clock=time.time, seeds=None, mailer=None):
         self.clock, self.lock, self.rates = clock, threading.RLock(), {}
+        self.mailer = mailer or Mailer()
         target = Path(db_path)
         if db_path != ':memory:':
             self._prepare_path(target)
@@ -131,7 +138,13 @@ class Marketplace:
         CREATE INDEX IF NOT EXISTS drafts_user ON drafts(user);
         CREATE INDEX IF NOT EXISTS notes_user ON notes(user);
         CREATE INDEX IF NOT EXISTS versions_work ON versions(work);
+        CREATE TABLE IF NOT EXISTS verifications(user TEXT,purpose TEXT,hash TEXT,email TEXT,expires REAL,attempts INTEGER DEFAULT 0,PRIMARY KEY(user,purpose));
         ''')
+        columns = {r[1] for r in self.db.execute('PRAGMA table_info(users)')}
+        if 'email' not in columns:
+            self.db.execute('ALTER TABLE users ADD COLUMN email TEXT')
+            self.db.execute('ALTER TABLE users ADD COLUMN email_verified INTEGER NOT NULL DEFAULT 0')
+            self.db.commit()
 
     def close(self):
         self.db.close()
@@ -148,7 +161,7 @@ class Marketplace:
         stamp, count = self.rates.get(key, (now, 0))
         if now-stamp >= window:
             stamp, count = now, 0
-        require(count < maximum and (key in self.rates or len(self.rates)<20000), 'Too many attempts; try later', 429, 'rate_limited')
+        require(count < maximum and (key in self.rates or len(self.rates)<20000), '尝试次数过多，请稍后再试', 429, 'rate_limited')
         self.rates[key] = (stamp, count+1)
 
     def login_session(self, user):
@@ -162,9 +175,9 @@ class Marketplace:
         return {'token':token, 'user':{'id':user['id'],'username':user['username']}}
 
     def auth(self, token):
-        require(isinstance(token, str) and 20 <= len(token) <= 256, 'Please sign in', 401, 'unauthenticated')
+        require(isinstance(token, str) and 20 <= len(token) <= 256, '请先登录', 401, 'unauthenticated')
         row = self.row('SELECT u.* FROM sessions s JOIN users u ON s.user=u.id WHERE s.hash=? AND s.expires>?', (hashlib.sha256(token.encode()).hexdigest(), self.clock()))
-        require(row, 'Session expired; sign in again', 401, 'unauthenticated')
+        require(row, '登录已过期，请重新登录', 401, 'unauthenticated')
         return row
 
     def own_draft(self, ident, user):
@@ -253,6 +266,10 @@ class Marketplace:
         path = urlsplit(target).path.rstrip('/')[len('/market/v1'):]
         if method == 'POST' and path in ('/register', '/login'):
             return self.sign_in(path, body, peer)
+        if method == 'POST' and path == '/password/reset':
+            return self.reset_password(body, peer)
+        if method == 'POST' and path == '/password/change':
+            return self.change_password(token, body)
         with self.lock, self.db:
             return self._handle(method,target,token,body,peer)
 
@@ -262,9 +279,9 @@ class Marketplace:
 
     def credentials(self, body):
         username = text(body,'username',32).strip().lower()
-        require(re.fullmatch(r'[a-z0-9][a-z0-9_-]{2,31}',username), 'Username must be 3–32 letters, digits, underscores or hyphens')
+        require(re.fullmatch(r'[a-z0-9][a-z0-9_-]{2,31}',username), '用户名需为 3–32 位小写字母、数字、下划线或连字符')
         password = text(body,'password',256)
-        require(len(password)>=12, 'Password must have at least 12 characters')
+        require(len(password)>=12, '密码至少需要 12 位')
         return username, password
 
     def sign_in(self, path, body, peer):
@@ -273,24 +290,86 @@ class Marketplace:
         with self.lock:
             self.rate((peer,path), 10 if path=='/register' else 30, 3600 if path=='/register' else 600)
             username, password = self.credentials(body)
-            require(username not in ('atom','official','admin','system'), 'Username unavailable')
+            require(username not in ('atom','official','admin','system'), '用户名已被使用')
             self.rate(('account',hashlib.sha256(username.encode()).hexdigest()),30,600)
             user = self.row('SELECT * FROM users WHERE username=?',(username,))
             if path == '/register':
-                require(not user,'Username unavailable',409,'username_unavailable')
+                require(not user,'用户名已被使用',409,'username_unavailable')
             salt = secrets.token_hex(16) if path == '/register' else (user['salt'] if user else '00'*16)
         computed = self.hash_password(password, salt)
         with self.lock, self.db:
             user = self.row('SELECT * FROM users WHERE username=?',(username,))
             if path == '/register':
-                require(not user,'Username unavailable',409,'username_unavailable')
-                require(self.row('SELECT COUNT(*) n FROM users')['n']<1000,'Account capacity reached',409,'quota_exceeded')
+                require(not user,'用户名已被使用',409,'username_unavailable')
+                require(self.row('SELECT COUNT(*) n FROM users')['n']<1000,'服务器账号已满，请联系管理员',409,'quota_exceeded')
                 uid=secrets.token_hex(16)
                 self.db.execute('INSERT INTO users(id,username,salt,password_hash,created) VALUES(?,?,?,?,?)',(uid,username,salt,computed,self.clock()))
                 user=self.row('SELECT * FROM users WHERE id=?',(uid,))
             else:
-                require(user and user['salt']==salt and hmac.compare_digest(computed,user['password_hash']),'Invalid username or password',401,'invalid_credentials')
+                require(user and user['salt']==salt and hmac.compare_digest(computed,user['password_hash']),'用户名或密码不正确',401,'invalid_credentials')
             return self.login_session(user)
+
+    def issue_code(self, user, purpose, email):
+        code = '%06d' % secrets.randbelow(10**6)
+        self.db.execute('INSERT OR REPLACE INTO verifications VALUES(?,?,?,?,?,0)', (user['id'], purpose, self.code_hash(user, purpose, code), email, self.clock()+CODE_TTL))
+        return code
+
+    @staticmethod
+    def code_hash(user, purpose, code):
+        return hashlib.sha256((user['id']+'|'+purpose+'|'+code).encode()).hexdigest()
+
+    def check_code(self, user, purpose, code):
+        # Each wrong guess is committed even when the caller's transaction later fails.
+        row = self.row('SELECT * FROM verifications WHERE user=? AND purpose=?', (user['id'], purpose))
+        require(row and row['expires'] > self.clock() and row['attempts'] < CODE_ATTEMPTS, '验证码已失效，请重新获取', 400, 'code_expired')
+        if not (isinstance(code, str) and hmac.compare_digest(self.code_hash(user, purpose, code.strip()), row['hash'])):
+            self.db.execute('UPDATE verifications SET attempts=attempts+1 WHERE user=? AND purpose=?', (user['id'], purpose))
+            self.db.commit()
+            raise MarketError(400, '验证码不正确', 'code_invalid')
+        self.db.execute('DELETE FROM verifications WHERE user=? AND purpose=?', (user['id'], purpose))
+        return row
+
+    def new_password(self, body, key='new_password'):
+        password = text(body, key, 256)
+        require(len(password) >= 12, '密码至少需要 12 位')
+        return password
+
+    def reset_password(self, body, peer):
+        require(isinstance(body, dict), 'JSON object required')
+        with self.lock, self.db:
+            self.rate((peer, '/password/reset'), 20, 3600)
+            username = text(body, 'username', 32).strip().lower()
+            password = self.new_password(body)
+            user = self.row('SELECT * FROM users WHERE username=?', (username,))
+            require(user, '验证码已失效，请重新获取', 400, 'code_expired')
+            self.check_code(user, 'reset', body.get('code'))
+        salt = secrets.token_hex(16)
+        computed = self.hash_password(password, salt)
+        with self.lock, self.db:
+            self.db.execute('UPDATE users SET salt=?,password_hash=? WHERE id=?', (salt, computed, user['id']))
+            self.db.execute('DELETE FROM sessions WHERE user=?', (user['id'],))
+            return self.login_session(self.row('SELECT * FROM users WHERE id=?', (user['id'],)))
+
+    def change_password(self, token, body):
+        require(isinstance(body, dict), 'JSON object required')
+        with self.lock:
+            user = self.auth(token)
+            self.rate(('change', user['id']), 10, 3600)
+            old, new = text(body, 'old_password', 256), self.new_password(body)
+        require(hmac.compare_digest(self.hash_password(old, user['salt']), user['password_hash']), '当前密码不正确', 401, 'invalid_credentials')
+        salt = secrets.token_hex(16)
+        computed = self.hash_password(new, salt)
+        with self.lock, self.db:
+            current = self.auth(token)
+            require(current['salt'] == user['salt'], '密码已在其他地方修改，请重新登录', 409, 'password_changed')
+            self.db.execute('UPDATE users SET salt=?,password_hash=? WHERE id=?', (salt, computed, user['id']))
+            # Keep this session, sign out every other one.
+            self.db.execute('DELETE FROM sessions WHERE user=? AND hash<>?', (user['id'], hashlib.sha256(token.encode()).hexdigest()))
+            return {'ok': True}
+
+    def mail(self, to, subject, body):
+        require(self.mailer.configured, '服务器暂未配置邮件发送', 503, 'mail_unavailable')
+        self.mailer.send(to, subject, body)
 
     def _handle(self, method, target, token, body, peer):
         parsed = urlsplit(target)
@@ -315,9 +394,31 @@ class Marketplace:
             return {'work':work,'versions':versions,'derivatives':[w for w in derivatives if w.get('parent_id')==parts[1]][:100]}
         if method=='GET' and len(parts)==2 and parts[0]=='versions':
             return self.version(parts[1])
+        if path=='/password/forgot' and method=='POST':
+            self.rate((peer,path),10,3600)
+            username=text(body,'username',32).strip().lower()
+            require(self.mailer.configured,'服务器暂未配置邮件发送',503,'mail_unavailable')
+            self.rate(('forgot',hashlib.sha256(username.encode()).hexdigest()),5,3600)
+            user=self.row('SELECT * FROM users WHERE username=?',(username,))
+            # Same answer whether or not the account exists or has a verified email.
+            if user and user['email'] and user['email_verified']:
+                code=self.issue_code(user,'reset',user['email'])
+                self.mail(user['email'],'ATOM 密码重置验证码',user['username']+'，你好：\n\n你的 ATOM 密码重置验证码是 '+code+'，15 分钟内有效。\n如果不是你本人操作，请忽略这封邮件，你的密码不会改变。\n')
+            return {'ok':True}
         user=self.auth(token)
         if path=='/me' and method=='GET':
-            return {'user':{'id':user['id'],'username':user['username']}}
+            return {'user':{'id':user['id'],'username':user['username'],'email':user['email'] or '','email_verified':bool(user['email_verified'])}}
+        if path=='/email/start' and method=='POST':
+            email=text(body,'email',254).strip()
+            require(EMAIL.fullmatch(email),'请输入有效的邮箱地址')
+            self.rate(('email',user['id']),5,3600)
+            code=self.issue_code(user,'email',email)
+            self.mail(email,'ATOM 邮箱验证码',user['username']+'，你好：\n\n你的 ATOM 邮箱验证码是 '+code+'，15 分钟内有效。\n验证后，这个邮箱可以用来找回密码。\n')
+            return {'ok':True,'email':email}
+        if path=='/email/verify' and method=='POST':
+            row=self.check_code(user,'email',body.get('code'))
+            self.db.execute('UPDATE users SET email=?,email_verified=1 WHERE id=?',(row['email'],user['id']))
+            return {'ok':True,'email':row['email'],'email_verified':True}
         if path=='/logout' and method=='POST':
             self.db.execute('DELETE FROM sessions WHERE hash=?',(hashlib.sha256(token.encode()).hexdigest(),))
             return {'ok':True}
