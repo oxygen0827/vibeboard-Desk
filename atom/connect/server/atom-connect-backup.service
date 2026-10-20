@@ -1,0 +1,17 @@
+[Unit]
+Description=ATOM Connect database backup to OSS
+After=atom-connect.service
+
+[Service]
+Type=oneshot
+User=atom
+Group=atom
+# Root-only file with OSS_ACCESS_KEY_ID, OSS_ACCESS_KEY_SECRET, OSS_BUCKET, OSS_ENDPOINT, OSS_REGION, OSS_PREFIX.
+EnvironmentFile=/etc/atom/oss.env
+ExecStart=/opt/atom/connect/server/backup.sh
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/atom

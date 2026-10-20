@@ -3,6 +3,10 @@
 import argparse, pathlib, shutil, subprocess, plistlib, os
 p=argparse.ArgumentParser();p.add_argument('--node',required=True);p.add_argument('--output',default='atom/connect/dist/ATOM Connect.app');a=p.parse_args()
 base=pathlib.Path(__file__).resolve().parent;app=pathlib.Path(a.output).resolve()
+# The runtime is copied alone, so it must not link Homebrew/@rpath libraries (e.g. libnode.dylib).
+links=[l.split()[0] for l in subprocess.run(['otool','-L',str(pathlib.Path(a.node).resolve())],capture_output=True,text=True,check=True).stdout.splitlines()[1:]]
+foreign=[l for l in links if not l.startswith(('/usr/lib/','/System/'))]
+if foreign:raise SystemExit('Node runtime is not self-contained (links '+', '.join(foreign[:3])+'); pass a standalone node, e.g. an official nodejs.org build')
 if app.exists():shutil.rmtree(app)
 mac=app/'Contents/MacOS';resources=app/'Contents/Resources';mac.mkdir(parents=True);(resources/'runtime').mkdir(parents=True)
 node=pathlib.Path(a.node).resolve()

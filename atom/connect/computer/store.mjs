@@ -6,4 +6,4 @@ export class Store {
  save(){writePrivate(this.file,this.data);}
  event(task,type,body){const event={event_id:crypto.randomUUID(),type,...body};this.data.outbox.push({task_id:task.id,event});if(body.status)task.status=body.status;this.save();return event;}
 }
-export function relayURL(input){const u=new URL(input);if(u.username||u.password||u.search||u.hash||u.pathname!=='/')throw new Error('请输入服务器根地址');if(u.protocol!=='https:'&&!(u.protocol==='http:'&&['127.0.0.1','localhost','[::1]'].includes(u.hostname)))throw new Error('服务器必须使用 HTTPS');return u.origin;}
+export function relayURL(input){const raw=String(input).trim(),u=new URL(raw);if(u.username||u.password||u.search||u.hash||raw.includes('?')||raw.includes('#')||/\/\.{1,2}(\/|$)/.test(raw)||/%2f|%5c|\\/i.test(u.pathname)||!/^(\/[A-Za-z0-9._~-]+)*\/?$/.test(u.pathname))throw new Error('请输入服务器地址，可带路径前缀，不含凭据或参数');if(u.protocol!=='https:'&&!(u.protocol==='http:'&&['127.0.0.1','localhost','[::1]'].includes(u.hostname)))throw new Error('服务器必须使用 HTTPS');return u.origin+u.pathname.replace(/\/+$/,'');}

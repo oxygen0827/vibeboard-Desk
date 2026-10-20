@@ -238,6 +238,14 @@ class RelayTests(unittest.TestCase):
             self.assertEqual(request('POST', '/v1/clients/register', 'x'*131073, {'Content-Type':'application/json'})[0], 413)
             server.rate_buckets = {('127.0.0.1', '/v1/pair/claim'): (module.time.monotonic(), 30)}
             self.assertEqual(request('POST', '/v1/pair/claim', '{}', {'Content-Type':'application/json'})[0], 429)
+            spoof = {'Content-Type':'application/json', 'X-Real-IP':'203.0.113.9'}
+            self.assertEqual(request('POST', '/v1/pair/claim', '{}', spoof)[0], 429, 'untrusted peers cannot choose their rate-limit key')
+            server.trusted_proxies = module.trusted_networks(['127.0.0.0/8'])
+            self.assertNotEqual(request('POST', '/v1/pair/claim', '{}', spoof)[0], 429)
+            server.rate_buckets[('203.0.113.9', '/v1/pair/claim')] = (module.time.monotonic(), 30)
+            self.assertEqual(request('POST', '/v1/pair/claim', '{}', spoof)[0], 429)
+            self.assertNotEqual(request('POST', '/v1/pair/claim', '{}', {'Content-Type':'application/json', 'X-Real-IP':'198.51.100.7'})[0], 429)
+            self.assertEqual(request('POST', '/v1/pair/claim', '{}', {'Content-Type':'application/json', 'X-Real-IP':'bogus'})[0], 429, 'invalid proxy header falls back to the proxy address')
         finally:
             server.shutdown()
             server.server_close()

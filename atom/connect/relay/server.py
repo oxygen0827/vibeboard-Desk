@@ -1,6 +1,7 @@
 """ATOM Connect durable HTTP relay. Standard library only; never logs request bodies."""
 import argparse
 import hashlib
+import ipaddress
 import json
 import math
 import re
@@ -342,8 +343,23 @@ class Relay:
         raise ApiError(404, 'Endpoint not found')
 
 
+def trusted_networks(values):
+    return tuple(ipaddress.ip_network(v.strip(), strict=False) for v in values if v.strip())
+
+
 class Handler(BaseHTTPRequestHandler):
     protocol_version = 'HTTP/1.1'
+
+    def peer(self):
+        # Only a configured reverse proxy may name the client; its X-Real-IP must overwrite any client-sent value.
+        direct = self.client_address[0]
+        trusted = getattr(self.server, 'trusted_proxies', ())
+        try:
+            if trusted and any(ipaddress.ip_address(direct) in net for net in trusted):
+                return str(ipaddress.ip_address(self.headers.get('X-Real-IP', '').strip()))
+        except ValueError:
+            pass
+        return direct
 
     def log_message(self, *args):
         pass
@@ -363,12 +379,13 @@ class Handler(BaseHTTPRequestHandler):
             require(not self.headers.get('Transfer-Encoding'), 'Transfer encoding unsupported')
             self.connection.settimeout(10)
             require(length == 0 or self.headers.get('Content-Type', '').split(';')[0].strip() == 'application/json', 'JSON content type required', 415)
+            peer = self.peer()
             if self.path in ('/v1/clients/register', '/v1/pair/claim'):
                 with self.server.relay.lock:
                     stamp = time.monotonic()
                     buckets = getattr(self.server, 'rate_buckets', {})
                     buckets = {k: v for k, v in buckets.items() if stamp-v[0] < 60}
-                    key = (self.client_address[0], self.path)
+                    key = (peer, self.path)
                     start, count = buckets.get(key, (stamp, 0))
                     require(count < 30 and (key in buckets or len(buckets) < 10000), 'Please retry later', 429)
                     buckets[key] = (start, count+1)
@@ -376,7 +393,7 @@ class Handler(BaseHTTPRequestHandler):
             body = json.loads(self.rfile.read(length).decode('utf-8')) if length else {}
             token = self.headers.get('Authorization', '')
             token = token[7:] if token.startswith('Bearer ') else ''
-            result = self.server.relay.handle(self.command, self.path, token, body, peer=self.client_address[0])
+            result = self.server.relay.handle(self.command, self.path, token, body, peer=peer)
             status = 200
         except MarketError as exc:
             status, result = exc.status, dict(error=exc.message, code=exc.code, **exc.extra)
@@ -405,9 +422,11 @@ def main():
     parser.add_argument('--host', default='127.0.0.1')
     parser.add_argument('--port', type=int, default=8787)
     parser.add_argument('--db', default=os.path.expanduser('~/.local/share/atom-connect/relay.sqlite3'))
+    parser.add_argument('--trusted-proxy', action='append', default=[], help='CIDR of a reverse proxy whose X-Real-IP is trusted; repeatable')
     args = parser.parse_args()
     os.umask(0o077)
     server = ThreadingHTTPServer((args.host, args.port), Handler)
+    server.trusted_proxies = trusted_networks(args.trusted_proxy)
     server.relay = Relay(args.db)
     try:
         server.serve_forever()
