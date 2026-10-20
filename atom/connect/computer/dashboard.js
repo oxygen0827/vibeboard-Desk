@@ -65,7 +65,7 @@ function render(s){lastState=s;
   if(!s.configured)$('config').hidden=false;
   const config=$('config');if(!config.dataset.hydrated){config.elements.relay_url.value=s.relay_url||'';config.elements.name.value=s.name||'我的 Mac';config.dataset.hydrated='true';}
   $('paired-count').textContent=paired.length?online.length+' / '+paired.length+' 在线':'';
-  $('paired').replaceChildren(...paired.map(p=>row({icon:'device',tone:p.online?'ok':'',title:p.name,sub:p.online?'在线，可以向这台电脑发起任务':'离线，联网后会自动重连',mono:false,end:[pill(p.online?'在线':'离线',p.online?'ok':'')]})));
+  $('paired').replaceChildren(...paired.map(p=>row({icon:'device',tone:p.online?'ok':'',title:p.name,sub:p.online?'在线，可以向这台电脑发起任务':'离线，联网后会自动重连',mono:false,end:[pill(p.online?'在线':'离线',p.online?'ok':''),h('button',{class:'btn ghost small',text:'解除配对',onclick:async e=>{if(!confirm('解除与「'+p.name+'」的配对？这台设备将不能再向电脑发任务，进行中的任务会被取消。需要时可以重新配对。'))return;e.target.disabled=true;try{await api('unpair',{client_id:p.client_id});note('已解除与 '+p.name+' 的配对');await refresh();}catch(err){note(err.message,true);e.target.disabled=false;}}})]})));
   if(!paired.length)$('paired').append(emptyState('还没有配对的设备','按下方步骤连接你的第一台 ATOM'));
   // Agents
   $('agents').replaceChildren(...agents.map(a=>{const ok=a.available&&a.authenticated;return h('div',{class:'card agent'},h('span',{class:'row-icon '+(ok?'ok':'')},icon('agent')),h('div',{class:'row-main'},h('strong',{text:a.name}),h('small',{text:a.reason||'尚未检测'})),pill(ok?'就绪':'待配置',ok?'ok':'warn'));}));

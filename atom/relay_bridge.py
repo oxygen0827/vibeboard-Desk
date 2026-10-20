@@ -132,6 +132,7 @@ class DeviceBridge:
         if action == 'pair-confirm':
             if type(data.get('accept')) is not bool: raise BridgeError('请确认是否连接电脑')
             return self._request('/v1/pair/confirm', {'request_id':identifier(data.get('request_id')), 'accept':data['accept']})
+        if action == 'unpair': return self._request('/v1/pair/remove', {'client_id':identifier(data.get('client_id'), '电脑')})
         if action == 'create-task':
             payload = {k:data[k] for k in ('request_id','computer_id','project_id','agent_id','prompt','session_id','kind') if k in data}
             if payload.get('kind', 'task') not in ('task', 'app'): raise BridgeError('任务类型无效')

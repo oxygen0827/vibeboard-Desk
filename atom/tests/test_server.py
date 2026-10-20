@@ -173,4 +173,16 @@ class APITests(unittest.TestCase):
         self.assertIn(b'data-atom-theme', html)
         self.assertEqual(self.request('/api/voice/transcribe', {'recording_id':'../../bad'})[0], 400)
 
+    def test_market_install_does_not_require_developer_mode(self):
+        self.request('/api/developer', {'enabled': False})
+        icon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M8 8H56V56H8Z" stroke="currentColor" fill="none"/></svg>'
+        source = {'bundle': {'manifest': {'id': 'market-demo', 'name': 'Market Demo', 'entry': 'index.html', 'icon': 'icon.svg'}, 'files': {'index.html': '<h1>Hi</h1>', 'icon.svg': icon}},
+                  'version': {'id': 'v1', 'work_id': 'w1'}, 'license': 'MIT', 'author': 'alice', 'official': False}
+        service = server.features(self.http)
+        with mock.patch.object(service.market, 'execute', return_value=source):
+            self.assertEqual(self.request('/api/market/install', {'version_id': 'v1'})[0], 400, 'explicit confirmation is still required')
+            self.assertEqual(self.request('/api/market/install', {'version_id': 'v1', 'confirm': True})[0], 200)
+        self.assertIn(b'<h1>Hi</h1>', self.request('/user-apps/market-demo/index.html')[1])
+        self.assertEqual(self.request('/api/apps/install', self.package())[0], 403, 'raw bundles still need developer mode')
+
 if __name__ == '__main__': unittest.main()

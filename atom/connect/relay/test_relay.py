@@ -65,6 +65,27 @@ class RelayTests(unittest.TestCase):
         self.assertNotIn(self.device['token'], str([tuple(r) for r in self.relay.rows('SELECT * FROM clients')]))
         self.assertNotIn(code, str([tuple(r) for r in self.relay.rows('SELECT * FROM codes')]))
 
+    def test_unpair_from_either_side_stops_pending_work(self):
+        self.pair()
+        queued = self.create(request_id='queued')
+        self.denied(lambda: self.call(self.stranger, '/v1/pair/remove', {'client_id': self.pc['client_id']}), 404)
+        self.call(self.device, '/v1/pair/remove', {'client_id': self.pc['client_id']})
+        self.assertEqual(self.call(self.device, '/v1/state')['paired'], [])
+        self.assertEqual(self.call(self.pc, '/v1/state')['paired'], [])
+        self.assertEqual(self.call(self.pc, '/v1/computer/commands')['commands'], [], 'undelivered start is withdrawn')
+        self.assertEqual(self.call(self.device, '/v1/tasks/'+queued['id']+'/events')['task']['status'], 'cancelled')
+        self.denied(lambda: self.create(request_id='after'), 403)
+        self.denied(lambda: self.call(self.device, '/v1/pair/remove', {'client_id': self.pc['client_id']}), 404)
+        # A task already running on the computer gets a cancel command; the computer reports the end.
+        self.pair()
+        running = self.create(request_id='running')
+        for command in self.call(self.pc, '/v1/computer/commands')['commands']:
+            self.call(self.pc, '/v1/computer/commands/ack', {'command_id': command['id']})
+        self.event(running, 'e1', status='running')
+        self.call(self.pc, '/v1/pair/remove', {'client_id': self.device['client_id']})
+        self.assertEqual([c['type'] for c in self.call(self.pc, '/v1/computer/commands')['commands']], ['task.cancel'])
+        self.event(running, 'e2', 'error', status='cancelled')
+
     def test_task_isolation_and_idempotency(self):
         self.pair()
         t = self.create()

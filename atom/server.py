@@ -470,8 +470,6 @@ class Handler(SimpleHTTPRequestHandler):
                 action = path.rsplit('/', 1)[-1]
                 service = features(self.server)
                 if action == 'rollback':
-                    if not read_settings(self.server.settings_path)['enabled']:
-                        self.json_response(403, dict(error='请先开启开发模式')); return
                     if data.get('confirm') is not True: raise ValueError('请确认恢复应用资源')
                     app_id = data.get('app_id')
                     if app_id in TRUSTED_CLIENT_IDS and app_id not in ('today','task-pal'): raise ValueError('系统入口不能通过市场回滚')
@@ -482,8 +480,6 @@ class Handler(SimpleHTTPRequestHandler):
                     result = dict(ok=True, app=install_app(self.server.apps_root, bundle, update=True, trusted_connect=app_id in ('today','task-pal')))
                 elif action in ('preview','install','install-state'):
 
-                    if action == 'install' and not read_settings(self.server.settings_path)['enabled']:
-                        self.json_response(403, dict(error='请先在系统设置中开启开发模式')); return
                     source = service.market.execute('source', data)
                     source_id = source.get('bundle', {}).get('manifest', {}).get('id')
                     trusted = source.get('official') is True and source_id in {'today','task-pal'}
@@ -517,8 +513,6 @@ class Handler(SimpleHTTPRequestHandler):
                         raise ValueError('only reviewed Connect client updates are accepted here')
                     result = dict(ok=True, app=install_app(self.server.apps_root, data['bundle'], update=data.get('update') is not False, trusted_connect=True))
                 elif action in ('preview-app','install-app'):
-                    if action == 'install-app' and not read_settings(self.server.settings_path)['enabled']:
-                        self.json_response(403, dict(error='请先在系统设置中开启开发模式')); return
                     bundle = connect_app_bundle(bridge, data)
                     if action == 'preview-app': result = dict(bundle=bundle)
                     else:

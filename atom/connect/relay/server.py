@@ -191,6 +191,26 @@ class Relay:
                 require(self.one('SELECT COUNT(*) n FROM bindings WHERE device=? OR computer=?', (cid, row['computer']))['n'] < 100, 'Pairing limit reached', 409)
                 self.db.execute('INSERT OR IGNORE INTO bindings VALUES(?,?)', (cid, row['computer']))
             return {'ok': True}
+        if method == 'POST' and path == '/v1/pair/remove':
+            other = string(body, 'client_id', 100)
+            device, computer = (cid, other) if role == 'device' else (other, cid)
+            require(self.one('SELECT 1 FROM bindings WHERE device=? AND computer=?', (device, computer)), 'Pairing not found', 404)
+            self.db.execute('DELETE FROM bindings WHERE device=? AND computer=?', (device, computer))
+            self.db.execute("UPDATE requests SET status='revoked' WHERE device=? AND computer=? AND status='pending'", (device, computer))
+            for row in self.rows('SELECT id, data FROM tasks WHERE device=? AND computer=?', (device, computer)):
+                task = json.loads(row['data'])
+                if task['status'] in TERMINAL:
+                    continue
+                if task['status'] == 'queued' and self.one("SELECT 1 FROM commands WHERE task=? AND acked=0 AND json_extract(data,'$.type')='task.start'", (row['id'],)):
+                    # Never delivered: drop it and close the task here.
+                    self.db.execute('DELETE FROM commands WHERE task=? AND acked=0', (row['id'],))
+                    task.update(status='cancelled', updated_at=now)
+                elif not task.get('cancel_requested'):
+                    # Already on the computer: ask it to stop and let it report the terminal event.
+                    self.command(computer, row['id'], 'task.cancel', {})
+                    task['cancel_requested'] = True
+                self.db.execute('UPDATE tasks SET data=? WHERE id=?', (json.dumps(task), row['id']))
+            return {'ok': True}
         if method == 'POST' and path == '/v1/computer/state':
             only('computer')
             projects, agents = body.get('projects'), body.get('agents')

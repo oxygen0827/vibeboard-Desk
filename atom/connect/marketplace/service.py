@@ -249,8 +249,48 @@ class Marketplace:
                 self.db.execute('INSERT INTO versions VALUES(?,?,?,?,?)',(vid,wid,number,packed(version),canonical))
 
     def handle(self, method, target, token='', body=None, peer='local'):
+        body = body if body is not None else {}
+        path = urlsplit(target).path.rstrip('/')[len('/market/v1'):]
+        if method == 'POST' and path in ('/register', '/login'):
+            return self.sign_in(path, body, peer)
         with self.lock, self.db:
-            return self._handle(method,target,token,body if body is not None else {},peer)
+            return self._handle(method,target,token,body,peer)
+
+    @staticmethod
+    def hash_password(password, salt):
+        return hashlib.pbkdf2_hmac('sha256', password.encode(), bytes.fromhex(salt), 310000).hex()
+
+    def credentials(self, body):
+        username = text(body,'username',32).strip().lower()
+        require(re.fullmatch(r'[a-z0-9][a-z0-9_-]{2,31}',username), 'Username must be 3–32 letters, digits, underscores or hyphens')
+        password = text(body,'password',256)
+        require(len(password)>=12, 'Password must have at least 12 characters')
+        return username, password
+
+    def sign_in(self, path, body, peer):
+        # Rate limits are charged before hashing, and PBKDF2 runs outside the lock so it cannot stall other requests.
+        require(isinstance(body,dict), 'JSON object required')
+        with self.lock:
+            self.rate((peer,path), 10 if path=='/register' else 30, 3600 if path=='/register' else 600)
+            username, password = self.credentials(body)
+            require(username not in ('atom','official','admin','system'), 'Username unavailable')
+            self.rate(('account',hashlib.sha256(username.encode()).hexdigest()),30,600)
+            user = self.row('SELECT * FROM users WHERE username=?',(username,))
+            if path == '/register':
+                require(not user,'Username unavailable',409,'username_unavailable')
+            salt = secrets.token_hex(16) if path == '/register' else (user['salt'] if user else '00'*16)
+        computed = self.hash_password(password, salt)
+        with self.lock, self.db:
+            user = self.row('SELECT * FROM users WHERE username=?',(username,))
+            if path == '/register':
+                require(not user,'Username unavailable',409,'username_unavailable')
+                require(self.row('SELECT COUNT(*) n FROM users')['n']<1000,'Account capacity reached',409,'quota_exceeded')
+                uid=secrets.token_hex(16)
+                self.db.execute('INSERT INTO users(id,username,salt,password_hash,created) VALUES(?,?,?,?,?)',(uid,username,salt,computed,self.clock()))
+                user=self.row('SELECT * FROM users WHERE id=?',(uid,))
+            else:
+                require(user and user['salt']==salt and hmac.compare_digest(computed,user['password_hash']),'Invalid username or password',401,'invalid_credentials')
+            return self.login_session(user)
 
     def _handle(self, method, target, token, body, peer):
         parsed = urlsplit(target)
@@ -258,28 +298,6 @@ class Marketplace:
         require(isinstance(body,dict), 'JSON object required')
         if path == '/health' and method == 'GET':
             return {'ok':True}
-        if path in ('/register','/login') and method == 'POST':
-            self.rate((peer,path), 10 if path=='/register' else 30, 3600 if path=='/register' else 600)
-            username = text(body,'username',32).strip().lower()
-            require(re.fullmatch(r'[a-z0-9][a-z0-9_-]{2,31}',username), 'Username must be 3–32 letters, digits, underscores or hyphens')
-            require(username not in ('atom','official','admin','system'), 'Username unavailable')
-            password = text(body,'password',256)
-            require(len(password)>=12, 'Password must have at least 12 characters')
-            self.rate(('account',hashlib.sha256(username.encode()).hexdigest()),30,600)
-            user = self.row('SELECT * FROM users WHERE username=?',(username,))
-            if path == '/register':
-                require(not user,'Username unavailable',409,'username_unavailable')
-                require(self.row('SELECT COUNT(*) n FROM users')['n']<1000,'Account capacity reached',409,'quota_exceeded')
-                salt=secrets.token_hex(16)
-                hashed=hashlib.pbkdf2_hmac('sha256',password.encode(),bytes.fromhex(salt),310000).hex()
-                uid=secrets.token_hex(16)
-                self.db.execute('INSERT INTO users VALUES(?,?,?,?,?)',(uid,username,salt,hashed,self.clock()))
-                user=self.row('SELECT * FROM users WHERE id=?',(uid,))
-            else:
-                salt=bytes.fromhex(user['salt']) if user else bytes(16)
-                computed=hashlib.pbkdf2_hmac('sha256',password.encode(),salt,310000).hex()
-                require(user and hmac.compare_digest(computed,user['password_hash']),'Invalid username or password',401,'invalid_credentials')
-            return self.login_session(user)
         if method == 'GET' and path == '/catalog':
             query=parse_qs(parsed.query)
             category=query.get('category',[''])[0]

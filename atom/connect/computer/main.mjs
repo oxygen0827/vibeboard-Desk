@@ -27,6 +27,7 @@ export function dashboard(companion,{port=8788}={}){
    else if(url.pathname==='/api/projects')result=companion.addProject(body);
    else if(url.pathname==='/api/projects/remove')companion.removeProject(body.id);
    else if(url.pathname==='/api/pair')result=await companion.request('/v1/pair/claim',{code:String(body.code||'').trim()});
+   else if(url.pathname==='/api/unpair'){result=await companion.request('/v1/pair/remove',{client_id:String(body.client_id||'')});companion.relayState=await companion.request('/v1/state');}
    else if(url.pathname==='/api/diagnostics')result={agents:await companion.diagnose()};
    else return send(404,{error:'接口不存在'});
    send(200,result);

@@ -313,4 +313,21 @@ class MarketplaceTests(unittest.TestCase):
         self.denied(429,lambda:self.call('/login',dict(username='alice',password='incorrect-password')))
 
 
+    def test_password_hashing_runs_outside_marketplace_lock(self):
+        original,seen=m.Marketplace.hash_password,[]
+        def probe(password,salt):
+            got=[]
+            def other():
+                ok=self.market.lock.acquire(timeout=1)
+                if ok:self.market.lock.release()
+                got.append(ok)
+            t=threading.Thread(target=other);t.start();t.join()
+            seen.append(got[0])
+            return original(password,salt)
+        self.market.hash_password=probe
+        self.call('/login',dict(username='alice',password='long-test-password-a'))
+        self.denied(401,lambda:self.call('/login',dict(username='alice',password='wrong-password-x')))
+        self.call('/register',dict(username='carol',password='long-test-password-c'))
+        self.assertEqual(seen,[True,True,True])
+
 if __name__=='__main__':unittest.main()
