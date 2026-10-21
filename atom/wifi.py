@@ -79,6 +79,7 @@ def connect(ssid, password):
     previous = next((f[0] for f in (_fields(line) for line in profiles.splitlines())
                      if len(f) == 2 and f[1] in ('wifi', '802-11-wireless')
                      and re.fullmatch(r'[0-9a-fA-F-]{36}', f[0])), None)
+    known = _wifi_profiles()
     args = ['-w', '35', 'device', 'wifi', 'connect', ssid] + (['password', password] if password else [])
     failure = None
     try:
@@ -92,6 +93,12 @@ def connect(ssid, password):
             failure = _connection_error(out + err)
     except WifiError as exc:
         failure = str(exc)
+    # A failed attempt still saves a profile with the wrong password; NetworkManager would keep retrying it.
+    for uuid in _wifi_profiles() - known:
+        try:
+            _nmcli(['connection', 'delete', 'uuid', uuid], timeout=15)
+        except WifiError:
+            pass
     if previous:
         try:
             restored, _, _ = _nmcli(['-w', '20', 'connection', 'up', 'uuid', previous], timeout=25)
@@ -99,6 +106,12 @@ def connect(ssid, password):
         except WifiError:
             failure += '；请重新选择原网络'
     raise WifiError(failure)
+
+
+def _wifi_profiles():
+    _, out, _ = _nmcli(['-t', '-f', 'UUID,TYPE', 'connection', 'show'], timeout=10)
+    return {f[0] for f in (_fields(line) for line in out.splitlines())
+            if len(f) == 2 and f[1] in ('wifi', '802-11-wireless') and re.fullmatch(r'[0-9a-fA-F-]{36}', f[0])}
 
 
 def _connection_error(output):
