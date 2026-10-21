@@ -44,3 +44,15 @@ body[data-view=workshop] #workshop-tts-text{width:100%;height:172px;resize:none;
 .welcome-keys{list-style:none;padding:0!important;gap:6px!important}
 .welcome-keys li{font-size:15px!important;color:var(--ink)!important}
 .welcome kbd{font:12px ui-monospace,monospace;border:1px solid var(--line);border-radius:5px;padding:1px 6px;margin-right:6px;background:var(--card)}
+.wifi-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:2px 0 8px;font-size:13px}
+.wifi-head button{min-height:32px;padding:4px 12px;font-size:12px}
+.wifi-list{display:flex;flex-direction:column;gap:6px}
+.wifi-row>button{width:100%;display:flex;justify-content:space-between;align-items:center;min-height:44px;text-align:left}
+.wifi-row.active>button{border-color:var(--accent)}
+.wifi-name small{color:var(--muted);font-size:11px;margin-left:6px}
+.wifi-meta{font-size:12px;color:var(--muted);letter-spacing:1px}
+.wifi-join{display:flex;gap:6px;margin-top:6px}
+.wifi-join input{flex:1;min-width:0;font:inherit;min-height:40px;padding:6px 10px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
+.wifi-join button{min-height:40px;padding:6px 12px}
+.wifi-error{color:var(--action);font-size:12px;margin:0 0 6px}
+.welcome-wifi{max-height:170px;overflow-y:auto}

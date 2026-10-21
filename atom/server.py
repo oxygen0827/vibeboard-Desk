@@ -424,6 +424,10 @@ class Handler(SimpleHTTPRequestHandler):
             self.json_response(200, dict(ok=True, service='atom', version='0.5.0'))
         elif path == '/api/status':
             self.json_response(200, system_status())
+        elif path == '/api/wifi':
+            import wifi
+            try: self.json_response(200, dict(status=wifi.status(), networks=wifi.networks()))
+            except wifi.WifiError as exc: self.json_response(503, dict(error=str(exc)))
         elif path == '/api/apps':
             self.json_response(200, dict(apps=apps(self.server.apps_root)))
         elif path == '/api/developer':
@@ -635,6 +639,13 @@ class Handler(SimpleHTTPRequestHandler):
                     raise ValueError('brightness must be an integer from 0 to 100')
                 set_brightness(brightness)
                 self.json_response(200, dict(ok=True, brightness=brightness))
+            elif path in ('/api/wifi/scan', '/api/wifi/connect'):
+                import wifi
+                try:
+                    if path == '/api/wifi/scan': result = dict(status=wifi.status(), networks=wifi.networks(rescan=True))
+                    else: result = dict(status=wifi.connect(data.get('ssid'), data.get('password', '')))
+                    self.json_response(200, result)
+                except wifi.WifiError as exc: self.json_response(400, dict(error=str(exc)))
             elif path == '/api/audio/volume':
                 volume = data.get('volume')
                 if type(volume) is not int or not 0 <= volume <= 100:

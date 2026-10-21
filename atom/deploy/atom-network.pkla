@@ -1,0 +1,9 @@
+# Lets the ATOM service (user linaro, outside a login session) scan and join Wi-Fi from Settings > 网络
+# and the first-run setup. Install as root to /etc/polkit-1/localauthority/50-local.d/atom-network.pkla
+# (polkit 0.105, Debian 10). Sharing, hotspots and other users are not granted.
+[ATOM network control]
+Identity=unix-user:linaro
+Action=org.freedesktop.NetworkManager.network-control;org.freedesktop.NetworkManager.enable-disable-wifi;org.freedesktop.NetworkManager.settings.modify.system;org.freedesktop.NetworkManager.settings.modify.own
+ResultAny=yes
+ResultInactive=yes
+ResultActive=yes
