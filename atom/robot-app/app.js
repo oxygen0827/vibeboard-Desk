@@ -100,6 +100,12 @@ function say(text,error){subtitle.textContent=text||'';subtitle.classList.toggle
 function hint(){const el=$('hint'),show=['idle','asleep','error'].includes(state)&&!subtitle.textContent;el.textContent='长按空格开始聊天';el.classList.toggle('off',!show);}
 
 // ---------------------------------------------------------------- conversation
+// Friendly lines instead of error codes; only setup problems the user must fix are shown as they are.
+const MISHEARD=['我没听清，再说一遍好吗？','咦，好像没听到声音，再试一次吧','刚才有点小声，能再说一次吗？','我漏听了，麻烦再讲一遍','嗯？再说一次我就能听清啦','你说什么？我刚刚走神了','哎呀，我耳朵打了个盹，再说一次吧','再靠近一点说，我就能听清楚啦'];
+let lastLine='';
+function misheard(){const options=MISHEARD.filter(l=>l!==lastLine);lastLine=options[Math.random()*options.length|0];setState('idle');setExpression('confused');say(lastLine);setTimeout(()=>{if(state==='idle'&&subtitle.textContent===lastLine){setExpression('calm');say('');heard.hidden=true;}},4000);}
+const setupProblem=message=>/配置|密钥|余额|未开通|key/i.test(message||'');
+function failed(message){if(setupProblem(message)){setState('error');setExpression('sad');say(message,true);}else misheard();}
 let data={settings:{name:'小原',style:'lively',voice:'tongtong',note:''},history:[]},job=null,poll=0,levelInfo={level:0,ahead:[],at:0};
 function level(){const since=(performance.now()-levelInfo.at)/50|0,v=since<=0?levelInfo.level:levelInfo.ahead[since-1];return v===undefined?levelInfo.level*.6:v;}
 function setState(next){state=next;hint();if(next==='listening'){setExpression('listening');look.x.t=0;look.y.t=0;}else if(next==='thinking'||next==='transcribing')setExpression('thinking');else if(next==='idle')setExpression('calm');}
@@ -107,11 +113,11 @@ function onVoice(m){wake();
   if(m.state==='starting'||m.state==='recording'){if(job)stopTalking();if(state!=='listening'){setState('listening');say('');heard.hidden=true;}}
   else if(m.state==='level')mic=mic*.4+m.level*.6;
   else if(m.state==='transcribing'){mic=0;setState('transcribing');}
-  else if(m.state==='done'){mic=0;const text=(m.text||'').trim();if(text)ask(text);else{setState('idle');setExpression('confused');say('没听清，再说一次吧');}}
-  else if(m.state==='error'){mic=0;setState('error');setExpression('sad');say(m.error||'录音失败了',true);}}
+  else if(m.state==='done'){mic=0;const text=(m.text||'').trim();if(text)ask(text);else misheard();}
+  else if(m.state==='error'){mic=0;failed(m.error);}}
 async function ask(text){wake();heard.textContent='你：'+text;heard.hidden=false;say('');setState('thinking');
   try{const s=data.settings,r=await call('chat',{text,history:data.history.slice(-16),name:s.name,style:s.style,voice:s.voice,note:s.note});job={id:r.job_id,text};pollJob(job);}
-  catch(e){setState('error');setExpression('sad');say(e.message,true);}}
+  catch(e){failed(e.message);}}
 async function pollJob(current){clearTimeout(poll);if(job!==current||!alive)return;let r;
   try{r=await call('status',{job_id:current.id});}catch(e){if(job===current)poll=setTimeout(()=>pollJob(current),400);return;}
   if(job!==current)return;
@@ -119,11 +125,11 @@ async function pollJob(current){clearTimeout(poll);if(job!==current||!alive)retu
     if(r.phase==='speaking'){levelInfo={level:r.level||0,ahead:r.ahead||[],at:performance.now()};if(r.emotion&&r.emotion!==expression&&EXPR[r.emotion])setExpression(r.emotion);if(r.subtitle)say(r.subtitle);if(r.level>.55&&!reduced)bob.s-=40*r.level;}
     poll=setTimeout(()=>pollJob(current),110);return;}
   job=null;
-  if(r.phase==='done'){const reply=r.reply||'';remember(current.text,reply);lastActive=performance.now();
+  if(r.phase==='done'){const reply=r.reply||'';if(!r.fallback)remember(current.text,reply);lastActive=performance.now();
     if(!r.speech){if(EXPR[r.emotion])setExpression(r.emotion);say(reply+(r.error?'（'+r.error+'）':''));}
     state='idle';hint();speakLevel=0;
     setTimeout(()=>{if(state==='idle'&&!job){setExpression('calm');say('');heard.hidden=true;}},r.speech?5000:Math.min(12000,3000+reply.length*150));}
-  else if(r.phase==='error'){setState('error');setExpression('sad');say(r.error||'出了点问题',true);}
+  else if(r.phase==='error')failed(r.error);
   else setState('idle');}
 function stopTalking(){job=null;clearTimeout(poll);call('stop').catch(()=>{});speakLevel=0;}
 async function remember(user,reply){if(!reply)return;data.history.push({role:'user',content:user.slice(0,500)},{role:'assistant',content:reply.slice(0,600)});data.history=data.history.slice(-16);

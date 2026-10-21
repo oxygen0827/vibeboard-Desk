@@ -8,6 +8,7 @@ import audioop
 import base64
 import json
 import queue
+import random
 import re
 import subprocess
 import threading
@@ -33,6 +34,34 @@ RATE, FRAME = 24000, 1200  # 16-bit mono PCM at 24 kHz; loudness frames of 50 ms
 CUE_SECONDS = 0.6  # provider's AI-content audio label at the start of each clip; kept, never stripped
 TAG = re.compile(r'^\s*[\[【]([^\]】]{1,4})[\]】]\s*')
 SENTENCE_END = re.compile(r'[。！？!?；;…\n]')
+# Spoken, in-character answers instead of error codes. A turn answered from here is not kept in memory.
+FALLBACK = {
+    'filtered': ['[害羞]哎呀，这个话我可接不住，咱们换个话题吧。', '[疑惑]嗯？这句我不太会回答，聊点别的好不好？', '[平静]这个我就不接啦，你还想聊点什么？',
+                 '[害羞]这话说得我都脸红了，换一句吧。', '[思考]这个话题我先跳过，跟我说说你今天过得怎么样？', '[疑惑]这句话我的小脑袋处理不了，换个说法试试？',
+                 '[平静]咱们文明聊天嘛，说点开心的事吧。', '[害羞]哎哟，这个我可不能说，你问点别的吧。', '[思考]这个我答不上来，要不聊聊你喜欢的东西？',
+                 '[开心]好啦好啦，咱们换个轻松点的话题吧。'],
+    'unavailable': ['[疑惑]哎，我刚刚没听清，能再说一遍吗？', '[困]我脑子卡了一下，你再说一次好不好？', '[难过]不好意思，信号好像不太好，再说一遍吧。',
+                    '[思考]嗯……我走神了，刚才你说什么来着？', '[疑惑]刚才那句我没接住，麻烦再说一次。', '[害羞]抱歉抱歉，我刚才没反应过来，再说一遍？',
+                    '[困]我有点迷糊，你能慢一点再说一次吗？', '[疑惑]咦，我好像漏听了，再讲一遍好吗？', '[难过]哎呀，我这边有点卡，等一下再问我一次吧。',
+                    '[思考]让我缓一缓，你再说一次我就能接上啦。'],
+}
+_last_fallback = {}
+
+
+def fallback_line(kind):
+    choices = [line for line in FALLBACK[kind] if line != _last_fallback.get(kind)]
+    _last_fallback[kind] = line = random.choice(choices)
+    return line
+
+
+class Filtered(Exception):
+    """The provider's content filter refused the request or the reply."""
+
+
+class Unavailable(Exception):
+    """A transient failure: network, busy model, timeout."""
+
+
 EMOJI = re.compile('[\U0001F000-\U0001FAFF☀-➿️]')
 
 
@@ -101,7 +130,8 @@ class RobotTalk:
             return dict(phase=job['phase'], emotion=(current[-1]['emotion'] if current else job['emotion']),
                         subtitle=(current[-1]['text'] if current else ''),
                         reply=job['reply'], level=job['levels'][frame] if playing and frame < len(job['levels']) else 0.0,
-                        ahead=job['levels'][frame + 1:frame + 7] if playing else [], speech=job['speech'], error=job['error'])
+                        ahead=job['levels'][frame + 1:frame + 7] if playing else [], speech=job['speech'], error=job['error'],
+                        fallback=job.get('fallback'))
 
     def stop(self):
         with self.lock:
@@ -133,25 +163,33 @@ class RobotTalk:
 
     def _chat(self, job, base, key, messages):
         """Yield reply text deltas, falling back to the free model when the first one is unavailable."""
-        last = None
+        setup = {401: '聊天服务密钥无效，请在工作坊检查智谱 API key', 402: '智谱账户余额不足，请充值后再聊', 403: '智谱聊天服务未开通或被拒绝'}
         for model in CHAT_MODELS:
             body = dict(model=model, messages=messages, stream=True, max_tokens=400, temperature=0.8)
             if model.startswith('glm-4.5'): body['thinking'] = {'type': 'disabled'}
             try:
                 response = self._post(base + '/chat/completions', key, body)
             except HTTPError as exc:
-                last = exc
-                if exc.code in (401, 403): break
+                try: detail = exc.read(4096).decode('utf-8', 'replace')
+                except Exception: detail = ''
+                if exc.code == 400 and '1301' in detail: raise Filtered()
+                if exc.code in setup: raise ValueError(setup[exc.code])
+                continue  # busy, rate limited or rejected: try the next model
+            except (URLError, OSError):
                 continue
             job['model'] = model
-            with response:
-                for event in self._events(response):
-                    if job['cancelled']: return
-                    delta = (event.get('choices') or [{}])[0].get('delta') or {}
-                    if delta.get('content'): yield delta['content']
+            try:
+                with response:
+                    for event in self._events(response):
+                        if job['cancelled']: return
+                        choice = (event.get('choices') or [{}])[0]
+                        if choice.get('finish_reason') == 'sensitive': raise Filtered()
+                        delta = choice.get('delta') or {}
+                        if delta.get('content'): yield delta['content']
+            except (URLError, OSError) as exc:
+                raise Unavailable() from exc
             return
-        labels = {401: '密钥无效', 402: '账户余额不足', 403: '服务未开通', 429: '请求太频繁'}
-        raise ValueError('聊天服务暂不可用：' + (labels.get(last.code, 'HTTP %d' % last.code) if isinstance(last, HTTPError) else '网络错误'))
+        raise Unavailable()
 
     def _sentences(self, job, base, key, messages, out):
         buffer, emotion = '', 'calm'
@@ -183,10 +221,18 @@ class RobotTalk:
                     emit(buffer[:cut]); buffer = buffer[cut:]
                 if job['cancelled']: return
             emit(buffer)
+        except (Filtered, Unavailable, URLError, OSError) as exc:
+            # Replace whatever arrived with one spoken, in-character line.
+            job['fallback'] = 'filtered' if isinstance(exc, Filtered) else 'unavailable'
+            job['reply'] = ''
+            out.put(('reset', ''))
+            emit(fallback_line(job['fallback']))
         except ValueError as exc:
             job['llm_error'] = str(exc)
         except Exception:
-            job['llm_error'] = '聊天服务暂不可用：网络错误'
+            job['fallback'], job['reply'] = 'unavailable', ''
+            out.put(('reset', ''))
+            emit(fallback_line('unavailable'))
         finally:
             job['llm_done'] = True
             out.put(None)
@@ -217,11 +263,17 @@ class RobotTalk:
             while True:
                 item = sentences.get(timeout=60)
                 if item is None or job['cancelled']: break
+                if item[0] == 'reset':
+                    parts = []
+                    continue
                 parts.append(item)
                 job['emotion'] = item[0]
             if job['cancelled']: return
             if job.get('llm_error'): raise ValueError(job['llm_error'])
-            if not parts: raise ValueError('没有听清，再说一次吧')
+            if not parts:
+                job['fallback'] = 'unavailable'
+                parts = [('confused', clean(TAG.sub('', fallback_line('unavailable'))))]
+                job['reply'] = parts[0][1]
             text = ''.join(t for _, t in parts)
             job['segments'] = [dict(at=0.0 if i == 0 else float('inf'), emotion=e, text=t) for i, (e, t) in enumerate(parts)]
             try:

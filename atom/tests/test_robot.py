@@ -102,6 +102,30 @@ class RobotTests(unittest.TestCase):
         self.assertEqual(status['reply'], '只有文字。')
         self.assertIn('语音播报暂不可用', status['error'])
 
+    def test_content_filter_gets_a_spoken_deflection_not_an_error(self):
+        class Refusing(FakeOpener):
+            def open(self, request, timeout=None):
+                if request.full_url.endswith('/chat/completions'):
+                    self.requests.append((request.full_url, json.loads(request.data)))
+                    raise HTTPError(request.full_url, 400, 'bad', {}, io.BytesIO('{"error":{"code":"1301","message":"系统检测到输入或生成内容可能包含不安全或敏感内容"}}'.encode()))
+                return super().open(request, timeout)
+        opener = Refusing([])
+        talk = robot.RobotTalk(opener=opener, player=FakePlayer)
+        status = wait_done(talk, talk.start(CONFIG, {'text': '脏话'})['job_id'])
+        self.assertEqual((status['phase'], status['fallback'], status['error']), ('done', 'filtered', None))
+        self.assertIn(status['reply'], [robot.clean(robot.TAG.sub('', line)) for line in robot.FALLBACK['filtered']])
+        self.assertEqual(len([u for u, _ in opener.requests if u.endswith('/chat/completions')]), 1, 'a filtered input is not retried on another model')
+        self.assertEqual([b['input'] for u, b in opener.requests if u.endswith('/audio/speech')], [status['reply']], 'the deflection is spoken')
+
+    def test_unavailable_chat_says_it_did_not_catch_that(self):
+        talk = robot.RobotTalk(opener=FakeOpener([], chat_errors=[429, 503]), player=FakePlayer)
+        status = wait_done(talk, talk.start(CONFIG, {'text': '你好'})['job_id'])
+        self.assertEqual((status['phase'], status['fallback']), ('done', 'unavailable'))
+        self.assertTrue(status['reply'])
+        lines = [robot.fallback_line('unavailable') for _ in range(30)]
+        self.assertTrue(all(a != b for a, b in zip(lines, lines[1:])), 'never the same line twice in a row')
+        self.assertGreater(len(set(lines)), 3)
+
     def test_bad_key_reports_error(self):
         talk = robot.RobotTalk(opener=FakeOpener([], chat_errors=[401]), player=FakePlayer)
         status = wait_done(talk, talk.start(CONFIG, {'text': '你好'})['job_id'])
