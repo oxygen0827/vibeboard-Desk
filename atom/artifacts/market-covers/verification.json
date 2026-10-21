@@ -1,0 +1,22 @@
+{
+  "verifiedAt": "2026-10-21T08:35:18.273Z",
+  "backendRelease": "20261021T082756Z",
+  "siteRelease": "20261021T083151Z",
+  "publicMarketWorks": 12,
+  "publicMarketCovers": 12,
+  "curatedWebsiteScreenshots": 35,
+  "websiteTotal": 37,
+  "macPackageUpdated": true,
+  "liveMacMarketCards": 12,
+  "deviceDeployment": "pending: SSH remote connection refused",
+  "checks": [
+    "public covers decode as JPEG",
+    "website cloud cover merge and detail",
+    "desktop/mobile no horizontal overflow",
+    "installed Mac worker serves new cards",
+    "cover upload/publish and failed replacement UI test",
+    "private cover authorization and persistence tests",
+    "immutable source versions unchanged",
+    "workshop result and installed reminders fit 480x360 without root scrolling or clipped buttons"
+  ]
+}

@@ -11,3 +11,16 @@
 
 .collection-art .art-world{position:absolute;width:73%;aspect-ratio:4/3;border:7px solid #172328;border-radius:9px;box-shadow:12px 18px 0 #c7d4bd;overflow:hidden;background:#172328}.collection-art .art-world img{position:static;border:0;box-shadow:none;border-radius:0;width:105.833333%;max-width:none;height:100%;object-fit:fill}.detail-visual>img[data-capture-width="508"]{width:105.833333%;max-width:none;object-fit:fill;justify-self:start}
 @media(max-width:760px){.collection-art .art-world{width:68%;border-width:5px;box-shadow:9px 12px 0 #c7d4bd}}
+
+/* The cover is the application itself; metadata stays legible over its lower edge. */
+.app-card{position:relative;isolation:isolate;overflow:hidden;min-height:280px;justify-content:flex-end}
+.app-card>.card-cover{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2}
+.app-card>.card-cover[data-capture-width="508"]{width:105.833333%;max-width:none;object-fit:cover}
+.app-card.has-cover{background:#172128;border-color:transparent;color:white}
+.app-card.has-cover:before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(6,14,22,.06) 8%,rgba(6,14,22,.2) 30%,rgba(6,14,22,.91) 100%)}
+.app-card.has-cover .app-card-top{margin-bottom:auto}.app-card.has-cover .catalog-icon{width:36px;height:36px;border-radius:10px;background:#ffffffe0}.app-card.has-cover .catalog-icon img{width:26px;height:26px}
+.app-card.has-cover .card-kind{color:#fff;background:#10182070;padding:4px 7px;border-radius:3px;margin-top:0}
+.app-card.has-cover h3{font-size:23px;margin-top:35px;line-height:1.25;font-weight:550}
+.app-card.has-cover>p{color:#ffffffe0;font-size:12px;-webkit-line-clamp:2;margin-bottom:14px}
+.app-card.has-cover .card-foot{margin-top:0;color:#ffffffb0;border-color:#ffffff35}.app-card.has-cover .card-foot>span:last-child{color:#fff}
+@media(max-width:760px){.app-card{min-height:245px;padding:16px 12px}.app-card.has-cover .app-card-top{display:flex;gap:4px}.app-card.has-cover .catalog-icon{width:29px;height:29px;border-radius:8px}.app-card.has-cover .catalog-icon img{width:23px;height:23px}.app-card.has-cover .card-kind{font-size:8px;padding:3px 5px}.app-card.has-cover h3{font-size:18px;margin-top:45px}.app-card.has-cover>p{font-size:10px}.app-card.has-cover .card-foot{font-size:8px}}

@@ -83,7 +83,7 @@
       "market_id": "official-photo-album",
       "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/official/photo-album",
       "icon": "/atom/assets/apps/photo-album.svg",
-      "image": null,
+      "image": "/atom/assets/apps/photo-album.png",
       "needs": "同步需要联网；生图需配置并开通模型",
       "guide": "/atom/guide/#market"
     },
@@ -174,7 +174,7 @@
       "market_id": "official-today",
       "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/official/today",
       "icon": "/atom/assets/apps/today.svg",
-      "image": "/atom/assets/today.png",
+      "image": "/atom/assets/apps/today.png",
       "needs": "跨设备同步需要同一账号和网络",
       "guide": "/atom/guide/#market"
     },
@@ -330,7 +330,7 @@
       "market_id": null,
       "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/ports/material-world",
       "icon": "/atom/assets/apps/material-world.svg",
-      "image": null,
+      "image": "/atom/assets/apps/material-world.png",
       "needs": "完整资源安装后本机运行；查看源码目录中的许可与边界",
       "guide": "/atom/guide/#developer"
     },
@@ -382,7 +382,7 @@
       "market_id": null,
       "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/computer-app",
       "icon": "/atom/assets/apps/my-computer.svg",
-      "image": null,
+      "image": "/atom/assets/apps/my-computer.png",
       "needs": "电脑任务需要配对电脑在线",
       "guide": "/atom/guide/#desktop"
     },
@@ -395,7 +395,7 @@
       "market_id": null,
       "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/notes-app",
       "icon": "/atom/assets/apps/quick-notes.svg",
-      "image": null,
+      "image": "/atom/assets/apps/quick-notes.png",
       "needs": "同步需要同一账号和网络",
       "guide": "/atom/guide/#desktop"
     },
@@ -408,7 +408,7 @@
       "market_id": null,
       "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/market-app",
       "icon": "/atom/assets/apps/market.svg",
-      "image": null,
+      "image": "/atom/assets/apps/market.png",
       "needs": "需要联网；安装与发布在客户端确认",
       "guide": "/atom/guide/#desktop"
     },
@@ -421,7 +421,7 @@
       "market_id": null,
       "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/robot-app",
       "icon": "/atom/assets/apps/robot.svg",
-      "image": null,
+      "image": "/atom/assets/apps/robot.png",
       "needs": "语音聊天需要麦克风、网络及已配置模型服务",
       "guide": "/atom/guide/#desktop"
     },
@@ -434,7 +434,7 @@
       "market_id": null,
       "source": "https://github.com/wangqioo/vibeboard-Desk/blob/deploy/ldcx-public/atom/static/app.js",
       "icon": "/atom/assets/apps/workshop.svg",
-      "image": null,
+      "image": "/atom/assets/apps/workshop.png",
       "needs": "工作坊生成需要有效模型服务",
       "guide": "/atom/guide/#desktop"
     },
@@ -447,7 +447,7 @@
       "market_id": null,
       "source": "https://github.com/wangqioo/vibeboard-Desk/blob/deploy/ldcx-public/atom/static/app.js",
       "icon": "/atom/assets/apps/clock.svg",
-      "image": null,
+      "image": "/atom/assets/apps/clock.png",
       "needs": "本机运行",
       "guide": "/atom/guide/#desktop"
     },
@@ -460,7 +460,7 @@
       "market_id": null,
       "source": "https://github.com/wangqioo/vibeboard-Desk/blob/deploy/ldcx-public/atom/static/app.js",
       "icon": "/atom/assets/apps/timer.svg",
-      "image": null,
+      "image": "/atom/assets/apps/timer.png",
       "needs": "本机运行",
       "guide": "/atom/guide/#desktop"
     }

@@ -17,6 +17,7 @@ from urllib.parse import urlsplit, parse_qs
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from mailer import Mailer, settings as mailer_settings
 from photos import PhotoLibrary, PhotoError
+import covers
 
 CATEGORIES = {'life', 'companion', 'sound', 'play', 'connect'}
 LICENSES = {'MIT', 'Apache-2.0', 'BSD-2-Clause', 'BSD-3-Clause', 'CC0-1.0', 'MPL-2.0', 'GPL-3.0-only', 'GPL-3.0-or-later'}
@@ -130,6 +131,7 @@ class Marketplace:
         self._schema()
         self.seed_root = Path(seeds) if seeds else Path(__file__).resolve().parents[2] / 'official'
         self.import_official()
+        covers.official(self)
         self.photos = PhotoLibrary(self)
 
     def _prepare_path(self, target):
@@ -147,6 +149,7 @@ class Marketplace:
         CREATE TABLE IF NOT EXISTS users(id TEXT PRIMARY KEY,username TEXT UNIQUE,salt TEXT,password_hash TEXT,created REAL);
         CREATE TABLE IF NOT EXISTS sessions(hash TEXT PRIMARY KEY,user TEXT,expires REAL,created REAL);
         CREATE TABLE IF NOT EXISTS drafts(id TEXT PRIMARY KEY,user TEXT,data TEXT,bundle TEXT);
+        CREATE TABLE IF NOT EXISTS covers(id TEXT PRIMARY KEY,owner TEXT,image BLOB,width INTEGER,height INTEGER,public INTEGER,created REAL);
         CREATE TABLE IF NOT EXISTS works(id TEXT PRIMARY KEY,user TEXT,data TEXT);
         CREATE TABLE IF NOT EXISTS versions(id TEXT PRIMARY KEY,work TEXT,number INTEGER,data TEXT,bundle TEXT,UNIQUE(work,number));
         CREATE TABLE IF NOT EXISTS notes(id TEXT PRIMARY KEY,user TEXT,data TEXT);
@@ -237,7 +240,11 @@ class Marketplace:
         canonical = packed(bundle)
         digest = hashlib.sha256(canonical.encode('utf-8')).hexdigest()
         version = dict(id=version_id, work_id=work_id, number=number, created_at=self.clock(), changelog=changelog, sha256=digest, source_sha256=digest)
-        work = {k:draft.get(k) for k in ('title','description','category','license','parent_id','parent_version_id','attribution')}
+        work = {k:draft.get(k) for k in ('title','description','category','license','parent_id','parent_version_id','attribution','cover_id')}
+        if draft.get('cover_id'):
+            require(self.row('SELECT 1 FROM covers WHERE id=? AND owner=?', (draft['cover_id'],user['id'])), '封面不存在，请重新上传')
+            self.db.execute('UPDATE covers SET public=1 WHERE id=?', (draft['cover_id'],))
+            version['cover_id'] = draft['cover_id']
         work.update(id=work_id, author=user['username'], latest_version_id=version_id, updated_at=self.clock(), official=False)
         self.db.execute('INSERT OR REPLACE INTO works VALUES(?,?,?)', (work_id,user['id'],packed(work)))
         self.db.execute('INSERT INTO versions VALUES(?,?,?,?,?)', (version_id,work_id,number,packed(version),canonical))
@@ -464,6 +471,15 @@ class Marketplace:
             versions=[json.loads(r['data']) for r in self.rows('SELECT data FROM versions WHERE work=? ORDER BY number DESC',(parts[1],))]
             derivatives=[json.loads(r['data']) for r in self.rows('SELECT w.data FROM works w LEFT JOIN visibility v ON v.work=w.id WHERE COALESCE(v.unlisted,0)=0')]
             return {'work':work,'versions':versions,'derivatives':[w for w in derivatives if w.get('parent_id')==parts[1]][:100]}
+        if method=='GET' and len(parts)==2 and parts[0]=='covers':
+            require(covers.COVER_ID.fullmatch(parts[1]), '封面标识无效')
+            media=self.row('SELECT * FROM covers WHERE id=?', (parts[1],))
+            require(media, '封面不存在', 404)
+            if not media['public']:
+                user=self.auth(token)
+                require(media['owner']==user['id'], '封面不存在', 404)
+            import base64
+            return {'id':media['id'], 'image':'data:image/jpeg;base64,'+base64.b64encode(media['image']).decode(), 'width':media['width'], 'height':media['height']}
         if method=='GET' and len(parts)==2 and parts[0]=='versions':
             return self.version(parts[1])
         if path=='/password/forgot' and method=='POST':
@@ -524,11 +540,29 @@ class Marketplace:
             row,draft=self.own_draft(parts[1],user)
             if len(parts)==2 and method=='GET':
                 return {'draft':draft,'bundle':json.loads(row['bundle'])}
+            if len(parts)==3 and method=='POST' and parts[2]=='cover':
+                if type(body.get('revision')) is not int or body['revision']!=draft['revision']:
+                    raise MarketError(409,'草稿已更新，请重新打开后上传封面','revision_conflict',current=draft)
+                self.rate(('cover',user['id']),30,600)
+                try:
+                    image,width,height=covers.normalize(body.get('image'))
+                    ident=covers.save(self,user['id'],image,width,height)
+                except PhotoError as exc:
+                    raise MarketError(exc.status,exc.message,exc.code)
+                previous=draft.get('cover_id')
+                draft.update(cover_id=ident,revision=draft['revision']+1,updated_at=self.clock())
+                self.db.execute('UPDATE drafts SET data=? WHERE id=?',(packed(draft),draft['id']))
+                if previous and previous!=ident:
+                    used=any(json.loads(r['data']).get('cover_id')==previous for r in self.rows('SELECT data FROM drafts WHERE user=?',(user['id'],)))
+                    if not used: self.db.execute('DELETE FROM covers WHERE id=? AND owner=? AND public=0',(previous,user['id']))
+                return {'draft':draft}
             if len(parts)==3 and method=='POST' and parts[2] in ('save','publish'):
                 if type(body.get('revision')) is not int or body['revision']!=draft['revision']:
                     raise MarketError(409,'Draft has changed; reload before saving','revision_conflict',current=draft)
                 if parts[2]=='publish':
                     require(body.get('confirm') is True,'Explicit publication confirmation required')
+                    if body.get('require_cover') is True:
+                        require(draft.get('cover_id'), '请上传应用首页截图作为市场封面', 400, 'cover_required')
                     changelog=text(body,'changelog',500)
                     return self.publish(user,row,draft,changelog)
                 bundle=validate_bundle(body.get('bundle'))

@@ -1,0 +1,42 @@
+{
+  "language-alchemy": {
+    "source": "site/assets/language-alchemy.png",
+    "capture": "Reviewed application UI; empty/demo state for private-data applications"
+  },
+  "symbiotic-world": {
+    "source": "site/assets/symbiotic-world.png",
+    "capture": "Reviewed application UI; empty/demo state for private-data applications"
+  },
+  "ai-duet": {
+    "source": "site/assets/ai-duet.png",
+    "capture": "Reviewed application UI; empty/demo state for private-data applications"
+  },
+  "weather-window": {
+    "source": "site/assets/apps/weather-window.png",
+    "capture": "Reviewed application UI; empty/demo state for private-data applications"
+  },
+  "clap-stage": {
+    "source": "site/assets/apps/clap-stage.png",
+    "capture": "Reviewed application UI; empty/demo state for private-data applications"
+  },
+  "photo-album": {
+    "source": "site/assets/apps/photo-album.png",
+    "capture": "Reviewed application UI; empty/demo state for private-data applications"
+  },
+  "agent-studio": {
+    "source": "site/assets/agent-studio.png",
+    "capture": "Reviewed application UI; empty/demo state for private-data applications"
+  },
+  "today": {
+    "source": "site/assets/apps/today.png",
+    "capture": "Reviewed application UI; empty/demo state for private-data applications"
+  },
+  "pixel-lab": {
+    "source": "site/assets/apps/pixel-lab.png",
+    "capture": "Reviewed application UI; empty/demo state for private-data applications"
+  },
+  "sound-lab": {
+    "source": "site/assets/sound-lab.png",
+    "capture": "Reviewed application UI; empty/demo state for private-data applications"
+  }
+}

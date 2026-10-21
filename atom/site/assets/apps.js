@@ -3,6 +3,9 @@
   const $ = id => document.getElementById(id), base='/atom/market/v1/';
   let records=[],local=[],categories={},category='all',limit=12,selected=null,lastFocus=null,request=0;
   const jobs=new Set(), dialog=$('app-detail'), params=new URLSearchParams(location.search);
+  const covers=new Map();let coverObserver;
+  function coverURL(id){if(!covers.has(id))covers.set(id,get(base+'covers/'+id).then(r=>{if(!/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(r.image||''))throw Error();return r.image;}).catch(e=>{covers.delete(id);throw e;}));return covers.get(id);}
+  function loadCovers(){if(coverObserver)coverObserver.disconnect();coverObserver=new IntersectionObserver(entries=>entries.forEach(e=>{if(!e.isIntersecting)return;const img=e.target;coverObserver.unobserve(img);coverURL(img.dataset.cover).then(src=>{img.src=src;}).catch(()=>{if(!img.getAttribute('src'))img.remove();});}),{rootMargin:'250px'});document.querySelectorAll('[data-cover]').forEach(img=>coverObserver.observe(img));}
   const knownCategory = x => Object.prototype.hasOwnProperty.call(categories,x);
   function text(value,max=500){return typeof value==='string'?value.replace(/[\u0000-\u001f]/g,' ').slice(0,max):'';}
   function validID(value){return typeof value==='string'&&/^[A-Za-z0-9_-]{1,100}$/.test(value);}
@@ -15,8 +18,8 @@
     const q=$('app-search').value.trim().toLocaleLowerCase(),source=$('app-source').value;
     const found=records.filter(a=>(category==='all'||a.category===category)&&(!q||[a.name,a.description,a.id,a.author||'',categories[a.category]].join(' ').toLocaleLowerCase().includes(q))&&(source==='all'||(source==='market'?['market','community'].includes(a.kind):source==='system'?['system','device'].includes(a.kind):a.kind===source)));
     const frag=document.createDocumentFragment();
-    found.slice(0,limit).forEach(app=>{const a=element('a','app-card');a.href='/atom/apps/?app='+encodeURIComponent(app.id);a.dataset.app=app.id;const top=element('span','app-card-top');top.append(icon(app),element('span','card-kind',kind(app)));const foot=element('span','card-foot');foot.append(element('span','',categories[app.category]),element('span','','↗'));a.append(top,element('h3','',app.name),element('p','',app.description),foot);frag.append(a);});
-    $('app-grid').replaceChildren(frag);$('catalog-count').textContent=records.length;
+    found.slice(0,limit).forEach(app=>{const a=element('a','app-card');a.href='/atom/apps/?app='+encodeURIComponent(app.id);a.dataset.app=app.id;if(app.image||app.cover_id){const img=element('img','card-cover');img.alt=app.name+'首页截图';img.loading='lazy';if(app.image)img.src=app.image;if(app.cover_id)img.dataset.cover=app.cover_id;img.onload=()=>{img.dataset.captureWidth=String(img.naturalWidth);a.classList.add('has-cover');};a.append(img);}const top=element('span','app-card-top');top.append(icon(app),element('span','card-kind',kind(app)));const foot=element('span','card-foot');foot.append(element('span','',categories[app.category]),element('span','','↗'));a.append(top,element('h3','',app.name),element('p','',app.description),foot);frag.append(a);});
+    $('app-grid').replaceChildren(frag);loadCovers();$('catalog-count').textContent=records.length;
     $('catalog-empty').hidden=found.length!==0;$('load-more').hidden=found.length<=limit;
     $('load-more').textContent='再看 '+Math.min(12,found.length-limit)+' 个应用 ↓';
     $('results-status').textContent='显示 '+Math.min(limit,found.length)+' / '+found.length+' 个应用';
@@ -25,7 +28,7 @@
   function closeDetail(update=true){const id=selected?.id;if(dialog.open)dialog.close();selected=null;document.body.style.overflow='';if(update){const u=new URL(location.href);u.searchParams.delete('app');history.replaceState(null,'',u);}const target=lastFocus?.isConnected?lastFocus:id?document.querySelector('[data-app="'+CSS.escape(id)+'"]'):null;target?.focus({preventScroll:true});}
   function openApp(id,push=true){const app=records.find(a=>a.id===id);if(!app)return;selected=app;if(!dialog.open)lastFocus=document.activeElement;$('detail-title').textContent=app.name;$('detail-category').textContent=categories[app.category]+' / '+kind(app);$('detail-description').textContent=app.description;$('detail-needs').textContent=app.needs;
     $('detail-install').textContent=app.kind==='market'||app.kind==='community'?(app.live===false?'已收录；本次云端目录未查到上架版本':app.version?'已在云端市场上架 · 在 ATOM 或电脑端搜索应用名称':'收录于源码市场 · 实际版本以客户端为准'):app.kind==='port'?'需要完整资源目录，由开发者部署；入口 JSON 不包含所有素材':app.kind==='device'?'样机定制；当前未提供独立源码安装包':'随 ATOM 系统提供，入口以设备配置为准';
-    const visual=$('detail-visual');visual.replaceChildren();if(app.image){const img=element('img');img.src=app.image;img.alt=app.name+'界面预览';img.onload=()=>{img.dataset.captureWidth=String(img.naturalWidth);};visual.append(img);}else visual.append(icon(app));
+    const visual=$('detail-visual');visual.replaceChildren();if(app.image||app.cover_id){const img=element('img');if(app.image)img.src=app.image;if(app.cover_id)coverURL(app.cover_id).then(src=>{if(selected?.id===id)img.src=src;}).catch(()=>{});img.alt=app.name+'界面预览';img.onload=()=>{img.dataset.captureWidth=String(img.naturalWidth);};visual.append(img);}else visual.append(icon(app));
     $('detail-guide').href=app.guide;$('detail-guide').textContent=app.kind==='port'?'查看部署说明 ↗':'查看使用方式 ↗';
     $('detail-source').hidden=!app.source;if(app.source)$('detail-source').href=app.source;
     $('detail-download').hidden=!app.version;$('detail-download').disabled=false;$('detail-download').textContent='下载公开源码包';$('detail-feedback').textContent=app.author?'作者：'+app.author+' · 许可：'+(app.id==='weather-window'?'MIT（程序）；摄影另附素材许可':app.license):'';
@@ -35,9 +38,9 @@
   async function refresh(){const epoch=++request;$('catalog-status').textContent='正在读取云端公开应用目录…';$('catalog-retry').hidden=true;try{
     const data=await get(base+'catalog');if(epoch!==request)return;if(!Array.isArray(data.works))throw Error('目录格式异常');
     const work=data.works.filter(w=>w&&validID(w.id)&&validID(w.latest_version_id)&&typeof w.title==='string').slice(0,200),byId=new Map(work.map(w=>[w.id,w]));
-    records=local.map(app=>{const w=byId.get(app.market_id);return w?{...app,version:w.latest_version_id,live:true,author:text(w.author,80),license:text(w.license,80)}:{...app,live:app.market_id?false:undefined};});
+    records=local.map(app=>{const w=byId.get(app.market_id);return w?{...app,cover_id:/^[a-f0-9]{32}$/.test(w.cover_id||'')?w.cover_id:null,version:w.latest_version_id,live:true,author:text(w.author,80),license:text(w.license,80)}:{...app,live:app.market_id?false:undefined};});
     const known=new Set(local.map(a=>a.market_id));
-    for(const w of work){if(known.has(w.id)||['official-official-companion','official-task-pal'].includes(w.id))continue;records.push({id:'public-'+w.id,name:text(w.title,80),description:text(w.description)||'来自云端源码市场的公开作品，查看源码并在客户端预览后安装。',category:({life:'life',sound:'sound',play:'visual',companion:'visual',connect:'connect'})[w.category]||'create',kind:'community',market_id:w.id,version:w.latest_version_id,author:text(w.author,80),license:text(w.license,80),needs:'运行条件与权限以该作品说明及客户端预览为准',guide:'/atom/guide/#market'});}
+    for(const w of work){if(known.has(w.id)||['official-official-companion','official-task-pal'].includes(w.id))continue;records.push({id:'public-'+w.id,name:text(w.title,80),description:text(w.description)||'来自云端源码市场的公开作品，查看源码并在客户端预览后安装。',category:({life:'life',sound:'sound',play:'visual',companion:'visual',connect:'connect'})[w.category]||'create',kind:'community',cover_id:/^[a-f0-9]{32}$/.test(w.cover_id||'')?w.cover_id:null,market_id:w.id,version:w.latest_version_id,author:text(w.author,80),license:text(w.license,80),needs:'运行条件与权限以该作品说明及客户端预览为准',guide:'/atom/guide/#market'});}
     render();$('catalog-status').textContent='已连接云端市场 · '+work.length+' 个公开作品 · 同一目录，同一份源码';
     const id=selected?.id||new URLSearchParams(location.search).get('app');if(id)openApp(id,false);
   }catch(e){if(epoch!==request)return;$('catalog-status').textContent='当前显示已收录目录 · 云端暂时未连接';$('catalog-retry').hidden=false;}}

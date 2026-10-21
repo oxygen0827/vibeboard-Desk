@@ -162,6 +162,7 @@ class MarketClient:
         if action=='catalog':
             query={k:str(data[k])[:120] for k in ('q','category') if data.get(k)}
             return self.request('catalog'+('?' + urlencode(query) if query else ''))
+        if action=='cover':return self.request('covers/'+identifier(data.get('cover_id'),'封面'))
         if action=='work':return self.request('works/'+identifier(data.get('work_id'),'作品'))
         if action=='source':return self.request('versions/'+identifier(data.get('version_id'),'版本'))
         if action=='fork':return self.request('forks',{'version_id':identifier(data.get('version_id'),'版本'),**({'title':data['title']} if 'title' in data else {})},True)

@@ -323,3 +323,13 @@ main>section[data-panel=settings]{height:100%;overflow:hidden;max-width:820px}
 :root[data-appearance=dark] .preview-frame iframe,:root[data-appearance=dark] .modal-preview{background:var(--bg)}
 iframe{color-scheme:inherit}
 @media (max-width:820px){.appearance-options{gap:14px}.appearance-window{height:126px}}
+
+/* Market cards show the real application, with readable captions over the image. */
+.work{position:relative;isolation:isolate;overflow:hidden;min-height:225px;justify-content:flex-end}
+.work>.work-cover{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2}
+.work.has-cover:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,10,18,.03) 12%,rgba(4,10,18,.32) 45%,rgba(4,10,18,.93) 100%);z-index:-1}
+.work.has-cover,.work.has-cover p,.work.has-cover small{color:#fff}.work.has-cover strong{font-size:19px;letter-spacing:-.4px}.work.has-cover p{flex:0;opacity:.85;font-size:12px}.work.has-cover small{opacity:.7}
+.work.has-cover .work-icon{display:none}.work .cover-missing{font-size:11px;color:var(--text-3)}
+.work-detail-cover{display:block;width:100%;max-height:300px;object-fit:contain;border-radius:14px;background:var(--surface-2);margin-bottom:18px}
+.cover-uploader{display:grid;grid-template-columns:180px 1fr;gap:10px 18px;margin:5px 0 20px}.cover-uploader h3{grid-column:1/-1;margin:0;font-size:16px}.cover-upload-preview{grid-row:2/5;aspect-ratio:4/3;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:grid;place-items:center;color:var(--text-3);font-size:12px;text-align:center;padding:8px}.cover-upload-preview.has-cover{padding:0}.cover-upload-image{width:100%;height:100%;object-fit:cover}.cover-uploader input{display:block;max-width:100%;font-size:12px;margin-top:8px}.cover-uploader p{font-size:12px;line-height:1.5;margin:0}.cover-uploader label{min-width:0}.cover-uploader input::file-selector-button{border:0;background:var(--accent);color:#fff;border-radius:8px;padding:8px 12px;margin-right:8px;cursor:pointer}
+@media(max-width:600px){.cover-uploader{grid-template-columns:1fr}.cover-upload-preview{grid-row:auto;max-height:180px}.cover-uploader h3{grid-column:auto}}

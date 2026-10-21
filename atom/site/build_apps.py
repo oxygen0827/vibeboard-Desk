@@ -18,7 +18,7 @@ metadata={
 'clap-stage':('sound','点按或拍手找到速度，跟着木音、拍手与轻鼓练习自己的节奏。','ambient-apps/clap-480.png','本机运行；拍手定速需要麦克风与更新后的设备系统'),
 'pixel-lab':('visual','绘制点阵生命、沙粒和涟漪，亲眼看看简单规则如何产生变化。','official-ui-refresh/pixel-lab.png','本机运行'),
 'sound-lab':('sound','四轨十六步编排，调节速度与音量，保存自己的声音实验。','sound-lab.png','本机声音合成'),
-'today':('life','把日程和待办放在桌边，与电脑工作台同步，离线也保留修改。','today.png','跨设备同步需要同一账号和网络'),
+'today':('life','把日程和待办放在桌边，与电脑工作台同步，离线也保留修改。','market-covers/today.png','跨设备同步需要同一账号和网络'),
 }
 rows=[]
 def icon_for(aid,path=None):
@@ -33,6 +33,7 @@ def icon_for(aid,path=None):
  dest=SITE/'assets/apps'/f'{aid}.svg';dest.write_text(s);return '/atom/assets/apps/'+dest.name
 
 def shot(name,aid):
+ if not name and (ROOT/'artifacts/market-covers'/f'{aid}.png').exists():name='market-covers/'+aid+'.png'
  if not name:return None
  for base in [SITE/'assets',ROOT/'artifacts']:
   p=base/name
@@ -86,6 +87,7 @@ payload={'updated':'2026-10-21','categories':CATS,'apps':rows}
 (SITE/'assets/apps/catalog.json').write_text(json.dumps(payload,ensure_ascii=False,indent=2)+'\n')
 def card(r):
  e=html.escape
- return f'''<a class="app-card" href="{e(r['source']or r['guide'])}" data-app="{r['id']}"><span class="app-card-top"><span class="catalog-icon" data-category="{r['category']}"><img src="{r['icon']}" width="64" height="64" alt="" loading="lazy"></span><span class="card-kind">{ {'market':'官方作品','port':'开源适配','system':'系统应用','device':'样机定制'}[r['kind']] }</span></span><h3>{e(r['name'])}</h3><p>{e(r['description'])}</p><span class="card-foot"><span>{CATS[r['category']]}</span><span aria-hidden="true">↗</span></span></a>'''
+ cover=f'<img class="card-cover" src="{e(r["image"])}" alt="{e(r["name"])}首页截图" loading="lazy">'if r['image']else ''
+ return f'''<a class="app-card{" has-cover" if cover else ""}" href="{e(r['source']or r['guide'])}" data-app="{r['id']}">{cover}<span class="app-card-top"><span class="catalog-icon" data-category="{r['category']}"><img src="{r['icon']}" width="64" height="64" alt="" loading="lazy"></span><span class="card-kind">{ {'market':'官方作品','port':'开源适配','system':'系统应用','device':'样机定制'}[r['kind']] }</span></span><h3>{e(r['name'])}</h3><p>{e(r['description'])}</p><span class="card-foot"><span>{CATS[r['category']]}</span><span aria-hidden="true">↗</span></span></a>'''
 template=(SITE/'apps/template.html').read_text();(SITE/'apps/index.html').write_text(template.replace('<!-- CATALOG CARDS -->','\n'.join(card(r)for r in rows)).replace('<!-- TOTAL -->',str(len(rows))))
 print(f'Built {len(rows)} app listings with validated purpose icons; no runtime files copied')

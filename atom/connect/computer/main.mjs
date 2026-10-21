@@ -8,7 +8,7 @@ import {previewHTML,previewCSP} from './preview.mjs';
 export function dashboard(companion,{port=8788}={}){
  const session=crypto.randomUUID(),csrf=crypto.randomUUID();let origin;
  const server=http.createServer(async(req,res)=>{
-  res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Content-Security-Policy',"default-src 'self'; frame-ancestors 'none'; object-src 'none'; base-uri 'none'");
+  res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Content-Security-Policy',"default-src 'self'; img-src 'self' data: blob:; frame-ancestors 'none'; object-src 'none'; base-uri 'none'");
   const send=(status,value)=>{res.writeHead(status,{'Content-Type':'application/json; charset=utf-8'});res.end(JSON.stringify(value));};
   if(req.headers.host!==new URL(origin).host)return send(403,{error:'本地地址无效'});
   const url=new URL(req.url,origin);

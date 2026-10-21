@@ -89,6 +89,38 @@ def visibility(path, work_id, unlisted, confirmation):
         conn.close()
 
 
+def set_cover(path, work_id, image_path, confirmation):
+    """Backfill a reviewed screenshot without altering source or existing covers."""
+    if not re.fullmatch(r'[A-Za-z0-9_-]{1,100}',work_id or '') or confirmation!=work_id:
+        raise OpsError('Confirm the exact work ID')
+    import base64
+    import covers
+    from photos import PhotoError
+    image_file=Path(image_path)
+    if image_file.is_symlink() or not image_file.is_file() or image_file.stat().st_size>covers.MAX_UPLOAD:
+        raise OpsError('Use a reviewed regular PNG or JPEG screenshot below 1 MiB')
+    mime='image/png' if image_file.suffix.lower()=='.png' else 'image/jpeg'
+    try: image,width,height=covers.normalize('data:'+mime+';base64,'+base64.b64encode(image_file.read_bytes()).decode())
+    except PhotoError: raise OpsError('Invalid screenshot')
+    conn=database(path,writable=True);conn.row_factory=sqlite3.Row
+    class Store:
+        db=conn
+        clock=staticmethod(time.time)
+        def row(self,sql,args=()):return conn.execute(sql,args).fetchone()
+    try:
+        with conn:
+            row=conn.execute('SELECT user,data FROM works WHERE id=?',(work_id,)).fetchone()
+            if not row:raise OpsError('Work not found')
+            work=json.loads(row['data'])
+            if work.get('cover_id'):return {'ok':True,'unchanged':True,'work_id':work_id}
+            try: ident=covers.save(Store(),row['user'],image,width,height,True)
+            except PhotoError:raise OpsError('Cover storage unavailable')
+            work['cover_id']=ident
+            conn.execute('UPDATE works SET data=? WHERE id=?',(json.dumps(work,ensure_ascii=False),work_id))
+        return {'ok':True,'work_id':work_id,'cover_id':ident}
+    finally:conn.close()
+
+
 class NoRedirect(HTTPRedirectHandler):
     def redirect_request(self,*args,**kwargs):
         return None
@@ -127,10 +159,12 @@ def main():
     b=sub.add_parser('backup');b.add_argument('--output',required=True)
     for name in ('unlist','restore'):
         p=sub.add_parser(name);p.add_argument('--work-id',required=True);p.add_argument('--confirm',required=True)
+    c=sub.add_parser('cover');c.add_argument('--work-id',required=True);c.add_argument('--image',required=True);c.add_argument('--confirm',required=True)
     args=parser.parse_args()
     try:
         if args.command=='health':result=health(args.db,args.url)
         elif args.command=='stats':result=stats(args.db)
+        elif args.command=='cover':result=set_cover(args.db,args.work_id,args.image,args.confirm)
         elif args.command=='backup':result=backup(args.db,args.output)
         else:result=visibility(args.db,args.work_id,args.command=='unlist',args.confirm)
         print(json.dumps(result,ensure_ascii=False))

@@ -13,7 +13,7 @@ function clearDialog(title){el('dialog-title').textContent=title;el('dialog-cont
 el('dialog-close').onclick=()=>dialog.close();
 
 // Account
-async function studioState(){const s=await call('/state');account=s.user;window.studioJobs=s.jobs||[];
+async function studioState(){const s=await call('/state');if(account?.id!==s.user?.id)coverCache.clear();account=s.user;window.studioJobs=s.jobs||[];
   el('account-avatar').replaceChildren(account?account.username.slice(0,1).toUpperCase():icon('user'));el('account-avatar').classList.toggle('on',!!account);
   el('account-name').textContent=account?account.username:'未登录';
   el('account-detail').textContent=!account?'登录市场账号以同步':s.encryption==='locked'||s.encryption==='recovery'?'随手记已锁定，点此解锁':s.pending_notes?s.pending_notes+' 条便签待同步':'随手记与今日已加密';
@@ -75,7 +75,30 @@ function showBundle(box,bundle){const values={'manifest.json':JSON.stringify(bun
   pre.textContent=values['manifest.json'];list.firstChild?.classList.add('selected');box.append(h('div',{class:'source-view'},list,pre));}
 
 // Market
-function workCard(work,onclick){return h('button',{type:'button',class:'work',onclick},h('span',{class:'work-icon cat-'+(work.category||'life'),text:(work.title||'?').slice(0,1)}),h('strong',{},work.title,work.official?pill('官方','info plain'):null),h('p',{text:work.description||'暂无介绍'}),h('small',{text:authorOf(work)+' · '+(categories[work.category]||work.category||'')}));}
+const coverCache=new Map();
+function coverImage(ident,cls='work-cover'){
+  if(!/^[a-f0-9]{32}$/.test(ident||''))return null;
+  const img=h('img',{class:cls,alt:'应用首页截图',loading:'lazy'});
+  const load=()=>{if(!coverCache.has(ident))coverCache.set(ident,call('/covers/'+ident).then(r=>{if(!/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(r.image||''))throw Error('封面无效');return r.image;}).catch(e=>{coverCache.delete(ident);throw e;}));coverCache.get(ident).then(src=>{img.src=src;img.onload=()=>img.parentElement?.classList.add('has-cover');}).catch(()=>{img.remove();});};
+  const observer=new IntersectionObserver(entries=>{if(entries.some(e=>e.isIntersecting)){observer.disconnect();load();}},{rootMargin:'160px'});observer.observe(img);
+  return img;
+}
+async function screenshotData(file){
+  if(!file||file.size>20*1024*1024)throw Error('首页截图最大支持 20 MiB');
+  if(!['image/png','image/jpeg','image/webp'].includes(file.type))throw Error('请选择 PNG、JPEG 或 WebP 截图');
+  const url=URL.createObjectURL(file),img=new Image();
+  try{img.src=url;await img.decode();if(img.naturalWidth*img.naturalHeight>64000000)throw Error('截图分辨率过大');const scale=Math.min(1,1280/img.naturalWidth,960/img.naturalHeight),canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(img.naturalWidth*scale));canvas.height=Math.max(1,Math.round(img.naturalHeight*scale));const ctx=canvas.getContext('2d');ctx.fillStyle='#f2f2f7';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(img,0,0,canvas.width,canvas.height);const result=canvas.toDataURL('image/jpeg',.85);if(result.length>1200000)throw Error('截图内容过大，请降低分辨率');return result;}finally{URL.revokeObjectURL(url);}
+}
+function coverUploader(draftId){
+  const area=h('section',{class:'cover-uploader'}),preview=h('div',{class:'cover-upload-preview'}),feedback=h('p',{class:'muted',role:'status'});
+  const input=h('input',{type:'file',accept:'image/png,image/jpeg,image/webp','aria-label':'上传应用首页截图'});
+  function show(){preview.replaceChildren(editing?.draft.cover_id?coverImage(editing.draft.cover_id,'cover-upload-image'):text('span','上传后，市场卡片会展示你的应用首页'));}
+  show();
+  input.onchange=async()=>{const selected=input.files?.[0];if(!selected)return;input.disabled=true;feedback.textContent='正在优化并上传截图…';try{const image=await screenshotData(selected);if(editing?.draft.id!==draftId)throw Error('草稿已切换，请重新上传');const result=await call('/drafts/'+draftId+'/cover',{image,revision:editing.draft.revision});if(editing?.draft.id!==draftId)return;editing.draft=result.draft;show();feedback.textContent='封面已保存到私有草稿，发布后会公开展示。';}catch(e){feedback.textContent=e.message;error(e);}finally{input.disabled=false;input.value='';}};
+  area.append(text('h3','上传首页截图'),preview,h('label',{},'选择或更换封面',input),text('p','推荐 4:3 横图。PNG / JPEG / WebP，20 MiB 以内，自动优化。请确认画面没有账号、密钥或私人内容。','muted'),feedback);
+  return area;
+}
+function workCard(work,onclick){return h('button',{type:'button',class:'work',onclick},coverImage(work.cover_id),h('span',{class:'work-icon cat-'+(work.category||'life'),text:(work.title||'?').slice(0,1)}),h('strong',{},work.title,work.official?pill('官方','info plain'):null),h('p',{text:work.description||'暂无介绍'}),h('small',{text:authorOf(work)+' · '+(categories[work.category]||work.category||'')}),!work.cover_id?text('span','首页截图待上传','cover-missing'):null);}
 async function catalog(){const box=el('market-catalog');box.replaceChildren(text('p','正在打开市场…','muted'));
   try{studioState().catch(()=>{});const form=el('market-search'),q=new URLSearchParams({q:form.elements.q.value,category:form.elements.category.value}),r=await call('/catalog?'+q);
     box.replaceChildren(...r.works.map(w=>workCard(w,()=>workDetail(w.id).catch(error))));
@@ -92,6 +115,7 @@ async function workDetail(workId){const result=await call('/works/'+encodeURICom
   async function loadSource(){source.replaceChildren(text('p','正在读取完整源码…','muted'));const r=await call('/versions/'+encodeURIComponent(select.value));source.replaceChildren(text('p',Object.keys(r.bundle.files).length+' 个文件 · SHA-256 '+(r.version.sha256||r.version.source_sha256||'见服务器记录'),'muted lineage'));showBundle(source,r.bundle);}
   select.onchange=()=>loadSource().catch(error);
   const fork=button('基于此版本创作',async()=>{if(!await needAccount())return;const r=await call('/forks',{version_id:select.value,title:work.title+' · 我的版本'});dialog.close();showPage('creations');await openEditor(r.draft.id);},'btn primary');
+  const hero=coverImage(work.cover_id,'work-detail-cover');if(hero)box.append(hero);
   box.append(text('p',work.description||''),meta,h('div',{class:'button-row'},select,fork),source);
   if(result.derivatives?.length){box.append(text('h3','由此衍生'),h('div',{class:'button-row'},...result.derivatives.map(d=>button(d.title,()=>workDetail(d.id)))));}
   if(select.value)await loadSource();}
@@ -112,6 +136,7 @@ function drawEditor(){el('editor-title').textContent=editing.draft.title;setDirt
   el('editor-source').value=file==='manifest.json'?JSON.stringify(buffer.manifest,null,2):buffer.files[file]||'';
   el('editor-snapshots').replaceChildren(...[...editing.snapshots||[]].reverse().map(s=>new Option(s.label+' · '+new Date(s.created_at).toLocaleString(),s.id)));
   if(!el('editor-snapshots').options.length)el('editor-snapshots').append(new Option('还没有快照',''));
+  if(!el('editor-cover')){const coverButton=button('首页截图',async()=>{await saveLocal();clearDialog('应用市场封面').append(coverUploader(editing.draft.id));},'btn');coverButton.id='editor-cover';el('editor-publish').before(coverButton);}
   const d=editing.draft;el('editor-lineage').textContent='许可 '+d.license+(d.parent_id?' · 上游 '+d.parent_id+' / '+d.parent_version_id:' · 原创')+(editing.source_path?' · 本机源码 '+editing.source_path:'');}
 async function openEditor(draftId){try{await call('/drafts/'+encodeURIComponent(draftId));editing=await call('/workspaces/'+encodeURIComponent(draftId));buffer=JSON.parse(JSON.stringify(editing.bundle));file='index.html';
   el('creations-home').hidden=true;el('studio-editor').hidden=false;drawEditor();refreshPreview();el('ai-state').replaceChildren();
@@ -141,8 +166,8 @@ el('editor-diff').onclick=async()=>{try{const snapshotId=el('editor-snapshots').
   for(const change of r.files)box.append(text('h3',change.name+' · '+change.kind),h('div',{class:'source-diff'},text('pre','之前\n'+(change.before??'文件不存在')),text('pre','现在\n'+(change.after??'文件已删除'))));}catch(e){error(e);}};
 el('editor-publish').onclick=async()=>{try{await saveLocal();const box=clearDialog('发布到应用市场');
   const changes=h('textarea',{placeholder:'这次修改了什么？',rows:'3'}),checkbox=h('input',{type:'checkbox'});
-  box.append(text('p','发布会公开全部源码与安装资源。上游作者、版本和许可证会保留；发布后的版本不可修改。'),h('dl',{class:'meta'},h('dt',{text:'作品'}),h('dd',{text:editing.draft.title}),h('dt',{text:'许可'}),h('dd',{text:editing.draft.license})),h('label',{},'更新说明',changes),h('label',{class:'check'},checkbox,h('span',{text:'我已检查全部源码，没有账号密钥或私人信息，并同意按上述许可证公开发布。'})),
-    h('div',{class:'form-actions'},button('确认发布',async()=>{if(!checkbox.checked)throw Error('请先确认源码可以公开');await call('/drafts/'+editing.draft.id+'/save',{revision:editing.draft.revision});editing=await call('/workspaces/'+editing.draft.id);const r=await call('/drafts/'+editing.draft.id+'/publish',{revision:editing.draft.revision,changelog:changes.value,confirm:true});dialog.close();drawEditor();note('已发布版本 '+r.version.number+'，完整源码已公开');},'btn primary')));}catch(e){error(e);}};
+  box.append(coverUploader(editing.draft.id),text('p','发布会公开首页截图、全部源码与安装资源。上游作者、版本和许可证会保留；发布后的版本不可修改。'),h('dl',{class:'meta'},h('dt',{text:'作品'}),h('dd',{text:editing.draft.title}),h('dt',{text:'许可'}),h('dd',{text:editing.draft.license})),h('label',{},'更新说明',changes),h('label',{class:'check'},checkbox,h('span',{text:'我已检查源码和截图，没有账号密钥或私人信息，并同意按上述许可证公开发布。'})),
+    h('div',{class:'form-actions'},button('确认发布',async()=>{if(!checkbox.checked)throw Error('请先确认源码和截图可以公开');if(!editing.draft.cover_id)throw Error('请先上传首页截图，让大家看见你的应用');await call('/drafts/'+editing.draft.id+'/save',{revision:editing.draft.revision});editing=await call('/workspaces/'+editing.draft.id);const r=await call('/drafts/'+editing.draft.id+'/publish',{revision:editing.draft.revision,changelog:changes.value,confirm:true,require_cover:true});dialog.close();drawEditor();note('已发布版本 '+r.version.number+'，完整源码已公开');},'btn primary')));}catch(e){error(e);}};
 
 // AI modification
 el('ai-modify').onclick=async()=>{try{if(!el('ai-change').value.trim())throw Error('先描述你想怎么修改');await saveLocal();const r=await call('/ai-modify',{draft_id:editing.draft.id,prompt:el('ai-change').value});await watchJob(r.job.id);}catch(e){error(e);}};
@@ -154,7 +179,7 @@ async function watchJob(jobId){if(poll)clearTimeout(poll);const r=await call('/a
   for(const id of ['editor-add-file','editor-delete-file','editor-save','editor-sync','editor-restore','editor-publish'])el(id).disabled=busy;
   if(job.approval)area.append(button('允许',()=>call('/ai-jobs/'+job.id+'/approve',{request_id:job.approval.request_id,decision:'accept'}),'btn primary small'),button('拒绝',()=>call('/ai-jobs/'+job.id+'/approve',{request_id:job.approval.request_id,decision:'decline'}),'btn small'));
   if(['conflict','failed','interrupted'].includes(job.status)&&job.artifact)area.append(button('查看保留的源码',()=>showBundle(clearDialog('AI 保留产物'),job.artifact),'btn small'),button('应用到当前草稿',async()=>{if(!confirm('将保留的 AI 产物应用到当前草稿？现有内容会先保存快照。'))return;await call('/ai-jobs/'+job.id+'/apply',{});await openEditor(job.draft_id);},'btn small'));
-  if(job.status==='completed'&&editing?.draft.id===job.draft_id){editing=await call('/workspaces/'+job.draft_id);buffer=JSON.parse(JSON.stringify(editing.bundle));drawEditor();refreshPreview();}
+  if(job.status==='completed'&&editing?.draft.id===job.draft_id){note('应用已更新；发布前可在「首页截图」上传或更换封面。');editing=await call('/workspaces/'+job.draft_id);buffer=JSON.parse(JSON.stringify(editing.bundle));drawEditor();refreshPreview();}
   if(busy)poll=setTimeout(()=>watchJob(jobId).catch(error),1000);}
 el('ai-cancel').onclick=async()=>{try{await call('/ai-jobs/'+job.id+'/cancel',{});note('正在停止 AI 修改');}catch(e){error(e);}};
 
