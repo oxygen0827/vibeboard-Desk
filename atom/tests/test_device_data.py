@@ -25,6 +25,35 @@ class DataTests(unittest.TestCase):
         self.store.root.mkdir(exist_ok=True);self.store.path.write_text('{broken')
         with self.assertRaises(ValueError):self.store.capture(self.data)
         self.assertEqual(self.store.path.read_text(),'{broken')
+    def test_empty_browser_recovers_the_saved_copy(self):
+        with self.assertRaisesRegex(ValueError,'没有可恢复'):self.store.recover_current()
+        self.store.capture(self.data)
+        token=self.store.recover_current()['pending']
+        self.assertEqual(self.store.status()['pending'],dict(id=token,data=self.data,source='recover'))
+        self.assertEqual(self.store.recover_current()['pending'],token,'a second empty shell gets the same pending restore')
+        self.store.acknowledge(token);self.assertIsNone(self.store.status()['pending'])
+    def test_damaged_copy_falls_back_to_previous_version(self):
+        self.store.capture(self.data)
+        newer=dict(self.data,**{'atom.timer':'{"seconds":60}'})
+        self.store.capture(newer)
+        self.store.path.write_text('{broken')
+        self.assertEqual(self.store.current()['data'],self.data)
+        self.store.capture(newer)
+        self.assertEqual(json.loads(self.store.path.read_text())['data'],newer)
+    def test_daily_snapshots_rotate_and_do_not_count_as_manual(self):
+        import device_data,time as t
+        days=iter(['20261001','20261002','20261003','20261004','20261005','20261006','20261007','20261008','20261009'])
+        real=t.strftime
+        for i,day in enumerate(days):
+            device_data.time.strftime=lambda f,day=day:day if f=='%Y%m%d' else real(f)
+            try:self.store.capture(dict(self.data,**{'atom.timer':json.dumps({'n':i})}))
+            finally:device_data.time.strftime=real
+        autos=sorted(p.stem for p in self.store.folder.glob('auto-*.json'))
+        self.assertEqual(autos,['auto-202610%02d'%d for d in range(3,10)])
+        self.assertTrue(all(b['automatic'] for b in self.store.status()['backups']))
+        self.assertEqual(self.store.read_backup('auto-20261009')['data']['atom.timer'],json.dumps({'n':8}))
+        for _ in range(10):self.store.backup(dict(self.data,**{'atom.notes':json.dumps(_)}))
+        with self.assertRaisesRegex(ValueError,'10 份'):self.store.backup(self.data)
     def test_mirror_has_strict_whole_snapshot_limit(self):
         with self.assertRaises(ValueError):validate({'atom.app.v1.a':json.dumps('x'*40000),'atom.app.v1.b':json.dumps('x'*40000)},MIRROR_LIMIT)
         self.assertFalse(self.store.status()['mirror'])

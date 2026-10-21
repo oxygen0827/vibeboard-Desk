@@ -531,6 +531,7 @@ class Handler(SimpleHTTPRequestHandler):
                     (store.folder / (data['id'] + '.json')).unlink()
                     result = dict(ok=True)
                 elif action == 'ack': result = store.acknowledge(data.get('id'))
+                elif action == 'recover': result = store.recover_current()
                 elif action == 'mirror': result = store.enable_mirror(data.get('enabled'))
                 elif action == 'preview':
                     if not getattr(self.server, 'is_simulator', False): raise ValueError('此接口仅供模拟设备使用')

@@ -16,6 +16,8 @@ LIMIT = 1500 * 1024
 MIRROR_LIMIT = 64 * 1024
 KEYS = {'atom.desktop.v2', 'atom.widget', 'atom.timer', 'atom.notes', 'atom.speechFeedback',
         'atom.experienceAnimations', 'atom.appearance', 'atom.appearance.v1'}
+AUTO_KEEP = 7  # daily automatic snapshots kept alongside up to 10 manual backups
+BACKUP_ID = re.compile(r'^(?:[0-9]{8}-[0-9]{6}-[a-f0-9]{6}|auto-[0-9]{8})$')
 APP_KEY = re.compile(r'^atom\.app\.v1\.[a-z][a-z0-9_-]{0,47}$')
 
 
@@ -42,6 +44,7 @@ class DeviceData:
         self.root = Path(root)
         self.folder = self.root / 'user-backups'
         self.path = self.root / 'user-data.json'
+        self.previous = self.root / 'user-data.prev.json'
         self.mirror_path = self.root / 'mirror.json'
         self.pending = self.root / 'pending-restore.json'
         self.bridge = bridge
@@ -60,24 +63,57 @@ class DeviceData:
         except (OSError, ValueError):
             raise ValueError('本机记录无法读取，请重试；已有数据没有被覆盖')
 
+    def current(self):
+        """The authoritative copy; falls back to the previous version if the newest file is damaged."""
+        try:
+            return self._read(self.path, {})
+        except ValueError:
+            value = self._read(self.previous, None)
+            if value is None:
+                raise
+            return value
+
     def capture(self, data):
         with self.lock:
             if self.closed or self.pending.exists():
                 raise ValueError('正在恢复记录，请完成恢复后重试')
             version, size = validate(data)
-            old = self._read(self.path, {})
+            old = self.current()
             if old.get('version') != version:
+                if old:
+                    _write(self.previous, old)
                 _write(self.path, dict(version=version, data=data, size=size, updated=time.time()))
+                if data:
+                    self._daily(version, data)
         self.push()
         return dict(version=version, size=size)
+
+    def _daily(self, version, data):
+        name = 'auto-' + time.strftime('%Y%m%d')
+        target = self.folder / (name + '.json')
+        _write(target, dict(format='atom-user-data-v1', created=time.time(), version=version, data=data, automatic=True))
+        for old in sorted(self.folder.glob('auto-*.json'))[:-AUTO_KEEP]:
+            old.unlink()
+
+    def recover_current(self):
+        """Hand the saved copy back to a shell whose browser storage came up empty."""
+        with self.lock:
+            if self.pending.exists():
+                return dict(pending=self._read(self.pending, {}).get('id'))
+            snap = self.current()
+            if not snap.get('data'):
+                raise ValueError('没有可恢复的本机记录')
+            token = secrets.token_hex(16)
+            _write(self.pending, dict(id=token, data=snap['data'], source='recover'))
+            return dict(pending=token)
 
     def status(self):
         with self.lock:
             backups = []
-            for p in sorted(self.folder.glob('*.json'), reverse=True):
+            for p in sorted(self.folder.glob('*.json'), key=lambda p: p.stat().st_mtime, reverse=True):
                 value = self._read(p, {})
-                backups.append(dict(id=p.stem, created=value.get('created'), size=p.stat().st_size))
-            snap = self._read(self.path, {})
+                backups.append(dict(id=p.stem, created=value.get('created'), size=p.stat().st_size, automatic=p.stem.startswith('auto-')))
+            snap = self.current()
             return dict(backups=backups, mirror=self._read(self.mirror_path, {}).get('enabled', False),
                         mirror_clear_pending=self._read(self.mirror_path, {}).get('clear_pending', False),
                         mirror_error=self.last_error, version=snap.get('version'), size=snap.get('size', 0),
@@ -86,7 +122,7 @@ class DeviceData:
     def backup(self, data):
         with self.lock:
             self.capture(data)
-            if len(list(self.folder.glob('*.json'))) >= 10:
+            if len([p for p in self.folder.glob('*.json') if not p.stem.startswith('auto-')]) >= 10:
                 raise ValueError('已保存 10 份备份，请先导出并删除一份旧备份')
             version, _ = validate(data)
             value = dict(format='atom-user-data-v1', created=time.time(), version=version, data=data)
@@ -95,7 +131,7 @@ class DeviceData:
             return dict(id=ident, backup=value)
 
     def read_backup(self, ident):
-        if not isinstance(ident, str) or not re.fullmatch(r'[0-9]{8}-[0-9]{6}-[a-f0-9]{6}', ident):
+        if not isinstance(ident, str) or not BACKUP_ID.fullmatch(ident):
             raise ValueError('备份标识无效')
         value = self._read(self.folder / (ident + '.json'), None)
         if value is None:
