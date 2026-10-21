@@ -5,6 +5,7 @@ grant in deploy/atom-network.pkla. Without it scanning still works and connect e
 """
 import re
 import subprocess
+import time
 
 TIMEOUT = 40
 
@@ -75,6 +76,7 @@ def connect(ssid, password):
     active = next((n for n in networks() if n['active']), None)
     if active and active['ssid'] == ssid:
         return status()
+    previous_ssid = active['ssid'] if active else None
     _, profiles, _ = _nmcli(['-t', '-f', 'UUID,TYPE', 'connection', 'show', '--active'], timeout=10)
     previous = next((f[0] for f in (_fields(line) for line in profiles.splitlines())
                      if len(f) == 2 and f[1] in ('wifi', '802-11-wireless')
@@ -85,10 +87,10 @@ def connect(ssid, password):
     try:
         code, out, err = _nmcli(args)
         if code == 0:
-            connected = status()
-            if connected['connected']:
+            connected = _wait(ssid, 15)
+            if connected:
                 return connected
-            failure = '新网络尚未连接成功'
+            failure = '没有连上这个 Wi‑Fi，可能是密码不对'
         else:
             failure = _connection_error(out + err)
     except WifiError as exc:
@@ -101,11 +103,28 @@ def connect(ssid, password):
             pass
     if previous:
         try:
-            restored, _, _ = _nmcli(['-w', '20', 'connection', 'up', 'uuid', previous], timeout=25)
-            failure += '；已恢复原网络' if restored == 0 else '；请重新选择原网络'
+            _nmcli(['-w', '20', 'connection', 'up', 'uuid', previous], timeout=25)
         except WifiError:
-            failure += '；请重新选择原网络'
+            pass
+        # NetworkManager may already be reconnecting by itself, which makes `connection up` fail while
+        # the old network comes back moments later. Judge by where the device actually ends up.
+        back = _wait(previous_ssid, 40)
+        failure += '；已回到原来的网络' + ('「' + previous_ssid + '」' if previous_ssid else '') if back else '；请在「网络」里重新选择原来的网络'
     raise WifiError(failure)
+
+
+def _wait(ssid, seconds):
+    deadline = time.monotonic() + seconds
+    while True:
+        try:
+            now = status()
+        except WifiError:
+            now = {}
+        if now.get('connected') and (ssid is None or now.get('ssid') == ssid):
+            return now
+        if time.monotonic() >= deadline:
+            return None
+        time.sleep(2)
 
 
 def _wifi_profiles():
