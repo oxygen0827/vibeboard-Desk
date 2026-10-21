@@ -1,12 +1,16 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import os from 'node:os';
+import {execFileSync} from 'node:child_process';
 import { writePrivate } from './store.mjs';
 import * as e2e from './e2e.mjs';
 const LOCKED='随手记和今日已加密，请在账号里输入密码解锁';
 import { validateArtifact, appPrompt } from './artifact.mjs';
 import {StudioCodex}from './studio-codex.mjs';
 import {organizePrompt,parseOrganization}from './organize.mjs';
+// The name people gave this Mac in System Settings, not its network host name.
+function computerName(){if(process.platform==='darwin'){try{const n=execFileSync('/usr/sbin/scutil',['--get','ComputerName'],{encoding:'utf8',timeout:2000}).trim();if(n)return n.slice(0,80);}catch{}}return os.hostname();}
 // Market browsing and account sign-in work against the official service before the Mac pairs.
 const DEFAULT_RELAY=(process.env.ATOM_DEFAULT_RELAY||'https://ldcx.tech/atom').replace(/\/$/,'');
 
@@ -30,7 +34,7 @@ export class Studio {
  scope(){const a=this.requireAccount();return crypto.createHash('sha256').update(a.relay_url+'\0'+a.user.id).digest('hex').slice(0,24);}
  profile(){const key=this.scope();if(!this.data.profiles[key])this.data.profiles[key]={drafts:{},notes:[],pending:[]};const p=this.data.profiles[key];p.agenda=p.agenda||[];p.agenda_pending=p.agenda_pending||[];return p;}
  activitySummary(){let account;try{account=this.account();}catch{return null;}if(!account)return null;const jobs=Object.values(this.data.jobs).filter(j=>j.scope===this.scope());const j=jobs.find(j=>this.active?.id===j.id)||jobs.slice(-1)[0];if(!j)return null;const status=['saving','waiting_approval'].includes(j.status)?'running':j.status==='conflict'?'failed':j.status;return {id:j.id,type:j.kind==='notes-organize'?'notes-organize':'app-modify',status,updated_at:Math.floor((['queued','running'].includes(status)?Date.now():Date.parse(j.finished_at||j.created_at)||Date.now())/1000)};}
- state(){let account=null,configured=false;try{configured=!!this.url();account=this.account();}catch{}const profile=account?this.profile():null;return {configured,authenticated:!!account,encryption:this.encryption(),...(this.recoveryCode?{recovery_code:this.recoveryCode}:{}),user:account?.user||null,pending_notes:profile?.pending.length||0,jobs:Object.values(this.data.jobs).filter(j=>account&&j.scope===this.scope()).map(({id,draft_id,kind,status,created_at,finished_at,error})=>({id,draft_id,kind:kind||'app-modify',status,created_at,finished_at,error}))};}
+ state(){let account=null,configured=false;try{configured=!!this.url();account=this.account();}catch{}if(account?.token&&this.linkedToken!==account.token)void this.linkAccount();const profile=account?this.profile():null;return {configured,authenticated:!!account,encryption:this.encryption(),...(this.recoveryCode?{recovery_code:this.recoveryCode}:{}),user:account?.user||null,pending_notes:profile?.pending.length||0,jobs:Object.values(this.data.jobs).filter(j=>account&&j.scope===this.scope()).map(({id,draft_id,kind,status,created_at,finished_at,error})=>({id,draft_id,kind:kind||'app-modify',status,created_at,finished_at,error}))};}
  // Notes and agenda leave this computer sealed with the account data key and are opened on arrival.
  dataKey(){const k=this.account()?.data_key;return k?e2e.unb64(k,32):null;}
  sealPrivate(route,body,key,uid){if(!key||!body)return body;const b={...body};b.id||=crypto.randomBytes(16).toString('hex');const fields=route==='/notes'?['text']:['title','starts_at'];
@@ -64,8 +68,11 @@ export class Studio {
   if(this.url()!==relay||(!publicRead&&account?.token!==this.account()?.token))throw problem('账号或服务器已改变，请重新打开内容',409);
   if(!response.ok){const error=problem(String(result.error||'市场操作失败').slice(0,500),response.status,result.code);error.details=result;throw error;}return result;
  }
- async login(route,body){if(this.active)throw problem('请先结束 AI 修改再切换账号');const result=await this.remote(route,{method:'POST',body,publicRead:true});if(typeof result.token!=='string'||!result.user?.id)throw problem('登录响应无效',502);this.data.account={relay_url:this.url(),token:result.token,user:result.user};this.recoveryCode=null;this.pendingKeys=null;this.profile();this.save();const password=body.password||body.new_password;if(password){try{await this.afterSignIn(String(password));}catch{}}return {user:result.user,authenticated:true,encryption:this.encryption()};}
- async logout(){if(this.active)throw problem('请先结束 AI 修改再退出');try{await this.remote('/logout',{method:'POST',body:{}});}catch{}this.data.account=null;this.recoveryCode=null;this.pendingKeys=null;this.save();return {ok:true};}
+ async login(route,body){if(this.active)throw problem('请先结束 AI 修改再切换账号');const result=await this.remote(route,{method:'POST',body,publicRead:true});if(typeof result.token!=='string'||!result.user?.id)throw problem('登录响应无效',502);this.data.account={relay_url:this.url(),token:result.token,user:result.user};this.recoveryCode=null;this.pendingKeys=null;this.profile();this.save();const password=body.password||body.new_password;if(password){try{await this.afterSignIn(String(password));}catch{}}await this.linkAccount();return {user:result.user,authenticated:true,encryption:this.encryption()};}
+ // Join this computer to the signed-in account so it can see and connect the owner's ATOM devices.
+ // Connects to the service first if this computer never did. Best effort; pairing by code still works.
+ async linkAccount(){const a=this.account();if(!a?.token||this.linkedToken===a.token)return;this.linkedToken=a.token;try{if(!this.companion.store.data.config)await this.companion.configure({relay_url:this.url(),name:computerName()});await this.companion.request('/v1/account/link',{market_token:a.token});}catch{this.linkedToken=null;}}
+ async logout(){if(this.active)throw problem('请先结束 AI 修改再退出');if(this.companion.store.data.config){try{await this.companion.request('/v1/account/unlink',{});}catch{}}this.linkedToken=null;try{await this.remote('/logout',{method:'POST',body:{}});}catch{}this.data.account=null;this.recoveryCode=null;this.pendingKeys=null;this.save();return {ok:true};}
  workspace(draftId){return this.safePath(path.join(this.dir,'workspaces',this.scope(),id(draftId)));}
  cached(draftId){const entry=this.profile().drafts[id(draftId)];if(!entry)throw problem('请先打开此草稿源码',404);return entry;}
  snapshot(draftId,label){const entry=this.cached(draftId);const snapshot={id:crypto.randomUUID(),created_at:this.now(),label:String(label).slice(0,120),bundle:clone(entry.bundle),revision:entry.draft.revision};const dir=path.join(this.workspace(draftId),'snapshots');writePrivate(this.safePath(path.join(dir,snapshot.id+'.json')),snapshot);entry.snapshots=entry.snapshots||[];entry.snapshots.push({id:snapshot.id,created_at:snapshot.created_at,label:snapshot.label,revision:snapshot.revision});if(entry.snapshots.length>80){const removed=entry.snapshots.shift();fs.rmSync(path.join(dir,removed.id+'.json'),{force:true});}this.save();return entry.snapshots.slice(-1)[0];}

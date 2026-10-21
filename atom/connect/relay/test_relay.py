@@ -310,6 +310,31 @@ class RelayTests(unittest.TestCase):
             server.server_close()
             worker.join()
 
+    def test_same_account_discovery_and_invite(self):
+        alice = self.relay.handle('POST', '/market/v1/register', body={'username': 'alice', 'password': 'long-test-password-a'})
+        bob = self.relay.handle('POST', '/market/v1/register', body={'username': 'bobby', 'password': 'long-test-password-b'})
+        self.assertEqual(self.call(self.pc, '/v1/account/peers'), {'linked': False, 'peers': []})
+        self.denied(lambda: self.call(self.pc, '/v1/account/link', {'market_token': 'x' * 40}), 401)
+        for client in (self.device, self.pc):
+            self.call(client, '/v1/account/link', {'market_token': alice['token']})
+        self.call(self.stranger, '/v1/account/link', {'market_token': bob['token']})
+        peers = self.call(self.pc, '/v1/account/peers')['peers']
+        self.assertEqual([p['client_id'] for p in peers], [self.device['client_id']], 'only same-account devices are listed')
+        self.assertFalse(peers[0]['paired'])
+        self.denied(lambda: self.call(self.pc, '/v1/pair/invite', {'device_id': self.stranger['client_id']}), 404)
+        self.denied(lambda: self.call(self.otherpc, '/v1/pair/invite', {'device_id': self.device['client_id']}), 404)
+        self.denied(lambda: self.call(self.device, '/v1/pair/invite', {'device_id': self.device['client_id']}), 403)
+        invite = self.call(self.pc, '/v1/pair/invite', {'device_id': self.device['client_id']})
+        self.assertTrue(self.call(self.pc, '/v1/account/peers')['peers'][0]['pending'])
+        requests = self.call(self.device, '/v1/state')['pair_requests']
+        self.assertEqual([r['request_id'] for r in requests], [invite['request_id']], 'the device still has to confirm')
+        self.assertEqual(self.call(self.pc, '/v1/state')['paired'], [])
+        self.call(self.device, '/v1/pair/confirm', {'request_id': invite['request_id'], 'accept': True})
+        self.assertTrue(self.call(self.pc, '/v1/account/peers')['peers'][0]['paired'])
+        self.denied(lambda: self.call(self.pc, '/v1/pair/invite', {'device_id': self.device['client_id']}), 409)
+        self.call(self.device, '/v1/account/unlink', {})
+        self.assertEqual(self.call(self.pc, '/v1/account/peers')['peers'], [])
+
     def test_auth_roles_and_bounds(self):
         self.denied(lambda: self.relay.handle('GET', '/v1/state', self.device['client_id']), 401)
         self.denied(lambda: self.call(self.pc, '/v1/pair/code', {}), 403)

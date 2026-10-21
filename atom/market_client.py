@@ -18,6 +18,7 @@ class MarketClient:
         self.lock=threading.RLock();self.opener=build_opener(NoRedirect());self.account={}
         # Memory only: a recovery code waiting to be shown, and the password while recovery is pending.
         self.recovery_code=None;self.pending=None
+        self.linked=None  # market token already joined to this device's relay identity
         try:
             if self.path.is_symlink():raise ValueError('symlink')
             value=json.loads(self.path.read_text(encoding='utf-8'))
@@ -26,6 +27,20 @@ class MarketClient:
             if not isinstance(value.get('user'),dict):raise ValueError('user')
             self.account=value
         except (OSError,ValueError,KeyError,TypeError):pass
+    def link_account(self):
+        """Join this device to the signed-in account so the owner's computers can find it.
+
+        Registers with the service first when the device has never connected. Best effort:
+        a failure leaves pairing by code available and is retried on the next state check."""
+        token=self.current().get('token')
+        if not token or self.linked==token:return
+        self.linked=token
+        try:
+            if not self.connect.config.get('token'):
+                self.connect.configure({'relay_url':self.base(),'name':self.connect.config.get('name') or 'ATOM 小电脑'})
+            self.connect._request('/v1/account/link',{'market_token':token})
+        except BridgeError:
+            self.linked=None
     def relay(self):
         # Before the device registers, browse and sign in against the official service.
         return self.connect.config.get('relay_url') or DEFAULT_RELAY
@@ -93,6 +108,7 @@ class MarketClient:
                 raise BridgeError('相册操作不支持')
         if action=='state':
             value=self.current();user=value.get('user') or {}
+            if value.get('token') and self.linked!=value.get('token'):threading.Thread(target=self.link_account,daemon=True).start()
             return dict(configured=bool(self.relay()),authenticated=bool(value.get('token')),user={k:user[k] for k in ('id','username') if k in user},
                         encryption=self.encryption(),**({'recovery_code':self.recovery_code} if self.recovery_code else {}))
         if action in ('register','login'):
@@ -105,6 +121,7 @@ class MarketClient:
                 self.recovery_code=self.pending=None
                 try:self.after_sign_in(password)
                 except BridgeError:pass  # stays locked; the account page offers unlock again
+            self.link_account()
             return self.execute('state',{})
         if action=='unlock':
             password=data.get('password')
@@ -155,6 +172,10 @@ class MarketClient:
         if action=='logout':
             self.recovery_code=self.pending=None
             revoked=True
+            if self.connect.config.get('token'):
+                try:self.connect._request('/v1/account/unlink',{})
+                except BridgeError:pass
+            self.linked=None
             with self.lock:
                 try:
                     if self.current().get('token'):self.request('logout',{},True)

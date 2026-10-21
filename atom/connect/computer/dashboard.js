@@ -42,8 +42,8 @@ function hostOf(url){try{const u=new URL(url);return u.host+u.pathname.replace(/
 function setNode(id,tone,sub,badge){const n=$(id);n.className='node '+tone;n.querySelector('small').textContent=sub;n.querySelector('.badge').replaceChildren(badge?pill(badge,tone):'');}
 
 function health(s,ctx){const {online,paired,ready,projects}=ctx;
-  if(!s.configured)return['warn','还没有连接中继服务器','去设置','devices'];
-  if(s.connection_error)return['bad','无法连接中继服务器：'+s.connection_error,'查看连接','devices'];
+  if(!s.configured)return['warn','还没有连接 ATOM 服务','去设置','devices'];
+  if(s.connection_error)return['bad','无法连接 ATOM 服务：'+s.connection_error,'查看连接','devices'];
   if(!paired.length)return['warn','还没有配对 ATOM 设备','配对设备','devices'];
   if(!online.length)return['warn','ATOM 设备当前离线，联网后会自动重连',null,null];
   if(!ready.length)return['warn','没有可用的 Agent，ATOM 发来的任务暂时无法执行','检查 Agent','agents'];
@@ -77,7 +77,7 @@ function render(s){lastState=s;
   renderActivity();
   renderLinks();
   // Devices
-  $('server-url').textContent=s.configured?s.relay_url:'未配置中继服务器';
+  $('server-url').textContent=s.configured?s.relay_url:'还没有连接 ATOM 服务';
   $('server-detail').textContent=s.connection_error||(s.configured?'电脑名称：'+(s.name||'')+' · 客户端 '+(s.client_id||'').slice(0,8):'填写服务器地址后开始连接');
   $('server-pill').className='pill '+tone;$('server-pill').textContent=!s.configured?'未配置':s.connection_error?'连接异常':'已连接';
   if(!s.configured)$('config').hidden=false;
@@ -133,6 +133,7 @@ function applyDevtools(){document.documentElement.toggleAttribute('data-devtools
   if(!devtools&&currentPage==='simulator')showPage('overview');}
 $('devtools').onchange=e=>{devtools=e.target.checked;try{localStorage.setItem('atom.connect.devtools',devtools?'1':'0');}catch{}applyDevtools();refreshSimulator();renderLinks();};
 window.addEventListener('atom:account',()=>renderLinks());
+let accountPeers=[],peersLoading=false;
 let simState=null,simNative=native?'stopped':'external',simMessage='',simPairing=false,simLoading=false;
 function simAsk(action){if(native)native.postMessage({action});}
 window.addEventListener('atom:simulator',e=>{simNative=e.detail?.state||'stopped';simMessage=e.detail?.message||'';refreshSimulator();});
@@ -171,7 +172,8 @@ function renderLinks(){
   const real=(s.paired||[]).filter(x=>x.client_id!==d.client_id),realOnline=real.filter(x=>x.online);
   const tasks=s.tasks||[],simTask=tasks.find(t=>d.client_id&&t.device_id===d.client_id),realTask=tasks.find(t=>t.device_id&&real.some(r=>r.client_id===t.device_id));
   const ready=(s.agents||[]).filter(a=>a.available&&a.authenticated),projects=s.projects||[],user=window.atomAccount;
-  const realStep=[realOnline.length>0,devtools?'真机配对并在线':'连接你的 ATOM 小电脑',realOnline.length?realOnline.map(x=>x.name).join('、')+' 在线':real.length?real.map(x=>x.name).join('、')+' 离线，开机联网后会自动连上':'在小电脑打开「我的电脑」生成配对码，到「设备与连接」输入','去配对',()=>showPage('devices')];
+  const invitable=accountPeers.filter(x=>!x.paired&&!x.pending),waiting=accountPeers.filter(x=>x.pending);
+  const realStep=[realOnline.length>0,devtools?'真机配对并在线':'连接你的 ATOM 小电脑',realOnline.length?realOnline.map(x=>x.name).join('、')+' 在线':real.length?real.map(x=>x.name).join('、')+' 离线，开机联网后会自动连上':(waiting.length?'已向 '+waiting.map(x=>x.name).join('、')+' 发出请求，请在小电脑上点「允许连接」':invitable.length?'账号下发现 '+invitable.map(x=>x.name).join('、')+'，点「连接」，再到小电脑上允许':'在小电脑上登录同一个账号，它会出现在这里；也可以用配对码'),invitable.length?'连接 '+invitable[0].name:'去配对',invitable.length?()=>invitePeer(invitable[0]):()=>showPage('devices')];
   const taskStep=[!!realTask,devtools?'从真机发起一次电脑任务':'从小电脑发起第一个任务',realTask?'已收到：'+(realTask.title||'任务')+' · '+(statuses[realTask.status]||realTask.status):'在小电脑「我的电脑」里选这台电脑、项目和 Agent，说出需求'];
   const steps=devtools?[
     [running,'启动模拟设备',running?(sim.apps||0)+' 个应用已安装':'在 ATOM Connect 中启动','启动',()=>{showPage('simulator');simAsk('start');}],
@@ -201,3 +203,14 @@ async function pairSim(){if(simPairing)return;simPairing=true;renderSimulator();
 $('sim-pair').onclick=pairSim;
 $('sim-toggle').onclick=()=>{if(simState?.running){simAsk('stop');simNative='stopped';}else{simAsk('start');simNative='starting';}renderSimulator();setTimeout(refreshSimulator,600);};
 applyDevtools();refreshSimulator();setInterval(refreshSimulator,2000);
+
+/* Same-account discovery: devices signed in to this account, connectable without a code. */
+async function refreshPeers(){if(peersLoading)return;peersLoading=true;try{const r=await api('account/peers');accountPeers=r.peers||[];renderPeers(r);}catch{accountPeers=[];}finally{peersLoading=false;}renderLinks();}
+function renderPeers(r){const list=$('account-peers');
+  $('account-peers-note').textContent=!window.atomAccount?'登录账号后显示':r.linked?'同账号设备不用配对码':'';
+  if(!window.atomAccount){list.replaceChildren(emptyState('登录 ATOM 账号后显示','小电脑也登录同一个账号，就会出现在这里'));return;}
+  if(!accountPeers.length){list.replaceChildren(emptyState('账号下还没有其他 ATOM','在小电脑上登录这个账号，几秒后会出现在这里'));return;}
+  list.replaceChildren(...accountPeers.map(p=>row({icon:'device',tone:p.paired?'ok':p.online?'':'',title:p.name,sub:p.paired?'已连接':p.pending?'等待小电脑上点「允许连接」':p.online?'在线 · 可以连接':'离线 · 开机联网后可以连接',
+    end:p.paired||p.pending?[]:[h('button',{class:'btn small primary',text:'连接',onclick:()=>invitePeer(p)})]})));}
+async function invitePeer(p){try{await api('account/invite',{device_id:p.client_id});note('已向 '+p.name+' 发出连接请求，请在小电脑上点「允许连接」');}catch(e){note(e.message,true);}refreshPeers();}
+window.addEventListener('atom:account',refreshPeers);refreshPeers();setInterval(refreshPeers,5000);

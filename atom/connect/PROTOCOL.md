@@ -12,6 +12,10 @@ POST /v1/clients/register unauthenticated {role:"computer"|"device",name} -> {cl
 GET /v1/state -> {client_id,role,paired:[{client_id,name,online,projects:[],agents:[]}],pair_requests:[{request_id,computer_id,computer_name}],tasks:[]}.
 POST /v1/pair/code device -> {code,expires_at}.
 POST /v1/pair/claim computer {code} -> {request_id,device_id,device_name} pending until device confirm.
+POST /v1/account/link any {market_token} -> {ok}; joins this client to the signed-in market account (verified by the marketplace session).
+POST /v1/account/unlink any {} -> {ok}.
+GET /v1/account/peers any -> {linked,peers:[{client_id,name,online,paired,pending}]}; clients of the other role on the same account.
+POST /v1/pair/invite computer {device_id,public_key?} -> {request_id,device_id,device_name}; same account only, no code. The request appears in the device's pair_requests and still needs /v1/pair/confirm.
 POST /v1/pair/confirm device {request_id,accept:boolean} -> {ok:true}.
 POST /v1/computer/state computer {projects:[{id,name}],agents:[{id,name,available,authenticated,reason}]} -> {ok:true}; also heartbeat. Never publish local filesystem paths or credentials.
 POST /v1/tasks device {request_id,computer_id,project_id,agent_id,prompt,session_id?} -> {task:task}; idempotency by device+request_id. Verify binding and published project/agent; reject offline computer with409. task = {id,device_id,computer_id,project_id,agent_id,prompt,status,session_id?,last_seq,...}.

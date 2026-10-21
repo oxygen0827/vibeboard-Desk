@@ -217,7 +217,15 @@ resumeWorkshop();
 
 
 /* Keep device presence alive while using the desktop or another application. */
-var connectHeartbeatBusy=false;function refreshDesktopConnection(){if(connectHeartbeatBusy)return;connectHeartbeatBusy=true;request('/api/connect/state').then(function(s){desktopConnectState=s;updateDesktopStatus();}).catch(function(){desktopConnectState={configured:true,paired:[]};updateDesktopStatus();}).then(function(){connectHeartbeatBusy=false;});}refreshDesktopConnection();setInterval(refreshDesktopConnection,15000);
+var connectHeartbeatBusy=false,connectTimer=null;function refreshDesktopConnection(){if(connectHeartbeatBusy)return;connectHeartbeatBusy=true;clearTimeout(connectTimer);request('/api/connect/state').then(function(s){desktopConnectState=s;updateDesktopStatus();promptPairRequest(s);}).catch(function(){desktopConnectState={configured:true,paired:[]};updateDesktopStatus();}).then(function(){connectHeartbeatBusy=false;
+// Check more often until a computer is connected, so a connection request shows up within seconds.
+connectTimer=setTimeout(refreshDesktopConnection,desktopConnectState&&desktopConnectState.configured&&!(desktopConnectState.paired||[]).length?5000:15000);});}refreshDesktopConnection();
+/* A computer on the same account asked to connect (no code typed). The person decides here, over
+   whatever is open; declining or ignoring leaves things as they were. */
+var pairPrompt=null,pairDismissed={};
+function promptPairRequest(s){var r=(s&&s.pair_requests||[]).find(function(x){return !pairDismissed[x.request_id];});if(!r||pairPrompt)return;var overlay=document.createElement('div');overlay.className='app-action-backdrop';overlay.innerHTML='<section class="app-action-sheet" role="dialog" aria-modal="true"><h2>“'+esc(r.computer_name||'一台电脑')+'”想连接这台 ATOM</h2><p class="app-action-description">同一个账号下的电脑。允许后，可以从这里让它执行任务。</p><div class="app-action-buttons"><button id="pair-allow">允许连接</button><button id="pair-deny">不允许</button></div></section>';document.body.appendChild(overlay);pairPrompt=r;
+function finish(accept){overlay.querySelectorAll('button').forEach(function(b){b.disabled=true;});post('/api/connect/pair-confirm',{request_id:r.request_id,accept:accept}).then(function(){showToast(accept?'已连接“'+(r.computer_name||'电脑')+'”':'已拒绝连接请求');}).catch(function(e){showToast(e.message||'操作失败，请稍后在「我的电脑」里处理');}).then(function(){pairDismissed[r.request_id]=true;pairPrompt=null;overlay.remove();refreshDesktopConnection();});}
+overlay.querySelector('#pair-allow').onclick=function(){finish(true);};overlay.querySelector('#pair-deny').onclick=function(){finish(false);};}
 
 /* Scoped personal-data access: manifest declaration plus per-account user grant. */
 var capabilityPrompt=null;

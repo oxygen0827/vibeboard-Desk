@@ -117,8 +117,8 @@
 
 <!-- 设备与连接 -->
 <section data-panel="devices" hidden>
-  <header class="page-head"><div><h1>设备与连接</h1><p>这台电脑和 ATOM 通过同一个中继服务器连接</p></div></header>
-  <div class="section-head"><h2>中继服务器</h2></div>
+  <header class="page-head"><div><h1>设备与连接</h1><p>这台电脑和 ATOM 通过同一个 ATOM 服务连接</p></div></header>
+  <div class="section-head"><h2>ATOM 服务</h2></div>
   <div class="card server-card">
     <div class="row"><span class="row-icon"><svg><use href="#i-server"/></svg></span><div class="row-main"><strong id="server-url">未配置</strong><small id="server-detail"></small></div><span class="pill" id="server-pill"></span><button class="btn" id="server-edit">修改</button></div>
     <form id="config" class="inline-form" hidden>
@@ -130,7 +130,9 @@
   </div>
   <div class="section-head"><h2>已配对设备</h2><span class="muted" id="paired-count"></span></div>
   <div class="list card" id="paired"></div>
-  <div class="section-head"><h2>配对新设备</h2></div>
+  <div class="section-head"><h2>你账号下的 ATOM</h2><span class="muted" id="account-peers-note"></span></div>
+  <div class="list card" id="account-peers"></div>
+  <div class="section-head"><h2>用配对码连接</h2><span class="muted">连接别人的 ATOM，或账号下没有显示时使用</span></div>
   <div class="card pair-card">
     <ol class="steps"><li>在 ATOM 上打开「我的电脑」，生成配对码</li><li>在这里输入配对码</li><li>回到 ATOM 确认配对</li></ol>
     <form id="pair" class="pair-form"><input name="code" class="code" placeholder="配对码" autocomplete="off" required maxlength="64" spellcheck="false"><button class="btn primary">请求配对</button></form>

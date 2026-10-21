@@ -101,7 +101,7 @@ class Relay:
         CREATE TABLE IF NOT EXISTS commands(id TEXT PRIMARY KEY, computer TEXT, task TEXT, data TEXT, acked INTEGER DEFAULT 0);
         CREATE TABLE IF NOT EXISTS approvals(task TEXT, request TEXT, data TEXT, answered INTEGER DEFAULT 0, PRIMARY KEY(task,request));
         ''')
-        for table, column in (('bindings', 'device_key'), ('bindings', 'computer_key'), ('requests', 'computer_key')):
+        for table, column in (('bindings', 'device_key'), ('bindings', 'computer_key'), ('requests', 'computer_key'), ('clients', 'account')):
             if column not in {r[1] for r in self.db.execute('PRAGMA table_info(' + table + ')')}:
                 self.db.execute('ALTER TABLE ' + table + ' ADD COLUMN ' + column + ' TEXT')
         self.db.commit()
@@ -205,6 +205,41 @@ class Relay:
             self.db.execute("INSERT INTO requests(id,device,computer,expires,status,computer_key) VALUES(?,?,?,?,'pending',?)", (rid, row['device'], cid, row['expires'], public_key(body)))
             dev = self.one('SELECT name FROM clients WHERE id=?', (row['device'],))
             return dict(request_id=rid, device_id=row['device'], device_name=dev['name'])
+        # Same-account discovery: a device and a computer signed in to the same market account see
+        # each other and the computer may ask to connect without a code. The device still confirms,
+        # and encryption keys are exchanged exactly as with a code.
+        if method == 'POST' and path == '/v1/account/link':
+            try:
+                user = self.marketplace.auth(string(body, 'market_token', 256))
+            except MarketError:
+                raise ApiError(401, 'Market sign-in expired')
+            self.db.execute('UPDATE clients SET account=? WHERE id=?', (user['id'], cid))
+            return {'ok': True}
+        if method == 'POST' and path == '/v1/account/unlink':
+            self.db.execute('UPDATE clients SET account=NULL WHERE id=?', (cid,))
+            return {'ok': True}
+        if method == 'GET' and path == '/v1/account/peers':
+            if not client['account']:
+                return {'linked': False, 'peers': []}
+            other = 'computer' if role == 'device' else 'device'
+            peers = []
+            for row in self.rows('SELECT * FROM clients WHERE account=? AND role=? AND id!=? ORDER BY heartbeat DESC LIMIT 20', (client['account'], other, cid)):
+                device, computer = (cid, row['id']) if role == 'device' else (row['id'], cid)
+                pending = self.one("SELECT 1 FROM requests WHERE device=? AND computer=? AND status='pending' AND expires>?", (device, computer, now))
+                peers.append(dict(client_id=row['id'], name=row['name'], online=now-row['heartbeat'] < self.lease,
+                                  paired=bool(self.binding(device, computer)), pending=bool(pending)))
+            return {'linked': True, 'peers': peers}
+        if method == 'POST' and path == '/v1/pair/invite':
+            only('computer')
+            device = string(body, 'device_id', 100)
+            row = self.one("SELECT * FROM clients WHERE id=? AND role='device'", (device,))
+            require(row and client['account'] and row['account'] == client['account'], 'Device not found on this account', 404)
+            require(not self.binding(device, cid), 'Already connected', 409)
+            require(self.one('SELECT COUNT(*) n FROM requests')['n'] < MAX_PAIR_REQUESTS, 'Pairing capacity reached', 503)
+            self.db.execute("UPDATE requests SET status='expired' WHERE device=? AND computer=? AND status='pending'", (device, cid))
+            rid = secrets.token_hex(16)
+            self.db.execute("INSERT INTO requests(id,device,computer,expires,status,computer_key) VALUES(?,?,?,?,'pending',?)", (rid, device, cid, now+300, public_key(body)))
+            return dict(request_id=rid, device_id=device, device_name=row['name'])
         if method == 'POST' and path == '/v1/pair/confirm':
             only('device')
             rid = string(body, 'request_id')
