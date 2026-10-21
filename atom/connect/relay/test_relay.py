@@ -86,6 +86,42 @@ class RelayTests(unittest.TestCase):
         self.assertEqual([c['type'] for c in self.call(self.pc, '/v1/computer/commands')['commands']], ['task.cancel'])
         self.event(running, 'e2', 'error', status='cancelled')
 
+    def test_key_exchange_and_encrypted_tasks_refuse_plaintext(self):
+        pk = lambda c: c*43
+        env = lambda: {'v': 1, 'iv': 'A'*16, 'ct': 'B'*40}
+        code = self.call(self.device, '/v1/pair/code', {})['code']
+        claim = self.call(self.pc, '/v1/pair/claim', {'code': code, 'public_key': pk('c')})
+        self.denied(lambda: self.call(self.device, '/v1/pair/confirm', {'request_id': claim['request_id'], 'accept': True, 'public_key': 'short'}), 400)
+        self.call(self.device, '/v1/pair/confirm', {'request_id': claim['request_id'], 'accept': True, 'public_key': pk('d')})
+        self.call(self.pc, '/v1/computer/state', {'projects': [{'id': 'project', 'name': 'Demo'}], 'agents': [{'id': 'codex', 'name': 'Codex', 'available': True, 'authenticated': True}]})
+        host = self.call(self.device, '/v1/state')['paired'][0]
+        self.assertEqual((host['public_key'], host['own_key']), (pk('c'), pk('d')))
+        self.assertEqual(self.call(self.pc, '/v1/state')['paired'][0]['public_key'], pk('d'))
+        self.denied(lambda: self.create(), 400)
+        t = self.call(self.device, '/v1/tasks', dict(request_id='r1', computer_id=self.pc['client_id'], project_id='project', agent_id='codex', enc_prompt=env()))['task']
+        self.assertTrue(t['e2e'])
+        self.assertNotIn('prompt', t)
+        self.assertEqual(t['request_id'], 'r1')
+        self.denied(lambda: self.event(t, 'plain', text='leak'), 400)
+        self.denied(lambda: self.event(t, 'bad', enc_text={'v': 1, 'iv': 'A'*16, 'ct': 'not base64!'}), 400)
+        e = self.event(t, 'e1', enc_text=env(), status='running')
+        self.assertNotIn('text', e)
+        self.denied(lambda: self.event(t, 'a0', 'approval', approval={'request_id': 'q', 'title': 'leak', 'choices': ['accept', 'decline']}), 400)
+        self.event(t, 'a1', 'approval', approval={'request_id': 'q', 'enc_title': env(), 'enc_detail': env(), 'choices': ['accept', 'decline']})
+        # Keys of an existing pairing are set once and cannot be swapped silently.
+        self.denied(lambda: self.call(self.pc, '/v1/pair/keys', {'client_id': self.device['client_id'], 'public_key': pk('x')}), 409)
+        self.call(self.pc, '/v1/pair/keys', {'client_id': self.device['client_id'], 'public_key': pk('c')})
+
+    def test_existing_pairing_publishes_keys_later(self):
+        self.pair()
+        self.assertIsNone(self.call(self.device, '/v1/state')['paired'][0]['public_key'])
+        self.create(request_id='plain')
+        self.call(self.device, '/v1/pair/keys', {'client_id': self.pc['client_id'], 'public_key': 'd'*43})
+        self.create(request_id='still-plain')
+        self.call(self.pc, '/v1/pair/keys', {'client_id': self.device['client_id'], 'public_key': 'c'*43})
+        self.denied(lambda: self.create(request_id='now-encrypted'), 400)
+        self.denied(lambda: self.call(self.stranger, '/v1/pair/keys', {'client_id': self.pc['client_id'], 'public_key': 'e'*43}), 404)
+
     def test_task_isolation_and_idempotency(self):
         self.pair()
         t = self.create()
@@ -256,7 +292,7 @@ class RelayTests(unittest.TestCase):
             self.assertEqual(request('GET', '/v1/state', headers={'Authorization': 'Bearer '+self.device['token']})[0], 200)
             self.assertEqual(request('POST', '/v1/clients/register', '{}')[0], 415)
             self.assertEqual(request('POST', '/v1/clients/register', '{', {'Content-Type':'application/json'})[0], 400)
-            self.assertEqual(request('POST', '/v1/clients/register', 'x'*131073, {'Content-Type':'application/json'})[0], 413)
+            self.assertEqual(request('POST', '/v1/clients/register', 'x'*(module.MAX_BODY+1), {'Content-Type':'application/json'})[0], 413)
             server.rate_buckets = {('127.0.0.1', '/v1/clients/register'): (module.time.monotonic()-120, 10)}
             self.assertEqual(request('POST', '/v1/clients/register', '{"role":"device","name":"x"}', {'Content-Type':'application/json'})[0], 429, 'registration window is hourly, not per minute')
             server.rate_buckets = {('127.0.0.1', '/v1/pair/claim'): (module.time.monotonic(), 30)}

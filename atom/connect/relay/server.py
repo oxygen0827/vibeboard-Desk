@@ -20,8 +20,10 @@ from marketplace.service import Marketplace, MarketError
 
 TERMINAL = {'completed', 'failed', 'cancelled', 'interrupted'}
 STATUSES = {'queued', 'running', 'waiting_approval'} | TERMINAL
-MAX_BODY = 128 * 1024
+MAX_BODY = 192 * 1024
 MAX_ARTIFACT = 96 * 1024
+PUBLIC_KEY = re.compile(r'^[A-Za-z0-9_-]{43}$')
+B64 = re.compile(r'^[A-Za-z0-9_-]+$')
 # Hard upper bounds for a self-hosted prototype; never silently prune task history.
 MAX_CLIENTS = 10000
 MAX_TASKS = 10000
@@ -47,6 +49,20 @@ class ApiError(Exception):
 def require(value, message='Invalid request', status=400):
     if not value:
         raise ApiError(status, message)
+
+
+def sealed(data, key, plain_limit):
+    # End-to-end envelope from atom/e2e.py; the relay checks shape and size only.
+    value = data.get(key)
+    require(isinstance(value, dict) and set(value) == {'v', 'iv', 'ct'} and value['v'] == 1 and isinstance(value['iv'], str) and len(value['iv']) == 16 and B64.fullmatch(value['iv'])
+            and isinstance(value['ct'], str) and 22 <= len(value['ct']) <= (plain_limit * 3 + 16) * 4 // 3 + 4 and B64.fullmatch(value['ct']), 'Invalid encrypted ' + key)
+    return value
+
+
+def public_key(data):
+    value = data.get('public_key')
+    require(value is None or isinstance(value, str) and PUBLIC_KEY.fullmatch(value), 'Invalid public key')
+    return value
 
 
 def string(data, key, limit=256, optional=False):
@@ -85,6 +101,10 @@ class Relay:
         CREATE TABLE IF NOT EXISTS commands(id TEXT PRIMARY KEY, computer TEXT, task TEXT, data TEXT, acked INTEGER DEFAULT 0);
         CREATE TABLE IF NOT EXISTS approvals(task TEXT, request TEXT, data TEXT, answered INTEGER DEFAULT 0, PRIMARY KEY(task,request));
         ''')
+        for table, column in (('bindings', 'device_key'), ('bindings', 'computer_key'), ('requests', 'computer_key')):
+            if column not in {r[1] for r in self.db.execute('PRAGMA table_info(' + table + ')')}:
+                self.db.execute('ALTER TABLE ' + table + ' ADD COLUMN ' + column + ' TEXT')
+        self.db.commit()
         if path != ':memory:':
             os.chmod(path, 0o600)
 
@@ -110,6 +130,9 @@ class Relay:
                          (not computer_only and row['device'] == client['id'] and client['role'] == 'device')),
                 'Task not found', 404)
         return json.loads(row['data'])
+
+    def binding(self, device, computer):
+        return self.one('SELECT * FROM bindings WHERE device=? AND computer=?', (device, computer))
 
     def command(self, computer, task, kind, payload):
         require(self.one('SELECT COUNT(*) n FROM commands')['n'] < MAX_COMMANDS, 'Command capacity reached; operator maintenance required', 503)
@@ -145,21 +168,23 @@ class Relay:
             require(role == expected, 'Role not permitted', 403)
         if method == 'GET' and path == '/v1/state':
             other = 'computer' if role == 'device' else 'device'
-            bound = self.rows('SELECT c.* FROM clients c JOIN bindings b ON c.id=b.' + other + ' WHERE b.' + role + '=?', (cid,))
+            bound = self.rows('SELECT c.*, b.device_key, b.computer_key FROM clients c JOIN bindings b ON c.id=b.' + other + ' WHERE b.' + role + '=?', (cid,))
             paired = []
             for row in bound:
                 meta = json.loads(row['metadata'])
                 paired.append(dict(client_id=row['id'], name=row['name'], online=now-row['heartbeat'] < self.lease,
-                                   projects=meta.get('projects', []), agents=meta.get('agents', [])))
+                                   projects=meta.get('projects', []), agents=meta.get('agents', []),
+                                   public_key=row[other + '_key'], own_key=row[role + '_key']))
                 if row['role'] == 'computer' and isinstance(meta.get('activity'), dict):
                     paired[-1]['activity'] = meta['activity']
             requests = [dict(request_id=r['id'], computer_id=r['computer'], computer_name=r['name']) for r in
                         self.rows("SELECT r.*,c.name FROM requests r JOIN clients c ON c.id=r.computer WHERE r.device=? AND r.status='pending' AND r.expires>?", (cid, now))] if role == 'device' else []
             tasks = [json.loads(r['data']) for r in self.rows('SELECT data FROM tasks WHERE ' + role + '=? ORDER BY rowid DESC LIMIT 100', (cid,))]
             for item in tasks:
-                if 'artifact' in item:
-                    item.pop('artifact')
-                    item['artifact_available'] = True
+                for key in ('artifact', 'enc_artifact'):
+                    if key in item:
+                        item.pop(key)
+                        item['artifact_available'] = True
             return dict(client_id=cid, role=role, paired=paired, pair_requests=requests, tasks=tasks)
         if method == 'POST' and path == '/v1/pair/code':
             only('device')
@@ -177,7 +202,7 @@ class Relay:
             require(self.one('SELECT COUNT(*) n FROM requests')['n'] < MAX_PAIR_REQUESTS, 'Pairing capacity reached', 503)
             rid = secrets.token_hex(16)
             self.db.execute('UPDATE codes SET used=1 WHERE code_hash=?', (row['code_hash'],))
-            self.db.execute("INSERT INTO requests VALUES(?,?,?,?,'pending')", (rid, row['device'], cid, row['expires']))
+            self.db.execute("INSERT INTO requests(id,device,computer,expires,status,computer_key) VALUES(?,?,?,?,'pending',?)", (rid, row['device'], cid, row['expires'], public_key(body)))
             dev = self.one('SELECT name FROM clients WHERE id=?', (row['device'],))
             return dict(request_id=rid, device_id=row['device'], device_name=dev['name'])
         if method == 'POST' and path == '/v1/pair/confirm':
@@ -189,7 +214,20 @@ class Relay:
             self.db.execute('UPDATE requests SET status=? WHERE id=?', ('accepted' if body['accept'] else 'declined', rid))
             if body['accept']:
                 require(self.one('SELECT COUNT(*) n FROM bindings WHERE device=? OR computer=?', (cid, row['computer']))['n'] < 100, 'Pairing limit reached', 409)
-                self.db.execute('INSERT OR IGNORE INTO bindings VALUES(?,?)', (cid, row['computer']))
+                self.db.execute('INSERT OR IGNORE INTO bindings(device,computer) VALUES(?,?)', (cid, row['computer']))
+                # A fresh pairing replaces both keys; either side may still be a client without encryption.
+                self.db.execute('UPDATE bindings SET device_key=?,computer_key=? WHERE device=? AND computer=?', (public_key(body), row['computer_key'], cid, row['computer']))
+            return {'ok': True}
+        if method == 'POST' and path == '/v1/pair/keys':
+            # Existing pairings publish keys once; a different key needs a fresh pairing.
+            other, key = string(body, 'client_id', 100), public_key(body)
+            require(key, 'Invalid public key')
+            device, computer = (cid, other) if role == 'device' else (other, cid)
+            bound = self.binding(device, computer)
+            require(bound, 'Pairing not found', 404)
+            current = bound[role + '_key']
+            require(current in (None, key), 'Key already set; pair again to change it', 409)
+            self.db.execute('UPDATE bindings SET ' + role + '_key=? WHERE device=? AND computer=?', (key, device, computer))
             return {'ok': True}
         if method == 'POST' and path == '/v1/pair/remove':
             other = string(body, 'client_id', 100)
@@ -244,7 +282,9 @@ class Relay:
                 return {'task': json.loads(existing['data'])}
             require(self.one('SELECT COUNT(*) n FROM tasks')['n'] < MAX_TASKS and self.one('SELECT COUNT(*) n FROM tasks WHERE device=?', (cid,))['n'] < MAX_DEVICE_TASKS, 'Task history capacity reached; operator maintenance required', 503)
             computer = string(body, 'computer_id', 100)
-            require(self.one('SELECT 1 FROM bindings WHERE device=? AND computer=?', (cid, computer)), 'Computer unavailable', 403)
+            bound = self.binding(cid, computer)
+            require(bound, 'Computer unavailable', 403)
+            encrypted = bool(bound['device_key'] and bound['computer_key'])
             host = self.one('SELECT * FROM clients WHERE id=?', (computer,))
             require(host and now-host['heartbeat'] < self.lease, 'Computer offline', 409)
             meta = json.loads(host['metadata'])
@@ -253,8 +293,13 @@ class Relay:
             require(any(x['id'] == agent and x['available'] and x['authenticated'] for x in meta.get('agents', [])), 'Agent unavailable', 409)
             task_kind = body.get('kind', 'task')
             require(task_kind in ('task', 'app'), 'Invalid task kind')
-            task = dict(kind=task_kind, id=secrets.token_hex(16), device_id=cid, computer_id=computer, project_id=project, agent_id=agent,
-                        prompt=string(body, 'prompt', 16000), status='queued', last_seq=0, created_at=now, updated_at=now)
+            task = dict(kind=task_kind, id=secrets.token_hex(16), request_id=rid, device_id=cid, computer_id=computer, project_id=project, agent_id=agent,
+                        status='queued', last_seq=0, created_at=now, updated_at=now)
+            if encrypted:
+                require('prompt' not in body, 'This pairing requires an encrypted prompt', 400)
+                task.update(e2e=True, enc_prompt=sealed(body, 'enc_prompt', 16000 * 3))
+            else:
+                task['prompt'] = string(body, 'prompt', 16000)
             session = string(body, 'session_id', 256, True)
             if session:
                 previous = [json.loads(r['data']) for r in self.rows('SELECT data FROM tasks WHERE device=? AND computer=?', (cid, computer))]
@@ -277,8 +322,8 @@ class Relay:
             task = self.task(parts[3], client, method == 'POST' and parts[4] == 'events')
             ident, action = task['id'], parts[4]
             if action == 'artifact' and method == 'GET':
-                require(task.get('kind') == 'app' and task['status'] == 'completed' and isinstance(task.get('artifact'), dict), 'App artifact unavailable', 409)
-                return {'artifact': task['artifact']}
+                require(task.get('kind') == 'app' and task['status'] == 'completed' and isinstance(task.get('artifact') or task.get('enc_artifact'), dict), 'App artifact unavailable', 409)
+                return {'enc_artifact': task['enc_artifact']} if task.get('e2e') else {'artifact': task['artifact']}
             if action == 'events' and method == 'GET':
                 try:
                     after = int(urllib.parse.parse_qs(parsed.query).get('after', ['0'])[0])
@@ -296,12 +341,19 @@ class Relay:
                 kind = body.get('type')
                 require(kind in ('status', 'delta', 'approval', 'result', 'error'), 'Invalid event type')
                 event = dict(event_id=eid, type=kind, seq=task['last_seq']+1, created_at=now)
-                if 'text' in body:
+                if task.get('e2e'):
+                    require(not any(k in body for k in ('text', 'artifact')), 'This task requires encrypted content')
+                    if 'enc_text' in body:
+                        event['enc_text'] = sealed(body, 'enc_text', 32000 * 3)
+                elif 'text' in body:
                     event['text'] = string(body, 'text', 32000, True)
                 if 'session_id' in body:
                     event['session_id'] = string(body, 'session_id', 256)
                     task['session_id'] = event['session_id']
                 status = body.get('status')
+                if 'enc_artifact' in body:
+                    require(task.get('e2e') and kind == 'result' and task.get('kind') == 'app' and status in (None, 'completed'), 'Artifact requires completed app result')
+                    event['enc_artifact'] = task['enc_artifact'] = sealed(body, 'enc_artifact', MAX_ARTIFACT)
                 if 'artifact' in body:
                     require(kind == 'result' and task.get('kind') == 'app' and status in (None, 'completed'), 'Artifact requires completed app result')
                     artifact = body['artifact']
@@ -326,7 +378,11 @@ class Relay:
                     require(choices == ['accept', 'decline'], 'Invalid approval choices')
                     require(not self.one('SELECT 1 FROM approvals WHERE task=? AND request=?', (ident, req)), 'Approval already exists', 409)
                     require(not self.one('SELECT 1 FROM approvals WHERE task=? AND answered=0', (ident,)), 'Approval pending', 409)
-                    event['approval'] = dict(request_id=req, title=string(approval, 'title', 200), detail=string(approval, 'detail', 8000, True), choices=choices)
+                    if task.get('e2e'):
+                        require(not any(k in approval for k in ('title', 'detail')), 'This task requires encrypted content')
+                        event['approval'] = dict(request_id=req, enc_title=sealed(approval, 'enc_title', 200 * 3), enc_detail=sealed(approval, 'enc_detail', 8000 * 3), choices=choices)
+                    else:
+                        event['approval'] = dict(request_id=req, title=string(approval, 'title', 200), detail=string(approval, 'detail', 8000, True), choices=choices)
                     self.db.execute('INSERT INTO approvals VALUES(?,?,?,0)', (ident, req, json.dumps(event['approval'])))
                     status = 'waiting_approval'
                 if status is not None:

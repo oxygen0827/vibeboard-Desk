@@ -9,7 +9,13 @@ from urllib.request import Request, build_opener, HTTPRedirectHandler
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlsplit, urlencode
 
+try:
+    import e2e
+except ImportError:  # python3-cryptography not installed: pairings stay unencrypted
+    e2e = None
+
 IDENTIFIER = re.compile(r'^[A-Za-z0-9_-]{1,128}$')
+UNREADABLE = '[无法解密：配对密钥不一致，请解除配对后重新配对]'
 MAX_RESPONSE = 2 * 1024 * 1024
 
 class BridgeError(ValueError):
@@ -47,6 +53,7 @@ class DeviceBridge:
         self.path = self.root / 'connect.json'
         self.lock = threading.RLock()
         self.config = {}
+        self.key_cache = {}
         self.opener = build_opener(NoRedirect())
         try:
             if self.path.is_symlink(): raise ValueError('symlink')
@@ -55,7 +62,60 @@ class DeviceBridge:
             identifier(data['client_id'], '设备')
             if not isinstance(data.get('token'), str) or not 16 <= len(data['token']) <= 4096: raise ValueError('token')
             self.config = data
+            self.ensure_key()
         except (OSError, ValueError, TypeError, KeyError): pass
+
+    def ensure_key(self):
+        # One X25519 identity per device registration; peers are pinned on first sight.
+        if e2e and self.config.get('token') and not self.config.get('e2e_private'):
+            self._save(dict(self.config, e2e_private=e2e.new_private_key(), peers={}))
+
+    def pairing(self, computer_id, entry=None):
+        """Encryption state of one pairing from a /v1/state entry: off, on, or a refusal reason."""
+        if entry is None and computer_id in self.key_cache: return self.key_cache[computer_id]
+        if entry is None:
+            entry = next((p for p in self._request('/v1/state').get('paired', []) if p.get('client_id') == computer_id), None)
+            if entry is None: raise BridgeError('电脑未配对', 403)
+        if not e2e or not self.config.get('e2e_private'): return dict(state='off')
+        mine = e2e.public_key(self.config['e2e_private'])
+        if entry.get('own_key') is None:
+            self._request('/v1/pair/keys', {'client_id': computer_id, 'public_key': mine})
+            entry['own_key'] = mine
+        if entry['own_key'] != mine: return dict(state='mismatch')
+        peer, pinned = entry.get('public_key'), self.config.get('peers', {}).get(computer_id)
+        if not peer: return dict(state='off')
+        if pinned and pinned != peer: return dict(state='changed')
+        if not pinned:
+            self._save(dict(self.config, peers=dict(self.config.get('peers', {}), **{computer_id: peer})))
+        info = dict(state='on', key=e2e.pair_key(self.config['e2e_private'], peer, self.config['client_id'], computer_id), code=e2e.safety_code(mine, peer))
+        self.key_cache[computer_id] = info
+        return info
+
+    def reveal(self, key, envelope, aad, fallback=UNREADABLE):
+        try: return e2e.open_sealed(key, envelope, aad)
+        except (e2e.E2EError, AttributeError): return fallback
+
+    def reveal_task(self, task, key):
+        if key and isinstance(task, dict) and task.get('enc_prompt'):
+            task['prompt'] = self.reveal(key, task.pop('enc_prompt'), 'prompt|' + str(task.get('request_id')))
+        return task
+
+    def reveal_event(self, event, task_id, key):
+        if not key or not isinstance(event, dict): return event
+        if 'enc_text' in event: event['text'] = self.reveal(key, event.pop('enc_text'), 'text|' + task_id + '|' + str(event.get('event_id')))
+        event.pop('enc_artifact', None)
+        approval = event.get('approval')
+        if isinstance(approval, dict):
+            for field in ('title', 'detail'):
+                if 'enc_' + field in approval:
+                    approval[field] = self.reveal(key, approval.pop('enc_' + field), 'approval|' + task_id + '|' + str(approval.get('request_id')) + '|' + field)
+        return event
+
+    def task_key(self, task_id):
+        task = self._request('/v1/tasks/' + task_id + '/events?after=999999999').get('task', {})
+        if not task.get('e2e'): return None, task
+        info = self.pairing(task.get('computer_id'))
+        return (info['key'] if info['state'] == 'on' else b''), task
 
     def _save(self, config):
         if self.root.is_symlink() or any(p.is_symlink() for p in self.root.parents): raise BridgeError('配置路径不可用')
@@ -109,6 +169,7 @@ class DeviceBridge:
                 token = result.get('token')
                 if not isinstance(token, str) or not 16 <= len(token) <= 4096: raise BridgeError('服务器注册响应无效', 502)
                 config = dict(relay_url=value, name=name.strip(), client_id=result['client_id'], token=token)
+                if e2e: config.update(e2e_private=e2e.new_private_key(), peers={})
             self._save(config)
         return self.state()
 
@@ -120,6 +181,15 @@ class DeviceBridge:
             # Never expose the private config or arbitrary relay response properties.
             for key in ('client_id','role','paired','pair_requests','tasks'):
                 if key in response: public[key] = response[key]
+            keys = {}
+            for entry in public['paired']:
+                info = self.pairing(entry.get('client_id'), entry)
+                keys[entry.get('client_id')] = info.get('key')
+                entry['e2e'] = info['state']
+                if info.get('code'): entry['safety_code'] = info['code']
+                entry.pop('public_key', None); entry.pop('own_key', None)
+            for task in public['tasks']:
+                if task.get('e2e'): self.reveal_task(task, keys.get(task.get('computer_id')) or b'')
         except BridgeError as exc:
             public.update(connection_error=str(exc), connection_code=exc.code)
         return public
@@ -131,21 +201,48 @@ class DeviceBridge:
         if action == 'pair-code': return self._request('/v1/pair/code', {})
         if action == 'pair-confirm':
             if type(data.get('accept')) is not bool: raise BridgeError('请确认是否连接电脑')
-            return self._request('/v1/pair/confirm', {'request_id':identifier(data.get('request_id')), 'accept':data['accept']})
-        if action == 'unpair': return self._request('/v1/pair/remove', {'client_id':identifier(data.get('client_id'), '电脑')})
+            body = {'request_id':identifier(data.get('request_id')), 'accept':data['accept']}
+            if e2e and self.config.get('e2e_private'): body['public_key'] = e2e.public_key(self.config['e2e_private'])
+            return self._request('/v1/pair/confirm', body)
+        if action == 'unpair':
+            computer = identifier(data.get('client_id'), '电脑')
+            result = self._request('/v1/pair/remove', {'client_id':computer})
+            self.key_cache.pop(computer, None)
+            with self.lock:
+                if computer in self.config.get('peers', {}):
+                    self._save(dict(self.config, peers={k:v for k,v in self.config['peers'].items() if k != computer}))
+            return result
         if action == 'create-task':
             payload = {k:data[k] for k in ('request_id','computer_id','project_id','agent_id','prompt','session_id','kind') if k in data}
             if payload.get('kind', 'task') not in ('task', 'app'): raise BridgeError('任务类型无效')
             for key in ('request_id','computer_id','project_id','agent_id'): identifier(payload.get(key), key)
             if not isinstance(payload.get('prompt'), str) or not 1 <= len(payload['prompt'].strip()) <= 16000: raise BridgeError('请输入 1–16000 字的任务')
             if 'session_id' in payload: identifier(payload['session_id'], '会话')
-            return self._request('/v1/tasks', payload)
+            info = self.pairing(payload['computer_id'])
+            if info['state'] in ('mismatch', 'changed'): raise BridgeError('这台电脑的加密密钥发生了变化，为安全起见已停止发送。请解除配对后重新配对。', 409, 'e2e_key_changed')
+            if info['state'] == 'on':
+                payload['enc_prompt'] = e2e.seal(info['key'], payload.pop('prompt'), 'prompt|' + payload['request_id'])
+            result = self._request('/v1/tasks', payload)
+            self.reveal_task(result.get('task'), info.get('key'))
+            return result
         task = identifier(data.get('task_id'))
-        if action == 'artifact': return self._request('/v1/tasks/' + task + '/artifact')
+        if action == 'artifact':
+            result = self._request('/v1/tasks/' + task + '/artifact')
+            if 'enc_artifact' in result:
+                key, _ = self.task_key(task)
+                try: return {'artifact': e2e.open_json(key, result['enc_artifact'], 'artifact|' + task)}
+                except (e2e.E2EError, AttributeError): raise BridgeError('应用结果无法解密，请解除配对后重新配对', 409, 'e2e_unreadable')
+            return result
         if action == 'task-events':
             after = data.get('after',0)
             if type(after) is not int or not 0 <= after <= 10**10: raise BridgeError('事件序号无效')
-            return self._request('/v1/tasks/' + task + '/events?' + urlencode({'after':after}))
+            result = self._request('/v1/tasks/' + task + '/events?' + urlencode({'after':after}))
+            info = result.get('task') or {}
+            if info.get('e2e'):
+                key = self.pairing(info.get('computer_id')).get('key') or b''
+                self.reveal_task(info, key)
+                for event in result.get('events', []): self.reveal_event(event, task, key)
+            return result
         if action == 'cancel-task': return self._request('/v1/tasks/' + task + '/cancel', {})
         if action == 'approve-task':
             if data.get('decision') not in ('accept','decline'): raise BridgeError('审批选项无效')
