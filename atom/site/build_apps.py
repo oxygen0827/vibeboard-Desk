@@ -9,6 +9,10 @@ retired=set(catalog['retired'])
 CATS={'create':'AI 与创作','visual':'光影与陪伴','sound':'声音与音乐','life':'日常与记录','science':'科学与造物','connect':'连接与工具'}
 # Editorial descriptions explain actual behaviour, not roadmap promises.
 metadata={
+'photon-chip':('science','在六条光路中注入光点，观察相位、交叉路径与探测器响应。','gray-migration/photon-chip.png','本机交互示意，不是光学求解器或算力测试'),
+'photon-runner':('visual','点按让光子跃起，穿过加速光门，挑战自己的本机最高纪录。','gray-migration/photon-runner.png','本机运行；截图为测试纪录'),
+'finger-fireworks':('visual','点击夜空点燃烟花，齐放、连放，让一句短话变成光点。','gray-migration/finger-fireworks.png','本机运行'),
+'mini-piano':('sound','十个白键、七个黑键与双音色，随手弹奏或听一段小星星。','gray-migration/mini-piano.png','本机合成音色，无需联网'),
 'language-alchemy':('create','用一句话生成 GPU 材质，移动鼠标改变光纹，保存喜欢的作品。','language-alchemy.png','需要联网与模型服务'),
 'symbiotic-world':('create','改变建筑、天气与小物件，亲手搭建一座可以交互的小岛。','symbiotic-world.png','AI 创作需要联网与模型服务'),
 'ai-duet':('sound','先弹奏几个音符，再让 AI 接下一句，保存你们一起做的旋律。','ai-duet.png','弹奏可在本机运行；AI 接奏需要模型'),
@@ -83,7 +87,7 @@ priority=['language-alchemy','symbiotic-world','ai-duet','weather-window','clap-
 rows.sort(key=lambda r:priority.index(r['id'])if r['id']in priority else len(priority))
 assert len({r['id'] for r in rows})==len(rows)
 assert not retired.intersection(r['id']for r in rows)
-payload={'updated':'2026-10-21','categories':CATS,'apps':rows}
+payload={'updated':'2026-10-22','categories':CATS,'apps':rows}
 (SITE/'assets/apps/catalog.json').write_text(json.dumps(payload,ensure_ascii=False,indent=2)+'\n')
 def card(r):
  e=html.escape

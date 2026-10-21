@@ -1,0 +1,49 @@
+{
+  "results": [
+    {
+      "id": "photon-chip",
+      "fps": 59,
+      "width": 480,
+      "height": 360,
+      "scroll": 360,
+      "origin": "null",
+      "audio": "unused",
+      "active": true,
+      "returnPage": "7 / 8"
+    },
+    {
+      "id": "photon-runner",
+      "fps": 62,
+      "width": 480,
+      "height": 360,
+      "scroll": 360,
+      "origin": "null",
+      "audio": "unused",
+      "active": true,
+      "returnPage": "7 / 8"
+    },
+    {
+      "id": "finger-fireworks",
+      "fps": 63,
+      "width": 480,
+      "height": 360,
+      "scroll": 360,
+      "origin": "null",
+      "audio": "unused",
+      "active": true,
+      "returnPage": "7 / 8"
+    },
+    {
+      "id": "mini-piano",
+      "fps": 46,
+      "width": 480,
+      "height": 360,
+      "scroll": 360,
+      "origin": "null",
+      "audio": "running",
+      "active": true,
+      "returnPage": "8 / 8"
+    }
+  ],
+  "errors": []
+}

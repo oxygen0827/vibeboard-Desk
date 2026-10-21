@@ -27,8 +27,20 @@
     "source": "site/assets/agent-studio.png",
     "capture": "Reviewed application UI; empty/demo state for private-data applications"
   },
+  "mini-piano": {
+    "source": "site/assets/apps/mini-piano.png",
+    "capture": "Reviewed application UI; empty/demo state for private-data applications"
+  },
+  "photon-chip": {
+    "source": "site/assets/apps/photon-chip.png",
+    "capture": "Reviewed application UI; empty/demo state for private-data applications"
+  },
   "today": {
     "source": "site/assets/apps/today.png",
+    "capture": "Reviewed application UI; empty/demo state for private-data applications"
+  },
+  "finger-fireworks": {
+    "source": "site/assets/apps/finger-fireworks.png",
     "capture": "Reviewed application UI; empty/demo state for private-data applications"
   },
   "pixel-lab": {
@@ -37,6 +49,10 @@
   },
   "sound-lab": {
     "source": "site/assets/sound-lab.png",
+    "capture": "Reviewed application UI; empty/demo state for private-data applications"
+  },
+  "photon-runner": {
+    "source": "site/assets/apps/photon-runner.png",
     "capture": "Reviewed application UI; empty/demo state for private-data applications"
   }
 }

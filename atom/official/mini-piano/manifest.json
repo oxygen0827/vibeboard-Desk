@@ -1,0 +1,9 @@
+{
+  "id": "mini-piano",
+  "name": "迷你钢琴",
+  "description": "十个白键与七个黑键，双音色本机合成，支持鼠标、触屏、数字键和小星星自动演奏。",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "theme_ui": "controls",
+  "layout": "fullscreen"
+}

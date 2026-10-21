@@ -8,6 +8,7 @@
 | Studio、源码市场、双端应用本轮交付 | [studio-delivery.md](studio-delivery.md) |
 | 团队协作与本地开发 | [collaboration.md](collaboration.md) |
 | 官方应用视觉改版 | [official-ui-refresh.md](official-ui-refresh.md) |
+| 灰色板迁移、四个交互作品与连接验证 | [gray-migration.md](gray-migration.md) |
 | 部署、运行服务、回退 | [deployment.md](deployment.md) |
 | 麦克风、单端实验、风扇、按住说话 | [audio-diagnostics.md](audio-diagnostics.md) |
 | 云端语音与官方接口 | [voice-zhipu.md](voice-zhipu.md) |

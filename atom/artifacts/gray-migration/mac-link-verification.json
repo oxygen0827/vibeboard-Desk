@@ -1,0 +1,22 @@
+{
+  "status": "completed",
+  "e2e": true,
+  "events": [
+    {
+      "type": "status",
+      "text": "正在启动电脑 Agent"
+    },
+    {
+      "type": "status",
+      "text": "Agent 已连接"
+    },
+    {
+      "type": "delta",
+      "text": "灰色 ATOM 与 Mac 的任务链路已打通。"
+    },
+    {
+      "type": "result",
+      "text": "灰色 ATOM 与 Mac 的任务链路已打通。"
+    }
+  ]
+}

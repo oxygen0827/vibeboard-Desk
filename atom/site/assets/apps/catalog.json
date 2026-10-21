@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-21",
+  "updated": "2026-10-22",
   "categories": {
     "create": "AI 与创作",
     "visual": "光影与陪伴",
@@ -166,6 +166,32 @@
       "guide": "/atom/guide/#developer"
     },
     {
+      "id": "mini-piano",
+      "name": "迷你钢琴",
+      "category": "sound",
+      "description": "十个白键、七个黑键与双音色，随手弹奏或听一段小星星。",
+      "kind": "market",
+      "market_id": "official-mini-piano",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/official/mini-piano",
+      "icon": "/atom/assets/apps/mini-piano.svg",
+      "image": "/atom/assets/apps/mini-piano.png",
+      "needs": "本机合成音色，无需联网",
+      "guide": "/atom/guide/#market"
+    },
+    {
+      "id": "photon-chip",
+      "name": "光子芯片",
+      "category": "science",
+      "description": "在六条光路中注入光点，观察相位、交叉路径与探测器响应。",
+      "kind": "market",
+      "market_id": "official-photon-chip",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/official/photon-chip",
+      "icon": "/atom/assets/apps/photon-chip.svg",
+      "image": "/atom/assets/apps/photon-chip.png",
+      "needs": "本机交互示意，不是光学求解器或算力测试",
+      "guide": "/atom/guide/#market"
+    },
+    {
       "id": "today",
       "name": "今日",
       "category": "life",
@@ -176,6 +202,19 @@
       "icon": "/atom/assets/apps/today.svg",
       "image": "/atom/assets/apps/today.png",
       "needs": "跨设备同步需要同一账号和网络",
+      "guide": "/atom/guide/#market"
+    },
+    {
+      "id": "finger-fireworks",
+      "name": "指尖烟花",
+      "category": "visual",
+      "description": "点击夜空点燃烟花，齐放、连放，让一句短话变成光点。",
+      "kind": "market",
+      "market_id": "official-finger-fireworks",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/official/finger-fireworks",
+      "icon": "/atom/assets/apps/finger-fireworks.svg",
+      "image": "/atom/assets/apps/finger-fireworks.png",
+      "needs": "本机运行",
       "guide": "/atom/guide/#market"
     },
     {
@@ -202,6 +241,19 @@
       "icon": "/atom/assets/apps/sound-lab.svg",
       "image": "/atom/assets/sound-lab.png",
       "needs": "本机声音合成",
+      "guide": "/atom/guide/#market"
+    },
+    {
+      "id": "photon-runner",
+      "name": "光子快跑",
+      "category": "visual",
+      "description": "点按让光子跃起，穿过加速光门，挑战自己的本机最高纪录。",
+      "kind": "market",
+      "market_id": "official-photon-runner",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/official/photon-runner",
+      "icon": "/atom/assets/apps/photon-runner.svg",
+      "image": "/atom/assets/apps/photon-runner.png",
+      "needs": "本机运行；截图为测试纪录",
       "guide": "/atom/guide/#market"
     },
     {

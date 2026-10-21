@@ -1,0 +1,9 @@
+{
+  "id": "photon-runner",
+  "name": "光子快跑",
+  "description": "点按或按 Enter 控制光子跃起，穿过逐渐加速的光门，最高纪录保存在本机。",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "theme_ui": "controls",
+  "layout": "fullscreen"
+}

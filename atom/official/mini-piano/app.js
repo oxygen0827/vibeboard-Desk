@@ -1,0 +1,12 @@
+'use strict';
+const scene=new Scene(),g=scene.ctx;scene.sound=true;const sound=document.querySelector('[data-sound]');sound.textContent='声音 开';sound.setAttribute('aria-pressed','true');
+const names=['Do','Re','Mi','Fa','Sol','La','Si','Do','Re','Mi'],semis=[0,2,4,5,7,9,11,12,14,16],blacks=[1,3,6,8,10,13,15],keys={},bars=[],stamps={};let tone='triangle',demo=false,index=0,remaining=0;
+function makeKey(note,left,width,black,label){const key=document.createElement('button');key.className='piano-key '+(black?'black':'white');key.style.left=left+'%';key.style.width=width+'%';key.setAttribute('aria-label','弹奏 '+label);key.innerHTML='<span>'+label+'</span>'+(!black?'<small>'+((semis.indexOf(note)+1)%10)+'</small>':'');document.querySelector('#keys').append(key);keys[note]=key;scene.listen(key,'pointerdown',e=>{e.preventDefault();play(note);});scene.listen(key,'keydown',e=>{if(e.key==='Enter'){e.preventDefault();e.stopPropagation();play(note);}});}
+semis.forEach((s,i)=>makeKey(s,i*10,9.7,false,names[i]));blacks.forEach(s=>makeKey(s,(semis.indexOf(s-1)+1)*10-3,6,true,'♯'));
+function play(note){scene.tone(261.63*Math.pow(2,note/12),tone==='sine'?.75:.5,.6,tone);const key=keys[note],stamp=(stamps[note]||0)+1;stamps[note]=stamp;key.classList.add('on');scene.after(()=>{if(stamps[note]===stamp)key.classList.remove('on');},180);if(bars.length<50)bars.push({x:(semis.includes(note)?semis.indexOf(note)+.5:semis.indexOf(note-1)+1)*48,life:1,hue:200+note*8});scene.notice(names[semis.indexOf(note)]||'升半音');}
+scene.key(e=>{if(/^[0-9]$/.test(e.key))play(semis[e.key==='0'?9:+e.key-1]);else if(e.key==='Enter')toggleDemo();});
+scene.listen(document.querySelector('#tone'),'click',e=>{tone=tone==='triangle'?'sine':'triangle';e.target.textContent=tone==='triangle'?'音色 · 木琴':'音色 · 柔光';});
+const song=[0,0,7,7,9,9,7,-1,5,5,4,4,2,2,0,-1,7,7,5,5,4,4,2,-1,7,7,5,5,4,4,2];
+function toggleDemo(){demo=!demo;index=0;remaining=0;document.querySelector('#demo').textContent=demo?'停止演奏':'小星星';if(!demo)scene.silence();}
+scene.listen(document.querySelector('#demo'),'click',toggleDemo);
+scene.loop(dt=>{g.clearRect(0,0,480,360);if(demo){remaining-=dt;if(remaining<=0){const n=song[index++];if(n>=0)play(n);remaining=23;if(index>=song.length){demo=false;document.querySelector('#demo').textContent='小星星';}}}for(let i=bars.length-1;i>=0;i--){const b=bars[i];b.life-=.018*dt;if(b.life<=0){bars.splice(i,1);continue;}g.fillStyle=`hsla(${b.hue},85%,60%,${b.life*.65})`;const height=b.life*320;g.fillRect(b.x-13,360-height,26,height);}});

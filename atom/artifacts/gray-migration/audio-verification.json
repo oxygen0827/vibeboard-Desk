@@ -1,0 +1,11 @@
+{
+  "source": "PulseAudio hardware-output monitor during the real piano demo",
+  "rate": 44100,
+  "channels": 2,
+  "format": "s16le",
+  "frames": 263480,
+  "peak": 3495,
+  "rms": 500.28,
+  "signal_present": true,
+  "note": "Digital output verified; acoustic listening was not performed remotely"
+}

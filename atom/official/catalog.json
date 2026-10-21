@@ -10,7 +10,11 @@
     "agent-studio": "connect",
     "photo-album": "life",
     "weather-window": "life",
-    "clap-stage": "sound"
+    "clap-stage": "sound",
+    "photon-chip": "play",
+    "photon-runner": "play",
+    "finger-fireworks": "play",
+    "mini-piano": "sound"
   },
   "extra_sources": [
     "../experiences/world/bundle.json",

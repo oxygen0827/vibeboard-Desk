@@ -1,0 +1,9 @@
+{
+  "id": "finger-fireworks",
+  "name": "指尖烟花",
+  "description": "在画面上点燃烟花，连放、齐放或写一句短话，让文字变成光点。",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "theme_ui": "controls",
+  "layout": "fullscreen"
+}

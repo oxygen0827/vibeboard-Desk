@@ -1,0 +1,9 @@
+{
+  "id": "photon-chip",
+  "name": "光子芯片",
+  "description": "点击六条光路注入光点，观察相位变化、交叉路径与探测器响应的交互演示。",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "theme_ui": "controls",
+  "layout": "fullscreen"
+}
