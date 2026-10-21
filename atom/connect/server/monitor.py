@@ -39,7 +39,11 @@ def check_service():
 
 
 def check_backup(now):
-    if not Path('/etc/atom/oss.env').exists():
+    try:  # /etc/atom is root-only, so ask systemd whether backups are switched on
+        enabled = subprocess.run(['systemctl', 'is-enabled', 'atom-connect-backup.timer'], capture_output=True, text=True, timeout=10).stdout.strip() == 'enabled'
+    except (OSError, subprocess.SubprocessError):
+        enabled = False
+    if not enabled:
         return True, 'backup not configured'
     stamp = DATA / 'backups' / 'last-success'
     try:
