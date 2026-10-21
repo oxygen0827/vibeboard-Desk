@@ -25,3 +25,5 @@
 - `node atom/experiences/agents/ui.test.cjs`
 
 2026-10-21：在真实 RK3566 / Chromium 91 上安装四个应用，验证全屏、实际 Canvas/WebGL 渲染、真实模型世界/着色器/接奏任务完成。旧 Chromium 深拷贝兼容和无 allow-forms 沙箱点击生成问题已修复。这里只记录实际执行的项目，不将桌面浏览器性能视为设备帧率数据。
+
+四个作品已由 `atom/official/catalog.json` 纳入官方市场种子目录，云端部署包含 `experiences` 完整源码。电脑端与设备端共享云端目录，可查看完整源码、安装或派生。

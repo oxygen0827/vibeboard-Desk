@@ -51,9 +51,12 @@ python3 -m unittest discover -s atom/connect/marketplace -p 'test_*.py' -v
 
 ## 官方初始作品
 
-启动时读取仓库 `atom/official/*/bundle.json` 和 `atom/official/*.json`。完整快照改变时追加新版本；未改变时不会重复导入。
+启动时读取仓库 `atom/official/*/bundle.json` 和 `atom/official/*.json`，并按 `atom/official/catalog.json` 的相对路径导入额外完整资源包。额外路径必须落在同一应用源码树内。完整快照改变时追加新版本；未改变时不会重复导入。
 
-- official-companion：companion。
+- official-companion：已退役，目录下架，历史版本和已有派生保持可追溯。
+- symbiotic-world、language-alchemy：play。
+- ai-duet：sound。
+- agent-studio：connect。
 - pixel-lab：play。
 - task-pal：connect。
 - today：life。

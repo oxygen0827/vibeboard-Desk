@@ -1,0 +1,17 @@
+{
+  "retired": [
+    "official-companion"
+  ],
+  "categories": {
+    "symbiotic-world": "play",
+    "language-alchemy": "play",
+    "ai-duet": "sound",
+    "agent-studio": "connect"
+  },
+  "extra_sources": [
+    "../experiences/world/bundle.json",
+    "../experiences/visual/bundle.json",
+    "../experiences/duet/bundle.json",
+    "../experiences/agents/bundle.json"
+  ]
+}

@@ -254,8 +254,32 @@ class Marketplace:
     def import_official(self):
         if not self.seed_root.exists():
             return
+        catalog_path = self.seed_root / 'catalog.json'
+        catalog = json.loads(catalog_path.read_text(encoding='utf-8')) if catalog_path.exists() else {}
+        require(isinstance(catalog, dict), 'Invalid official catalog')
+        retired = catalog.get('retired', [])
+        categories = {'official-companion':'companion','pixel-lab':'play','task-pal':'connect','today':'life','sound-lab':'sound'}
+        overrides = catalog.get('categories', {})
+        require(isinstance(retired, list) and all(isinstance(a, str) and APP_ID.fullmatch(a) for a in retired), 'Invalid retired official IDs')
+        require(isinstance(overrides, dict) and all(isinstance(a, str) and APP_ID.fullmatch(a) and c in CATEGORIES for a,c in overrides.items()), 'Invalid official categories')
+        categories.update(overrides)
+        extras = catalog.get('extra_sources', [])
+        require(isinstance(extras, list) and len(extras)<=50, 'Invalid official source list')
+        paths=list(self.seed_root.glob('*/bundle.json'))+list(self.seed_root.glob('*.json'))
+        for relative in extras:
+            require(isinstance(relative, str) and not Path(relative).is_absolute(), 'Official sources must use relative paths')
+            source=(self.seed_root / relative).resolve()
+            try: source.relative_to(self.seed_root.resolve().parent)
+            except ValueError: raise MarketError(400, 'Official source is outside the application tree')
+            require(source.is_file() and source.name=='bundle.json', 'Official source bundle is missing')
+            paths.append(source)
         with self.lock, self.db:
-            paths=sorted(list(self.seed_root.glob('*/bundle.json'))+list(self.seed_root.glob('*.json')))
+            # Retire from discovery while preserving immutable versions and existing forks.
+            for aid in retired:
+                wid='official-'+aid
+                if self.row('SELECT 1 FROM works WHERE id=?', (wid,)):
+                    self.db.execute('INSERT OR REPLACE INTO visibility VALUES(?,?,?)',(wid,1,self.clock()))
+            paths=sorted(set(paths))
             require(len(paths)<=100, 'Too many official seed sources')
             for source in paths:
                 candidate = json.loads(source.read_text(encoding='utf-8'))
@@ -266,12 +290,12 @@ class Marketplace:
                 bundle = validate_bundle(candidate, official=True)
                 scan_publish(bundle)
                 aid=bundle['manifest']['id']
+                if aid in retired: continue
                 canonical = packed(bundle)
                 digest = hashlib.sha256(canonical.encode()).hexdigest()
                 wid, vid = 'official-'+aid, 'official-'+digest[:32]
                 if self.row('SELECT 1 FROM versions WHERE id=?', (vid,)):
                     continue
-                categories = {'official-companion':'companion','pixel-lab':'play','task-pal':'connect','today':'life','sound-lab':'sound'}
                 work = dict(id=wid,title=bundle['manifest']['name'],description=bundle['manifest'].get('description',''),category=categories.get(aid,'life'),license='MIT',author='ATOM',official=True,parent_id=None,parent_version_id=None,latest_version_id=vid,updated_at=self.clock())
                 number=self.row('SELECT COUNT(*) n FROM versions WHERE work=?',(wid,))['n']+1
                 version=dict(id=vid,work_id=wid,number=number,created_at=self.clock(),changelog='Official source snapshot',sha256=digest,source_sha256=digest)

@@ -8,7 +8,7 @@ ATOM=$(cd "$(dirname "$0")/../.." && pwd)
 SSH="ssh -i $KEY -o BatchMode=yes"
 RELEASE=$(date -u +%Y%m%dT%H%M%SZ)
 
-COPYFILE_DISABLE=1 tar --no-xattrs -C "$ATOM" --exclude '__pycache__' --exclude 'test_*.py' -czf - connect/relay connect/marketplace connect/server official \
+COPYFILE_DISABLE=1 tar --no-xattrs -C "$ATOM" --exclude '__pycache__' --exclude 'test_*.py' -czf - connect/relay connect/marketplace connect/server official experiences \
   | $SSH "$HOST" "mkdir -p /opt/atom/releases/$RELEASE && tar -xzf - -C /opt/atom/releases/$RELEASE"
 
 $SSH "$HOST" sh -s "$RELEASE" <<'REMOTE'
@@ -20,7 +20,7 @@ install -d -o root -g root -m 0700 /etc/atom
 chown -R root:root /opt/atom/releases/$RELEASE
 chmod -R go-w /opt/atom/releases/$RELEASE
 chmod 755 /opt/atom /opt/atom/releases
-for d in connect official; do ln -sfn releases/$RELEASE/$d /opt/atom/$d.new && mv -Tf /opt/atom/$d.new /opt/atom/$d; done
+for d in connect official experiences; do ln -sfn releases/$RELEASE/$d /opt/atom/$d.new && mv -Tf /opt/atom/$d.new /opt/atom/$d; done
 install -m 0644 /opt/atom/connect/server/atom-connect.service /opt/atom/connect/server/atom-connect-backup.service /opt/atom/connect/server/atom-connect-backup.timer /opt/atom/connect/server/atom-connect-monitor.service /opt/atom/connect/server/atom-connect-monitor.timer /etc/systemd/system/
 systemctl daemon-reload
 systemctl enable atom-connect.service >/dev/null

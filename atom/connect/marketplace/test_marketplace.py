@@ -239,15 +239,37 @@ class MarketplaceTests(unittest.TestCase):
         (invalid/'bundle.json').write_text('{}')
         with self.assertRaises(m.MarketError):self.market.import_official()
 
-    def test_current_official_sources_cover_five_categories(self):
+    def test_current_official_sources_include_experiences_without_retired_cloud(self):
         source_root=Path(__file__).resolve().parents[2]/'official'
         current=m.Marketplace(str(Path(self.tmp.name)/'official-live.db'),seeds=source_root)
         try:
             works=current.handle('GET','/market/v1/catalog')['works']
-            self.assertEqual({w['category'] for w in works},{'life','companion','sound','play','connect'})
-            self.assertEqual(len(works),5)
+            self.assertEqual({w['category'] for w in works},{'life','sound','play','connect'})
+            self.assertEqual(len(works),8)
+            ids={w['id'] for w in works}
+            self.assertNotIn('official-official-companion',ids)
+            self.assertTrue({'official-symbiotic-world','official-language-alchemy','official-ai-duet','official-agent-studio'} <= ids)
             self.assertTrue(all(current.version(w['latest_version_id'])['official'] for w in works))
         finally:current.close()
+
+    def test_catalog_retirement_preserves_versions_and_imports_complete_extra_source(self):
+        old=self.seeds/'official-companion';old.mkdir(parents=True)
+        original=bundle('official-companion')
+        (old/'bundle.json').write_text(json.dumps(original))
+        self.market.import_official()
+        previous=self.call('/catalog')['works'][0]
+        extra=self.seeds.parent/'experiences'/'world';extra.mkdir(parents=True)
+        new=bundle('symbiotic-world')
+        (extra/'bundle.json').write_text(json.dumps(new))
+        (self.seeds/'catalog.json').write_text(json.dumps(dict(retired=['official-companion'],categories={'symbiotic-world':'play'},extra_sources=['../experiences/world/bundle.json'])))
+        self.market.import_official()
+        visible=self.call('/catalog')['works']
+        self.assertEqual([w['id'] for w in visible],['official-symbiotic-world'])
+        self.assertEqual(visible[0]['category'],'play')
+        self.assertEqual(self.call('/versions/'+visible[0]['latest_version_id'])['bundle'],new)
+        self.assertEqual(self.call('/versions/'+previous['latest_version_id'])['bundle'],original)
+        self.market.import_official()
+        self.assertEqual(len(self.call('/works/'+visible[0]['id'])['versions']),1)
 
     def test_seed_changed_source_appends_new_immutable_version(self):
         root=self.seeds/'official-companion';root.mkdir(parents=True)

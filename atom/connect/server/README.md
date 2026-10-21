@@ -4,7 +4,7 @@
 
 | 项 | 值 |
 | --- | --- |
-| 代码 | `/opt/atom/releases/<时间戳>`，`/opt/atom/connect`、`/opt/atom/official` 为指向当前版本的链接，保留最近 3 个版本 |
+| 代码 | `/opt/atom/releases/<时间戳>`，`/opt/atom/connect`、`/opt/atom/official`、`/opt/atom/experiences` 为指向当前版本的链接，保留最近 3 个版本 |
 | 数据 | `/var/lib/atom/relay.sqlite3`、`relay.marketplace.sqlite3`（目录 0700，属 `atom` 系统用户） |
 | 监听 | `172.17.0.1:9092`（Docker 网桥网关），只供 nginx 容器经 `host.docker.internal` 访问，不对公网开放 |
 | 真实 IP | nginx 写入 `X-Real-IP`；服务只信任来自 `172.17.0.0/16` 的该请求头（`--trusted-proxy`），用于注册/登录/配对限流 |
@@ -69,7 +69,7 @@ systemctl restart atom-connect && sudo -u atom env $(cat /etc/atom/smtp.env | xa
 
 更新：再次运行 `deploy.sh`。数据库不随版本变化。
 
-回退：把 `/opt/atom/connect`、`/opt/atom/official` 链接指回 `/opt/atom/releases/` 下的旧版本，再 `systemctl restart atom-connect`。数据库恢复流程见 [市场运维说明](../marketplace/README.md)，需停服并保留现有数据库与 WAL。
+回退：把 `/opt/atom/connect`、`/opt/atom/official`、`/opt/atom/experiences` 链接指回 `/opt/atom/releases/` 下的旧版本，再 `systemctl restart atom-connect`。数据库恢复流程见 [市场运维说明](../marketplace/README.md)，需停服并保留现有数据库与 WAL。
 
 ## 运维
 
