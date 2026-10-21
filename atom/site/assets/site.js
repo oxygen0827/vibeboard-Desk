@@ -33,28 +33,93 @@
   }
 
   let pausePreview = () => {};
+  let previewInteracting = false;
+  let scheduleExhibit = () => {};
   const tabs = [...document.querySelectorAll('[data-experience]')];
-  function selectTab(tab) {
-    pausePreview();
-    tabs.forEach(item => {
-      const selected = item === tab;
+  const stage = document.querySelector('.exhibit-stage');
+  const motion = matchMedia('(prefers-reduced-motion: reduce)');
+  let current = 0, userPaused = motion.matches, exhibitVisible = false, cycle = null, progress = null;
+  const transitions = new Set();
+  const pauseButton = document.querySelector('#exhibit-pause');
+  const panels = tabs.map(tab => document.getElementById(tab.getAttribute('aria-controls')));
+  function selectTab(tab, direction = 1) {
+    const next = tabs.indexOf(tab);
+    if (next < 0) return;
+    const old = panels[current], incoming = panels[next], changed = next !== current;
+    transitions.forEach(animation => animation.cancel()); transitions.clear();
+    panels.forEach(panel => panel.classList.remove('is-leaving'));
+    if (changed) pausePreview();
+    current = next;
+    tabs.forEach((item,index) => {
+      const selected = index === current;
       item.setAttribute('aria-selected', String(selected));
       item.tabIndex = selected ? 0 : -1;
-      document.getElementById(item.getAttribute('aria-controls')).hidden = !selected;
+      panels[index].hidden = !selected;
+      panels[index].setAttribute('aria-hidden', String(!selected));
+      panels[index].inert = !selected;
     });
+    if (changed && !motion.matches && incoming.animate) {
+      old.classList.add('is-leaving');
+      const options = {duration:600,easing:'cubic-bezier(.22,.75,.18,1)',fill:'both'};
+      for (const [panel,frames] of [[old,[{opacity:1,transform:'translateX(0)'},{opacity:0,transform:`translateX(${-direction*16}px)`}]],
+        [incoming,[{opacity:0,transform:`translateX(${direction*16}px)`},{opacity:1,transform:'translateX(0)'}]]]) {
+        const animation = panel.animate(frames,options); transitions.add(animation);
+        animation.finished.catch(()=>{}).finally(()=>{
+          if (transitions.delete(animation)) { panel.classList.remove('is-leaving'); animation.cancel(); }
+        });
+      }
+    }
+    document.querySelector('#exhibit-current').textContent = String(current+1).padStart(2,'0');
+    // Scroll only the label strip; scrollIntoView would pull the whole page away from its reader.
+    const strip = tab.parentElement, left = tab.offsetLeft-strip.offsetLeft-(strip.clientWidth-tab.offsetWidth)/2;
+    strip.scrollTo({left,behavior:motion.matches?'auto':'smooth'});
+    scheduleExhibit();
   }
-  tabs.forEach((tab, index) => {
-    tab.addEventListener('click', () => selectTab(tab));
-    tab.addEventListener('keydown', e => {
-      let next;
-      if (e.key === 'ArrowRight') next = (index + 1) % tabs.length;
-      if (e.key === 'ArrowLeft') next = (index + tabs.length - 1) % tabs.length;
-      if (e.key === 'Home') next = 0;
-      if (e.key === 'End') next = tabs.length - 1;
-      if (next === undefined) return;
-      e.preventDefault(); selectTab(tabs[next]); tabs[next].focus();
+  if (stage && tabs.length) {
+    stage.classList.add('is-enhanced');
+    document.querySelector('.exhibit-controls').hidden = false;
+    const pace = document.querySelector('#exhibit-pace');
+    scheduleExhibit = () => {
+      clearTimeout(cycle); cycle = null; progress?.cancel(); progress = null;
+      pauseButton.textContent = userPaused ? '开始轮播' : '暂停轮播';
+      pauseButton.setAttribute('aria-label',userPaused?'开始自动轮播':'暂停自动轮播');
+      const focused = stage.contains(document.activeElement);
+      const running = !userPaused && !previewInteracting && !focused && exhibitVisible && !document.hidden;
+      pace.textContent = previewInteracting ? '交互中 · 自动轮播已暂停' : userPaused ? '已暂停 · 慢慢看' : focused ? '阅读中 · 暂停切换' : '每 3 秒，下一种可能';
+      stage.dataset.rotating = String(running);
+      if (!running) return;
+      if (!motion.matches) progress = document.querySelector('.exhibit-progress span').animate([{transform:'scaleX(0)'},{transform:'scaleX(1)'}],{duration:3000,fill:'forwards'});
+      cycle = setTimeout(()=>selectTab(tabs[(current+1)%tabs.length]),3000);
+    };
+    tabs.forEach((tab,index) => {
+      tab.addEventListener('click',()=>selectTab(tab,index<current?-1:1));
+      tab.addEventListener('keydown',e=>{
+        let next;
+        if (e.key === 'ArrowRight') next = (index+1)%tabs.length;
+        if (e.key === 'ArrowLeft') next = (index+tabs.length-1)%tabs.length;
+        if (e.key === 'Home') next = 0;
+        if (e.key === 'End') next = tabs.length-1;
+        if (next === undefined) return;
+        e.preventDefault(); selectTab(tabs[next],e.key==='ArrowLeft'?-1:1); tabs[next].focus({preventScroll:true});
+      });
     });
-  });
+    document.querySelector('#exhibit-previous').addEventListener('click',()=>selectTab(tabs[(current+tabs.length-1)%tabs.length],-1));
+    document.querySelector('#exhibit-next').addEventListener('click',()=>selectTab(tabs[(current+1)%tabs.length]));
+    pauseButton.addEventListener('click',()=>{userPaused=!userPaused;scheduleExhibit();});
+    stage.addEventListener('focusin',scheduleExhibit);
+    stage.addEventListener('focusout',()=>queueMicrotask(scheduleExhibit));
+    document.addEventListener('visibilitychange',scheduleExhibit);
+    motion.addEventListener('change',()=>{userPaused=motion.matches;selectTab(tabs[current]);});
+    if ('IntersectionObserver' in window) new IntersectionObserver(entries=>{
+      exhibitVisible=entries[0].isIntersecting;
+      if (exhibitVisible) panels.forEach(panel=>panel.querySelectorAll('img').forEach(img=>{img.loading='eager';img.decode().catch(()=>{});}));
+      scheduleExhibit();
+    },{threshold:.15}).observe(stage);
+    else {exhibitVisible=true;scheduleExhibit();}
+    window.addEventListener('pagehide',()=>{exhibitVisible=false;scheduleExhibit();transitions.forEach(a=>a.cancel());transitions.clear();});
+    window.addEventListener('pageshow',()=>{exhibitVisible=stage.getBoundingClientRect().bottom>0&&stage.getBoundingClientRect().top<innerHeight;scheduleExhibit();});
+    selectTab(tabs[0]);
+  }
 
   const canvas = document.querySelector('#material-preview');
   if (canvas) {
@@ -92,7 +157,7 @@
       program = buffer = null;
     }
     function init() {
-      gl = canvas.getContext('webgl', {alpha:false,antialias:false,powerPreference:'low-power'});
+      gl = canvas.getContext('webgl', {alpha:false,antialias:false,powerPreference:'low-power',preserveDrawingBuffer:true});
       if (!gl) throw Error('webgl');
       const vertex = compile(gl.VERTEX_SHADER, 'attribute vec2 a; void main(){gl_Position=vec4(a,0.,1.);}');
       let pixel;
@@ -125,7 +190,7 @@
       if (enabled && visible && !document.hidden) { draw(); if (!reduced.matches) raf = requestAnimationFrame(tick); }
     }
     function stop() {
-      enabled = false; cancelAnimationFrame(raf); raf = 0;
+      enabled = false; previewInteracting = false; scheduleExhibit(); cancelAnimationFrame(raf); raf = 0;
       canvas.hidden = true; toggle.setAttribute('aria-pressed','false');
       toggle.textContent = '用鼠标试试 ↗'; label.textContent = '实际应用界面';
     }
@@ -134,7 +199,7 @@
       if (enabled) { stop(); return; }
       try {
         if (!program) init();
-        enabled = true; canvas.hidden = false; status.hidden = true;
+        enabled = true; previewInteracting = true; scheduleExhibit(); canvas.hidden = false; status.hidden = true;
         toggle.setAttribute('aria-pressed','true'); toggle.textContent = '返回应用画面';
         label.textContent = reduced.matches ? '静态预览 · 移动光标改变光纹' : '网页交互预览 · 移动光标试试';
         resume();

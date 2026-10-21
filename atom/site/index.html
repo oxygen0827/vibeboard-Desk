@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#ffffff">
+  <meta name="theme-color" content="#2d43eb">
   <title>ATOM — 让你的想法，拥有自己的小电脑</title>
   <meta name="description" content="ATOM 是一台可以用 AI 创造应用的独立个人小电脑。生成交互画面、搭建自己的小世界、与 AI 合奏，再从源码市场继续改造和分享。">
   <link rel="canonical" href="https://ldcx.tech/atom/">
@@ -13,21 +13,27 @@
   <meta property="og:image" content="https://ldcx.tech/atom/assets/atom-film-poster.jpg">
   <meta property="og:url" content="https://ldcx.tech/atom/">
   <link rel="icon" href="/atom/assets/favicon.svg" type="image/svg+xml">
-  <link rel="preload" as="image" href="/atom/assets/atom-film-poster.jpg" fetchpriority="high">
+  <link rel="preload" as="image" href="/atom/assets/atom-object-v2.png" fetchpriority="high">
   <link rel="stylesheet" href="/atom/assets/site.css?v=20261021b">
-  <script defer src="/atom/assets/site.js?v=20261021b"></script>
+  <link rel="stylesheet" href="/atom/assets/art-direction.css?v=20261021e">
+  <script defer src="/atom/assets/site.js?v=20261021d"></script>
 </head>
-<body>
+<body class="art-page">
 <a class="skip" href="#main">跳到内容</a>
 <header class="nav">
   <a class="brand" href="/atom/" aria-label="ATOM 首页"><svg class="brand-symbol" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 27 16 5l12 22M9 19h14"/><circle cx="16" cy="26" r="2"/></svg>ATOM</a>
   <nav aria-label="主导航"><a href="#possibilities">探索体验</a><a href="#create">创造应用</a><a href="/atom/guide/">使用指南</a><a class="nav-source" href="https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public">GitHub <span aria-hidden="true">↗</span></a></nav>
 </header>
 <main id="main">
-  <section class="hero wrap">
-    <div class="hero-heading"><p class="product-kind">独立运行的个人 AI 小电脑</p><h1>你的想法，<br>值得一台小电脑。</h1></div>
-    <div class="hero-intro"><p>把一句想法，做成桌上的应用。<br>用 AI 创造，拿源码改造，<br>让这台独立的小电脑，越来越像你。</p><div class="actions"><a class="button primary" href="#film" data-watch>看 40 秒短片 <span class="play-mini" aria-hidden="true">▶</span></a><a class="text-link" href="/atom/guide/#start">开始使用</a></div></div>
+  <section class="hero art-hero" aria-labelledby="hero-title">
+    <div class="hero-edition"><span>个人 AI 小电脑</span><span>OPEN TO YOUR IMAGINATION</span><span>研发原型 / 2026</span></div>
+    <div class="hero-word" aria-hidden="true">ATOM</div>
+    <figure class="hero-object"><img src="/atom/assets/atom-object-v2.png" width="1374" height="1145" alt="ATOM 小电脑概念插画：奶白色机身，小小的屏幕装着你的应用" fetchpriority="high"><figcaption>外观概念插画 / 实际能力见下方</figcaption></figure>
+    <div class="hero-heading"><h1 id="hero-title">让想法，<br><em>长出身体。</em></h1><p class="product-kind">用 AI 创造，拿源码改造。<br>一台独立的小电脑，装下你不一样的主意。</p><a class="hero-film-link" href="#film" data-watch><span class="hero-play" aria-hidden="true">↗</span><span>进入 ATOM 的世界<small>看产品短片 / 00:40</small></span></a></div>
+    <div class="hero-foot"><span>你的应用。你的玩法。</span><a href="#possibilities">向下探索 <span aria-hidden="true">↓</span></a></div>
   </section>
+
+  <div class="manifesto wrap"><p class="section-index">01 / 有形的灵感</p><p>有些想法，<br>值得从对话框里<em>走出来。</em></p><div>一片听你描述的光，一座亲手搭建的小岛，一段 AI 接上的旋律。把它们留在桌边，成为日常里看得见、玩得到的一部分。</div></div>
 
   <section class="film-section wrap" id="film" aria-labelledby="film-title">
     <div class="film-frame">
@@ -41,8 +47,11 @@
 
   <section class="experiences" id="possibilities">
     <div class="wrap">
-      <div class="section-heading"><h2>让 AI 的回答，<br>成为可以玩的作品。</h2><p>选一种你喜欢的方式，<br>把画面、世界和旋律变成自己的。</p></div>
-      <div class="experience-tabs" role="tablist" aria-label="选择代表体验"><button id="tab-alchemy" role="tab" aria-selected="true" aria-controls="panel-alchemy" data-experience="alchemy">语言炼金</button><button id="tab-world" role="tab" aria-selected="false" aria-controls="panel-world" tabindex="-1" data-experience="world">共生世界</button><button id="tab-duet" role="tab" aria-selected="false" aria-controls="panel-duet" tabindex="-1" data-experience="duet">合奏伙伴</button></div>
+      <p class="section-index">02 / 作品，正在发生</p><div class="section-heading"><h2>让 AI 的回答，<br>成为可以玩的作品。</h2><p>12 个作品，12 种可能。<br>从 AI 创作，到开源改造，找到你的下一份灵感。</p></div>
+      <div class="exhibit-controls" aria-label="作品轮播控制" hidden><div class="exhibit-position"><span id="exhibit-current">01</span><span class="exhibit-total"> / 12</span><span class="exhibit-pace" id="exhibit-pace">每 3 秒，下一种可能</span></div><div class="exhibit-buttons"><button type="button" id="exhibit-previous" aria-label="上一个案例">←</button><button type="button" id="exhibit-pause" aria-label="暂停自动轮播">暂停轮播</button><button type="button" id="exhibit-next" aria-label="下一个案例">→</button></div></div>
+      <div class="exhibit-progress" aria-hidden="true"><span></span></div>
+      <div class="experience-tabs" role="tablist" aria-label="选择代表体验"><button id="tab-alchemy" role="tab" aria-selected="true" aria-controls="panel-alchemy" data-experience="alchemy"><small>01</small>语言炼金</button><button id="tab-world" role="tab" aria-selected="false" aria-controls="panel-world" tabindex="-1" data-experience="world"><small>02</small>共生世界</button><button id="tab-duet" role="tab" aria-selected="false" aria-controls="panel-duet" tabindex="-1" data-experience="duet"><small>03</small>合奏伙伴</button><button id="tab-water" role="tab" aria-selected="false" aria-controls="panel-water" tabindex="-1" data-experience="water"><small>04</small>光影水池</button><button id="tab-flow" role="tab" aria-selected="false" aria-controls="panel-flow" tabindex="-1" data-experience="flow"><small>05</small>体积流场</button><button id="tab-ocean" role="tab" aria-selected="false" aria-controls="panel-ocean" tabindex="-1" data-experience="ocean"><small>06</small>月光海洋</button><button id="tab-planets" role="tab" aria-selected="false" aria-controls="panel-planets" tabindex="-1" data-experience="planets"><small>07</small>天体观测台</button><button id="tab-studio" role="tab" aria-selected="false" aria-controls="panel-studio" tabindex="-1" data-experience="studio"><small>08</small>口袋音乐工作站</button><button id="tab-physics" role="tab" aria-selected="false" aria-controls="panel-physics" tabindex="-1" data-experience="physics"><small>09</small>物理实验台</button><button id="tab-eyes" role="tab" aria-selected="false" aria-controls="panel-eyes" tabindex="-1" data-experience="eyes"><small>10</small>机器人眼睛</button><button id="tab-circuit" role="tab" aria-selected="false" aria-controls="panel-circuit" tabindex="-1" data-experience="circuit"><small>11</small>电路实验室</button><button id="tab-math" role="tab" aria-selected="false" aria-controls="panel-math" tabindex="-1" data-experience="math"><small>12</small>数学游乐场</button></div>
+      <div class="exhibit-stage" aria-label="ATOM 作品精选" aria-live="off">
       <article class="experience-panel" id="panel-alchemy" role="tabpanel" aria-labelledby="tab-alchemy" tabindex="0">
         <div class="experience-visual alchemy-visual"><div class="app-screen"><img src="/atom/assets/language-alchemy.png" alt="语言炼金的实际界面：流动的青银色材质和自然语言输入框" width="480" height="360" loading="lazy"><canvas id="material-preview" tabindex="0" width="640" height="480" aria-label="预设材质交互预览，移动鼠标、触摸或使用方向键改变光纹" hidden></canvas></div><div class="preview-toolbar"><p id="preview-label">实际应用界面</p><button type="button" id="material-toggle" aria-pressed="false">用鼠标试试 <span aria-hidden="true">↗</span></button></div><p class="preview-status" id="preview-status" role="status" hidden></p></div>
         <div class="experience-copy"><span class="feature-type">语言 → 交互画面</span><h3>说一种感觉。<br>炼成一片光。</h3><blockquote>“让它像一片流动的月银。”</blockquote><p>描述你想看的材质，AI 生成着色器，小电脑用 GPU 把它画出来。移动鼠标，光纹也随之变化。</p><ul><li>真实生成代码，编译后呈现</li><li>喜欢的作品，保存后继续玩</li><li>尝试失败时，保留上一份作品</li></ul><a class="text-link" href="/atom/guide/#experiments">了解创作方式</a></div>
@@ -55,12 +64,49 @@
         <div class="experience-visual duet-visual"><div class="app-screen"><img src="/atom/assets/ai-duet.png" alt="合奏伙伴实际界面：青色用户音符、金色 AI 接奏和八个琴键" width="508" height="360" loading="lazy"></div><p class="image-note">实际应用界面 · 青色是你，金色是 AI</p></div>
         <div class="experience-copy"><span class="feature-type">几个音符 → 一段合奏</span><h3>你弹一句。<br>AI 接下一句。</h3><blockquote>“接一段温柔的雨夜旋律。”</blockquote><p>用鼠标或键盘留下几个音符，把乐句交给 AI 接奏。听听它的回应，再把你们一起做出的旋律保存下来。</p><ul><li>琴键实时发声，记录你的乐句</li><li>AI 根据音符生成后续旋律</li><li>回放、重新弹奏，保存合奏</li></ul><a class="text-link" href="/atom/guide/#experiments">了解创作方式</a></div>
       </article>
-      <p class="experience-footnote">以上应用已在 RK3566 样机运行。AI 创作需要联网和有效模型服务；已保存的画面、场景与乐句可在本机运行。网页交互预览仅展示预设材质，不调用模型。</p>
+      <article class="experience-panel" id="panel-water" role="tabpanel" aria-labelledby="tab-water" tabindex="0" hidden>
+        <div class="experience-visual water-visual"><div class="app-screen"><img src="/atom/assets/showcase-water.png" alt="光影水池的实际应用界面" width="508" height="360" loading="lazy"></div><p class="image-note">实际应用界面 · 光影水池</p></div>
+        <div class="experience-copy"><span class="feature-type">GPU · 光与水的实验</span><h3>拨动水面，<br>看光跑起来。</h3><blockquote>“拖动水面，或把球轻轻推过去。”</blockquote><p>水波、反射与池底的焦散一起变化。不是一段循环视频，而是随你的操作重新计算的水面。</p><ul><li>鼠标拨水、拖动球体、旋转视角</li><li>雨滴和重力，改变水面的节奏</li><li>Evan Wallace / WebGL Water 开源移植</li></ul><a class="text-link" href="https://github.com/evanw/webgl-water" target="_blank" rel="noopener">开源来源 · WebGL Water ↗</a></div>
+      </article>
+      <article class="experience-panel" id="panel-flow" role="tabpanel" aria-labelledby="tab-flow" tabindex="0" hidden>
+        <div class="experience-visual flow-visual"><div class="app-screen"><img src="/atom/assets/showcase-flow.png" alt="体积流场的实际应用界面" width="508" height="360" loading="lazy"></div><p class="image-note">实际应用界面 · 体积流场</p></div>
+        <div class="experience-copy"><span class="feature-type">GPU · 粒子与空间</span><h3>让粒子，<br>有风的形状。</h3><blockquote>“换一种流场，看看风往哪里去。”</blockquote><p>数千颗粒子沿流场漂移，光与阴影勾出它们的体积。旋转观察、换色、暂停，把某个瞬间留在屏幕上。</p><ul><li>三档粒子数量，适配小电脑性能</li><li>拖动旋转，滚轮缩放</li><li>David Li / Flow 开源移植</li></ul><a class="text-link" href="https://github.com/dli/flow" target="_blank" rel="noopener">开源来源 · Flow ↗</a></div>
+      </article>
+      <article class="experience-panel" id="panel-ocean" role="tabpanel" aria-labelledby="tab-ocean" tabindex="0" hidden>
+        <div class="experience-visual ocean-visual"><div class="app-screen"><img src="/atom/assets/showcase-ocean.png" alt="月光海洋的实际应用界面" width="480" height="360" loading="lazy"></div><p class="image-note">实际应用界面 · 月光海洋</p></div>
+        <div class="experience-copy"><span class="feature-type">GPU · 一片会呼吸的海</span><h3>把一片海，<br>放在桌边。</h3><blockquote>“月夜、白昼，还是落日时分？”</blockquote><p>海浪由 FFT 波浪模拟产生，天空和水面互相映照。改变风力，拖动视角，安静看一会儿浪。</p><ul><li>月夜、白昼与日落三种氛围</li><li>风力变化驱动波浪形态</li><li>jbouny / FFT Ocean 开源移植</li></ul><a class="text-link" href="https://github.com/jbouny/fft-ocean" target="_blank" rel="noopener">开源来源 · FFT Ocean ↗</a></div>
+      </article>
+      <article class="experience-panel" id="panel-planets" role="tabpanel" aria-labelledby="tab-planets" tabindex="0" hidden>
+        <div class="experience-visual planets-visual"><div class="app-screen"><img src="/atom/assets/showcase-planets.png" alt="天体观测台的实际应用界面" width="508" height="360" loading="lazy"></div><p class="image-note">实际应用界面 · 天体观测台</p></div>
+        <div class="experience-copy"><span class="feature-type">3D · 行星近距离观察</span><h3>今晚，<br>靠近一颗星。</h3><blockquote>“转到土星的另一面。”</blockquote><p>从地球、木星到土星，用鼠标环绕观察、推近细节。星表、球面与行星环在本机渲染，给桌面留一扇望向宇宙的窗。</p><ul><li>三颗行星，三个独立观察场景</li><li>拖动环绕、缩放与自动巡航</li><li>基于 Spacekit 开源天文引擎</li></ul><a class="text-link" href="https://github.com/typpo/spacekit" target="_blank" rel="noopener">开源来源 · Spacekit ↗</a></div>
+      </article>
+      <article class="experience-panel" id="panel-studio" role="tabpanel" aria-labelledby="tab-studio" tabindex="0" hidden>
+        <div class="experience-visual studio-visual"><div class="app-screen"><img src="/atom/assets/showcase-studio.png" alt="口袋音乐工作站的实际应用界面" width="508" height="360" loading="lazy"></div><p class="image-note">实际应用界面 · 口袋音乐工作站</p></div>
+        <div class="experience-copy"><span class="feature-type">声音 · 一屏编曲</span><h3>点亮格子，<br>就有了节奏。</h3><blockquote>“先来一条底鼓，再加几个音。”</blockquote><p>把旋律与鼓点排进 16 步音序。调速度、试预设、做变奏，听见一个小想法逐渐变成自己的曲子。</p><ul><li>7 轨音序与本机声音合成</li><li>边播放边修改，随时尝试变奏</li><li>保存一份作品，下次接着编</li></ul><a class="text-link" href="https://github.com/Tonejs/Tone.js" target="_blank" rel="noopener">开源来源 · Tone.js ↗</a></div>
+      </article>
+      <article class="experience-panel" id="panel-physics" role="tabpanel" aria-labelledby="tab-physics" tabindex="0" hidden>
+        <div class="experience-visual physics-visual"><div class="app-screen"><img src="/atom/assets/showcase-physics.png" alt="物理实验台的实际应用界面" width="508" height="360" loading="lazy"></div><p class="image-note">实际应用界面 · 物理实验台</p></div>
+        <div class="experience-copy"><span class="feature-type">模拟 · 亲手试验</span><h3>推倒它，<br>看看会发生什么。</h3><blockquote>“搭一堆积木，再关掉重力。”</blockquote><p>碰撞、多米诺、悬索桥和弹弓，都是可以亲手拨动的实验。拖动物体，改变条件，观察连锁反应。</p><ul><li>四种实验，随时暂停和重置</li><li>增添物体，切换重力</li><li>基于 Matter.js 刚体物理引擎</li></ul><a class="text-link" href="https://github.com/liabru/matter-js" target="_blank" rel="noopener">开源来源 · Matter.js ↗</a></div>
+      </article>
+      <article class="experience-panel" id="panel-eyes" role="tabpanel" aria-labelledby="tab-eyes" tabindex="0" hidden>
+        <div class="experience-visual eyes-visual"><div class="app-screen"><img src="/atom/assets/showcase-eyes.png" alt="机器人眼睛的实际应用界面" width="480" height="360" loading="lazy"></div><p class="image-note">实际应用界面 · 机器人眼睛</p></div>
+        <div class="experience-copy"><span class="feature-type">表情 · 小小的生命感</span><h3>不用说话，<br>也有点可爱。</h3><blockquote>“鼠标靠近，它的目光也跟过来。”</blockquote><p>两只会眨动、会犯困的小眼睛，让屏幕多一点性格。没有摄像头，也不需要调用模型，轻轻一碰就有回应。</p><ul><li>鼠标视线跟随、表情和待机动画</li><li>安装后可离线运行</li><li>RoboEyes 原逻辑移植至 WebAssembly</li></ul><a class="text-link" href="https://github.com/FluxGarage/RoboEyes" target="_blank" rel="noopener">开源来源 · RoboEyes ↗</a></div>
+      </article>
+      <article class="experience-panel" id="panel-circuit" role="tabpanel" aria-labelledby="tab-circuit" tabindex="0" hidden>
+        <div class="experience-visual circuit-visual"><div class="app-screen"><img src="/atom/assets/showcase-circuit.png" alt="电路实验室的实际应用界面" width="480" height="360" loading="lazy"></div><p class="image-note">实际应用界面 · 电路实验室</p></div>
+        <div class="experience-copy"><span class="feature-type">模拟 · 看见电流</span><h3>让电路，<br>在屏幕上活过来。</h3><blockquote>“电阻变大，波形会怎样？”</blockquote><p>从 RLC 振荡、半波整流到 555 振荡器，切换电路、调整预设参数，直接观察电流与示波波形的变化。</p><ul><li>保留 CircuitJS 原计算引擎</li><li>三个实验，支持暂停和重置</li><li>为小屏重新组织常用操作</li></ul><a class="text-link" href="https://github.com/pfalstad/circuitjs1" target="_blank" rel="noopener">开源来源 · CircuitJS ↗</a></div>
+      </article>
+      <article class="experience-panel" id="panel-math" role="tabpanel" aria-labelledby="tab-math" tabindex="0" hidden>
+        <div class="experience-visual math-visual"><div class="app-screen"><img src="/atom/assets/showcase-math.png" alt="数学游乐场的实际应用界面" width="508" height="360" loading="lazy"></div><p class="image-note">实际应用界面 · 数学游乐场</p></div>
+        <div class="experience-copy"><span class="feature-type">交互 · 数学也有颜色</span><h3>轻轻一拖，<br>看见另一种无限。</h3><blockquote>“移动那个橙色的点。”</blockquote><p>复数分形、光线包络与三角几何，把抽象的关系变成可以操作的画面。改变一个点，整幅图形随之响应。</p><ul><li>三种交互实验，在本机计算</li><li>拖动参数点，实时观察变化</li><li>基于 CindyJS / CindyGL 引擎</li></ul><a class="text-link" href="https://github.com/CindyJS/CindyJS" target="_blank" rel="noopener">开源来源 · CindyJS ↗</a></div>
+      </article>
+      </div>
+      <p class="experience-footnote">以上为现有应用的精选运行截图，界面会随版本更新。AI 创作需要联网和有效模型服务；图形模拟、音乐和交互实验在本机运行。开源作品保留来源，并为小屏适配。网页交互预览仅展示预设材质，不调用模型。</p>
     </div>
   </section>
 
   <section class="create-section wrap" id="create">
-    <div class="create-intro"><p class="feature-type">真正有意思的，是接下来你会做什么</p><h2>别人的作品，<br>你的下一步。</h2><p>ATOM 的核心，是让你持续创造自己的应用。<br>从一句话开始，也可以从一份公开源码开始。</p><a class="button primary" href="/atom/guide/#workshop">做出第一个应用 <span aria-hidden="true">↗</span></a></div>
+    <div class="create-intro"><p class="section-index">03 / 从一个念头开始</p><p class="feature-type">真正有意思的，是接下来你会做什么</p><h2>别人的作品，<br>你的下一步。</h2><p>ATOM 的核心，是让你持续创造自己的应用。<br>从一句话开始，也可以从一份公开源码开始。</p><a class="button primary" href="/atom/guide/#workshop">做出第一个应用 <span aria-hidden="true">↗</span></a></div>
     <div class="creation-flow" aria-label="从想法到应用的流程">
       <div class="idea-note"><span>在工作坊，说出一个想法</span><p>“做一个会随呼吸起伏的海洋计时器。”</p></div>
       <div class="flow-line" aria-hidden="true"></div>
@@ -72,14 +118,15 @@
   </section>
 
   <section class="computer-section">
-    <div class="wrap computer-layout"><div class="computer-copy"><p class="feature-type">连接你的电脑，扩展创作能力</p><h2>大电脑忙的事，<br>小电脑看得见。</h2><p>配对 ATOM Connect，把任务交给个人电脑上的 Codex 等可用 Agent。选好项目、说出需求，在桌边看进度；需要确认时，由你决定。</p><p>Agent 小屋把真实任务状态放进一间小工作室。作品完成后，可以继续查看、预览和安装。</p><a class="button light" href="/atom/guide/#computer">连接我的电脑 <span aria-hidden="true">↗</span></a><small>电脑 Agent 任务需要个人电脑在线；ATOM 本地应用可以独立运行。</small></div><figure class="computer-visual"><img src="/atom/assets/agent-studio.png" alt="Agent 小屋应用界面，以像素工作室呈现任务，示例显示作品已完成" width="480" height="360" loading="lazy"><figcaption>Agent 小屋实际界面 · 图中任务为演示数据</figcaption></figure></div>
+    <div class="wrap computer-layout"><div class="computer-copy"><p class="section-index">04 / 大小电脑，一起创作</p><p class="feature-type">连接你的电脑，扩展创作能力</p><h2>大电脑忙的事，<br>小电脑看得见。</h2><p>配对 ATOM Connect，把任务交给个人电脑上的 Codex 等可用 Agent。选好项目、说出需求，在桌边看进度；需要确认时，由你决定。</p><p>Agent 小屋把真实任务状态放进一间小工作室。作品完成后，可以继续查看、预览和安装。</p><a class="button light" href="/atom/guide/#computer">连接我的电脑 <span aria-hidden="true">↗</span></a><small>电脑 Agent 任务需要个人电脑在线；ATOM 本地应用可以独立运行。</small></div><figure class="computer-visual"><img src="/atom/assets/agent-studio.png" alt="Agent 小屋应用界面，以像素工作室呈现任务，示例显示作品已完成" width="480" height="360" loading="lazy"><figcaption>Agent 小屋实际界面 · 图中任务为演示数据</figcaption></figure></div>
   </section>
 
-  <section class="independent wrap"><div><p class="feature-type">一台真正的小电脑</p><h2>在桌上，<br>有它自己的生活。</h2></div><div class="independent-copy"><p>让交互光影常驻，听一段自己的旋律，或翻看同步来的照片。个人电脑合上之后，ATOM 仍能运行自己的应用。</p><p>底层是开放的 Debian / Linux，画面与交互在本机完成，需要 AI 时再连接模型服务或你的电脑。开发者可以继续扩展硬件与软件。</p></div><dl class="specs"><div><dt>RK3566</dt><dd>当前样机处理器</dd></div><div><dt>Mali-G52</dt><dd>本地 GPU 图形渲染</dd></div><div><dt>Debian</dt><dd>开放的 Linux 底座</dd></div><div><dt>480 × 360</dt><dd>当前样机屏幕分辨率</dd></div></dl></section>
+  <section class="independent wrap"><div><p class="section-index">05 / 自己的生活</p><p class="feature-type">一台真正的小电脑</p><h2>在桌上，<br>有它自己的生活。</h2></div><div class="independent-copy"><p>让交互光影常驻，听一段自己的旋律，或翻看同步来的照片。个人电脑合上之后，ATOM 仍能运行自己的应用。</p><p>底层是开放的 Debian / Linux，画面与交互在本机完成，需要 AI 时再连接模型服务或你的电脑。开发者可以继续扩展硬件与软件。</p></div><dl class="specs"><div><dt>RK3566</dt><dd>当前样机处理器</dd></div><div><dt>Mali-G52</dt><dd>本地 GPU 图形渲染</dd></div><div><dt>Debian</dt><dd>开放的 Linux 底座</dd></div><div><dt>480 × 360</dt><dd>当前样机屏幕分辨率</dd></div></dl></section>
 
   <section class="questions wrap" aria-labelledby="questions-title"><h2 id="questions-title">先了解这几件事。</h2><div class="faq-list"><details><summary>必须一直连着个人电脑吗？</summary><p>不需要。已安装且资源完整的本地应用、已保存的创意作品可以独立运行。市场、同步和模型生成需要联网；只有执行个人电脑上的 Agent 任务，才需要电脑开机并运行 ATOM Connect。</p></details><details><summary>不会写代码，也能开始吗？</summary><p>可以从现有应用开始，也可以在工作坊描述需求，让模型生成一个应用。先预览、检查交互，再确认安装。复杂作品仍可能需要多次修改或开发者帮助，生成服务需要配置有效模型。</p></details><details><summary>现在可以体验到什么？</summary><p>当前是可运行的研发原型，包含桌面、工作坊、源码市场、电脑配对及本页介绍的创意应用。样机使用鼠标与键盘；触屏、实体 Home 键及短片中的部分传感器玩法属于后续硬件方向。设备上没有部署大型语言模型。</p></details><details><summary>从哪里开始使用和参与开发？</summary><p>已有设备请打开使用指南，从开机、账号、配对到创作逐步开始。开发者可进入公开仓库的 deploy/ldcx-public 分支查看源码、构建电脑伴侣或部署服务。当前没有公开公证的电脑端安装包。</p><a class="text-link" href="/atom/guide/#developer">查看开发说明</a></details></div></section>
 
   <section class="closing"><div class="wrap"><div><p>接下来，轮到你的想法。</p><h2>做一台，越来越像你的 ATOM。</h2></div><div class="actions"><a class="button primary" href="/atom/guide/">打开使用指南 <span aria-hidden="true">↗</span></a><a class="text-link" href="https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public">探索开放源码</a></div></div></section>
 </main>
+<div class="end-word" aria-hidden="true">MAKE IT<br><i>YOURS.</i></div>
 <footer class="footer wrap"><a class="brand" href="/atom/">ATOM</a><p>独立运行的个人 AI 小电脑</p><a href="/atom/guide/">帮助与使用指南</a><span>研发原型 · 持续更新</span></footer>
 </body></html>

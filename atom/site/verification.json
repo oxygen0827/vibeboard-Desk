@@ -1,0 +1,35 @@
+{
+  "date": "2026-10-21",
+  "release": "20261021T064846Z",
+  "url": "https://ldcx.tech/atom/",
+  "case_count": 12,
+  "automatic_interval_ms": 3000,
+  "transition_ms": 600,
+  "viewports": [
+    1440,
+    768,
+    390,
+    320
+  ],
+  "local_checks": [
+    "all case images decode",
+    "constant stage height",
+    "automatic interval and transition",
+    "manual controls and wrap",
+    "offscreen pause",
+    "interactive preview pause",
+    "reduced motion",
+    "video playback and seek",
+    "no horizontal overflow",
+    "no script errors"
+  ],
+  "public_checks": [
+    "12 cases",
+    "automatic advance",
+    "video playback and chapter seek",
+    "WebGL interactive preview",
+    "guide search",
+    "video Range 206 / video/mp4",
+    "market health ok"
+  ]
+}
