@@ -114,6 +114,7 @@ $('server-edit').onclick=()=>{$('config').hidden=!$('config').hidden;};
 $('server-cancel').onclick=()=>{$('config').hidden=true;};
 $('task-filter').onclick=e=>{const b=e.target.closest('button');if(!b)return;taskFilter=b.dataset.filter;$('task-filter').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));renderTasks();};
 $('diagnostics').onclick=async()=>{const b=$('diagnostics');b.disabled=true;try{await api('diagnostics',{});note('检测完成');await refresh();}catch(e){note(e.message,true);}finally{b.disabled=false;}};
+if(window.webkit?.messageHandlers?.openSimulator){$('open-simulator').hidden=false;$('open-simulator').onclick=()=>window.webkit.messageHandlers.openSimulator.postMessage({});}
 if(window.webkit?.messageHandlers?.chooseFolder){$('choose-folder').hidden=false;$('choose-folder').onclick=()=>window.webkit.messageHandlers.chooseFolder.postMessage({});}
 
 showPage('overview');

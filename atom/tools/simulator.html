@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ATOM 模拟器</title>
+<style>
+:root{--desk:#1b1d22;--bezel:#0c0d10;--edge:#2c2f37;--ink:#e9ebf0;--muted:#8d93a1;--accent:#7cc4ff;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--desk);color:var(--ink);font:13px -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif}
+body{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:16px;overflow:hidden}
+.device{background:var(--bezel);border:1px solid var(--edge);border-radius:18px;padding:18px;box-shadow:0 20px 60px #0008;transform-origin:center}
+.screen{width:480px;height:360px;display:block;border:0;background:#000;border-radius:3px}
+.bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center}
+button{font:inherit;color:var(--ink);background:#262a32;border:1px solid var(--edge);border-radius:6px;padding:5px 10px;cursor:pointer}
+button[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:#08111e}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.hint{color:var(--muted);text-align:center;max-width:560px;line-height:1.6}
+kbd{font:12px ui-monospace,monospace;background:#262a32;border:1px solid var(--edge);border-radius:4px;padding:0 5px}
+</style>
+</head>
+<body>
+<div class="device" id="device"><iframe class="screen" id="screen" src="/" title="ATOM 屏幕" allow="autoplay; microphone"></iframe></div>
+<div class="bar">
+  <span>缩放</span>
+  <button type="button" data-scale="1">1×</button>
+  <button type="button" data-scale="1.5">1.5×</button>
+  <button type="button" data-scale="2">2×</button>
+  <button type="button" id="fit">适应窗口</button>
+  <button type="button" id="reload">重启设备</button>
+</div>
+<p class="hint">屏幕内部始终是 480×360，缩放只放大显示。点一下屏幕再用键盘：<kbd>空格</kbd> 返回桌面；鼠标移动相当于倾斜体感键盘。这里用的是电脑上的 Chrome，小电脑是 Chromium 91，性能和兼容性以真机为准。</p>
+<script>
+(()=>{
+  const device=document.getElementById('device'),screen=document.getElementById('screen'),buttons=[...document.querySelectorAll('[data-scale]')],fit=document.getElementById('fit');
+  let mode='fit';
+  try{mode=localStorage.getItem('atom-sim-scale')||'fit'}catch(e){}
+  function apply(){
+    const base=device.offsetWidth,height=device.offsetHeight,chrome=document.querySelector('.bar').offsetHeight+document.querySelector('.hint').offsetHeight+80,room=Math.min((innerWidth-32)/base,(innerHeight-chrome)/height);
+    const scale=mode==='fit'?Math.max(.5,Math.min(3,room)):Number(mode);
+    device.style.transform='scale('+scale+')';
+    device.style.margin=((scale-1)*height/2)+'px '+((scale-1)*base/2)+'px';
+    buttons.forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.scale===mode)));
+    fit.setAttribute('aria-pressed',String(mode==='fit'));
+  }
+  function set(value){mode=value;try{localStorage.setItem('atom-sim-scale',mode)}catch(e){}apply()}
+  buttons.forEach(b=>b.addEventListener('click',()=>set(b.dataset.scale)));
+  fit.addEventListener('click',()=>set('fit'));
+  document.getElementById('reload').addEventListener('click',()=>{screen.src='/';screen.focus()});
+  addEventListener('resize',apply);
+  screen.addEventListener('load',()=>screen.focus());
+  apply();
+})();
+</script>
+</body>
+</html>

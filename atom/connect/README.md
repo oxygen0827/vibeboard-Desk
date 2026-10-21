@@ -54,6 +54,16 @@ open "atom/connect/dist/ATOM Connect.app"
 
 App 配置保存在 `~/Library/Application Support/ATOMConnect/state.json`。不要同时启动多个使用此目录的实例。
 
+### ATOM 模拟器
+
+侧栏「ATOM 模拟器」或菜单栏「打开 ATOM 模拟器」会在这台 Mac 上运行小电脑：App 内置真实的设备后端（`atom/*.py`、`static/`）和构建时预装的全部仓库应用，由 macOS 自带的 `/usr/bin/python3` 运行，窗口显示 480×360 屏幕。关闭窗口即停止模拟器。
+
+- 数据在 `~/Library/Application Support/ATOMConnect/simulator/`，与 App 配置、真机互不影响；固定端口 `127.0.0.1:8790`，应用存档按来源保存，不能换端口。
+- 首次启动以「Mac 模拟器」身份注册到 ATOM Connect 当前使用的中继，之后复用该身份。登录市场账号后，随手记、今日、市场、电脑任务和真机一样可用；AI 创作类应用需在模拟器的工作坊填写模型 API。
+- 依赖 Linux 硬件的功能不可用：录音/语音（`parec`/`pactl`）、音量、背光、温度。画面由 macOS WebKit 渲染，性能与兼容性以 RK3566 上的 Chromium 91 为准。
+- 未安装命令行工具时窗口会提示运行 `xcode-select --install`。
+- 开发时也可直接运行 `python3 atom/tools/simulator.py`（从仓库同步应用、用 Chrome 打开窗口）。
+
 ### 源码方式
 
 需要 Node.js 22+；主程序没有 npm 必装依赖。
