@@ -5,7 +5,8 @@ HOST=${1:-root@47.102.197.71}
 KEY=${ATOM_SSH_KEY:-$HOME/.ssh/ldcx_ed25519}
 SITE=$(cd "$(dirname "$0")/.." && pwd)
 RELEASE=$(date -u +%Y%m%dT%H%M%SZ)
-COPYFILE_DISABLE=1 tar --no-xattrs -C "$SITE" -czf - index.html guide/index.html assets | ssh -i "$KEY" -o BatchMode=yes "$HOST" "mkdir -p /home/lincaigui/nginx/static/atom-releases/$RELEASE && tar -xzf - -C /home/lincaigui/nginx/static/atom-releases/$RELEASE"
+python3 "$SITE/build_apps.py"
+COPYFILE_DISABLE=1 tar --no-xattrs -C "$SITE" -czf - index.html guide/index.html apps/index.html assets | ssh -i "$KEY" -o BatchMode=yes "$HOST" "mkdir -p /home/lincaigui/nginx/static/atom-releases/$RELEASE && tar -xzf - -C /home/lincaigui/nginx/static/atom-releases/$RELEASE"
 ssh -i "$KEY" -o BatchMode=yes "$HOST" python3 - "$RELEASE" <<'PY'
 import pathlib,sys,subprocess,shutil
 release=sys.argv[1]
@@ -26,6 +27,17 @@ if marker not in old:
     shutil.copy2(str(p),str(p)+'.atom-site-'+release+'.bak')
     # Write in place: the nginx container bind-mounts this exact inode.
     p.write_text(old.replace('        location = /atom {',block+'        location = /atom {',1))
+apps_marker='        # ATOM public application directory'
+updated=p.read_text()
+if apps_marker not in updated:
+    routes='''        # ATOM public application directory
+        location = /atom/apps { return 308 /atom/apps/; }
+        location = /atom/apps/ { root /static; try_files /atom/apps/index.html =404; add_header Cache-Control \"no-cache\"; }
+        location = /atom/assets/apps/catalog.json { root /static; try_files /atom/assets/apps/catalog.json =404; add_header Cache-Control \"no-cache\"; }
+'''
+    if marker not in updated: raise RuntimeError('Website route marker missing')
+    shutil.copy2(str(p),str(p)+'.atom-apps-'+release+'.bak')
+    p.write_text(updated.replace(marker,routes+marker,1))
 try:
     subprocess.run(['docker','exec','nginx','nginx','-t'],check=True)
 except Exception:

@@ -1,0 +1,16 @@
+{
+  "verifiedAt": "2026-10-21T07:45:49.825Z",
+  "release": "20261021T074431Z",
+  "url": "https://ldcx.tech/atom/apps/",
+  "localCuratedApps": 35,
+  "totalWithLiveMarket": 37,
+  "status": "已连接云端市场 · 12 个公开作品 · 同一目录，同一份源码",
+  "checks": [
+    "real public catalog merged",
+    "weather and metronome source downloads match local bundles",
+    "desktop and mobile layouts",
+    "GET health 200",
+    "bare apps URL redirect 308",
+    "no browser page errors"
+  ]
+}

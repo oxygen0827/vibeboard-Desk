@@ -1,0 +1,55 @@
+'use strict';
+(() => {
+  const $ = id => document.getElementById(id), base='/atom/market/v1/';
+  let records=[],local=[],categories={},category='all',limit=12,selected=null,lastFocus=null,request=0;
+  const jobs=new Set(), dialog=$('app-detail'), params=new URLSearchParams(location.search);
+  const knownCategory = x => Object.prototype.hasOwnProperty.call(categories,x);
+  function text(value,max=500){return typeof value==='string'?value.replace(/[\u0000-\u001f]/g,' ').slice(0,max):'';}
+  function validID(value){return typeof value==='string'&&/^[A-Za-z0-9_-]{1,100}$/.test(value);}
+  async function get(url){const ctl=new AbortController();jobs.add(ctl);const timer=setTimeout(()=>ctl.abort(),8000);try{const r=await fetch(url,{signal:ctl.signal,credentials:'omit'});if(!r.ok)throw Error('暂时无法读取');const body=await r.text();if(body.length>2*1024*1024)throw Error('响应过大');return JSON.parse(body);}finally{clearTimeout(timer);jobs.delete(ctl);}}
+  function element(tag,cls,value){const el=document.createElement(tag);if(cls)el.className=cls;if(value!==undefined)el.textContent=value;return el;}
+  function icon(app){const tile=element('span','catalog-icon');tile.dataset.category=app.category;if(app.icon){const image=element('img');image.src=app.icon;image.alt='';image.width=64;image.height=64;image.loading='lazy';tile.append(image);}else{tile.textContent=app.name.slice(0,1);tile.setAttribute('aria-hidden','true');}return tile;}
+  function kind(app){return ({market:'官方作品',community:'社区作品',port:'开源适配',system:'系统应用',device:'样机定制'})[app.kind];}
+  function persistFilter(){const u=new URL(location.href);for(const [k,v]of [['q',$('app-search').value.trim()],['category',category==='all'?'':category],['source',$('app-source').value==='all'?'':$('app-source').value]]){if(v)u.searchParams.set(k,v);else u.searchParams.delete(k);}history.replaceState(null,'',u);}
+  function render(){
+    const q=$('app-search').value.trim().toLocaleLowerCase(),source=$('app-source').value;
+    const found=records.filter(a=>(category==='all'||a.category===category)&&(!q||[a.name,a.description,a.id,a.author||'',categories[a.category]].join(' ').toLocaleLowerCase().includes(q))&&(source==='all'||(source==='market'?['market','community'].includes(a.kind):source==='system'?['system','device'].includes(a.kind):a.kind===source)));
+    const frag=document.createDocumentFragment();
+    found.slice(0,limit).forEach(app=>{const a=element('a','app-card');a.href='/atom/apps/?app='+encodeURIComponent(app.id);a.dataset.app=app.id;const top=element('span','app-card-top');top.append(icon(app),element('span','card-kind',kind(app)));const foot=element('span','card-foot');foot.append(element('span','',categories[app.category]),element('span','','↗'));a.append(top,element('h3','',app.name),element('p','',app.description),foot);frag.append(a);});
+    $('app-grid').replaceChildren(frag);$('catalog-count').textContent=records.length;
+    $('catalog-empty').hidden=found.length!==0;$('load-more').hidden=found.length<=limit;
+    $('load-more').textContent='再看 '+Math.min(12,found.length-limit)+' 个应用 ↓';
+    $('results-status').textContent='显示 '+Math.min(limit,found.length)+' / '+found.length+' 个应用';
+    document.querySelectorAll('[data-category]').forEach(b=>{if(b.tagName==='BUTTON')b.setAttribute('aria-pressed',String(b.dataset.category===category));});
+  }
+  function closeDetail(update=true){const id=selected?.id;if(dialog.open)dialog.close();selected=null;document.body.style.overflow='';if(update){const u=new URL(location.href);u.searchParams.delete('app');history.replaceState(null,'',u);}const target=lastFocus?.isConnected?lastFocus:id?document.querySelector('[data-app="'+CSS.escape(id)+'"]'):null;target?.focus({preventScroll:true});}
+  function openApp(id,push=true){const app=records.find(a=>a.id===id);if(!app)return;selected=app;if(!dialog.open)lastFocus=document.activeElement;$('detail-title').textContent=app.name;$('detail-category').textContent=categories[app.category]+' / '+kind(app);$('detail-description').textContent=app.description;$('detail-needs').textContent=app.needs;
+    $('detail-install').textContent=app.kind==='market'||app.kind==='community'?(app.live===false?'已收录；本次云端目录未查到上架版本':app.version?'已在云端市场上架 · 在 ATOM 或电脑端搜索应用名称':'收录于源码市场 · 实际版本以客户端为准'):app.kind==='port'?'需要完整资源目录，由开发者部署；入口 JSON 不包含所有素材':app.kind==='device'?'样机定制；当前未提供独立源码安装包':'随 ATOM 系统提供，入口以设备配置为准';
+    const visual=$('detail-visual');visual.replaceChildren();if(app.image){const img=element('img');img.src=app.image;img.alt=app.name+'界面预览';img.onload=()=>{img.dataset.captureWidth=String(img.naturalWidth);};visual.append(img);}else visual.append(icon(app));
+    $('detail-guide').href=app.guide;$('detail-guide').textContent=app.kind==='port'?'查看部署说明 ↗':'查看使用方式 ↗';
+    $('detail-source').hidden=!app.source;if(app.source)$('detail-source').href=app.source;
+    $('detail-download').hidden=!app.version;$('detail-download').disabled=false;$('detail-download').textContent='下载公开源码包';$('detail-feedback').textContent=app.author?'作者：'+app.author+' · 许可：'+(app.id==='weather-window'?'MIT（程序）；摄影另附素材许可':app.license):'';
+    if(!dialog.open){dialog.showModal();document.body.style.overflow='hidden';dialog.scrollTop=0;$('detail-close').focus({preventScroll:true});}
+    if(push){const u=new URL(location.href);u.searchParams.set('app',id);history.pushState(null,'',u);}
+  }
+  async function refresh(){const epoch=++request;$('catalog-status').textContent='正在读取云端公开应用目录…';$('catalog-retry').hidden=true;try{
+    const data=await get(base+'catalog');if(epoch!==request)return;if(!Array.isArray(data.works))throw Error('目录格式异常');
+    const work=data.works.filter(w=>w&&validID(w.id)&&validID(w.latest_version_id)&&typeof w.title==='string').slice(0,200),byId=new Map(work.map(w=>[w.id,w]));
+    records=local.map(app=>{const w=byId.get(app.market_id);return w?{...app,version:w.latest_version_id,live:true,author:text(w.author,80),license:text(w.license,80)}:{...app,live:app.market_id?false:undefined};});
+    const known=new Set(local.map(a=>a.market_id));
+    for(const w of work){if(known.has(w.id)||['official-official-companion','official-task-pal'].includes(w.id))continue;records.push({id:'public-'+w.id,name:text(w.title,80),description:text(w.description)||'来自云端源码市场的公开作品，查看源码并在客户端预览后安装。',category:({life:'life',sound:'sound',play:'visual',companion:'visual',connect:'connect'})[w.category]||'create',kind:'community',market_id:w.id,version:w.latest_version_id,author:text(w.author,80),license:text(w.license,80),needs:'运行条件与权限以该作品说明及客户端预览为准',guide:'/atom/guide/#market'});}
+    render();$('catalog-status').textContent='已连接云端市场 · '+work.length+' 个公开作品 · 同一目录，同一份源码';
+    const id=selected?.id||new URLSearchParams(location.search).get('app');if(id)openApp(id,false);
+  }catch(e){if(epoch!==request)return;$('catalog-status').textContent='当前显示已收录目录 · 云端暂时未连接';$('catalog-retry').hidden=false;}}
+  $('detail-download').addEventListener('click',async()=>{const app=selected;if(!app?.version)return;const button=$('detail-download');button.disabled=true;button.textContent='正在读取源码…';try{const payload=await get(base+'versions/'+encodeURIComponent(app.version));if(!payload.bundle?.manifest||typeof payload.bundle.files!=='object'||!payload.bundle.files)throw Error('不是完整源码包');const blob=new Blob([JSON.stringify(payload.bundle,null,2)+'\n'],{type:'application/json'}),url=URL.createObjectURL(blob),a=element('a');a.href=url;a.download=(validID(payload.bundle.manifest.id)?payload.bundle.manifest.id:app.id)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);if(selected?.id===app.id)$('detail-feedback').textContent='已准备源码包，请在客户端下载后预览并确认安装。';}catch{if(selected?.id===app.id)$('detail-feedback').textContent='源码暂时无法下载，请重试或在客户端查看。';}finally{if(selected?.id===app.id){button.disabled=false;button.textContent='下载公开源码包';}}});
+  $('app-grid').addEventListener('click',e=>{const card=e.target.closest('[data-app]');if(card&&records.length){e.preventDefault();openApp(card.dataset.app);}});
+  document.querySelector('.category-tabs').addEventListener('click',e=>{const b=e.target.closest('button[data-category]');if(!b)return;category=b.dataset.category;limit=12;persistFilter();render();});
+  for(const id of ['app-search','app-source'])$(id).addEventListener(id==='app-search'?'input':'change',()=>{limit=12;persistFilter();render();});
+  $('reset-filters').addEventListener('click',()=>{$('app-search').value='';$('app-source').value='all';category='all';limit=12;persistFilter();render();$('app-search').focus();});
+  $('load-more').addEventListener('click',()=>{limit+=12;render();});$('catalog-retry').addEventListener('click',refresh);
+  $('detail-close').addEventListener('click',()=>closeDetail());dialog.addEventListener('cancel',e=>{e.preventDefault();closeDetail();});dialog.addEventListener('click',e=>{const r=dialog.getBoundingClientRect();if(e.target===dialog&&(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom))closeDetail();});
+  addEventListener('popstate',()=>{const u=new URLSearchParams(location.search);category=knownCategory(u.get('category'))?u.get('category'):'all';$('app-search').value=u.get('q')||'';$('app-source').value=['market','port','system'].includes(u.get('source'))?u.get('source'):'all';render();u.get('app')?openApp(u.get('app'),false):closeDetail(false);});
+  addEventListener('keydown',e=>{if(e.key==='/'&&!dialog.open&&!['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)){e.preventDefault();$('app-search').focus();}});
+  addEventListener('pagehide',()=>jobs.forEach(job=>job.abort()));
+  get('/atom/assets/apps/catalog.json').then(data=>{if(!Array.isArray(data.apps))throw Error();local=data.apps;records=local;categories=data.categories;category=knownCategory(params.get('category'))?params.get('category'):'all';$('app-search').value=params.get('q')||'';$('app-source').value=['market','port','system'].includes(params.get('source'))?params.get('source'):'all';document.querySelector('.catalog-tools').hidden=false;document.querySelector('.category-tabs').hidden=false;render();if(params.get('app'))openApp(params.get('app'),false);refresh();}).catch(()=>{$('catalog-status').textContent='搜索暂时不可用，仍可浏览下方目录与源码链接。';});
+})();
