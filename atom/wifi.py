@@ -71,15 +71,42 @@ def connect(ssid, password):
         raise WifiError('请选择一个 Wi‑Fi')
     if not isinstance(password, str) or (password and not 8 <= len(password) <= 63) or '\n' in password:
         raise WifiError('Wi‑Fi 密码一般是 8–63 位')
-    args = ['-w', '35', 'device', 'wifi', 'connect', ssid] + (['password', password] if password else [])
-    code, out, err = _nmcli(args)
-    if code == 0:
+    # Clicking the active network must not tear down its working connection.
+    active = next((n for n in networks() if n['active']), None)
+    if active and active['ssid'] == ssid:
         return status()
-    text = (out + err).lower()
+    _, profiles, _ = _nmcli(['-t', '-f', 'UUID,TYPE', 'connection', 'show', '--active'], timeout=10)
+    previous = next((f[0] for f in (_fields(line) for line in profiles.splitlines())
+                     if len(f) == 2 and f[1] in ('wifi', '802-11-wireless')
+                     and re.fullmatch(r'[0-9a-fA-F-]{36}', f[0])), None)
+    args = ['-w', '35', 'device', 'wifi', 'connect', ssid] + (['password', password] if password else [])
+    failure = None
+    try:
+        code, out, err = _nmcli(args)
+        if code == 0:
+            connected = status()
+            if connected['connected']:
+                return connected
+            failure = '新网络尚未连接成功'
+        else:
+            failure = _connection_error(out + err)
+    except WifiError as exc:
+        failure = str(exc)
+    if previous:
+        try:
+            restored, _, _ = _nmcli(['-w', '20', 'connection', 'up', 'uuid', previous], timeout=25)
+            failure += '；已恢复原网络' if restored == 0 else '；请重新选择原网络'
+        except WifiError:
+            failure += '；请重新选择原网络'
+    raise WifiError(failure)
+
+
+def _connection_error(output):
+    text = output.lower()
     if 'not authorized' in text or 'insufficient privileges' in text:
-        raise WifiError('系统还没有允许 ATOM 设置网络，请联系管理员')
+        return '系统还没有允许 ATOM 设置网络，请联系管理员'
     if 'secrets were required' in text or 'invalid passphrase' in text or 'psk' in text or re.search(r'\b(7|10)\b.*password', text):
-        raise WifiError('密码不对，请再试一次')
+        return '密码不对，请再试一次'
     if 'no network with ssid' in text:
-        raise WifiError('附近找不到这个 Wi‑Fi，请刷新后重试')
-    raise WifiError('连不上这个 Wi‑Fi，请检查密码或换一个网络')
+        return '附近找不到这个 Wi‑Fi，请刷新后重试'
+    return '连不上这个 Wi‑Fi，请检查密码或换一个网络'
