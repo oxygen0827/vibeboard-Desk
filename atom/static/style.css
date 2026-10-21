@@ -25,3 +25,22 @@ body[data-view=workshop] #workshop-tts-text{width:100%;height:172px;resize:none;
 
 .installed-actions{display:flex;gap:6px;flex-shrink:0}
 .installed-actions button{min-height:32px;padding:4px 10px;font-size:12px}
+.welcome{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--ink);padding:14px 22px}
+.welcome-card{width:100%;max-width:436px;display:flex;flex-direction:column;gap:8px}
+.welcome-dots{display:flex;gap:5px;margin-bottom:4px}
+.welcome-dots i{width:18px;height:4px;border-radius:2px;background:var(--line)}
+.welcome-dots i.on{background:var(--accent)}
+.welcome h1{margin:0;font-size:22px;line-height:1.25}
+.welcome p,.welcome li{margin:0;font-size:13px;line-height:1.55;color:var(--muted)}
+.welcome ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:2px}
+.welcome .welcome-ok{color:var(--ink);font-weight:600;font-size:15px}
+.welcome .welcome-warn{color:var(--action);font-weight:600;font-size:15px}
+.welcome-form{display:flex;flex-direction:column;gap:7px}
+.welcome-form input{font:inherit;font-size:15px;min-height:38px;padding:6px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
+.welcome-error{color:var(--action)!important;min-height:1em;font-size:12px!important}
+.welcome-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.welcome-actions button{min-height:38px;padding:6px 14px}
+.welcome-code{font:600 15px ui-monospace,"DejaVu Sans Mono",monospace!important;color:var(--ink)!important;background:var(--card);border-radius:10px;padding:10px 12px;word-break:break-all;user-select:all}
+.welcome-keys{list-style:none;padding:0!important;gap:6px!important}
+.welcome-keys li{font-size:15px!important;color:var(--ink)!important}
+.welcome kbd{font:12px ui-monospace,monospace;border:1px solid var(--line);border-radius:5px;padding:1px 6px;margin-right:6px;background:var(--card)}
