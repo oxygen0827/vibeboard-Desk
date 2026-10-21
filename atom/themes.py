@@ -38,9 +38,12 @@ def theme(id, name, description, colors, icons=None):
     return dict(id=id, name=name, description=description, tokens=dict(zip(KEYS, colors)), builtin=True,icons=icons or icon_style())
 
 
-# One system foundation replaces the retired theme collection.
-BUILTINS = [theme('system', '系统外观', '清晰排版、圆润控件与统一应用体验',
+# Two appearances share one design system; retired theme collections stay retired.
+BUILTINS = [theme('system', '白天', '明亮纸面、柔和桌面与清晰控件',
     ['#f2f2f7','#1c1c1e','#007aff','#0066d6','#6c6c70','#d9d9df','#ffffff'],
+    icon_style('card','accent','transparent',16,2.2,'none')),
+    theme('system-dark', '暗黑', '深色层次、柔光图标与安静的夜间体验',
+    ['#101114','#f2f3f5','#78b4ff','#277cde','#a0a5b1','#34373f','#1d2026'],
     icon_style('card','accent','transparent',16,2.2,'none'))]
 
 
@@ -87,7 +90,12 @@ class ThemeStore:
     def activate(self, id):
         with self.lock:
             if id not in [t['id'] for t in BUILTINS+self.custom]: raise ValueError('theme not found')
-            self.active=id; self._save()
+            previous=self.active
+            self.active=id
+            try:self._save()
+            except OSError:
+                self.active=previous
+                raise
             return self.list_themes()
 
     def install(self, data):
@@ -104,6 +112,14 @@ class ThemeStore:
             selected=values[0];t=selected['tokens'];icons=selected['icons']
             aliases={'paper':'bg','ink':'ink','accent':'accent','action':'action','muted':'muted','secondary-text':'muted','line':'line','card':'card'}
             declarations=['--atom-'+k+':'+t[v] for k,v in aliases.items()]
+            rgb=[int(t['bg'][i:i+2],16) for i in (1,3,5)]
+            dark=sum(v*w for v,w in zip(rgb,(.2126,.7152,.0722)))<128
+            declarations += ['color-scheme:'+('dark' if dark else 'light'),
+                             '--atom-color-scheme:'+('dark' if dark else 'light'),
+                             '--atom-icon-filter:'+('invert(1)' if dark else 'none'),
+                             '--accent-ink:'+('#08111e' if dark else '#ffffff'),
+                             '--danger:'+('#ff8d85' if dark else '#bd3d35'),
+                             '--warning-bg:'+('#30271b' if dark else '#fff5e6')]
             declarations += ['--'+k+':'+v for k,v in t.items()]
             declarations += ['--paper:'+t['bg'],'--text:'+t['ink'],'--secondary-text:'+t['muted'],
                              '--secondaryText:'+t['muted'],'--atom-secondaryText:'+t['muted'],'--atom-bg:'+t['bg']]

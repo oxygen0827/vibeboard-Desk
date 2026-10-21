@@ -4,6 +4,15 @@ const root=document.getElementById('root'),pc=new URLSearchParams(location.searc
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Array.from(crypto.getRandomValues(new Uint8Array(16)),x=>x.toString(16).padStart(2,'0')).join('');
 const active=s=>['queued','generating','saving'].includes(s);
+// The computer host owns the appearance; no user data travels in this message.
+if(pc&&parent!==window){
+ window.addEventListener('message',e=>{
+  if(e.source!==parent||e.data?.type!=='atom:appearance'||!['light','dark'].includes(e.data.mode))return;
+  document.documentElement.dataset.appearance=e.data.mode;
+  document.documentElement.style.colorScheme=e.data.mode;
+ });
+ parent.postMessage({type:'atom:appearance-request'},'*');
+}
 const labels={queued:'等待开始',generating:'正在生成',saving:'正在保存到相册',completed:'已保存到相册',failed:'生成失败',interrupted:'生成已中断'};
 let alive=true,seq=0,pending=new Map(),user=null,config=null,screen='library',filter='all',page=0,listing={items:[],pages:0,total:0},
     selected=null,reference=null,before=null,job=null,jobs=[],busy=false,loading=false,message='',error='',readFailed=false,
@@ -11,7 +20,7 @@ let alive=true,seq=0,pending=new Map(),user=null,config=null,screen='library',fi
     generationRequest=null,creatingSignature='',deleteConfirm=false,voice='',viewEpoch=0,accountEpoch=0;
 const limit=()=>innerWidth<=600?6:12;
 function rpc(action,data={}){if(!alive)return Promise.reject(Error('相册已关闭'));return new Promise((resolve,reject)=>{
- const id='photo-'+(++seq),t=setTimeout(()=>{pending.delete(id);reject(Error('连接超时，请刷新查看结果；生成任务不会自动重发'))},action==='download'?300000:60000);
+ const id='photo-'+(++seq),t=setTimeout(()=>{pending.delete(id);reject(Error('连接超时，请刷新查看结果；生成任务不会自动重发'))},action==='download'?300000:action==='upload'?180000:60000);
  pending.set(id,{resolve,reject,t});parent.postMessage({type:'atom:photos',id,action,data:{...data,...(user&&action!=='state'?{expected_user_id:user.id}:{})}},'*');
 });}
 window.addEventListener('message',e=>{if(e.source!==parent)return;const d=e.data||{};
@@ -50,9 +59,9 @@ function render(){if(!alive)return;
    (readFailed?'<div class="notice">偏好读取失败，未覆盖原记录。'+button('retry-read','重试')+'</div>':'')+
    (!user?empty('把生活带到桌边','在电脑和 ATOM 登录同一个应用市场账号，<br>照片就能出现在这里。',button('login','登录账号','primary')+button('refresh','重试','quiet')):
     '<div class="tabs">'+[['all','全部'],['favorites','收藏'],['generated','AI 作品']].map(([v,t])=>button('filter:'+v,t,filter===v?'on':'')).join('')+'</div>'+
-    (listing.items.length?'<div class="grid">'+listing.items.map(p=>'<button class="photo" data-action="photo:'+p.id+'" aria-label="'+esc(p.name)+'"><img src="'+p.thumbnail+'" alt="'+esc(p.name)+'">'+(p.generated?'<span class="ai">AI</span>':'')+(p.favorite?'<span class="heart">♥</span>':'')+'</button>').join('')+'</div>':empty(loading?'正在同步照片…':'留一张值得回看的照片',filter==='all'?(pc?'导入照片到私有云端相册，<br>或把想象生成一幅作品。':'在电脑端相册导入照片，<br>也可以在这里创作新作品。'):'这里还没有照片'))+
+    (listing.items.length?'<div class="grid">'+listing.items.map(p=>'<button class="photo" data-action="photo:'+p.id+'" aria-label="'+esc(p.name)+'"><img src="'+p.thumbnail+'" alt="'+esc(p.name)+'">'+(p.generated?'<span class="ai">AI</span>':'')+(p.favorite?'<span class="heart">♥</span>':'')+'</button>').join('')+'</div>':empty(loading?'正在同步照片…':'留一张值得回看的照片',filter==='all'?(pc?'支持苹果 HEIC / HEIF、JPEG、PNG、WebP<br>每张最多 20 MiB，原文件完整保留。':'在电脑端相册导入照片，<br>也可以在这里创作新作品。'):'这里还没有照片'))+
     '<div class="pager"><span>'+esc(loading?'正在同步…':listing.pages?'第 '+(page+1)+' / '+listing.pages+' 页':'私有云端相册')+'</span><div class="actions">'+button('previous','‹','quiet',page===0)+button('next','›','quiet',page+1>=listing.pages)+button('refresh','同步','quiet',loading)+'</div></div>')+feedback()+
-   (pc?'<input class="visually-hidden" type="file" id="photo-files" accept="image/jpeg,image/png,image/webp" multiple>':'');
+   (pc?'<input class="visually-hidden" type="file" id="photo-files" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif" multiple>':'');
  }
  root.innerHTML='<section class="album">'+html+'</section>';
  if(window.AtomApp&&!render.ready){AtomApp.ready();render.ready=true}
@@ -89,9 +98,16 @@ async function generate(){if(busy)return;const signature=JSON.stringify([prompt,
  try{const r=await rpc('generate',{request_id:generationRequest,prompt,style,source_id:reference?.photo.id||null});job=r.job;screen='job';await savePreference();watchJob(job.id)}catch(e){error=e.message}finally{busy=false;render()}
 }
 async function upload(files){if(busy)return;busy=true;error='';let count=0;
- try{for(const f of files){if(!['image/jpeg','image/png','image/webp'].includes(f.type))throw Error('请导入 JPEG、PNG 或 WebP 照片');if(f.size>4*1024*1024)throw Error(f.name+' 超过 4 MiB，请先导出较小版本');message='正在上传 '+(count+1)+' / '+files.length;render();
+ try{for(const f of files){
+  const extension=f.name.split('.').pop().toLowerCase(),aliases={jpg:'image/jpeg',jpeg:'image/jpeg',png:'image/png',webp:'image/webp',heic:'image/heic',heif:'image/heif'};
+  const declared=(f.type||'').toLowerCase(),supported=['image/jpeg','image/png','image/webp','image/heic','image/heif'];
+  const mime=supported.includes(declared)?declared:(!declared||declared==='application/octet-stream'||/^image\/hei[cf]-sequence$/.test(declared))?aliases[extension]:null;
+  if(!mime)throw Error(f.name+'：格式不支持，请选择 HEIC、HEIF、JPEG、PNG 或 WebP');
+  const maximum=config?.max_original_bytes||20*1024*1024;
+  if(f.size>maximum)throw Error(f.name+'：超过 '+Math.round(maximum/1024/1024)+' MiB，请导出较小版本');
+  message='正在上传 '+(count+1)+' / '+files.length+' · '+f.name;render();
   const data=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>reject(Error('无法读取照片'));r.readAsDataURL(f)});
-  await rpc('upload',{id:uid(),name:f.name.slice(0,100),data_url:data});count++;
+  await rpc('upload',{id:uid(),name:f.name.slice(0,100),data_url:'data:'+mime+';base64,'+String(data).split(',')[1]});count++;
  }page=0;await refresh();message=count+' 张照片已上传并同步';
  }catch(e){error=(count?count+' 张已上传；':'')+e.message}finally{busy=false;render()}
 }

@@ -12,7 +12,7 @@ import unittest
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from PIL import Image
 from service import Marketplace, MarketError
-from photos import ArkImages, PhotoError, data_url
+from photos import ArkImages, PhotoError, data_url, decode_image, prepare, MAX_ORIGINAL
 
 
 def picture(color='orange', size=(160, 100)):
@@ -146,6 +146,56 @@ class PhotosTests(unittest.TestCase):
         with self.assertRaises(PhotoError) as caught:provider.generate('test')
         self.assertEqual(caught.exception.code,'model_not_open')
         self.assertNotIn(provider.key,caught.exception.message)
+
+    def test_twenty_mib_boundary_and_format_error_are_distinct(self):
+        raw = picture() + b'\0' * (MAX_ORIGINAL - len(picture()))
+        decoded, mime = decode_image(data_url(raw, 'image/png'))
+        self.assertEqual(len(decoded), 20 * 1024 * 1024)
+        self.assertEqual(mime, 'image/png')
+        with self.assertRaises(PhotoError) as caught:
+            decode_image(data_url(raw + b'x', 'image/png'))
+        self.assertEqual(caught.exception.status, 413)
+        self.assertIn('20 MiB', caught.exception.message)
+        with self.assertRaises(PhotoError) as caught:
+            decode_image(data_url(b'GIF89a', 'image/gif'))
+        self.assertEqual(caught.exception.status, 400)
+        self.assertIn('HEIC', caught.exception.message)
+
+    def test_heic_primary_preview_original_and_mime_alias(self):
+        # Real HEVC-encoded container, not a mocked decoder or renamed JPEG.
+        first = Image.new('RGB', (80, 60), 'red')
+        primary = Image.new('RGB', (160, 100), 'blue')
+        out = io.BytesIO()
+        first.save(out, 'HEIF', append_images=[primary], save_all=True, primary_index=1)
+        raw = out.getvalue()
+        for mime in ('image/heic', 'image/heif'):
+            p = self.call(body={'id':secrets.token_hex(16), 'name':'Apple photo.heic', 'data_url':data_url(raw,mime)})['photo']
+            self.assertEqual((p['width'],p['height']),(160,100))
+            self.assertEqual(p['mime'],mime)
+            self.assertEqual(base64.b64decode(self.call('/'+p['id']+'/original')['data_url'].split(',')[1]),raw)
+            preview = self.call('/'+p['id'])['data_url']
+            with Image.open(io.BytesIO(base64.b64decode(preview.split(',')[1]))) as decoded:
+                r,g,b = decoded.getpixel((80,50))
+                self.assertGreater(b, r+100)
+                self.assertEqual(len(decoded.getexif()),0)
+        with self.assertRaises(PhotoError):
+            prepare(picture(), 'image/heic')
+
+    def test_48_megapixel_photo_orientation_and_small_preview(self):
+        out = io.BytesIO()
+        image = Image.new('RGB', (8000,6000), '#3f7dc1')
+        exif = Image.Exif(); exif[274] = 6
+        image.save(out, 'JPEG', exif=exif)
+        image.close()
+        raw = out.getvalue()
+        result = prepare(raw, 'image/jpeg')
+        self.assertEqual(result[1:3], (6000,8000))
+        with Image.open(io.BytesIO(result[3])) as preview:
+            self.assertEqual(preview.size, (960,1280))
+            self.assertEqual(len(preview.getexif()),0)
+        with Image.open(io.BytesIO(result[4])) as thumb:
+            self.assertLessEqual(thumb.width,240)
+            self.assertLessEqual(thumb.height,180)
 
 
 if __name__=='__main__': unittest.main()

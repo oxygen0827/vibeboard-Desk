@@ -1,0 +1,51 @@
+{
+  "checkedAt": "2026-10-21T05:46:02.620Z",
+  "active": "system-dark",
+  "toggleBothDirections": true,
+  "survivesBrowserReload": true,
+  "returnsOriginPage": true,
+  "desktopSpaceReturnsFirstPage": true,
+  "apps": [
+    {
+      "id": "today",
+      "background": "rgb(16, 17, 20)",
+      "color": "rgb(242, 243, 245)",
+      "scheme": "dark",
+      "rootOverflow": false,
+      "canvas": false
+    },
+    {
+      "id": "quick-notes",
+      "background": "rgb(16, 17, 20)",
+      "color": "rgb(242, 243, 245)",
+      "scheme": "dark",
+      "rootOverflow": false,
+      "canvas": false
+    },
+    {
+      "id": "my-computer",
+      "background": "rgb(16, 17, 20)",
+      "color": "rgb(242, 243, 245)",
+      "scheme": "dark",
+      "rootOverflow": false,
+      "canvas": false
+    },
+    {
+      "id": "photo-album",
+      "background": "rgb(16, 17, 20)",
+      "color": "rgb(242, 243, 245)",
+      "scheme": "dark",
+      "rootOverflow": false,
+      "canvas": false
+    },
+    {
+      "id": "water-pool",
+      "background": "rgb(0, 0, 0)",
+      "color": "rgb(255, 255, 255)",
+      "scheme": "dark",
+      "rootOverflow": false,
+      "canvas": true
+    }
+  ],
+  "errors": []
+}

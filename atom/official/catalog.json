@@ -8,7 +8,9 @@
     "language-alchemy": "play",
     "ai-duet": "sound",
     "agent-studio": "connect",
-    "photo-album": "life"
+    "photo-album": "life",
+    "weather-window": "life",
+    "clap-stage": "sound"
   },
   "extra_sources": [
     "../experiences/world/bundle.json",

@@ -1,6 +1,6 @@
 # ATOM 原创官方作品
 
-本目录保留早期五个作品源码，当前上架其中三个；云朵伙伴已退役，任务伙伴已并入 Agent 小屋。作品使用原生 Canvas/HTML/CSS 与 AtomApp v1，无外链、无模型密钥、无复制的第三方素材。每个目录含完整源码、独立 currentColor 图标、MIT 许可（前三个作品另附 `SOURCE.md`），`bundle.json` 是完整可安装/发布快照。
+本目录保留早期五个作品源码，当前上架其中三个；云朵伙伴已退役，任务伙伴已并入 Agent 小屋。早期作品使用原生 Canvas/HTML/CSS 与 AtomApp v1。新增天气应用使用带署名的摄影及外部天气 API，相册使用云端服务；各目录说明其联网和素材边界，全部源码包不含模型密钥。每个目录含完整源码、独立 currentColor 图标、MIT 许可（前三个作品另附 `SOURCE.md`），`bundle.json` 是完整可安装/发布快照。
 
 - **云朵伙伴 official-companion（已退役）**：平滑视线追踪、自然眨眼、轻点回应、粒子与三种心情；遵守减少动态效果，表情偏好可保存。
 - **像素实验室 pixel-lab**：80×44 点阵上的真实生命规则、重力沙粒、衰减涟漪。可绘制、添加种子、暂停、清空及撤销五步。没有将预录动画当模拟。
@@ -8,6 +8,8 @@
 
 - **今日 today**：与电脑工作台共享真实日程和待办；离线 pending 持久保存、重连同步、冲突显式保留两份，账号数据隔离。
 - **相册 photo-album**：照片导入、账号私有云端同步、收藏、全屏轮播、文字生图与照片风格改写。[构建、使用和边界](photo-album/README.md)。新增资源单独运行 `python3 atom/official/photo-album/build.py`，同时更新电脑端嵌入资源。
+- **天气之窗 weather-window**：七种内置实拍场景、手选城市与 Open-Meteo 天气；摄影独立许可，原型 API 的商用边界见 [说明](weather-window/README.md)。
+- **掌心节拍 clap-stage**：本机 WebAudio 节拍器、点按定速与需明确开启的拍手定速；退出停止声音及收音。[说明](clap-stage/README.md)。
 - **声音实验室 sound-lab**：原生 WebAudio 的四轨十六步节拍编排，速度、音量与节拍可保存，暂停与退出释放音频资源。
 
 运行 `python3 atom/official/build.py` 重新生成五个完整 bundle；之后运行 `python3 atom/tools/prepare_icon_bundles.py`。市场服务按 `catalog.json` 导入：跳过退役的云朵伙伴和任务伙伴，并从 `../experiences/` 加入共生世界、语言炼金、合奏伙伴、Agent 小屋。电脑与设备端读取同一目录。导入为不可变版本后，源码改变不会偷偷修改已发布版本，应按市场新版本流程发布。

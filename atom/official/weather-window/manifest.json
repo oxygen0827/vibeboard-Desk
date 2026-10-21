@@ -1,0 +1,9 @@
+{
+  "id": "weather-window",
+  "name": "天气之窗",
+  "description": "把天气变成窗边的一幅摄影：实时温度、手选城市、七种天气实拍风景。",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "theme_ui": "controls",
+  "layout": "fullscreen"
+}

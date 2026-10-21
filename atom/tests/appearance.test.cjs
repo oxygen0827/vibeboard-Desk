@@ -1,0 +1,50 @@
+/* Appearance contract: persistence, opaque frames, unchanged scene colors and fixed viewport. */
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const {chromium,executablePath}=require('../tools/browser-test-runtime.cjs');
+const root=path.resolve(__dirname,'..');
+(async()=>{
+ const {previewHTML}=await import('../connect/computer/preview.mjs');
+ const browser=await chromium.launch({headless:true,executablePath});
+ const ctx=await browser.newContext({viewport:{width:1180,height:780},colorScheme:'light'});
+ const page=await ctx.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
+ const fixture={manifest:{id:'test-preview',name:'Test'},files:{'index.html':'<!doctype html><html><head></head><body><button>应用操作</button><canvas style="background:rgb(24,78,132)"></canvas></body></html>'}};
+ await ctx.route('http://appearance.test/**',async route=>{
+  const url=new URL(route.request().url());let body,type='text/html';
+  if(url.pathname==='/api/state')body=JSON.stringify({csrf:'test',configured:false,paired:[],agents:[],projects:[],tasks:[]});
+  else if(url.pathname==='/api/studio/photos/state')return route.fulfill({status:401,contentType:'application/json',body:JSON.stringify({error:'请登录市场账号'})});
+  else if(url.pathname.startsWith('/api/'))body=JSON.stringify({authenticated:false,jobs:[],notes:[],items:[],works:[],drafts:[]});
+  else if(url.pathname==='/test-preview')body=previewHTML(fixture);
+  else {const file=url.pathname==='/'?path.join(root,'connect/computer/dashboard.html'):url.pathname.startsWith('/photo-album/')?path.join(root,'official',url.pathname.slice(1)):path.join(root,'connect/computer',url.pathname.slice(1));if(!fs.existsSync(file))return route.fulfill({status:404,body:''});body=fs.readFileSync(file);type=file.endsWith('.js')?'text/javascript':file.endsWith('.css')?'text/css':file.endsWith('.svg')?'image/svg+xml':'text/html';}
+  if(url.pathname.startsWith('/api/'))type='application/json';await route.fulfill({contentType:type,body});
+ });
+ await page.goto('http://appearance.test/');await page.locator('[data-page=settings]').click();
+ await page.locator('[data-appearance-choice=dark]').click();
+ assert.equal(await page.locator('html').getAttribute('data-appearance'),'dark');
+ assert.equal(await page.evaluate(()=>getComputedStyle(document.body).backgroundColor),'rgb(16, 17, 20)');
+ assert.equal(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight),true);
+ fs.mkdirSync(path.join(root,'artifacts/appearance'),{recursive:true});
+ await page.screenshot({path:path.join(root,'artifacts/appearance/computer-dark-settings.png')});
+ await page.reload();assert.equal(await page.locator('html').getAttribute('data-appearance'),'dark');
+ await page.locator('[data-page=photos]').click();
+ const album=page.frameLocator('#photo-album-frame');await album.locator('.empty').waitFor();
+ assert.equal(await album.locator('body').evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(16, 17, 20)');
+ assert.equal(await album.locator('html').getAttribute('data-appearance'),'dark');
+ await page.screenshot({path:path.join(root,'artifacts/appearance/computer-dark-album.png')});
+ await page.locator('[data-page=settings]').click();
+ await page.evaluate(()=>{const f=document.createElement('iframe');f.id='appearance-test-frame';f.sandbox='allow-scripts';f.src='/test-preview';document.querySelector('[data-panel=settings]').append(f);});
+ const preview=page.frameLocator('#appearance-test-frame');await preview.locator('button').waitFor();
+ assert.equal(await preview.locator('body').evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(16, 17, 20)');
+ assert.equal(await preview.locator('canvas').evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(24, 78, 132)');
+ await page.locator('[data-appearance-choice=light]').click();
+ assert.equal(await preview.locator('body').evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(242, 242, 247)');
+ assert.equal(await preview.locator('canvas').evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(24, 78, 132)');
+ await page.reload();assert.equal(await page.locator('html').getAttribute('data-appearance'),'light');
+ await page.locator('[data-page=settings]').click();await page.setViewportSize({width:820,height:532});
+ assert.equal(await page.locator('[data-appearance-choice=dark]').evaluate(el=>el.getBoundingClientRect().bottom<=innerHeight),true);
+ assert.equal(await page.locator('#appearance-feedback').evaluate(el=>el.getBoundingClientRect().bottom<=innerHeight),true);
+ const native=await ctx.newPage();await native.addInitScript(()=>{window.atomNativeAppearance='dark';window.webkit={messageHandlers:{appearance:{postMessage({mode}){setTimeout(()=>dispatchEvent(new CustomEvent('atom:appearance-saved',{detail:{mode,ok:true}})),30);}}}};});
+ await native.goto('http://appearance.test/');assert.equal(await native.locator('html').getAttribute('data-appearance'),'dark');
+ await native.locator('[data-page=settings]').click();await native.locator('[data-appearance-choice=light]').click();await native.waitForFunction(()=>document.documentElement.dataset.appearance==='light');
+ assert.match(await native.locator('#appearance-feedback').textContent(),/下次打开仍会保留/);
+ assert.deepEqual(errors,[]);await browser.close();console.log('Appearance browser checks passed: persistent light/dark, native save acknowledgment, album iframe, Studio preview, original scene colors, fixed viewport.');
+})().catch(error=>{console.error(error);process.exit(1)});

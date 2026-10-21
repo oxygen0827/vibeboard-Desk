@@ -1,0 +1,46 @@
+{
+  "date": "2026-10-21",
+  "apps": [
+    "weather-window",
+    "clap-stage"
+  ],
+  "market": "Cloud source catalog entries verified",
+  "device_installation": "pending: device powered off by user",
+  "viewports": [
+    "480x360",
+    "960x700"
+  ],
+  "checks": [
+    "all seven embedded photographs decode",
+    "weather response fixture and city save",
+    "old weather save cannot overwrite newly selected city",
+    "failed state read does not overwrite preferences",
+    "no root scrolling",
+    "real WebAudio start / pause / suspend cleanup",
+    "steady-noise rejection and clap tempo from synthetic host meter samples",
+    "microphone stop requested after measurement"
+  ],
+  "limitations": [
+    "Actual device microphone, sound, themed desktop icons and fan recovery still require device acceptance",
+    "Weather browser UI data is fixture-based; direct Open-Meteo response was checked separately before shutdown",
+    "Computer source previews disable weather network and device microphone bridge"
+  ],
+  "cloud_release": "20261021T064732Z",
+  "public_bundle_verification": [
+    {
+      "app": "weather-window",
+      "version": 2,
+      "source_matches": true
+    },
+    {
+      "app": "clap-stage",
+      "version": 2,
+      "source_matches": true
+    },
+    {
+      "app": "photo-album",
+      "version": 5,
+      "source_matches": true
+    }
+  ]
+}

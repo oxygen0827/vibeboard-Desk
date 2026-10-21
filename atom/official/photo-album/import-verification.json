@@ -1,0 +1,28 @@
+{
+  "at": "2026-10-21T05:53:38.272Z",
+  "cloud": "https://ldcx.tech/atom",
+  "results": [
+    {
+      "fixture": "apple-format.heic",
+      "bytes": 2291,
+      "original_unchanged": true,
+      "preview": "JPEG",
+      "elapsed_ms": 188
+    },
+    {
+      "fixture": "twenty-mib.jpg",
+      "bytes": 20971520,
+      "original_unchanged": true,
+      "preview": "JPEG",
+      "elapsed_ms": 24088
+    }
+  ],
+  "fixtures_removed": true,
+  "date": "2026-10-21",
+  "scope": "HEIC/HEIF and 20 MiB photo import update",
+  "computer_browser": "Actual packaged Mac companion backend: HEIC empty MIME upload, preview, unchanged original download, deletion and dark appearance persistence verified",
+  "synthetic_fixture_note": "20 MiB JPEG is a valid image padded to exactly 20 MiB for transport boundary testing; not a user photo",
+  "device_bundle": "Pending update after user powers on device",
+  "native_file_picker": "Compiled; native UI click path not exercised",
+  "provider_generation": "Not re-tested; prior ModelNotOpen limitation remains"
+}

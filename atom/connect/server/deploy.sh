@@ -14,7 +14,7 @@ COPYFILE_DISABLE=1 tar --no-xattrs -C "$ATOM" --exclude '__pycache__' --exclude 
 $SSH "$HOST" sh -s "$RELEASE" <<'REMOTE'
 set -eu
 RELEASE=$1
-PYTHONPATH=/opt/atom/python-deps python3 -c 'from PIL import Image' || { echo "Install Pillow with connect/server/requirements.txt into /opt/atom/python-deps before deploying" >&2; exit 1; }
+PYTHONPATH=/opt/atom/python-deps python3 -c 'from PIL import Image; import pillow_heif' || { echo "Install photo dependencies with connect/server/requirements.txt into /opt/atom/python-deps before deploying" >&2; exit 1; }
 id atom >/dev/null 2>&1 || useradd --system --home-dir /var/lib/atom --shell /sbin/nologin atom
 install -d -o atom -g atom -m 0700 /var/lib/atom /var/lib/atom/backups
 install -d -o root -g root -m 0700 /etc/atom

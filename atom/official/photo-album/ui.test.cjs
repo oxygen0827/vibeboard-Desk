@@ -5,9 +5,10 @@ const image='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCA
 const items=Array.from({length:7},(_,i)=>({id:(i+1).toString(16).padStart(32,'0'),name:'Fixture '+i,revision:1,favorite:false,generated:i===0,parent_id:i===0?'00000000000000000000000000000002':null,thumbnail:image}));
 const state={user:{id:'fixture',username:'fixture'},generation_enabled:true,styles:[{id:'clay',name:'黏土世界'},{id:'film',name:'胶片时光'}]};
 const html=`<style>html,body{margin:0;width:100%;height:100%;overflow:hidden}iframe{border:0;width:100%;height:100%}</style><iframe src="/index.html" sandbox="allow-scripts"></iframe><script>
-const items=${JSON.stringify(items)},state=${JSON.stringify(state)},image=${JSON.stringify(image)};window.requests=[];
+const items=${JSON.stringify(items)},state=${JSON.stringify(state)},image=${JSON.stringify(image)};window.requests=[];window.uploads=[];
 addEventListener('message',e=>{const d=e.data;if(d?.type!=='atom:photos')return;requests.push(d.action);const x=d.data||{};let result;
 if(d.action==='state')result=state;
+if(d.action==='upload'){uploads.push({name:x.name,mime:x.data_url.split(';')[0],bytes:atob(x.data_url.split(',')[1]).length});result={photo:{id:x.id}};}
 if(d.action==='list'){const a=items.filter(p=>x.filter!=='favorites'||p.favorite);result={items:a.slice(x.page*x.limit,(x.page+1)*x.limit),pages:Math.ceil(a.length/x.limit),total:a.length}}
 if(d.action==='get')result={photo:items.find(p=>p.id===x.id),data_url:image};
 if(d.action==='update'){const p=items.find(p=>p.id===x.id);p.favorite=x.favorite;p.revision++;result={photo:p}}
@@ -16,7 +17,7 @@ if(d.action==='job')result={job:{id:'job',status:'failed',created_at:1,error:'Fi
 if(d.action==='jobs')result={jobs:[]};
 e.source.postMessage({type:'atom:photos-result',id:d.id,result},'*')});</script>`;
 (async()=>{
- const server=http.createServer((req,res)=>{const name=new URL(req.url,'http://localhost').pathname.slice(1);if(!name){res.setHeader('Content-Type','text/html');return res.end(html)}if(!['index.html','app.js','style.css','icon.svg'].includes(name)){res.statusCode=404;return res.end()}
+ const server=http.createServer((req,res)=>{const name=new URL(req.url,'http://localhost').pathname.slice(1);if(!name){res.setHeader('Content-Type','text/html');return res.end(req.url.includes('computer')?html.replace('src="/index.html"','src="/index.html?host=computer"'):html)}if(!['index.html','app.js','style.css','icon.svg'].includes(name)){res.statusCode=404;return res.end()}
   res.setHeader('Content-Type',name.endsWith('.js')?'text/javascript':name.endsWith('.css')?'text/css':name.endsWith('.svg')?'image/svg+xml':'text/html');res.end(fs.readFileSync(path.join(__dirname,name)))});
  await new Promise(r=>server.listen(0,'127.0.0.1',r));const browser=await chromium.launch({executablePath,headless:true});
  try{for(const size of [{width:480,height:360},{width:960,height:700}]){
@@ -30,6 +31,20 @@ e.source.postMessage({type:'atom:photos-result',id:d.id,result},'*')});</script>
   await f.getByRole('button',{name:'生成新作品'}).click();await f.getByText('Fixture: model unavailable',{exact:true}).waitFor();assert.equal(await f.locator('.ring').count(),0);
   await f.getByRole('button',{name:'返回相册'}).click();await f.getByText('照片已同步',{exact:true}).waitFor();const frame=p.frames()[1];await frame.evaluate(()=>window.suspendFixture());assert.equal(await f.locator('#root').innerText(),'');assert.deepEqual(errors,[]);
   await p.close();
- }console.log('Photo UI passed: fixed viewport, paging, comparison, generation failure and suspend cleanup (480×360 / 960×700).')}
+ }
+ const p=await browser.newPage({viewport:{width:960,height:700}});
+ await p.goto('http://127.0.0.1:'+server.address().port+'/?computer');const f=p.frameLocator('iframe');await f.getByText('照片已同步',{exact:true}).waitFor();
+ await f.locator('#photo-files').setInputFiles({name:'Apple.HEIC',mimeType:'',buffer:Buffer.from('test HEIC selection')});
+ await f.getByText('1 张照片已上传并同步',{exact:true}).waitFor();
+ assert.equal(await p.evaluate(()=>uploads[0].mime),'data:image/heic');
+ await f.locator('#photo-files').setInputFiles({name:'large.jpg',mimeType:'image/jpeg',buffer:Buffer.alloc(20*1024*1024,1)});
+ await f.getByText('1 张照片已上传并同步',{exact:true}).waitFor();
+ assert.equal(await p.evaluate(()=>uploads[1].bytes),20*1024*1024);
+ await f.locator('#photo-files').setInputFiles({name:'too-big.jpg',mimeType:'image/jpeg',buffer:Buffer.alloc(20*1024*1024+1,1)});
+ await f.getByText(/超过 20 MiB/).waitFor();assert.equal(await p.evaluate(()=>uploads.length),2);
+ await f.locator('#photo-files').setInputFiles({name:'unsupported.gif',mimeType:'image/gif',buffer:Buffer.from('GIF89a')});
+ await f.getByText(/格式不支持/).waitFor();assert.equal(await p.evaluate(()=>uploads.length),2);
+ await p.close();
+ console.log('Photo UI passed: fixed viewport, paging, comparison, generation failure and suspend cleanup (480×360 / 960×700).')}
  finally{await browser.close();await new Promise(r=>server.close(r))}
 })().catch(e=>{console.error(e);process.exitCode=1});

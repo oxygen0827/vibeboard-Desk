@@ -23,7 +23,7 @@ export function dashboard(companion,{port=8788}={}){
   if(req.method==='GET'&&url.pathname.startsWith('/api/studio/')){try{return send(200,await companion.studio.handle('GET',url.pathname.slice('/api/studio'.length)+url.search));}catch(e){return send(e.status||400,{error:e.message,code:e.code,...(e.status===409?{conflict:e.details}: {})});}}
   if(req.method==='GET'&&url.pathname==='/api/state')return send(200,{...companion.state(),csrf});
   if(req.method!=='POST'||req.headers.origin!==origin||req.headers['x-atom-csrf']!==csrf||!String(req.headers['content-type']).startsWith('application/json'))return send(403,{error:'请求来源无效'});
-  let text='';try{for await(const chunk of req){text+=chunk;if(Buffer.byteLength(text)>(url.pathname==='/api/studio/photos'?6*1024*1024:url.pathname.startsWith('/api/studio/')?2*1024*1024:32768))return send(413,{error:'请求过大'});}const body=JSON.parse(text||'{}');let result={ok:true};
+  let text='';try{for await(const chunk of req){text+=chunk;if(Buffer.byteLength(text)>(url.pathname==='/api/studio/photos'?28*1024*1024:url.pathname.startsWith('/api/studio/')?2*1024*1024:32768))return send(413,{error:'请求过大'});}const body=JSON.parse(text||'{}');let result={ok:true};
    if(url.pathname.startsWith('/api/studio/'))result=await companion.studio.handle('POST',url.pathname.slice('/api/studio'.length),body);
    else if(url.pathname==='/api/configure')await companion.configure(body);
    else if(url.pathname==='/api/projects')result=companion.addProject(body);

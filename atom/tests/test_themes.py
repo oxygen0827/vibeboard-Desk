@@ -38,7 +38,21 @@ class ThemeTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             p=Path(d)/'themes.json';p.write_text(json.dumps({'active':'sunshine','themes':[{'id':'mint','name':'Mint','tokens':{k:'#ffffff' for k in themes.KEYS}}]}))
             store=themes.ThemeStore(d)
-            self.assertEqual([t['id'] for t in store.list_themes()['themes']],['system'])
+            self.assertEqual([t['id'] for t in store.list_themes()['themes']],['system','system-dark'])
             self.assertEqual(themes.ThemeStore(d).active,'system')
             self.assertEqual(json.loads(p.read_text())['themes'],[])
             self.assertNotIn('#ffe49b',store.css())
+
+    def test_dark_appearance_persists_and_sets_native_controls(self):
+        with tempfile.TemporaryDirectory() as d:
+            store=themes.ThemeStore(d)
+            store.activate('system-dark')
+            loaded=themes.ThemeStore(d)
+            self.assertEqual(loaded.active,'system-dark')
+            self.assertIn('color-scheme:dark',loaded.css())
+            self.assertIn('--bg:#101114',loaded.css())
+            loaded.activate('system')
+            self.assertIn('color-scheme:light',loaded.css())
+            self.assertIn('--bg:#f2f2f7',loaded.css())
+            with self.assertRaises(ValueError):
+                loaded.install(dict(id='system-dark',name='Override',tokens={k:'#ffffff' for k in themes.KEYS}))

@@ -49,7 +49,7 @@ class MarketClient:
             if not token:raise BridgeError('请先登录应用市场账号',401,'market_login_required')
             headers['Authorization']='Bearer '+token
         body=None if data is None else json.dumps(data,ensure_ascii=False).encode('utf-8')
-        limit=6*1024*1024 if route=='photos' or route.startswith('photos/') or route.startswith('photos?') else 2*1024*1024
+        limit=28*1024*1024 if route=='photos' or route.startswith('photos/') or route.startswith('photos?') else 2*1024*1024
         if body and len(body)>limit:raise BridgeError('请求内容过大')
         try:
             with self.opener.open(Request(self.base()+'/market/v1/'+route,data=body,headers=headers),timeout=10) as response:

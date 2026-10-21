@@ -1,0 +1,9 @@
+{
+  "id": "clap-stage",
+  "name": "掌心节拍",
+  "description": "点按或拍手定速，木音、拍手与轻鼓，带可视节拍的桌面节奏舞台。",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "theme_ui": "controls",
+  "layout": "fullscreen"
+}

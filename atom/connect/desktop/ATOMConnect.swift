@@ -15,6 +15,12 @@ final class ConnectApplication: NSObject, NSApplicationDelegate, WKNavigationDel
         let config = WKWebViewConfiguration()
         config.userContentController.add(self, name: "chooseFolder")
         config.userContentController.add(self, name: "savePhoto")
+        config.userContentController.add(self, name: "appearance")
+        if let mode = UserDefaults.standard.string(forKey: "ATOMAppearance"), ["light", "dark"].contains(mode) {
+            NSApp.appearance = NSAppearance(named: mode == "dark" ? .darkAqua : .aqua)
+            let script = "window.atomNativeAppearance='\(mode)';if(document.documentElement){document.documentElement.dataset.appearance='\(mode)';document.documentElement.style.colorScheme='\(mode)';}"
+            config.userContentController.addUserScript(WKUserScript(source: script, injectionTime: .atDocumentStart, forMainFrameOnly: true))
+        }
         web = WKWebView(frame: .zero, configuration: config)
         web.navigationDelegate = self
         web.uiDelegate = self
@@ -36,7 +42,7 @@ final class ConnectApplication: NSObject, NSApplicationDelegate, WKNavigationDel
         quit.target = self; menu.addItem(quit)
         status.menu = menu
         NSApplication.shared.activate(ignoringOtherApps: true)
-        web.loadHTMLString("<html><body style='font:17px -apple-system;background:#f2f2f7;padding:60px;color:#1c1c1e'><h1>ATOM Connect</h1><p>正在启动本机连接服务…</p></body></html>", baseURL: nil)
+        web.loadHTMLString("<html><head><style>:root{color-scheme:light dark}body{font:17px -apple-system;background:Canvas;color:CanvasText;padding:60px}</style></head><body><h1>ATOM Connect</h1><p>正在启动本机连接服务…</p></body></html>", baseURL: nil)
         startWorker()
     }
     func startWorker() {
@@ -84,13 +90,28 @@ final class ConnectApplication: NSObject, NSApplicationDelegate, WKNavigationDel
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         guard message.frameInfo.isMainFrame, let url = message.frameInfo.request.url, let base = origin, url.scheme == base.scheme, url.host == base.host, url.port == base.port else { return }
         if message.name == "chooseFolder" { chooseFolder(); return }
+        if message.name == "appearance", let body = message.body as? [String: String], let mode = body["mode"], ["light", "dark"].contains(mode) {
+            UserDefaults.standard.set(mode, forKey: "ATOMAppearance")
+            let saved = UserDefaults.standard.string(forKey: "ATOMAppearance") == mode
+            if saved {
+                NSApp.appearance = NSAppearance(named: mode == "dark" ? .darkAqua : .aqua)
+                // The worker chooses a new port on launch, so native storage owns this preference.
+                // Refresh the document-start script too, including reloads in this session.
+                web.configuration.userContentController.removeAllUserScripts()
+                let script = "window.atomNativeAppearance='\(mode)';if(document.documentElement){document.documentElement.dataset.appearance='\(mode)';document.documentElement.style.colorScheme='\(mode)';}"
+                web.configuration.userContentController.addUserScript(WKUserScript(source: script, injectionTime: .atDocumentStart, forMainFrameOnly: true))
+            }
+            web.evaluateJavaScript("window.atomNativeAppearance='\(mode)';window.dispatchEvent(new CustomEvent('atom:appearance-saved',{detail:{mode:'\(mode)',ok:\(saved ? "true" : "false")}}))")
+            return
+        }
         if message.name == "savePhoto", let body = message.body as? [String: String], let requestID = body["id"], requestID.count < 128,
-           let value = body["data_url"], value.count <= 6 * 1024 * 1024,
-           let split = value.firstIndex(of: ","), ["data:image/jpeg;base64", "data:image/png;base64", "data:image/webp;base64"].contains(String(value[..<split])),
+           let value = body["data_url"], value.count <= 28 * 1024 * 1024,
+           let split = value.firstIndex(of: ","), ["data:image/jpeg;base64", "data:image/png;base64", "data:image/webp;base64", "data:image/heic;base64", "data:image/heif;base64"].contains(String(value[..<split])),
            let data = Data(base64Encoded: String(value[value.index(after: split)...])) {
             let panel = NSSavePanel()
             panel.nameFieldStringValue = (body["name"] ?? "photo").replacingOccurrences(of: "/", with: "_")
-            panel.allowedContentTypes = value.hasPrefix("data:image/png") ? [.png] : value.hasPrefix("data:image/webp") ? [.webP] : [.jpeg]
+            let mime = String(value[..<split]).replacingOccurrences(of: "data:", with: "").replacingOccurrences(of: ";base64", with: "")
+            panel.allowedContentTypes = [UTType(mimeType: mime) ?? .data]
             panel.beginSheetModal(for: window) { [weak self] response in
                 var result: [String: Any] = ["id": requestID, "ok": false, "error": "已取消导出"]
                 if response == .OK, let destination = panel.url {
@@ -106,7 +127,7 @@ final class ConnectApplication: NSObject, NSApplicationDelegate, WKNavigationDel
     func webView(_ webView: WKWebView, runOpenPanelWith parameters: WKOpenPanelParameters, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping ([URL]?) -> Void) {
         guard let url = frame.request.url, let base = origin, url.host == base.host, url.port == base.port, url.path.hasPrefix("/photo-album/") else { completionHandler(nil); return }
         let panel = NSOpenPanel(); panel.canChooseFiles = true; panel.canChooseDirectories = false
-        panel.allowsMultipleSelection = parameters.allowsMultipleSelection; panel.allowedContentTypes = [.jpeg, .png, .webP]
+        panel.allowsMultipleSelection = parameters.allowsMultipleSelection; panel.allowedContentTypes = [.jpeg, .png, .webP] + ["public.heic", "public.heif"].compactMap { UTType($0) }
         panel.beginSheetModal(for: window) { response in completionHandler(response == .OK ? Array(panel.urls.prefix(20)) : nil) }
     }
     @objc func chooseFolder() {

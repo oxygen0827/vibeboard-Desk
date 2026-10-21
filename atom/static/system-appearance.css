@@ -56,3 +56,32 @@ body.app-mode *{scrollbar-width:none!important}body.app-mode *::-webkit-scrollba
 body[data-view=settings] .page-heading,body[data-view=manager] .page-heading,body[data-view=developer] .page-heading{margin-bottom:13px}
 body[data-view=settings] .settings-menu{gap:0;border-radius:17px;padding:0 14px}body[data-view=settings] .settings-menu button{padding:10px 2px;min-height:56px;font-size:16px}body[data-view=settings] .settings-menu button span{font-size:11px}
 body[data-view=workshop] .page-heading h1{font-size:27px}body[data-view=workshop] #workshop-prompt{border-radius:16px;font-size:16px;line-height:1.65;padding:15px}
+
+/* Day / night share geometry. Only the system palette and icon dressing change. */
+.appearance-picker{display:flex;gap:10px;margin:0 0 4px;flex-shrink:0}
+.appearance-choice{display:flex;align-items:center;gap:10px;flex:1;min-width:0;min-height:64px;padding:8px 11px;background:var(--card);border:1.5px solid transparent;border-radius:15px;font-size:14px;color:var(--ink)}
+.appearance-choice[aria-pressed=true]{border-color:var(--accent)}
+.appearance-preview{width:42px;height:42px;flex:none;border-radius:10px;display:flex;align-items:center;justify-content:center;gap:3px;background:linear-gradient(145deg,#d8c8ec,#89a3dd);box-shadow:inset 0 0 0 1px #0000000a}
+.appearance-preview i{width:8px;height:12px;border-radius:3px;background:#ffffffd9}
+.appearance-preview.dark{background:linear-gradient(145deg,#16253e,#222037)}.appearance-preview.dark i{background:#88abdf}
+.appearance-check{margin-left:auto;color:var(--accent);font-size:14px;width:13px}
+.appearance-feedback{font-size:11px;line-height:16px;margin:0;min-height:0;flex-shrink:0}.appearance-feedback:empty{display:none}
+body[data-view=settings][data-subpage=personal] .settings-menu button{min-height:48px}
+body[data-view=settings][data-subpage=personal] .row{min-height:42px}
+:root[data-theme=system-dark]{color-scheme:dark}
+/* A static color-field wallpaper: luminous pigment around a quiet midnight center.
+   No blur filters, animation loops or additional canvas work on the RK3566. */
+:root[data-theme=system-dark] body[data-view=home]{background-color:#0a1121;background-image:radial-gradient(ellipse 72% 78% at -8% 2%,#2465a5 0%,#1c4b8766 43%,#12253d00 74%),radial-gradient(ellipse 62% 88% at 105% 8%,#743c9d 0%,#5c318677 46%,#241b3b00 80%),radial-gradient(ellipse 70% 64% at 92% 110%,#167b75 0%,#155f6577 47%,#0d253800 79%),radial-gradient(ellipse 64% 70% at 8% 105%,#394fa1 0%,#2b397366 48%,#161b3700 80%),linear-gradient(135deg,#102237,#18182f 60%,#0f2730)}
+:root[data-theme=system-dark] .app-tile .app-icon{background:linear-gradient(145deg,#2d3440,#1a202b)!important;color:var(--tile-glow,#a4c9ff)!important;box-shadow:0 5px 18px #00000050,inset 0 1px #ffffff16,inset 0 0 0 1px #ffffff08}
+:root[data-theme=system-dark] .app-tile[data-icon-tone=blue]{--tile-glow:#8bc4ff}:root[data-theme=system-dark] .app-tile[data-icon-tone=green]{--tile-glow:#8cddb0}:root[data-theme=system-dark] .app-tile[data-icon-tone=orange]{--tile-glow:#ffc17a}:root[data-theme=system-dark] .app-tile[data-icon-tone=yellow]{--tile-glow:#f5d682}:root[data-theme=system-dark] .app-tile[data-icon-tone=violet]{--tile-glow:#bdb2ff}:root[data-theme=system-dark] .app-tile[data-icon-tone=pink]{--tile-glow:#f1aec8}:root[data-theme=system-dark] .app-tile[data-icon-tone=cyan]{--tile-glow:#83d6dc}:root[data-theme=system-dark] .app-tile[data-icon-tone=indigo]{--tile-glow:#acbcff}:root[data-theme=system-dark] .app-tile[data-icon-tone=silver],:root[data-theme=system-dark] .app-tile[data-app=clock]{--tile-glow:#e1e6ee}
+:root[data-theme=system-dark] .app-name{color:#edf0f7;text-shadow:0 1px 4px #0008}
+:root[data-theme=system-dark] .desktop-status{color:#d9e1ee}
+:root[data-theme=system-dark] .page-tabs,:root[data-theme=system-dark] .timer #reset-timer{background:var(--line)}
+:root[data-theme=system-dark] .page-tabs .selected{background:var(--card);color:var(--ink);box-shadow:0 1px 5px #0004}
+:root[data-theme=system-dark] body[data-view=notes]{background:var(--bg)}
+:root[data-theme=system-dark] .voice-surface{background:radial-gradient(ellipse at 50% 30%,#293152,transparent 68%)}
+:root[data-theme=system-dark] .voice-orb{box-shadow:0 10px 40px #7893eb28,inset 0 0 18px #fff3}
+:root[data-theme=system-dark] #return-overlay{background:#242833f5;box-shadow:0 8px 30px #0008}
+:root[data-theme=system-dark] #return-toast{background:#e5eaf2f2;color:#19202c}
+:root[data-theme=system-dark] button.primary,:root[data-theme=system-dark] .toggle.on,:root[data-theme=system-dark] .timer #toggle-timer{color:var(--accent-ink)}
+:root[data-theme=system-dark] .installed .danger,:root[data-theme=system-dark] .app-action-danger,:root[data-theme=system-dark] #app-action-error{color:#ff8d85}

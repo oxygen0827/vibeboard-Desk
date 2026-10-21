@@ -14,8 +14,8 @@
   try{
    if(d.action==='login'){window.atomAlbumLogin?.();result={ok:true}}
    else if(d.action==='download'){
-    if(typeof body.data_url!=='string'||body.data_url.length>6*1024*1024||!/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(body.data_url))throw Error('下载内容无效');
-    const mime=body.data_url.slice(5,body.data_url.indexOf(';')),ext={'image/jpeg':'jpg','image/png':'png','image/webp':'webp'}[mime];body.name=String(body.name||'photo').replace(/[\\/]/g,'_').replace(/\.[^.]+$/,'')+'.'+ext;
+    if(typeof body.data_url!=='string'||body.data_url.length>28*1024*1024||!/^data:image\/(jpeg|png|webp|heic|heif);base64,[A-Za-z0-9+/=]+$/.test(body.data_url))throw Error('下载内容无效');
+    const mime=body.data_url.slice(5,body.data_url.indexOf(';')),ext={'image/jpeg':'jpg','image/png':'png','image/webp':'webp','image/heic':'heic','image/heif':'heif'}[mime];body.name=String(body.name||'photo').replace(/[\\/]/g,'_').replace(/\.[^.]+$/,'')+'.'+ext;
     if(window.webkit?.messageHandlers?.savePhoto){result=await new Promise((resolve,reject)=>{const id='export-'+crypto.randomUUID(),receive=e=>{if(e.detail.id!==id)return;window.removeEventListener('atom:photo-export',receive);clearTimeout(timer);e.detail.ok?resolve({ok:true}):reject(Error(e.detail.error||'导出未完成'))},timer=setTimeout(()=>{window.removeEventListener('atom:photo-export',receive);reject(Error('导出未完成'))},300000);window.addEventListener('atom:photo-export',receive);window.webkit.messageHandlers.savePhoto.postMessage({id,name:String(body.name||'photo'),data_url:body.data_url})})}
     else{const raw=atob(body.data_url.split(',')[1]),bytes=Uint8Array.from(raw,c=>c.charCodeAt(0)),blob=new Blob([bytes],{type:mime}),url=URL.createObjectURL(blob),a=document.createElement('a');
      a.href=url;a.download=String(body.name||'photo').replace(/[\\/]/g,'_');document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);result={ok:true};}

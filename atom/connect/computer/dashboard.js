@@ -1,7 +1,22 @@
+// Resolve before the first render; persistence belongs to this computer, not an app iframe.
+const appearanceKey='atom.connect.appearance.v1';
+let appearanceMode='light',appearanceStored=false,appearanceSaving=false;
+try{const saved=['light','dark'].includes(window.atomNativeAppearance)?window.atomNativeAppearance:localStorage.getItem(appearanceKey);appearanceStored=['light','dark'].includes(saved);appearanceMode=appearanceStored?saved:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');}catch{appearanceMode=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+document.documentElement.dataset.appearance=appearanceMode;
+function sendFrameAppearance(frame){try{frame.contentWindow?.postMessage({type:'atom:appearance',mode:appearanceMode},'*');}catch{}}
+function refreshAppearance(){document.documentElement.dataset.appearance=appearanceMode;document.querySelectorAll('[data-appearance-choice]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.appearanceChoice===appearanceMode)));document.querySelectorAll('iframe').forEach(sendFrameAppearance);}
+function persistAppearance(mode){if(window.webkit?.messageHandlers?.appearance)return new Promise((resolve,reject)=>{const done=e=>{if(e.detail?.mode!==mode)return;clearTimeout(timer);window.removeEventListener('atom:appearance-saved',done);e.detail.ok?resolve():reject(Error(e.detail.error||'无法保存外观'));},timer=setTimeout(()=>{window.removeEventListener('atom:appearance-saved',done);reject(Error('外观保存未完成，请重试'));},4000);window.addEventListener('atom:appearance-saved',done);window.webkit.messageHandlers.appearance.postMessage({mode});});localStorage.setItem(appearanceKey,mode);return Promise.resolve();}
+async function chooseAppearance(mode){if(!['light','dark'].includes(mode)||appearanceSaving)return;appearanceSaving=true;document.querySelectorAll('[data-appearance-choice]').forEach(button=>button.disabled=true);const feedback=document.getElementById('appearance-feedback');feedback.textContent='正在保存外观…';try{await persistAppearance(mode);appearanceStored=true;appearanceMode=mode;refreshAppearance();feedback.textContent='已设为'+(mode==='dark'?'暗黑':'白天')+'，下次打开仍会保留。';}catch(e){feedback.textContent=e.message||'无法保存外观，请重试。';}finally{appearanceSaving=false;document.querySelectorAll('[data-appearance-choice]').forEach(button=>button.disabled=false);}}
+document.addEventListener('click',e=>{const button=e.target.closest('[data-appearance-choice]');if(button)chooseAppearance(button.dataset.appearanceChoice);});
+const appearanceMedia=matchMedia('(prefers-color-scheme: dark)');appearanceMedia.addEventListener?.('change',e=>{if(!appearanceStored){appearanceMode=e.matches?'dark':'light';refreshAppearance();}});
+document.addEventListener('load',e=>{if(e.target.tagName==='IFRAME')sendFrameAppearance(e.target);},true);
+window.addEventListener('message',e=>{if(e.data?.type!=='atom:appearance-request')return;const frame=Array.from(document.querySelectorAll('iframe')).find(f=>f.contentWindow===e.source);if(frame)sendFrameAppearance(frame);});
+refreshAppearance();
+
 /* ATOM Connect local console: connection, computer agent and shell. Studio pages live in studio.js. */
 let csrf='',currentPage='overview',lastState=null,refreshing=false,taskFilter='all';
 const $=id=>document.getElementById(id);
-const pages=['overview','devices','tasks','agents','projects','notes','agenda','photos','market','creations'];
+const pages=['overview','devices','tasks','agents','projects','notes','agenda','photos','market','creations','settings'];
 const statuses={queued:'等待执行',running:'正在执行',waiting_approval:'等待审批',saving:'正在保存',completed:'已完成',failed:'失败',cancelled:'已取消',interrupted:'已中断',conflict:'有冲突'};
 const statusTone={queued:'info',running:'info',waiting_approval:'warn',saving:'info',completed:'ok',failed:'bad',cancelled:'',interrupted:'bad',conflict:'warn'};
 const ACTIVE=['queued','running','waiting_approval','saving'];
@@ -14,7 +29,7 @@ function row({icon:name,tone='',title,sub,mono=false,meta,end=[],onclick}){retur
 function emptyState(title,detail){return h('div',{class:'empty'},h('strong',{text:title}),detail||'');}
 function ago(value){if(!value)return'';const t=typeof value==='number'?(value<1e11?value*1000:value):Date.parse(value);if(!t)return'';const s=(Date.now()-t)/1000;if(s<60)return'刚刚';if(s<3600)return Math.floor(s/60)+' 分钟前';if(s<86400)return Math.floor(s/3600)+' 小时前';if(s<86400*7)return Math.floor(s/86400)+' 天前';return new Date(t).toLocaleDateString();}
 
-function showPage(page){if(!pages.includes(page))return;currentPage=page;document.querySelectorAll('[data-panel]').forEach(e=>e.hidden=e.dataset.panel!==page);document.querySelectorAll('nav [data-page]').forEach(e=>{const on=e.dataset.page===page;e.classList.toggle('selected',on);e.setAttribute('aria-current',on?'page':'false');});document.querySelector('main').scrollTop=0;window.dispatchEvent(new CustomEvent('atom:page',{detail:page}));}
+function showPage(page){if(!pages.includes(page))return;currentPage=page;document.querySelectorAll('[data-panel]').forEach(e=>e.hidden=e.dataset.panel!==page);document.querySelectorAll('aside [data-page]').forEach(e=>{const on=e.dataset.page===page;e.classList.toggle('selected',on);e.setAttribute('aria-current',on?'page':'false');});document.querySelector('main').scrollTop=0;window.dispatchEvent(new CustomEvent('atom:page',{detail:page}));}
 window.atomConnectPage=showPage;
 document.addEventListener('click',e=>{const target=e.target.closest('[data-page]');if(target)showPage(target.dataset.page);});
 

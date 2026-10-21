@@ -1,2 +1,3 @@
 # Image decoding only; relay, accounts and the source marketplace remain stdlib.
 Pillow==12.3.0
+pillow-heif==1.8.1

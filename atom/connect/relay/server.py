@@ -453,7 +453,7 @@ class Handler(BaseHTTPRequestHandler):
             require(len(self.path) <= 2048, 'URL too long', 414)
             require(self.command != 'POST' or self.headers.get('Origin') is None, 'Browser-origin mutations are not permitted', 403)
             length = int(self.headers.get('Content-Length', '0'))
-            limit = 6 * 1024 * 1024 if self.path == '/market/v1/photos' else (2 * 1024 * 1024 if url_is_market(self.path) else MAX_BODY)
+            limit = 28 * 1024 * 1024 if self.path == '/market/v1/photos' else (2 * 1024 * 1024 if url_is_market(self.path) else MAX_BODY)
             require(0 <= length <= limit, 'Request too large', 413)
             require(not self.headers.get('Transfer-Encoding'), 'Transfer encoding unsupported')
             self.connection.settimeout(10)
@@ -492,6 +492,10 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header('X-Content-Type-Options', 'nosniff')
         self.send_header('Connection', 'close')
         self.end_headers()
+        # A 20 MiB original becomes ~28 MiB JSON; allow slow downstream export
+        # after authentication without extending unauthenticated request reads.
+        if status == 200 and re.fullmatch(r'/market/v1/photos/[a-f0-9]{32}/original', self.path):
+            self.connection.settimeout(120)
         self.wfile.write(payload)
         self.close_connection = True
 

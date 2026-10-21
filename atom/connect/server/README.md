@@ -19,9 +19,9 @@
 
 将 `images.env.example` 复制为 `/etc/atom/images.env`，设为 root 所有、0600，填写方舟 API Key、已开通的模型 ID 和可使用该付费服务的 ATOM 账号 ID 白名单。配置修改后重启 `atom-connect`。服务不会把密钥返回给电脑或设备客户端。
 
-在现有 TLS server 中合并 `nginx-photos.conf`，`nginx -t` 成功后 reload。只有照片上传精确路径扩到 6 MiB，其他 API 保持原限制。`photo_media` 的原图/预览/缩略图 BLOB、元数据和持久生成任务均在市场 SQLite 中，因此现有备份与恢复流程完整覆盖相册。
+在现有 TLS server 中合并 `nginx-photos.conf`，`nginx -t` 成功后 reload。只有照片上传精确路径扩到 28 MiB（容纳 20 MiB 图片的 Base64），其他 API 保持原限制。`photo_media` 的原图/预览/缩略图 BLOB、元数据和持久生成任务均在市场 SQLite 中，因此现有备份与恢复流程完整覆盖相册。
 
-照片按账号隔离但服务器可读，只有用户点击生成才将参考预览与提示词发送给模型商；与便签/日程的端到端加密分开说明。单张上传上限 4 MiB / 1600 万像素；每账号 64 MiB，所有相册合计 128 MiB。详细行为见 [相册说明](../../official/photo-album/README.md)。
+照片按账号隔离但服务器可读，只有用户点击生成才将参考预览与提示词发送给模型商；与便签/日程的端到端加密分开说明。单张上传上限 20 MiB / 6400 万像素；每账号 64 MiB，所有相册合计 128 MiB。详细行为见 [相册说明](../../official/photo-album/README.md)。
 
 ## 首次部署
 

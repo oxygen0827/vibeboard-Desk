@@ -17,7 +17,17 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import parse_qs, urlsplit
 from urllib.request import Request, build_opener, HTTPRedirectHandler
 
-MAX_ORIGINAL = 4 * 1024 * 1024
+MAX_ORIGINAL = 20 * 1024 * 1024
+MAX_PIXELS = 64_000_000
+# Only previews are decoded; originals are retained byte-for-byte. Serialize
+# decoding so concurrent 48 MP imports don't multiply peak memory usage.
+DECODE_SLOT = threading.BoundedSemaphore(1)
+try:
+    from pillow_heif import register_heif_opener
+    register_heif_opener(thumbnails=False)
+    HEIF_AVAILABLE = True
+except ImportError:
+    HEIF_AVAILABLE = False
 USER_BYTES = 64 * 1024 * 1024
 TOTAL_BYTES = 128 * 1024 * 1024
 PHOTO_ID = re.compile(r'^[a-f0-9]{32}$')
@@ -53,14 +63,14 @@ def data_url(raw, mime):
 
 def decode_image(value):
     check(isinstance(value, str) and len(value) <= MAX_ORIGINAL * 4 // 3 + 100,
-          '照片最大支持 4 MiB；请先导出较小版本', 413)
-    match = re.fullmatch(r'data:(image/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)', value)
-    check(match, '请使用 JPEG、PNG 或 WebP 照片')
+          '单张照片最大支持 20 MiB，请导出较小版本后重试', 413)
+    match = re.fullmatch(r'data:(image/(?:jpeg|png|webp|heic|heif));base64,([A-Za-z0-9+/=]+)', value)
+    check(match, '支持 HEIC、HEIF、JPEG、PNG 和 WebP；请从相册导出这些格式')
     try:
         raw = base64.b64decode(match[2], validate=True)
     except ValueError:
         raise PhotoError('图片编码无效')
-    check(0 < len(raw) <= MAX_ORIGINAL, '照片过大', 413)
+    check(0 < len(raw) <= MAX_ORIGINAL, '单张照片最大支持 20 MiB', 413)
     return raw, match[1]
 
 
@@ -69,25 +79,47 @@ def prepare(raw, declared=None):
         from PIL import Image, ImageOps
     except ImportError:
         raise PhotoError('相册服务缺少 Pillow 图片处理依赖', 503)
+    check(declared not in ('image/heic', 'image/heif') or HEIF_AVAILABLE,
+          '服务器尚未启用 HEIC 解码，请更新相册服务后重试', 503)
     try:
-        with Image.open(io.BytesIO(raw)) as source:
-            mime = {'JPEG': 'image/jpeg', 'PNG': 'image/png', 'WEBP': 'image/webp'}.get(source.format)
-            check(mime and (declared is None or mime == declared), '图片内容与格式不符')
-            check(0 < source.width * source.height <= 16000000, '照片最多支持 1600 万像素')
-            check(getattr(source, 'n_frames', 1) == 1, '请上传静态照片')
-            source.load()
-            image = ImageOps.exif_transpose(source).convert('RGBA')
-        width, height = image.size
-        flat = Image.new('RGB', image.size, 'white')
-        flat.paste(image, mask=image.getchannel('A'))
-        outputs = []
-        for size, quality in (((1280, 1280), 84), ((240, 180), 70)):
-            copy = flat.copy()
-            copy.thumbnail(size, Image.Resampling.LANCZOS if hasattr(Image, 'Resampling') else Image.LANCZOS)
-            out = io.BytesIO()
-            copy.save(out, format='JPEG', quality=quality, optimize=True)
-            outputs.append(out.getvalue())
-        return mime, width, height, outputs[0], outputs[1]
+        with DECODE_SLOT:
+            with Image.open(io.BytesIO(raw)) as source:
+                mime = {'JPEG': 'image/jpeg', 'PNG': 'image/png', 'WEBP': 'image/webp', 'HEIF': 'image/heic'}.get(source.format)
+                heif = source.format == 'HEIF'
+                check(mime and (declared is None or mime == declared or heif and declared == 'image/heif'),
+                      '图片内容与格式不符，请重新从相册导出')
+                if heif:
+                    # HEIF can contain a primary still plus additional images.
+                    # Display its primary image without discarding the original container.
+                    check(source.n_frames <= 32, 'HEIF 内图片数量过多，请单独导出主照片')
+                    for index in range(source.n_frames):
+                        source.seek(index)
+                        if source.info.get('primary'):
+                            break
+                    else:
+                        source.seek(0)
+                    if declared == 'image/heif':
+                        mime = declared
+                else:
+                    check(getattr(source, 'n_frames', 1) == 1, '请上传静态照片')
+                check(0 < source.width * source.height <= MAX_PIXELS, '照片最多支持 6400 万像素，请导出较小分辨率')
+                width, height = source.size
+                if source.getexif().get(274) in (5, 6, 7, 8):
+                    width, height = height, width
+                # Resize before transpose/alpha conversion: a full-resolution RGBA
+                # copy of every 48 MP iPhone photo would waste hundreds of MiB.
+                source.thumbnail((1280, 1280), Image.Resampling.LANCZOS)
+                image = ImageOps.exif_transpose(source).convert('RGBA')
+            flat = Image.new('RGB', image.size, 'white')
+            flat.paste(image, mask=image.getchannel('A'))
+            outputs = []
+            for size, quality in (((1280, 1280), 84), ((240, 180), 70)):
+                copy = flat.copy()
+                copy.thumbnail(size, Image.Resampling.LANCZOS if hasattr(Image, 'Resampling') else Image.LANCZOS)
+                out = io.BytesIO()
+                copy.save(out, format='JPEG', quality=quality, optimize=True)
+                outputs.append(out.getvalue())
+            return mime, width, height, outputs[0], outputs[1]
     except PhotoError:
         raise
     except Exception:
@@ -212,6 +244,7 @@ class PhotoLibrary:
                 used = self.m.row('SELECT COALESCE(SUM(bytes),0) size,COUNT(*) n FROM photos WHERE user=?', (uid,))
                 return dict(user={'id': uid, 'username': user['username']}, generation_enabled=self.provider.enabled(uid),
                             provider='火山方舟', model=self.provider.model, used_bytes=used['size'], limit_bytes=USER_BYTES,
+                            max_original_bytes=MAX_ORIGINAL, max_pixels=MAX_PIXELS,
                             total=used['n'], styles=[{'id': k, 'name': v[0]} for k, v in STYLES.items()])
         if suffix == '' and method == 'GET':
             q = parse_qs(parsed.query)
