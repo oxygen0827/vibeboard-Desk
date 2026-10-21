@@ -34,3 +34,7 @@ jobs:
           npm --prefix atom run test:runtime
       - name: Browser applications (fixture APIs)
         run: npm --prefix atom run test:ui
+      - name: Creative experiences and product guide
+        run: |
+          npm --prefix atom run test:experiences
+          npm --prefix atom run test:site

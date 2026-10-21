@@ -1,0 +1,9 @@
+{
+  "id": "language-alchemy",
+  "name": "语言炼金",
+  "description": "用语言雕刻光与物质，真实 WebGL 材质交互。",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "theme_ui": "controls",
+  "layout": "fullscreen"
+}

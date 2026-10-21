@@ -3,11 +3,17 @@
   "version": "0.3.0",
   "private": true,
   "description": "Browser regression tools for the ATOM device applications",
-  "engines": {"node": ">=24"},
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
     "test:ui": "node market-app/ui.test.cjs && node official/clients.test.cjs && node computer-app/ui.test.cjs",
     "test:runtime": "node tests/app-host.test.cjs && node tests/app-runtime.test.cjs",
-    "test:computer": "node --test connect/computer/test/*.test.mjs"
+    "test:computer": "node --test connect/computer/test/*.test.mjs",
+    "test:experiences": "node experiences/world/test.cjs && node experiences/visual/ui.test.cjs && node experiences/agents/ui.test.cjs",
+    "test:site": "node site/test.cjs"
   },
-  "devDependencies": {"playwright": "1.62.1"}
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
 }

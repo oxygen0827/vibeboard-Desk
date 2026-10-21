@@ -78,6 +78,8 @@ def features(http):
             http.market = MarketClient(state, http.connect)
             from robot import RobotTalk
             http.robot = RobotTalk()
+            from experiences import Experiences
+            http.experiences = Experiences()
             from release_store import ReleaseStore
             http.releases = ReleaseStore(state / 'app-releases')
     return http
@@ -566,6 +568,14 @@ class Handler(SimpleHTTPRequestHandler):
                     recording = service.voice.recording_path(data.get('recording_id'))
                     result = transcribe(service.workshop.read_private_config(), recording)
                     recording.unlink()
+                else: raise ValueError('unknown endpoint')
+                self.json_response(200, result)
+            elif path.startswith('/api/experiences/'):
+                service = features(self.server)
+                action = path.rsplit('/', 1)[-1]
+                if action == 'generate': result = service.experiences.start(service.workshop.read_private_config(), data)
+                elif action == 'job': result = service.experiences.status(data.get('job_id'), data.get('kind'))
+                elif action == 'cancel': result = service.experiences.cancel(data.get('job_id'), data.get('kind'))
                 else: raise ValueError('unknown endpoint')
                 self.json_response(200, result)
             elif path.startswith('/api/robot/'):

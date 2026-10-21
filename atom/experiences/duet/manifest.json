@@ -1,0 +1,9 @@
+{
+  "id": "ai-duet",
+  "name": "合奏伙伴",
+  "description": "先弹奏一段，再让 AI 回应你的旋律。",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "theme_ui": "controls",
+  "layout": "fullscreen"
+}
