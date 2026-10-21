@@ -1,0 +1,9 @@
+[Unit]
+Description=Start an ATOM system update when the service requests one
+
+[Path]
+PathExists=/home/linaro/atom/state/update/request.json
+Unit=atom-update.service
+
+[Install]
+WantedBy=multi-user.target

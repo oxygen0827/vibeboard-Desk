@@ -26,6 +26,7 @@ def build(destination):
     destination.mkdir()  # refuse to merge into an existing device tree
     for source in ROOT.glob('*.py'):
         shutil.copy2(str(source), str(destination / source.name))
+    shutil.copy2(str(ROOT / 'VERSION'), str(destination / 'VERSION'))
     for name in ('static', 'deploy', 'templates'):
         shutil.copytree(str(ROOT / name), str(destination / name),
                         ignore=shutil.ignore_patterns('__pycache__', '*.pyc', '.DS_Store'))

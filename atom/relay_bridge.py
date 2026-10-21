@@ -143,7 +143,7 @@ class DeviceBridge:
             if not config.get('token'): raise BridgeError('设备尚未完成注册')
             headers['Authorization'] = 'Bearer ' + config['token']
         body = None if data is None else json.dumps(data, ensure_ascii=False).encode('utf-8')
-        if body and len(body) > 64 * 1024: raise BridgeError('请求内容过大')
+        if body and len(body) > (96 * 1024 if path == '/v1/device/snapshot' else 64 * 1024): raise BridgeError('请求内容过大')
         req = Request(config['relay_url'] + path, data=body, headers=headers)
         try:
             with self.opener.open(req, timeout=6) as response:

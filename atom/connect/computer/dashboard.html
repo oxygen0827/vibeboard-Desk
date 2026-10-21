@@ -112,6 +112,7 @@
 <section data-panel="simulator" hidden>
   <header class="page-head"><div><h1>模拟设备</h1><p id="sim-sub">在这台 Mac 上运行 ATOM 小电脑和全部应用</p></div>
     <div class="head-actions"><span id="sim-pill"></span><button class="btn" id="sim-pair" hidden>经中继配对</button><button class="btn" id="sim-toggle">启动</button></div></header>
+  <div class="sim-mirror"><select id="mirror-device" aria-label="选择镜像来源"><option value="">选择已配对的真机</option></select><button class="btn" id="mirror-start">同步真机数据</button><label><input id="mirror-auto" type="checkbox">持续跟随</label><span id="mirror-note" class="muted">在小电脑「设置 → 数据与恢复」开启同步</span></div>
   <div class="sim-stage card" id="sim-stage"><div class="empty" id="sim-empty"><strong>模拟设备未启动</strong><span id="sim-empty-detail">点「启动」后，屏幕会显示在这里。</span></div><iframe id="sim-frame" title="ATOM 模拟设备" hidden allow="autoplay; microphone"></iframe></div>
 </section>
 

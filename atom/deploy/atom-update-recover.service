@@ -1,0 +1,16 @@
+[Unit]
+Description=Recover an interrupted ATOM update before starting the desktop service
+Before=atom.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+User=linaro
+Environment=ATOM_ROOT=/home/linaro/atom
+ExecStart=/usr/bin/python3 /home/linaro/.local/lib/atom/system_update.py recover
+NoNewPrivileges=true
+UMask=0077
+TimeoutStartSec=300
+
+[Install]
+WantedBy=multi-user.target

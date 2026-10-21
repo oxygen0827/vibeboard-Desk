@@ -179,6 +179,7 @@ def main():
     ThreadingHTTPServer.request_queue_size = 128
     httpd = ThreadingHTTPServer(('127.0.0.1', args.port), SimulatorHandler)
     httpd.apps_root = apps_root
+    httpd.is_simulator = True
     httpd.settings_path = home / 'state' / 'settings.json'
     httpd.settings_path.parent.mkdir(parents=True, exist_ok=True)
     url = 'http://127.0.0.1:%d/simulator' % args.port

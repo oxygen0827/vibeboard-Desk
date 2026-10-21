@@ -1,0 +1,12 @@
+[Unit]
+Description=Install a verified ATOM system update with automatic rollback
+
+[Service]
+Type=oneshot
+User=linaro
+WorkingDirectory=/home/linaro
+Environment=ATOM_ROOT=/home/linaro/atom
+ExecStart=/usr/bin/python3 /home/linaro/.local/lib/atom/system_update.py apply
+NoNewPrivileges=true
+UMask=0077
+TimeoutStartSec=600

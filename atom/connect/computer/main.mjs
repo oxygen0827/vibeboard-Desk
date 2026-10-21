@@ -5,7 +5,7 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {Companion} from './companion.mjs';
 import {previewHTML,previewCSP} from './preview.mjs';
-import {simulatorState,pairSimulator,SIMULATOR_ORIGIN} from './simulator.mjs';
+import {simulatorState,pairSimulator,mirrorDevice,SIMULATOR_ORIGIN} from './simulator.mjs';
 export function dashboard(companion,{port=8788}={}){
  const session=crypto.randomUUID(),csrf=crypto.randomUUID();let origin;
  const server=http.createServer(async(req,res)=>{
@@ -34,6 +34,7 @@ export function dashboard(companion,{port=8788}={}){
    else if(url.pathname==='/api/pair')result=await companion.request('/v1/pair/claim',{code:String(body.code||'').trim(),public_key:companion.publicKey()});
    else if(url.pathname==='/api/unpair'){result=await companion.request('/v1/pair/remove',{client_id:String(body.client_id||'')});companion.forgetPeer(String(body.client_id||''));companion.relayState=await companion.request('/v1/state');}
    else if(url.pathname==='/api/account/invite')result=await companion.request('/v1/pair/invite',{device_id:String(body.device_id||''),public_key:companion.publicKey()});
+   else if(url.pathname==='/api/simulator/mirror')result=await mirrorDevice(companion,body.device_id,{confirm:body.confirm});
    else if(url.pathname==='/api/simulator/pair')result=await pairSimulator(companion);
    else if(url.pathname==='/api/diagnostics')result={agents:await companion.diagnose()};
    else return send(404,{error:'接口不存在'});

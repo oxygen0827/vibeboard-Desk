@@ -441,6 +441,41 @@ class RelayTests(unittest.TestCase):
             for s in (upstream, server):
                 s.shutdown(); s.server_close()
 
+    def test_system_releases_are_public_and_read_only(self):
+        self.assertEqual(self.relay.handle('GET', '/market/v1/system/latest'), {}, 'no release published yet')
+        folder = os.path.join(self.tmp.name, 'system'); os.makedirs(folder)
+        with open(os.path.join(folder, 'latest.json'), 'w') as f: json.dump({'version': '2026.1.1', 'signature': 'x'}, f)
+        with open(os.path.join(folder, '2026.1.1.tar.gz'), 'wb') as f: f.write(b'pkg')
+        self.assertEqual(self.relay.handle('GET', '/market/v1/system/latest')['version'], '2026.1.1')
+        self.assertEqual(self.relay.handle('GET', '/market/v1/system/package/2026.1.1')['data'], 'cGtn')
+        for path in ('/market/v1/system/package/..%2Fstate', '/market/v1/system/package/9.9', '/market/v1/system/other'):
+            with self.assertRaises(module.MarketError) as caught:
+                self.relay.handle('GET', path)
+            self.assertEqual(caught.exception.status, 404)
+        with self.assertRaises(module.MarketError):
+            self.relay.handle('POST', '/market/v1/system/latest', body={})
+
+    def test_snapshot_encrypted_pair_scope_change_detection_and_removal(self):
+        self.pair()
+        envelope={'v':1,'iv':'A'*16,'ct':'B'*40}
+        body={'computer_id':self.pc['client_id'],'version':'a'*64,'envelope':envelope}
+        self.denied(lambda:self.call(self.device,'/v1/device/snapshot',body),403)
+        for client,other in [(self.device,self.pc),(self.pc,self.device)]:
+            self.call(client,'/v1/pair/keys',{'client_id':other['client_id'],'public_key':'A'*43})
+        self.call(self.device,'/v1/device/snapshot',body)
+        path='/v1/device/snapshot/'+self.device['client_id']
+        self.assertEqual(self.call(self.pc,path)['envelope'],envelope)
+        self.denied(lambda:self.call(self.otherpc,path),403)
+        meta=self.call(self.pc,'/v1/state')['paired'][0]['snapshot']
+        self.now[0]+=10
+        self.call(self.device,'/v1/device/snapshot',body)
+        self.assertEqual(self.call(self.pc,'/v1/state')['paired'][0]['snapshot'],meta)
+        self.call(self.device,'/v1/device/snapshot/clear',{})
+        self.denied(lambda:self.call(self.pc,path),404)
+        self.call(self.device,'/v1/device/snapshot',body)
+        self.call(self.device,'/v1/pair/remove',{'client_id':self.pc['client_id']})
+        self.assertFalse(self.relay.one('SELECT 1 FROM snapshots'))
+
     def test_auth_roles_and_bounds(self):
         self.denied(lambda: self.relay.handle('GET', '/v1/state', self.device['client_id']), 401)
         self.denied(lambda: self.call(self.pc, '/v1/pair/code', {}), 403)

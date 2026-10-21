@@ -140,6 +140,7 @@ window.addEventListener('atom:simulator',e=>{simNative=e.detail?.state||'stopped
 async function refreshSimulator(){if(!devtools){simState=null;renderLinks();return;}if(simLoading)return;simLoading=true;try{simState=await api('simulator');}catch{simState={running:false};}finally{simLoading=false;}renderSimulator();renderLinks();}
 function setWire(id,tone,label){const w=$(id);w.className='wire '+(tone||'');const l=$(id+'-label');if(l)l.textContent=label||'';}
 function renderSimulator(){
+  renderMirror();
   const running=!!simState?.running,starting=simNative==='starting'&&!running;
   $('nav-simulator').className='nav-dot '+(running?'ok':simNative==='error'?'bad':'');
   $('sim-pill').replaceChildren(pill(running?'运行中':starting?'正在启动':simNative==='error'?'已停止':'未启动',running?'ok':starting?'info':simNative==='error'?'bad':''));
@@ -214,3 +215,12 @@ function renderPeers(r){const list=$('account-peers');
     end:p.paired||p.pending?[]:[h('button',{class:'btn small primary',text:'连接',onclick:()=>invitePeer(p)})]})));}
 async function invitePeer(p){try{await api('account/invite',{device_id:p.client_id});note('已向 '+p.name+' 发出连接请求，请在小电脑上点「允许连接」');}catch(e){note(e.message,true);}refreshPeers();}
 window.addEventListener('atom:account',refreshPeers);refreshPeers();setInterval(refreshPeers,5000);
+
+var mirrorVersion='',mirrorBusy=false,mirrorAuthorized=false;
+function renderMirror(){const select=$('mirror-device');if(!select)return;const id=select.value,peers=(lastState?.paired||[]).filter(p=>p.client_id!==simState?.device?.client_id&&p.e2e==='on');const options=peers.map(p=>p.client_id+'|'+p.name).join();if(select.dataset.options!==options){select.replaceChildren(new Option('选择已配对的真机',''),...peers.map(p=>new Option(p.name,p.client_id)));select.dataset.options=options;select.value=id;}
+$('mirror-start').disabled=mirrorBusy||!simState?.running||!select.value;
+const peer=peers.find(p=>p.client_id===select.value);if($('mirror-auto').checked&&mirrorAuthorized&&peer?.snapshot?.version&&peer.snapshot.version!==mirrorVersion&&!mirrorBusy&&simState?.running)void syncMirror(false);}
+async function syncMirror(ask=true){const id=$('mirror-device').value;if(!id||mirrorBusy)return;if(ask&&!confirm('用这台真机的桌面布局与应用记录覆盖模拟设备？真机不会被修改。'))return;mirrorAuthorized=true;mirrorBusy=true;renderMirror();$('mirror-note').textContent='正在同步…';try{const r=await api('simulator/mirror',{device_id:id,confirm:true});mirrorVersion=r.version;$('mirror-note').textContent='已送达模拟设备 · 打开画面后载入 · '+new Date(r.updated*1000).toLocaleTimeString();}catch(e){$('mirror-note').textContent=e.message;$('mirror-auto').checked=false;}finally{mirrorBusy=false;renderMirror();}}
+$('mirror-start').onclick=()=>syncMirror(true);
+$('mirror-device').onchange=()=>{mirrorVersion='';mirrorAuthorized=false;$('mirror-auto').checked=false;renderMirror();};
+$('mirror-auto').onchange=()=>{if($('mirror-auto').checked)void syncMirror(true);};

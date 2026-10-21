@@ -18,6 +18,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from marketplace.service import Marketplace, MarketError
 from marketplace.ai import OfficialAI
+from marketplace.releases import Releases
 
 TERMINAL = {'completed', 'failed', 'cancelled', 'interrupted'}
 STATUSES = {'queued', 'running', 'waiting_approval'} | TERMINAL
@@ -78,6 +79,7 @@ class Relay:
         self.clock, self.lease = clock, lease
         market_path = str(Path(path).with_name(Path(path).stem + '.marketplace.sqlite3')) if path != ':memory:' else ':memory:'
         self.marketplace = Marketplace(market_path, clock=clock)
+        self.releases = Releases(Path(path).parent / 'system' if path != ':memory:' else Path('/nonexistent'))
         self.ai = OfficialAI(str(Path(path).with_name(Path(path).stem + '.ai.sqlite3')) if path != ':memory:' else ':memory:', self.marketplace, clock=clock)
         self.lock = threading.RLock()
         if path != ':memory:':
@@ -102,6 +104,7 @@ class Relay:
         CREATE TABLE IF NOT EXISTS events(task TEXT, event_id TEXT, seq INTEGER, data TEXT, PRIMARY KEY(task,event_id), UNIQUE(task,seq));
         CREATE TABLE IF NOT EXISTS commands(id TEXT PRIMARY KEY, computer TEXT, task TEXT, data TEXT, acked INTEGER DEFAULT 0);
         CREATE TABLE IF NOT EXISTS approvals(task TEXT, request TEXT, data TEXT, answered INTEGER DEFAULT 0, PRIMARY KEY(task,request));
+        CREATE TABLE IF NOT EXISTS snapshots(device TEXT, computer TEXT, version TEXT, envelope TEXT, updated REAL, PRIMARY KEY(device,computer));
         ''')
         for table, column in (('bindings', 'device_key'), ('bindings', 'computer_key'), ('requests', 'computer_key'), ('clients', 'account')):
             if column not in {r[1] for r in self.db.execute('PRAGMA table_info(' + table + ')')}:
@@ -144,6 +147,8 @@ class Relay:
                         (item['id'], computer, task, json.dumps(item)))
 
     def handle(self, method, target, token='', body=None, peer='local'):
+        if urllib.parse.urlsplit(target).path.startswith('/market/v1/system/'):
+            return self.releases.handle(method, urllib.parse.urlsplit(target).path.rstrip('/'))
         if urllib.parse.urlsplit(target).path.startswith('/market/v1/ai/'):
             # Outside every lock: a model call takes minutes and must not stall the marketplace.
             return self.ai.handle(method, urllib.parse.urlsplit(target).path.rstrip('/'), token, body or {})
@@ -181,6 +186,9 @@ class Relay:
                 paired.append(dict(client_id=row['id'], name=row['name'], online=now-row['heartbeat'] < self.lease,
                                    projects=meta.get('projects', []), agents=meta.get('agents', []),
                                    public_key=row[other + '_key'], own_key=row[role + '_key']))
+                if role == 'computer':
+                    snapshot = self.one('SELECT version,updated FROM snapshots WHERE device=? AND computer=?', (row['id'],cid))
+                    if snapshot: paired[-1]['snapshot'] = dict(version=snapshot['version'], updated=snapshot['updated'])
                 if row['role'] == 'computer' and isinstance(meta.get('activity'), dict):
                     paired[-1]['activity'] = meta['activity']
             requests = [dict(request_id=r['id'], computer_id=r['computer'], computer_name=r['name']) for r in
@@ -192,6 +200,30 @@ class Relay:
                         item.pop(key)
                         item['artifact_available'] = True
             return dict(client_id=cid, role=role, paired=paired, pair_requests=requests, tasks=tasks)
+        if method == 'POST' and path == '/v1/device/snapshot/clear':
+            only('device')
+            self.db.execute('DELETE FROM snapshots WHERE device=?', (cid,))
+            return {'ok': True}
+        if method == 'POST' and path == '/v1/device/snapshot':
+            only('device')
+            computer = string(body, 'computer_id', 100)
+            bound = self.binding(cid, computer)
+            require(bound and bound['device_key'] and bound['computer_key'], 'Encrypted pairing required', 403)
+            version = string(body, 'version', 64)
+            require(re.fullmatch('[a-f0-9]{64}', version), 'Invalid snapshot version')
+            envelope = sealed(body, 'envelope', 65536)
+            require(len(json.dumps(envelope)) <= 90000, 'Snapshot too large', 413)
+            old = self.one('SELECT version FROM snapshots WHERE device=? AND computer=?', (cid,computer))
+            if not old or old['version'] != version:
+                self.db.execute('INSERT OR REPLACE INTO snapshots VALUES(?,?,?,?,?)', (cid,computer,version,json.dumps(envelope),now))
+            return {'ok': True, 'version': version}
+        if method == 'GET' and path.startswith('/v1/device/snapshot/'):
+            only('computer')
+            device = path.rsplit('/',1)[-1]
+            require(self.binding(device,cid), 'Pairing required', 403)
+            snapshot = self.one('SELECT version,envelope,updated FROM snapshots WHERE device=? AND computer=?', (device,cid))
+            require(snapshot, 'Device has not shared a snapshot', 404)
+            return dict(version=snapshot['version'], envelope=json.loads(snapshot['envelope']), updated=snapshot['updated'])
         if method == 'POST' and path == '/v1/pair/code':
             only('device')
             code = secrets.token_hex(6).upper()
@@ -275,6 +307,7 @@ class Relay:
             device, computer = (cid, other) if role == 'device' else (other, cid)
             require(self.one('SELECT 1 FROM bindings WHERE device=? AND computer=?', (device, computer)), 'Pairing not found', 404)
             self.db.execute('DELETE FROM bindings WHERE device=? AND computer=?', (device, computer))
+            self.db.execute('DELETE FROM snapshots WHERE device=? AND computer=?', (device, computer))
             self.db.execute("UPDATE requests SET status='revoked' WHERE device=? AND computer=? AND status='pending'", (device, computer))
             for row in self.rows('SELECT id, data FROM tasks WHERE device=? AND computer=?', (device, computer)):
                 task = json.loads(row['data'])

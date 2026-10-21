@@ -211,7 +211,8 @@ final class SimulatorController: NSObject {
         guard let resources = Bundle.main.resourceURL else { return }
         let script = resources.appendingPathComponent("device/tools/simulator.py")
         let seed = resources.appendingPathComponent("device/seed-apps")
-        let python = URL(fileURLWithPath: "/usr/bin/python3")
+        let embedded = resources.appendingPathComponent("runtime/python/bin/python3")
+        let python = FileManager.default.isExecutableFile(atPath: embedded.path) ? embedded : URL(fileURLWithPath: "/usr/bin/python3")
         guard FileManager.default.fileExists(atPath: script.path) else { report?("error", "安装包里没有模拟器，请用最新的构建脚本重新生成 ATOM Connect。"); return }
         guard hasPython(python) else { report?("error", "模拟设备需要 macOS 自带的 Python 3。请在终端运行 xcode-select --install 安装命令行工具后再启动。"); return }
         let home = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0].appendingPathComponent("ATOMConnect/simulator")
@@ -241,6 +242,7 @@ final class SimulatorController: NSObject {
     }
 
     func hasPython(_ url: URL) -> Bool {
+        if url.path != "/usr/bin/python3" { return FileManager.default.isExecutableFile(atPath: url.path) }
         // /usr/bin/python3 is a stub until the Command Line Tools are installed.
         let check = Process(); check.executableURL = URL(fileURLWithPath: "/usr/bin/xcode-select"); check.arguments = ["-p"]
         check.standardOutput = FileHandle.nullDevice; check.standardError = FileHandle.nullDevice

@@ -20,6 +20,7 @@ node_modules/
 *.sqlite
 *.db
 *.key
+!atom/deploy/release-public.key
 *.pem
 *.p12
 *.pfx

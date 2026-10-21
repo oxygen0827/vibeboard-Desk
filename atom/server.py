@@ -20,6 +20,7 @@ from urllib.parse import urlsplit, unquote
 BASE = Path(__file__).resolve().parent
 if str(BASE) not in sys.path: sys.path.insert(0, str(BASE))
 from app_icons import ensure_icon, validate_svg, theme_glyph
+import system_update
 from relay_bridge import DeviceBridge, BridgeError
 MAX_BODY = 2 * 1024 * 1024
 ID = re.compile(r'^[a-z][a-z0-9_-]{0,47}$')
@@ -67,14 +68,20 @@ def model_config(service):
     Text generation and voice (robot chat, transcription, speech) are decided separately, so a person
     can bring their own generation key and still use the official voice, or the other way round."""
     config = service.workshop.read_private_config()
-    own_voice = config.get('stt_api_key') or config.get('tts_api_key')
+    own_voice = config.get('stt_api_key') and config.get('tts_api_key')
     if config.get('api_key') and own_voice: return config
     account = service.market.current()
     if not account.get('token'): return config
     import official_ai
     relay, token = service.market.base(), account['token']
     if not config.get('api_key'): config = official_ai.overlay(config, relay, token)
-    if not own_voice: config = official_ai.voice_overlay(config, relay, token)
+    if not own_voice:
+        official_voice = official_ai.voice_overlay(config, relay, token)
+        for kind in ('stt', 'tts'):
+            if not config.get(kind + '_api_key'):
+                for suffix in ('_api_key', '_base_url', '_model'):
+                    config[kind + suffix] = official_voice[kind + suffix]
+        config['official_voice'] = True
     return config
 
 
@@ -104,6 +111,8 @@ def features(http):
             http.voice = VoiceRecorder(state)
             http.speech = SpeechPlayer(state)
             http.connect = DeviceBridge(state)
+            from device_data import DeviceData
+            http.device_data = DeviceData(state, http.connect)
             from market_client import MarketClient
             http.market = MarketClient(state, http.connect)
             from robot import RobotTalk
@@ -413,17 +422,19 @@ class Handler(SimpleHTTPRequestHandler):
                 elif path == '/api/voice/status':
                     result = service.voice.public_status()
                     result['reason'] = result.get('error') or ('' if result['available'] else '按录音时尝试初始化麦克风')
-                    config=service.workshop.public_config()
-                    result['stt_configured'] = bool(config['stt_api_key_set'] and config['stt_base_url'] and config['stt_model'])
-                    result['tts_configured'] = bool(config['tts_api_key_set'] and config['tts_base_url'] and config['tts_model'])
+                    config=model_config(service)
+                    result['stt_configured'] = all(config.get(k) for k in ('stt_api_key','stt_base_url','stt_model'))
+                    result['tts_configured'] = all(config.get(k) for k in ('tts_api_key','tts_base_url','tts_model'))
                 else: result = service.workshop.get_job(path.rsplit('/', 1)[-1])
                 self.json_response(200, result)
             except KeyError: self.json_response(404, dict(error='生成任务不存在或已失效'))
             except (ValueError, TypeError): self.json_response(400, dict(error='请求无效'))
         elif path == '/api/health':
-            self.json_response(200, dict(ok=True, service='atom', version='0.5.0'))
+            self.json_response(200, dict(ok=True, service='atom', version=system_update.RUNNING_VERSION))
         elif path == '/api/status':
             self.json_response(200, system_status())
+        elif path == '/api/system/update':
+            self.json_response(200, system_update.status())
         elif path == '/api/wifi':
             import wifi
             try: self.json_response(200, dict(status=wifi.status(), networks=wifi.networks()))
@@ -504,7 +515,50 @@ class Handler(SimpleHTTPRequestHandler):
             if not isinstance(data, dict):
                 raise ValueError('JSON object required')
             path = urlsplit(self.path).path
-            if path.startswith('/api/market/'):
+            if path.startswith('/api/device-data/'):
+                service = features(self.server)
+                store = service.device_data
+                action = path.rsplit('/', 1)[-1]
+                if action == 'status': result = store.status()
+                elif action == 'capture': result = store.capture(data.get('data'))
+                elif action == 'backup': result = store.backup(data.get('data'))
+                elif action == 'export': result = dict(backup=store.read_backup(data.get('id')))
+                elif action == 'restore':
+                    result = store.restore(data.get('backup') if 'backup' in data else store.read_backup(data.get('id')), data.get('confirm'))
+                elif action == 'delete':
+                    if data.get('confirm') is not True: raise ValueError('请确认删除这份备份')
+                    store.read_backup(data.get('id'))
+                    (store.folder / (data['id'] + '.json')).unlink()
+                    result = dict(ok=True)
+                elif action == 'ack': result = store.acknowledge(data.get('id'))
+                elif action == 'mirror': result = store.enable_mirror(data.get('enabled'))
+                elif action == 'preview':
+                    if not getattr(self.server, 'is_simulator', False): raise ValueError('此接口仅供模拟设备使用')
+                    result = store.mirror_import(data.get('data'))
+                elif action == 'reset':
+                    if data.get('confirm') != '重置这台设备': raise ValueError('请输入「重置这台设备」确认')
+                    if any(j['status'] in ('queued','generating','checking') for j in service.workshop.jobs.values()):
+                        raise ValueError('请等待生成任务结束再重置')
+                    if system_update.status()['installing'] or system_update.status()['recovery_required']:
+                        raise ValueError('请等待系统更新完成再重置')
+                    service.voice.stop(); service.voice.stop_playback(); service.speech.stop()
+                    store.close()
+                    # Local credentials are discarded even when the relay is offline. Cloud account content stays.
+                    for peer in service.connect.state().get('paired', []):
+                        try: service.connect.execute('unpair', {'client_id': peer['client_id']})
+                        except BridgeError: pass
+                    with FEATURE_LOCK:
+                        for child in self.server.settings_path.parent.iterdir():
+                            if child.name == 'update': continue
+                            if child.is_dir() and not child.is_symlink(): shutil.rmtree(str(child))
+                            else: child.unlink()
+                        from system_update import _write
+                        _write(store.pending, dict(id='reset-' + str(time.time_ns()), data={}, source='reset'))
+                        del self.server.workshop
+                    result = dict(ok=True)
+                else: raise ValueError('未知的数据操作')
+                self.json_response(200, result)
+            elif path.startswith('/api/market/'):
                 action = path.rsplit('/', 1)[-1]
                 service = features(self.server)
                 if action == 'rollback':
@@ -639,6 +693,15 @@ class Handler(SimpleHTTPRequestHandler):
                     raise ValueError('brightness must be an integer from 0 to 100')
                 set_brightness(brightness)
                 self.json_response(200, dict(ok=True, brightness=brightness))
+            elif path in ('/api/system/update/check', '/api/system/update/download', '/api/system/update/install'):
+                try:
+                    relay = features(self.server).market.base()
+                    if not system_update.supported(): raise system_update.UpdateError('此环境未安装更新服务；模拟设备请更新 ATOM Connect')
+                    if path.endswith('/check'): result = system_update.check(relay)
+                    elif path.endswith('/download'): result = dict(staged=system_update.stage(relay))
+                    else: result = system_update.request_install(str(data.get('version', '')))
+                    self.json_response(200, result)
+                except system_update.UpdateError as exc: self.json_response(400, dict(error=str(exc)))
             elif path in ('/api/wifi/scan', '/api/wifi/connect'):
                 import wifi
                 try:

@@ -4,7 +4,7 @@ import http from 'node:http';
 
 export const SIMULATOR_ORIGIN = process.env.ATOM_SIMULATOR_ORIGIN || 'http://127.0.0.1:8790';
 
-function call(path, {method = 'GET', body} = {}) {
+export function call(path, {method = 'GET', body} = {}) {
   const data = body === undefined ? null : Buffer.from(JSON.stringify(body));
   const started = performance.now();
   return new Promise((resolve, reject) => {
@@ -59,4 +59,19 @@ export async function pairSimulator(companion) {
   companion.relayState = await companion.request('/v1/state');
   await companion.syncKeys?.();
   return simulatorState(companion);
+}
+
+// One-way, explicit import; only an already paired computer can decrypt a device snapshot.
+export async function mirrorDevice(companion, deviceId, {confirm=false}={}) {
+  if(confirm!==true)throw new Error('请先确认覆盖模拟设备中的桌面与本地记录');
+  if(typeof deviceId!=='string'||!/^[A-Za-z0-9_-]{1,128}$/.test(deviceId))throw new Error('请选择已配对设备');
+  const peer=(companion.relayState?.paired||[]).find(p=>p.client_id===deviceId);
+  const pair=companion.pairings[deviceId];
+  if(!peer||pair?.state!=='on')throw new Error('请先完成加密配对');
+  const encrypted=await companion.request('/v1/device/snapshot/'+deviceId);
+  const {openJSON}=await import('./e2e.mjs');
+  const data=openJSON(pair.key,encrypted.envelope,'snapshot|'+deviceId+'|'+encrypted.version);
+  if(Buffer.byteLength(JSON.stringify(data))>65536)throw new Error('快照超过 64 KiB');
+  await call('/api/device-data/preview',{method:'POST',body:{data}});
+  return {version:encrypted.version,updated:encrypted.updated};
 }
