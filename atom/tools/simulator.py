@@ -41,6 +41,16 @@ def copy_assets(source, target):
             shutil.copy2(item, dest)
 
 
+def changed(source, target):
+    """True when any seed file is missing or different; an update may touch only app.js or an asset."""
+    for item in source.rglob('*'):
+        if item.is_file() and item.name not in SKIP:
+            dest = target / item.relative_to(source)
+            if not dest.is_file() or not filecmp.cmp(item, dest, shallow=False):
+                return True
+    return False
+
+
 def seed(apps_root, seed_root):
     """Install or refresh prebuilt apps; app data lives in the shell, not in these folders."""
     apps_root.mkdir(parents=True, exist_ok=True)
@@ -55,8 +65,7 @@ def seed(apps_root, seed_root):
             continue
         target = apps_root / source.name
         fresh = not (target / 'manifest.json').is_file()
-        if fresh or not filecmp.cmp(source / 'manifest.json', target / 'manifest.json', shallow=False) \
-                or not filecmp.cmp(source / 'index.html', target / 'index.html', shallow=False):
+        if fresh or changed(source, target):
             shutil.copytree(source, target, dirs_exist_ok=True)
             if fresh:  # keep the seed order on first install; updates keep their desktop position
                 os.utime(target / 'manifest.json')
@@ -85,15 +94,23 @@ def connect(httpd, relay, name):
         print('Relay not connected (' + str(exc) + '); connect later in Settings', flush=True)
 
 
+def retired():
+    """Official apps withdrawn from the market are not installed on new simulators either."""
+    try:
+        return set(json.loads((ATOM / 'official' / 'catalog.json').read_text(encoding='utf-8')).get('retired', []))
+    except (OSError, ValueError, AttributeError):
+        return set()
+
+
 def sync(apps_root):
     apps_root.mkdir(parents=True, exist_ok=True)
-    seen, failed = [], []
+    seen, failed, skip = [], [], retired()
     for pattern in SOURCES:
         for path in sorted(ATOM.glob(pattern)):
             try:
                 bundle = json.loads(path.read_text(encoding='utf-8'))
                 app_id = bundle['manifest']['id']
-                if app_id in seen:
+                if app_id in seen or app_id in skip:
                     continue
                 exists = (apps_root / app_id).is_dir()
                 server.install_app(apps_root, bundle, update=exists, trusted_connect=app_id in server.TRUSTED_CLIENT_IDS)
