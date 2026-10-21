@@ -29,7 +29,7 @@ kbd{font:12px ui-monospace,monospace;background:#262a32;border:1px solid var(--e
   <button type="button" id="fit">适应窗口</button>
   <button type="button" id="reload">重启设备</button>
 </div>
-<p class="hint">屏幕内部始终是 480×360，缩放只放大显示。点一下屏幕再用键盘：<kbd>空格</kbd> 返回桌面；鼠标移动相当于倾斜体感键盘。这里用的是电脑上的 Chrome，小电脑是 Chromium 91，性能和兼容性以真机为准。</p>
+<p class="hint">屏幕内部始终是 480×360，缩放只放大显示。点一下屏幕再用键盘：<kbd>空格</kbd> 返回桌面；鼠标移动相当于倾斜体感键盘。画面由这台电脑的浏览器内核渲染，小电脑是 Chromium 91，性能和兼容性以真机为准；录音、音量、亮度需要真机硬件。</p>
 <script>
 (()=>{
   const device=document.getElementById('device'),screen=document.getElementById('screen'),buttons=[...document.querySelectorAll('[data-scale]')],fit=document.getElementById('fit');
