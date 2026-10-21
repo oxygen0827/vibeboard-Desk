@@ -62,6 +62,8 @@ def build(destination):
     for aid in PORTS:
         source = ROOT / 'ports' / aid
         install(json.loads((source / 'bundle.json').read_text()), source)
+    for aid in ('particle-lab', 'local-music'):
+        install(json.loads((ROOT / 'apps' / (aid + '.json')).read_text()))
     install(json.loads((ROOT / 'examples/mic-test.json').read_text()))
     # New apps are appended after the current curated applications.
     for aid in NEW_PORTS:

@@ -2,6 +2,15 @@
 
 本次迁移对象是 `taishan-gray`，不是透明板。它使用 RK3566、约 2 GiB 内存、480×360 DSI、Debian 10 / Linux 4.19.232 / Chromium 91。应用系统安装在 `/home/linaro/atom`；保留 Debian、板厂驱动、联网、FRP、音频与风扇硬件控制。
 
+## 连接入口
+
+本次局域网地址为 `192.168.31.23`，用户 `linaro`；备用 FRP 入口为 `150.158.146.192:6278`。局域网地址可能随网络改变。维护用 SSH 私钥存于本机 `~/.ssh/atom_gray_ed25519`，没有复制进系统镜像或仓库。
+
+```sh
+ssh -i ~/.ssh/atom_gray_ed25519 linaro@192.168.31.23
+ssh -i ~/.ssh/atom_gray_ed25519 -p 6278 linaro@150.158.146.192
+```
+
 ## 四个 GrayOS 应用
 
 [光子芯片](../official/photon-chip)、[光子快跑](../official/photon-runner)、[指尖烟花](../official/finger-fireworks)、[迷你钢琴](../official/mini-piano) 已转为完整 ATOM 源码包。共用代码、构建和测试在 [gray-ports](../official/gray-ports)。
@@ -17,9 +26,9 @@
 
 ## 新系统安装树
 
-`python3 atom/deploy/build-device-image.py /绝对路径/新目录` 可生成不含设备身份、账号或模型密钥的新安装树（构建机 Python 3.8+）。目标目录必须不存在。它包含当前官方应用、四个系统客户端、用户此前选择且仓库中有完整资源的 15 个移植应用、麦克风测试，以及这次的四个新应用，共 **34 个可安装应用**。系统自带时钟、设置等入口另计。四个新应用追加在末尾。
+`python3 atom/deploy/build-device-image.py /绝对路径/新目录` 可生成不含设备身份、账号或模型密钥的新安装树（构建机 Python 3.8+）。目标目录必须不存在。它包含当前官方应用、四个系统客户端、用户此前选择且仓库中有完整资源的 15 个移植应用、两款已有的定制 JSON 应用、麦克风测试，以及这次的四个新应用，共 **36 个可安装应用**。系统自带时钟、设置等入口另计。四个新应用追加在末尾。
 
-两款只存在于透明样机的旧定制应用（粒子实验室、随身唱片）没有独立源码包，不凭空复制空壳。大型移植会复制整个资源目录，包括 JS、WASM、纹理及许可；不会只复制入口 JSON。
+粒子实验室和随身唱片的完整 JSON 源码位于 `atom/apps/`，也已安装。它们没有独立的 `ports/` 目录，不能据此误判为缺少源码。大型移植会复制整个资源目录，包括 JS、WASM、纹理及许可；不会只复制入口 JSON。
 
 `deploy/start-atom.sh` 现在允许根用户通过 `/etc/default/atom-kiosk` 选择 `ATOM_GRAPHICS=egl` 或 `software`。默认仍为原来的 EGL。`ATOM_DEBUG=1` 仅供诊断，调试接口只监听本机；本次交付已设为 0，并重启浏览器关闭接口。不要将状态目录或浏览器 profile 从透明板复制到灰色板。
 
@@ -49,4 +58,4 @@ Mac 的 `~/Library/Application Support/ATOM/Backups/taishan-gray-20261022-000556
 
 显示试验前的可用 fbdev 配置还保存在板子 `/root/atom-gray-xorg-fbdev.conf`，软件启动配置在 `/root/atom-gray-kiosk-software.conf`。恢复时先复制回对应系统路径，再安排重启；显示驱动已经卡住时不要无限重启 LightDM。SSH 可用后，先检查 `systemctl is-active atom lightdm frpc taishan-fan`、8770 健康接口、Xorg 日志与真实 DRM 输出层。
 
-最终桌面四个新应用统一排列在第 6 / 6 页，逐个验证退出仍返回第 6 页，见 [桌面图标](../artifacts/gray-migration/new-icons.png)。最新通用桌面与同账号发现功能使用仓库 `34a54bd` 基线，设备配对身份和应用数据独立保存。
+最终桌面四个新应用统一排列在第 6 / 6 页，逐个验证退出仍返回第 6 页，见 [桌面图标](../artifacts/gray-migration/new-icons.png)。最新通用桌面与同账号发现功能使用仓库 `f88c73f` 基线，设备配对身份和应用数据独立保存。

@@ -393,10 +393,10 @@
       "description": "操控粒子组成的画面，探索鼠标与动态光点之间的互动。",
       "kind": "device",
       "market_id": null,
-      "source": null,
+      "source": "https://github.com/wangqioo/vibeboard-Desk/blob/deploy/ldcx-public/atom/apps/particle-lab.json",
       "icon": "/atom/assets/apps/particle-lab.svg",
       "image": "/atom/assets/apps/particle-lab.png",
-      "needs": "样机定制应用；独立源码包尚未收录官网",
+      "needs": "完整 JSON 源码可导入设备；本机运行",
       "guide": "/atom/guide/#desktop"
     },
     {
@@ -406,10 +406,10 @@
       "description": "在小电脑上播放本地音乐，让桌边有自己的背景声。",
       "kind": "device",
       "market_id": null,
-      "source": null,
+      "source": "https://github.com/wangqioo/vibeboard-Desk/blob/deploy/ldcx-public/atom/apps/local-music.json",
       "icon": "/atom/assets/apps/local-music.svg",
       "image": "/atom/assets/apps/local-music.png",
-      "needs": "样机定制应用；独立源码包尚未收录官网",
+      "needs": "完整 JSON 源码可导入设备；音频文件留在本机",
       "guide": "/atom/guide/#desktop"
     },
     {

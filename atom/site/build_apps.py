@@ -72,8 +72,8 @@ ports=[
 ]
 for aid,cat,desc,img in ports:
  path=ROOT/'ports'/aid;m=json.loads((path/'bundle.json').read_text())['manifest'];add(aid,m['name'],cat,desc,path=path,kind='port',image=img,needs='完整资源安装后本机运行；查看源码目录中的许可与边界')
-add('particle-lab','粒子实验室','visual','操控粒子组成的画面，探索鼠标与动态光点之间的互动。',kind='device',image='particle-lab.png',needs='样机定制应用；独立源码包尚未收录官网')
-add('local-music','随身唱片','sound','在小电脑上播放本地音乐，让桌边有自己的背景声。',kind='device',image='interiors/local-music.png',needs='样机定制应用；独立源码包尚未收录官网')
+add('particle-lab','粒子实验室','visual','操控粒子组成的画面，探索鼠标与动态光点之间的互动。',source='apps/particle-lab.json',kind='device',image='particle-lab.png',needs='完整 JSON 源码可导入设备；本机运行')
+add('local-music','随身唱片','sound','在小电脑上播放本地音乐，让桌边有自己的背景声。',source='apps/local-music.json',kind='device',image='interiors/local-music.png',needs='完整 JSON 源码可导入设备；音频文件留在本机')
 add('mic-test','麦克风测试','sound','录音、回放，观察音量、峰值和削波，比较真实收音效果。',path=ROOT/'mic-test',source='examples/mic-test.json',kind='system',image='interiors/mic-test.png',needs='需要设备麦克风；风扇控制受温度保护')
 for aid,folder,cat,desc,img,needs in [
 ('my-computer','computer-app','connect','连接电脑 Agent，选择授权项目，发起任务并查看进度与审批。',None,'电脑任务需要配对电脑在线'),
