@@ -4,7 +4,7 @@ from pathlib import Path
 from urllib.request import Request, build_opener
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
-from relay_bridge import BridgeError, NoRedirect, relay_url, identifier
+from relay_bridge import BridgeError, NoRedirect, relay_url, identifier, DEFAULT_RELAY
 try:
     import e2e
 except ImportError:  # python3-cryptography not installed
@@ -26,10 +26,13 @@ class MarketClient:
             if not isinstance(value.get('user'),dict):raise ValueError('user')
             self.account=value
         except (OSError,ValueError,KeyError,TypeError):pass
+    def relay(self):
+        # Before the device registers, browse and sign in against the official service.
+        return self.connect.config.get('relay_url') or DEFAULT_RELAY
     def base(self):
-        return relay_url(self.connect.config.get('relay_url'))
+        return relay_url(self.relay())
     def current(self):
-        return self.account if self.account.get('relay_url')==self.connect.config.get('relay_url') else {}
+        return self.account if self.account.get('relay_url')==self.relay() else {}
     def save(self, value):
         if self.root.is_symlink() or any(p.is_symlink() for p in self.root.parents) or self.path.is_symlink():raise BridgeError('账号路径不可用')
         self.root.mkdir(parents=True,exist_ok=True)
@@ -90,7 +93,7 @@ class MarketClient:
                 raise BridgeError('相册操作不支持')
         if action=='state':
             value=self.current();user=value.get('user') or {}
-            return dict(configured=bool(self.connect.config.get('relay_url')),authenticated=bool(value.get('token')),user={k:user[k] for k in ('id','username') if k in user},
+            return dict(configured=bool(self.relay()),authenticated=bool(value.get('token')),user={k:user[k] for k in ('id','username') if k in user},
                         encryption=self.encryption(),**({'recovery_code':self.recovery_code} if self.recovery_code else {}))
         if action in ('register','login'):
             username=data.get('username');password=data.get('password')

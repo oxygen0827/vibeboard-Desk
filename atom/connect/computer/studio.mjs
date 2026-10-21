@@ -7,6 +7,8 @@ const LOCKED='随手记和今日已加密，请在账号里输入密码解锁';
 import { validateArtifact, appPrompt } from './artifact.mjs';
 import {StudioCodex}from './studio-codex.mjs';
 import {organizePrompt,parseOrganization}from './organize.mjs';
+// Market browsing and account sign-in work against the official service before the Mac pairs.
+const DEFAULT_RELAY=(process.env.ATOM_DEFAULT_RELAY||'https://ldcx.tech/atom').replace(/\/$/,'');
 
 const ID=/^[A-Za-z0-9_-]{1,128}$/;
 const terminal=new Set(['completed','failed','cancelled','interrupted','conflict']);
@@ -22,7 +24,7 @@ export class Studio {
  }
  safePath(file){const resolved=path.resolve(file);if(resolved!==this.dir&&!resolved.startsWith(this.dir+path.sep))throw problem('工作空间路径越界');let current=this.dir;for(const segment of path.relative(this.dir,resolved).split(path.sep)){if(!segment)continue;current=path.join(current,segment);try{if(fs.lstatSync(current).isSymbolicLink())throw problem('工作空间不能包含符号链接');}catch(e){if(e.code==='ENOENT')break;throw e;}}return resolved;}
  save(){writePrivate(this.safePath(this.file),this.data);}
- url(){const u=this.companion.store.data.config?.relay_url;if(!u)throw problem('请先连接中继服务器');return u;}
+ url(){return this.companion.store.data.config?.relay_url||DEFAULT_RELAY;}
  account(){const a=this.data.account;return a?.relay_url===this.url()?a:null;}
  requireAccount(){const a=this.account();if(!a)throw problem('请先登录创作账号',401);return a;}
  scope(){const a=this.requireAccount();return crypto.createHash('sha256').update(a.relay_url+'\0'+a.user.id).digest('hex').slice(0,24);}

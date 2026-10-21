@@ -27,6 +27,10 @@ class NoRedirect(HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         return None
 
+# The official service. Market browsing and account login work against it before the device
+# registers; pairing still needs an explicit connect. Override for self-hosting or tests.
+DEFAULT_RELAY = os.environ.get('ATOM_DEFAULT_RELAY', 'https://ldcx.tech/atom').rstrip('/')
+
 def relay_url(value):
     if not isinstance(value, str) or not 1 <= len(value) <= 2048:
         raise BridgeError('请输入中继服务器地址')
@@ -174,7 +178,7 @@ class DeviceBridge:
         return self.state()
 
     def state(self):
-        public = dict(configured=bool(self.config.get('token')), relay_url=self.config.get('relay_url',''), device_name=self.config.get('name','ATOM 小电脑'), paired=[], pair_requests=[], tasks=[])
+        public = dict(configured=bool(self.config.get('token')), relay_url=self.config.get('relay_url',''), default_relay_url=DEFAULT_RELAY, device_name=self.config.get('name','ATOM 小电脑'), paired=[], pair_requests=[], tasks=[])
         if not public['configured']: return public
         try:
             response = self._request('/v1/state')

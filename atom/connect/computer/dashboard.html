@@ -42,7 +42,7 @@
     <button data-page="overview"><svg><use href="#i-overview"/></svg>概览</button>
     <div class="nav-group">互联</div>
     <button data-page="devices"><svg><use href="#i-link"/></svg>设备与连接<i class="nav-dot" id="nav-devices"></i></button>
-    <button data-page="simulator"><svg><use href="#i-device"/></svg>模拟设备<i class="nav-dot" id="nav-simulator"></i></button>
+    <button data-page="simulator" class="dev-only"><svg><use href="#i-device"/></svg>模拟设备<i class="nav-dot" id="nav-simulator"></i></button>
     <div class="nav-group">电脑 Agent</div>
     <button data-page="tasks"><svg><use href="#i-tasks"/></svg>任务<i class="nav-count" id="nav-tasks"></i></button>
     <button data-page="agents"><svg><use href="#i-agent"/></svg>Agent<i class="nav-dot" id="nav-agents"></i></button>
@@ -67,7 +67,7 @@
 <section data-panel="overview">
   <header class="page-head"><div><h1>概览</h1><p id="overview-sub">这台电脑与 ATOM 的连接情况</p></div></header>
   <div class="links card">
-    <div class="link-row">
+    <div class="link-row dev-only">
       <div class="link-label"><strong>测试 · 本机直连</strong><small>不经过服务器，验证模拟设备本身</small></div>
       <div class="topology compact">
         <div class="node" id="node-sim-mac"><span class="node-icon"><svg><use href="#i-mac"/></svg></span><strong>这台 Mac</strong><small></small><span class="badge"></span></div>
@@ -75,7 +75,7 @@
         <div class="node" id="node-sim"><span class="node-icon"><svg><use href="#i-device"/></svg></span><strong>模拟设备</strong><small></small><span class="badge"></span></div>
       </div>
     </div>
-    <div class="link-row">
+    <div class="link-row dev-only">
       <div class="link-label"><strong>测试 · 经中继</strong><small>和真机完全相同的配对与任务链路</small></div>
       <div class="topology compact">
         <div class="node" id="node-simr-mac"><span class="node-icon"><svg><use href="#i-mac"/></svg></span><strong>这台 Mac</strong><small></small><span class="badge"></span></div>
@@ -86,7 +86,7 @@
       </div>
     </div>
     <div class="link-row">
-      <div class="link-label"><strong>正式 · 真机</strong><small>测试通过后走这条链路</small></div>
+      <div class="link-label"><strong id="real-lane-title">ATOM 小电脑</strong><small id="real-lane-sub">这台电脑经服务器连接你的 ATOM</small></div>
       <div class="topology compact" id="topology">
         <div class="node" id="node-mac"><span class="node-icon"><svg><use href="#i-mac"/></svg></span><strong>这台 Mac</strong><small></small><span class="badge"></span></div>
         <div class="wire" id="wire-relay"><i></i></div>
@@ -96,7 +96,7 @@
       </div>
     </div>
   </div>
-  <div class="section-head"><h2>上线步骤</h2><small class="muted">先在模拟设备上跑通，再换真机</small></div>
+  <div class="section-head"><h2 id="steps-title">开始使用</h2><small class="muted" id="steps-sub">按顺序完成，ATOM 就能和这台电脑一起工作</small></div>
   <ol class="launch-steps card" id="launch-steps"></ol>
   <div class="health" id="health"></div>
   <div class="tiles">
@@ -246,6 +246,8 @@
   </div>
   <div class="appearance-help">切换后，便签、日程、相册和创作界面会一起改变。照片与应用场景保留原本的颜色。<br>这台电脑会记住你的选择；ATOM 小电脑可在自己的设置中单独切换。</div>
   <p id="appearance-feedback" role="status"></p>
+  <div class="section-head"><h2>开发者工具</h2></div>
+  <label class="card dev-toggle"><input type="checkbox" id="devtools"><span><strong>模拟设备与测试链路</strong><small>在这台 Mac 上运行 ATOM 小电脑，概览里显示本机直连和经服务器的测试链路。给开发和调试用，普通使用不需要打开。</small></span></label>
 </section>
 
 <section data-panel="photos" class="fill" hidden><iframe id="photo-album-frame" title="同步相册" sandbox="allow-scripts"></iframe></section>

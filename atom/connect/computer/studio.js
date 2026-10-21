@@ -13,7 +13,7 @@ function clearDialog(title){el('dialog-title').textContent=title;el('dialog-cont
 el('dialog-close').onclick=()=>dialog.close();
 
 // Account
-async function studioState(){const s=await call('/state');if(account?.id!==s.user?.id)coverCache.clear();account=s.user;window.studioJobs=s.jobs||[];
+async function studioState(){const s=await call('/state');if(account?.id!==s.user?.id)coverCache.clear();account=s.user;window.studioJobs=s.jobs||[];window.atomAccount=account||null;window.dispatchEvent(new CustomEvent('atom:account'));
   el('account-avatar').replaceChildren(account?account.username.slice(0,1).toUpperCase():icon('user'));el('account-avatar').classList.toggle('on',!!account);
   el('account-name').textContent=account?account.username:'未登录';
   el('account-detail').textContent=!account?'登录市场账号以同步':s.encryption==='locked'||s.encryption==='recovery'?'随手记已锁定，点此解锁':s.pending_notes?s.pending_notes+' 条便签待同步':'随手记与今日已加密';

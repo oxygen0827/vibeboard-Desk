@@ -81,7 +81,7 @@ function render(s){lastState=s;
   $('server-detail').textContent=s.connection_error||(s.configured?'电脑名称：'+(s.name||'')+' · 客户端 '+(s.client_id||'').slice(0,8):'填写服务器地址后开始连接');
   $('server-pill').className='pill '+tone;$('server-pill').textContent=!s.configured?'未配置':s.connection_error?'连接异常':'已连接';
   if(!s.configured)$('config').hidden=false;
-  const config=$('config');if(!config.dataset.hydrated){config.elements.relay_url.value=s.relay_url||'';config.elements.name.value=s.name||'我的 Mac';config.dataset.hydrated='true';}
+  const config=$('config');if(!config.dataset.hydrated){config.elements.relay_url.value=s.relay_url||'https://ldcx.tech/atom';config.elements.name.value=s.name||'我的 Mac';config.dataset.hydrated='true';}
   $('paired-count').textContent=paired.length?online.length+' / '+paired.length+' 在线':'';
   $('paired').replaceChildren(...paired.map(p=>row({icon:'device',tone:p.online?'ok':'',title:p.name,sub:(p.online?'在线':'离线')+' · '+({on:'端到端加密 · 安全码 '+p.safety_code,changed:'设备密钥发生变化，已停止接收任务，请解除配对后重新配对',mismatch:'本机密钥与服务器记录不一致，请解除配对后重新配对'}[p.e2e]||'未加密（对方客户端版本较旧）'),mono:false,end:[p.e2e==='on'?pill('已加密','info plain'):p.e2e==='off'?null:pill('需要重新配对','bad'),pill(p.online?'在线':'离线',p.online?'ok':''),h('button',{class:'btn ghost small',text:'解除配对',onclick:async e=>{if(!confirm('解除与「'+p.name+'」的配对？这台设备将不能再向电脑发任务，进行中的任务会被取消。需要时可以重新配对。'))return;e.target.disabled=true;try{await api('unpair',{client_id:p.client_id});note('已解除与 '+p.name+' 的配对');await refresh();}catch(err){note(err.message,true);e.target.disabled=false;}}})]})));
   if(!paired.length)$('paired').append(emptyState('还没有配对的设备','按下方步骤连接你的第一台 ATOM'));
@@ -125,10 +125,18 @@ refresh();setInterval(refresh,3000);
 /* Simulator: the Mac app runs the real device backend on 127.0.0.1:8790; this page shows its screen
    and the overview shows both test links (direct, and through the relay) next to the real device. */
 const SIM_ORIGIN='http://127.0.0.1:8790',native=window.webkit?.messageHandlers?.simulator;
+let devtools=false;try{devtools=localStorage.getItem('atom.connect.devtools')==='1';}catch{}
+function applyDevtools(){document.documentElement.toggleAttribute('data-devtools',devtools);$('devtools').checked=devtools;
+  $('steps-title').textContent=devtools?'上线步骤':'开始使用';$('steps-sub').textContent=devtools?'先在模拟设备上跑通，再换真机':'按顺序完成，ATOM 就能和这台电脑一起工作';
+  $('real-lane-title').textContent=devtools?'正式 · 真机':'ATOM 小电脑';$('real-lane-sub').textContent=devtools?'测试通过后走这条链路':'这台电脑经服务器连接你的 ATOM';
+  document.querySelectorAll('#node-relay strong,#node-simr-relay strong').forEach(n=>n.textContent=devtools?'中继服务器':'ATOM 服务');
+  if(!devtools&&currentPage==='simulator')showPage('overview');}
+$('devtools').onchange=e=>{devtools=e.target.checked;try{localStorage.setItem('atom.connect.devtools',devtools?'1':'0');}catch{}applyDevtools();refreshSimulator();renderLinks();};
+window.addEventListener('atom:account',()=>renderLinks());
 let simState=null,simNative=native?'stopped':'external',simMessage='',simPairing=false,simLoading=false;
 function simAsk(action){if(native)native.postMessage({action});}
 window.addEventListener('atom:simulator',e=>{simNative=e.detail?.state||'stopped';simMessage=e.detail?.message||'';refreshSimulator();});
-async function refreshSimulator(){if(simLoading)return;simLoading=true;try{simState=await api('simulator');}catch{simState={running:false};}finally{simLoading=false;}renderSimulator();renderLinks();}
+async function refreshSimulator(){if(!devtools){simState=null;renderLinks();return;}if(simLoading)return;simLoading=true;try{simState=await api('simulator');}catch{simState={running:false};}finally{simLoading=false;}renderSimulator();renderLinks();}
 function setWire(id,tone,label){const w=$(id);w.className='wire '+(tone||'');const l=$(id+'-label');if(l)l.textContent=label||'';}
 function renderSimulator(){
   const running=!!simState?.running,starting=simNative==='starting'&&!running;
@@ -159,26 +167,37 @@ function renderLinks(){
   setNode('node-simr',bothOnline?'ok':simRelay?'warn':running&&d.error?'bad':'',d.name||'模拟设备',!running?'未启动':!d.configured?'未注册':d.error?'连接异常':!s.relay_url?'等 Mac 连上中继':!sameRelay?'服务器不同':!paired?'未配对':bothOnline?'已配对 · 在线':'已配对 · 离线');
   setWire('wire-simr-relay',relayOk?'ok':s.configured?'bad':'');
   setWire('wire-simr-device',bothOnline?'ok':running&&d.error?'bad':'');
-  // Steps: the order we roll out in.
+  // Steps: developers rehearse on the simulator first; everyone else gets a plain setup checklist.
   const real=(s.paired||[]).filter(x=>x.client_id!==d.client_id),realOnline=real.filter(x=>x.online);
   const tasks=s.tasks||[],simTask=tasks.find(t=>d.client_id&&t.device_id===d.client_id),realTask=tasks.find(t=>t.device_id&&real.some(r=>r.client_id===t.device_id));
-  const steps=[
+  const ready=(s.agents||[]).filter(a=>a.available&&a.authenticated),projects=s.projects||[],user=window.atomAccount;
+  const realStep=[realOnline.length>0,devtools?'真机配对并在线':'连接你的 ATOM 小电脑',realOnline.length?realOnline.map(x=>x.name).join('、')+' 在线':real.length?real.map(x=>x.name).join('、')+' 离线，开机联网后会自动连上':'在小电脑打开「我的电脑」生成配对码，到「设备与连接」输入','去配对',()=>showPage('devices')];
+  const taskStep=[!!realTask,devtools?'从真机发起一次电脑任务':'从小电脑发起第一个任务',realTask?'已收到：'+(realTask.title||'任务')+' · '+(statuses[realTask.status]||realTask.status):'在小电脑「我的电脑」里选这台电脑、项目和 Agent，说出需求'];
+  const steps=devtools?[
     [running,'启动模拟设备',running?(sim.apps||0)+' 个应用已安装':'在 ATOM Connect 中启动','启动',()=>{showPage('simulator');simAsk('start');}],
     [running&&sim.direct_ms!=null,'本机直连',running?'Mac ⇄ 模拟设备 '+sim.direct_ms+' ms，不经过服务器':'模拟设备启动后自动检测'],
     [relayOk,'这台 Mac 连上中继服务器',relayOk?hostOf(s.relay_url):s.connection_error||'在「设备与连接」里填写服务器','去设置',()=>showPage('devices')],
     [simRelay,'模拟设备连上同一个中继',!running?'等模拟设备启动':!d.configured?'模拟设备尚未注册':d.error?d.error:!sameRelay?'模拟设备连的是 '+hostOf(d.relay_url):hostOf(d.relay_url)],
     [bothOnline,'模拟设备与这台 Mac 经中继配对',bothOnline?'双方都能看到对方在线'+(p.e2e==='on'?' · 端到端加密':''):paired?'已配对，等待双方上线':'自动完成配对码、认领和设备确认','一键配对',simRelay&&!paired?pairSim:null],
     [!!simTask,'从模拟设备发起一次电脑任务',simTask?'已收到：'+(simTask.title||'任务')+' · '+(statuses[simTask.status]||simTask.status):'在模拟设备打开「我的电脑」，选这台 Mac 发一个任务'],
-    [realOnline.length>0,'真机配对并在线',realOnline.length?realOnline.map(x=>x.name).join('、'):real.length?real.map(x=>x.name).join('、')+' 离线':'在小电脑上显示配对码，到「设备与连接」输入','去配对',()=>showPage('devices')],
-    [!!realTask,'从真机发起一次电脑任务',realTask?'已收到：'+(realTask.title||'任务')+' · '+(statuses[realTask.status]||realTask.status):'和模拟设备的步骤相同，链路一致即可上线']
+    realStep,taskStep
+  ]:[
+    [relayOk,'连接 ATOM 服务',relayOk?'已连接 '+hostOf(s.relay_url):s.connection_error?'连接异常：'+s.connection_error:'服务器地址已经填好，确认电脑名称后保存','去连接',()=>showPage('devices')],
+    [!!user,'登录 ATOM 账号',user?'已登录 '+user.username+' · 随手记、今日、相册与小电脑同步':'和小电脑用同一个账号，内容会自动同步','登录',()=>$('studio-account')?.click()],
+    realStep,
+    [ready.length>0,'准备电脑 Agent',ready.length?ready.map(a=>a.name).join('、')+' 可用':'安装并登录 Codex，ATOM 才能让这台电脑干活','检查',()=>showPage('agents')],
+    [projects.length>0,'授权一个项目文件夹',projects.length?projects.length+' 个文件夹已授权':'选一个允许 Agent 工作的文件夹，不要授权整个磁盘','添加',()=>showPage('projects')],
+    taskStep
   ];
   const first=steps.findIndex(x=>!x[0]);
+  // The checklist already says what is missing; the banner only adds noise until setup is done.
+  if(!devtools&&first>=0)$('health').hidden=true;else $('health').hidden=false;
   $('launch-steps').replaceChildren(...steps.map(([done,title,detail,action,run],i)=>h('li',{class:done?'ok':i===first?'now':''},
     h('span',{class:'step-mark',text:done?'✓':String(i+1)}),h('div',{class:'step-main'},h('strong',{text:title}),h('small',{text:detail||''})),
-    !done&&action&&run&&(i===first||i===4)?h('button',{class:'btn small'+(i===first?' primary':''),text:action,onclick:run}):null)));
+    !done&&action&&run&&(i===first||(devtools&&i===4))?h('button',{class:'btn small'+(i===first?' primary':''),text:action,onclick:run}):null)));
 }
 async function pairSim(){if(simPairing)return;simPairing=true;renderSimulator();note('正在经中继配对模拟设备…');
   try{simState=await api('simulator/pair',{});note('模拟设备已与这台 Mac 配对');await refresh();}catch(e){note(e.message,true);}finally{simPairing=false;refreshSimulator();}}
 $('sim-pair').onclick=pairSim;
 $('sim-toggle').onclick=()=>{if(simState?.running){simAsk('stop');simNative='stopped';}else{simAsk('start');simNative='starting';}renderSimulator();setTimeout(refreshSimulator,600);};
-refreshSimulator();setInterval(refreshSimulator,2000);
+applyDevtools();refreshSimulator();setInterval(refreshSimulator,2000);
