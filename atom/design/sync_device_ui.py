@@ -9,4 +9,4 @@ def sync(base):
     if 'href="device-ui.css"' not in s:s=s.replace('</head>','<link rel="stylesheet" href="device-ui.css"></head>')
     p.write_text(s)
 if __name__=='__main__':
-    for folder in ['market-app','notes-app','computer-app','library-app']+[str(p.relative_to(root)) for p in (root/'official').iterdir() if (p/'manifest.json').exists()]:sync(root/folder)
+    for folder in ['market-app','notes-app','computer-app']+[str(p.relative_to(root)) for p in (root/'official').iterdir() if (p/'manifest.json').exists()]:sync(root/folder)
