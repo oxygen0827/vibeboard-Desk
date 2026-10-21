@@ -20,4 +20,5 @@ rm -f "$OUT/market-$STAMP.sqlite3" "$OUT/relay-$STAMP.sqlite3"
 /usr/local/bin/ossutil cp "$OUT/atom-$STAMP.tar.gz" "oss://$OSS_BUCKET/${OSS_PREFIX:-atom/backups}/atom-$STAMP.tar.gz" \
   -e "$OSS_ENDPOINT" --region "${OSS_REGION:-cn-shanghai}"
 ls -1t "$OUT"/atom-*.tar.gz | tail -n +4 | xargs -r rm -f
+date +%s > "$OUT/last-success"
 echo "backup ok: atom-$STAMP.tar.gz"

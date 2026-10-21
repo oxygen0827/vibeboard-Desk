@@ -10,6 +10,7 @@
 | 真实 IP | nginx 写入 `X-Real-IP`；服务只信任来自 `172.17.0.0/16` 的该请求头（`--trusted-proxy`），用于注册/登录/配对限流 |
 | 边缘限流 | nginx `limit_req` 每 IP 10 r/s，突发 40 |
 | 备份 | 每天主机时间 04:20 做一致性快照，打包上传 OSS 私有前缀，本地保留 3 份 |
+| 监控 | 每 5 分钟检查健康、服务、备份、磁盘、证书，异常时发邮件（需 `smtp.env`） |
 
 ## 首次部署
 
@@ -43,6 +44,27 @@
 
    然后 `systemctl enable --now atom-connect-backup.timer`，并用 `systemctl start atom-connect-backup.service && journalctl -u atom-connect-backup -n 20` 验证一次。
 
+## 邮件：账号找回与服务器告警
+
+在服务器上以 root 写入 `/etc/atom/smtp.env`（`chmod 600`，不进仓库），密码在终端里输入、不经过聊天记录：
+
+```sh
+umask 077; read -p "SMTP 服务器: " h; read -p "端口(465 或 587): " p; read -p "发信账号: " u; read -s -p "发信密码: " k; echo; read -p "发件地址: " f; read -p "告警收件人: " t
+printf "SMTP_HOST=%s\nSMTP_PORT=%s\nSMTP_USER=%s\nSMTP_PASSWORD=%s\nSMTP_FROM=%s\nALERT_TO=%s\n" "$h" "$p" "$u" "$k" "$f" "$t" > /etc/atom/smtp.env
+systemctl restart atom-connect && sudo -u atom env $(cat /etc/atom/smtp.env | xargs) python3 /opt/atom/connect/server/monitor.py --test-mail
+```
+
+- 465 端口使用 SSL，587 使用 STARTTLS。没有这个文件时，绑定邮箱、找回密码会提示「服务器暂未配置邮件发送」，监控照常运行但不发信。
+- `atom-connect-monitor.timer` 每 5 分钟检查：公网健康、服务状态、最近一次备份（超过 26 小时算异常）、根分区剩余空间（低于 10%）、HTTPS 证书（14 天内过期）。故障和恢复各发一封，持续故障每 24 小时提醒一次；状态在 `/var/lib/atom/monitor.json`。
+- 服务器整机宕机时它发不出邮件。建议在阿里云「云监控 → 站点监控」新建一个 HTTPS 探测：地址 `https://ldcx.tech/atom/market/v1/health`，返回内容包含 `"ok": true`，告警联系人填同一邮箱。
+
+## 端到端加密
+
+- **电脑任务**：配对时双方交换 X25519 公钥，任务内容、过程输出、审批说明和生成的应用在小电脑和电脑之间加密传输。两端「设备与连接」「我的电脑」显示同一组 6 位安全码，可以当面核对。某一方密钥变化后，另一方会停止收发并提示重新配对。
+- **随手记与今日**：每个账号一把数据密钥，分别用登录密码和恢复密钥包装后存在服务器。首次登录（或旧会话输入一次密码）时自动启用并把已有明文迁移成密文，同时显示一次恢复密钥。邮件重置密码后需要恢复密钥才能解开原内容；选择「放弃旧内容」会删除服务器上无法解密的旧记录。
+- 服务器能看到的只有路由和状态信息：设备与电脑 ID、任务状态和时间、便签置顶/删除、日程类型/完成状态、版本号。市场作品本来就公开源码，不加密。
+- 启用加密之前的备份（服务器本地 3 份与 OSS 上的历史备份）仍含明文，可在迁移完成后按需清理 OSS 上的旧备份。
+
 ## 更新与回退
 
 更新：再次运行 `deploy.sh`。数据库不随版本变化。
@@ -59,7 +81,7 @@ sudo -u atom python3 /opt/atom/connect/marketplace/ops.py --db /var/lib/atom/rel
 
 ## 上线前仍需注意
 
-- 注册对公网开放（上限 1,000 用户）；如只给自己人用，需要先加邀请码开关。
-- 数据库内容是服务器可读明文，不是端到端加密；主机与备份要按此保护。
+- 注册对公网开放（上限 1,000 用户）。
+- 端到端加密之外的元数据（见上文）服务器可读；主机与备份仍要妥善保护。
 - `172.17.0.0/16` 内其他容器也能伪造 `X-Real-IP`，这些容器应属可信服务。
 - 主机磁盘需要留出余量；SQLite 写满时事务会回滚并返回 503。

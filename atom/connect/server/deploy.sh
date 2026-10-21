@@ -21,7 +21,7 @@ chown -R root:root /opt/atom/releases/$RELEASE
 chmod -R go-w /opt/atom/releases/$RELEASE
 chmod 755 /opt/atom /opt/atom/releases
 for d in connect official; do ln -sfn releases/$RELEASE/$d /opt/atom/$d.new && mv -Tf /opt/atom/$d.new /opt/atom/$d; done
-install -m 0644 /opt/atom/connect/server/atom-connect.service /opt/atom/connect/server/atom-connect-backup.service /opt/atom/connect/server/atom-connect-backup.timer /etc/systemd/system/
+install -m 0644 /opt/atom/connect/server/atom-connect.service /opt/atom/connect/server/atom-connect-backup.service /opt/atom/connect/server/atom-connect-backup.timer /opt/atom/connect/server/atom-connect-monitor.service /opt/atom/connect/server/atom-connect-monitor.timer /etc/systemd/system/
 systemctl daemon-reload
 systemctl enable atom-connect.service >/dev/null
 systemctl restart atom-connect.service
@@ -29,6 +29,8 @@ sleep 1
 systemctl is-active atom-connect.service
 curl -fsS http://172.17.0.1:9092/market/v1/health && echo
 if [ -f /etc/atom/oss.env ]; then systemctl enable --now atom-connect-backup.timer >/dev/null; echo "backup timer on"; else echo "no /etc/atom/oss.env: backup timer not enabled"; fi
+systemctl enable --now atom-connect-monitor.timer >/dev/null
+if [ -f /etc/atom/smtp.env ]; then echo "monitor on, alerts by email"; else echo "monitor on; no /etc/atom/smtp.env: alerts and account email disabled"; fi
 ls -1dt /opt/atom/releases/* | tail -n +4 | xargs -r rm -rf
 echo "deployed $RELEASE"
 REMOTE

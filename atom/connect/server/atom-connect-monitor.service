@@ -1,0 +1,18 @@
+[Unit]
+Description=ATOM Connect health check and email alerts
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=atom
+Group=atom
+# Root-only file with SMTP_* and ALERT_TO; without it checks still run but no mail is sent.
+EnvironmentFile=-/etc/atom/smtp.env
+ExecStart=/usr/bin/python3 /opt/atom/connect/server/monitor.py
+TimeoutStartSec=2min
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/atom
