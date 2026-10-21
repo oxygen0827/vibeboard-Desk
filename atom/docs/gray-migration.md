@@ -59,3 +59,7 @@ Mac 的 `~/Library/Application Support/ATOM/Backups/taishan-gray-20261022-000556
 显示试验前的可用 fbdev 配置还保存在板子 `/root/atom-gray-xorg-fbdev.conf`，软件启动配置在 `/root/atom-gray-kiosk-software.conf`。恢复时先复制回对应系统路径，再安排重启；显示驱动已经卡住时不要无限重启 LightDM。SSH 可用后，先检查 `systemctl is-active atom lightdm frpc taishan-fan`、8770 健康接口、Xorg 日志与真实 DRM 输出层。
 
 最终桌面四个新应用统一排列在第 6 / 6 页，逐个验证退出仍返回第 6 页，见 [桌面图标](../artifacts/gray-migration/new-icons.png)。最新通用桌面与同账号发现功能使用仓库 `f88c73f` 基线，设备配对身份和应用数据独立保存。
+
+## 后续维护更新 · 2026-10-22
+
+设备当前局域网地址已变为 `192.168.1.12`（DHCP，仍可能变化）。已通过签名通道升级到 `2026.10.22.3`，36 个安装目录和原配对身份完整保留；Wi-Fi 补丁与维护验收见 [本轮交付记录](maintenance-delivery-2026-10-22.md)。

@@ -1,6 +1,6 @@
 # ATOM 文档索引
 
-截至 2026-10-08，本阶段功能开发暂停，文档与代码作为可继续开发的基线。
+更新至 2026-10-22。以下文档描述当前实现；历史验收记录保留各自的测试范围。
 
 | 阅读目的 | 文档 |
 | --- | --- |
@@ -9,6 +9,8 @@
 | 团队协作与本地开发 | [collaboration.md](collaboration.md) |
 | 官方应用视觉改版 | [official-ui-refresh.md](official-ui-refresh.md) |
 | 灰色板迁移、四个交互作品与连接验证 | [gray-migration.md](gray-migration.md) |
+| 系统更新、备份重置、模拟设备镜像与 Mac 发行 | [system-maintenance.md](system-maintenance.md) |
+| 本轮维护交付与真实测试 | [maintenance-delivery-2026-10-22.md](maintenance-delivery-2026-10-22.md) |
 | 部署、运行服务、回退 | [deployment.md](deployment.md) |
 | 麦克风、单端实验、风扇、按住说话 | [audio-diagnostics.md](audio-diagnostics.md) |
 | 云端语音与官方接口 | [voice-zhipu.md](voice-zhipu.md) |
