@@ -16,7 +16,7 @@ refreshAppearance();
 /* ATOM Connect local console: connection, computer agent and shell. Studio pages live in studio.js. */
 let csrf='',currentPage='overview',lastState=null,refreshing=false,taskFilter='all';
 const $=id=>document.getElementById(id);
-const pages=['overview','devices','tasks','agents','projects','notes','agenda','photos','market','creations','settings'];
+const pages=['overview','simulator','devices','tasks','agents','projects','notes','agenda','photos','market','creations','settings'];
 const statuses={queued:'等待执行',running:'正在执行',waiting_approval:'等待审批',saving:'正在保存',completed:'已完成',failed:'失败',cancelled:'已取消',interrupted:'已中断',conflict:'有冲突'};
 const statusTone={queued:'info',running:'info',waiting_approval:'warn',saving:'info',completed:'ok',failed:'bad',cancelled:'',interrupted:'bad',conflict:'warn'};
 const ACTIVE=['queued','running','waiting_approval','saving'];
@@ -51,7 +51,9 @@ function health(s,ctx){const {online,paired,ready,projects}=ctx;
   return['ok','一切就绪：ATOM 可以向这台电脑发起任务',null,null];}
 
 function render(s){lastState=s;
-  const paired=s.paired||[],agents=s.agents||[],projects=s.projects||[],tasks=s.tasks||[];
+  // The simulator pairs like any device; keep it out of the real-device lane.
+  const simId=simState?.device?.client_id;
+  const paired=(s.paired||[]).filter(p=>!simId||p.client_id!==simId),agents=s.agents||[],projects=s.projects||[],tasks=s.tasks||[];
   const online=paired.filter(p=>p.online),ready=agents.filter(a=>a.available&&a.authenticated),active=tasks.filter(t=>ACTIVE.includes(t.status));
   const tone=relayTone(s),host=hostOf(s.relay_url);
   // Sidebar
@@ -73,6 +75,7 @@ function render(s){lastState=s;
   $('tile-agent').textContent=ready.length?ready.map(a=>a.name).join(' · ')+' 就绪':'没有可用 Agent';
   $('tile-agent-sub').textContent=projects.length+' 个授权项目'+(active.length?' · '+active.length+' 个任务进行中':'');
   renderActivity();
+  renderLinks();
   // Devices
   $('server-url').textContent=s.configured?s.relay_url:'未配置中继服务器';
   $('server-detail').textContent=s.connection_error||(s.configured?'电脑名称：'+(s.name||'')+' · 客户端 '+(s.client_id||'').slice(0,8):'填写服务器地址后开始连接');
@@ -114,8 +117,68 @@ $('server-edit').onclick=()=>{$('config').hidden=!$('config').hidden;};
 $('server-cancel').onclick=()=>{$('config').hidden=true;};
 $('task-filter').onclick=e=>{const b=e.target.closest('button');if(!b)return;taskFilter=b.dataset.filter;$('task-filter').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));renderTasks();};
 $('diagnostics').onclick=async()=>{const b=$('diagnostics');b.disabled=true;try{await api('diagnostics',{});note('检测完成');await refresh();}catch(e){note(e.message,true);}finally{b.disabled=false;}};
-if(window.webkit?.messageHandlers?.openSimulator){$('open-simulator').hidden=false;$('open-simulator').onclick=()=>window.webkit.messageHandlers.openSimulator.postMessage({});}
 if(window.webkit?.messageHandlers?.chooseFolder){$('choose-folder').hidden=false;$('choose-folder').onclick=()=>window.webkit.messageHandlers.chooseFolder.postMessage({});}
 
 showPage('overview');
 refresh();setInterval(refresh,3000);
+
+/* Simulator: the Mac app runs the real device backend on 127.0.0.1:8790; this page shows its screen
+   and the overview shows both test links (direct, and through the relay) next to the real device. */
+const SIM_ORIGIN='http://127.0.0.1:8790',native=window.webkit?.messageHandlers?.simulator;
+let simState=null,simNative=native?'stopped':'external',simMessage='',simPairing=false,simLoading=false;
+function simAsk(action){if(native)native.postMessage({action});}
+window.addEventListener('atom:simulator',e=>{simNative=e.detail?.state||'stopped';simMessage=e.detail?.message||'';refreshSimulator();});
+async function refreshSimulator(){if(simLoading)return;simLoading=true;try{simState=await api('simulator');}catch{simState={running:false};}finally{simLoading=false;}renderSimulator();renderLinks();}
+function setWire(id,tone,label){const w=$(id);w.className='wire '+(tone||'');const l=$(id+'-label');if(l)l.textContent=label||'';}
+function renderSimulator(){
+  const running=!!simState?.running,starting=simNative==='starting'&&!running;
+  $('nav-simulator').className='nav-dot '+(running?'ok':simNative==='error'?'bad':'');
+  $('sim-pill').replaceChildren(pill(running?'运行中':starting?'正在启动':simNative==='error'?'已停止':'未启动',running?'ok':starting?'info':simNative==='error'?'bad':''));
+  $('sim-toggle').textContent=running?'停止':'启动';$('sim-toggle').disabled=starting||(!native&&!running);
+  $('sim-toggle').title=native?'':'请在 ATOM Connect App 中启动，或在终端运行 python3 atom/tools/simulator.py';
+  const p=simState?.pairing||{},paired=p.mac_sees_device&&p.device_sees_mac;
+  $('sim-pair').hidden=!running||!simState?.device?.configured||paired;$('sim-pair').disabled=simPairing;
+  $('sim-sub').textContent=running?(simState.apps||0)+' 个应用 · 本机直连 '+simState.direct_ms+' ms'+(paired?' · 已经中继与这台 Mac 配对':''):'在这台 Mac 上运行 ATOM 小电脑和全部应用';
+  const frame=$('sim-frame');
+  if(running){if(!frame.src)frame.src=SIM_ORIGIN+'/simulator';frame.hidden=false;$('sim-empty').hidden=true;}
+  else{if(frame.src)frame.removeAttribute('src');frame.hidden=true;$('sim-empty').hidden=false;
+    $('sim-empty-detail').textContent=starting?'正在启动，第一次需要几秒钟安装应用。':simMessage||(native?'点「启动」后，屏幕会显示在这里。':'请在 ATOM Connect App 中打开，或在终端运行 python3 atom/tools/simulator.py。');}
+}
+function renderLinks(){
+  const s=lastState;if(!s)return;
+  const sim=simState||{},d=sim.device||{},p=sim.pairing||{},running=!!sim.running,relayOk=s.configured&&!s.connection_error;
+  const sameRelay=d.relay_url&&s.relay_url&&d.relay_url.replace(/\/$/,'')===s.relay_url.replace(/\/$/,'');
+  const simRelay=running&&d.configured&&!d.error&&sameRelay,paired=p.mac_sees_device&&p.device_sees_mac,bothOnline=paired&&p.device_online_for_mac&&p.mac_online_for_device;
+  // Lane 1: direct
+  setNode('node-sim-mac','ok',s.name||'这台电脑','运行中');
+  setNode('node-sim',running?'ok':simNative==='error'?'bad':'',running?(sim.apps||0)+' 个应用':'未启动',running?'在线':simNative==='starting'?'启动中':'离线');
+  setWire('wire-sim-direct',running?'ok':simNative==='error'?'bad':'',running?sim.direct_ms+' ms · 127.0.0.1':'');
+  // Lane 2: through the relay
+  setNode('node-simr-mac',relayOk?'ok':'warn',s.name||'这台电脑',relayOk?'已连接':'未连接');
+  setNode('node-simr-relay',relayOk?'ok':s.configured?'bad':'',hostOf(s.relay_url)||'未配置',relayOk?'可用':s.configured?'连接异常':'未配置');
+  setNode('node-simr',bothOnline?'ok':simRelay?'warn':running&&d.error?'bad':'',d.name||'模拟设备',!running?'未启动':!d.configured?'未注册':d.error?'连接异常':!s.relay_url?'等 Mac 连上中继':!sameRelay?'服务器不同':!paired?'未配对':bothOnline?'已配对 · 在线':'已配对 · 离线');
+  setWire('wire-simr-relay',relayOk?'ok':s.configured?'bad':'');
+  setWire('wire-simr-device',bothOnline?'ok':running&&d.error?'bad':'');
+  // Steps: the order we roll out in.
+  const real=(s.paired||[]).filter(x=>x.client_id!==d.client_id),realOnline=real.filter(x=>x.online);
+  const tasks=s.tasks||[],simTask=tasks.find(t=>d.client_id&&t.device_id===d.client_id),realTask=tasks.find(t=>t.device_id&&real.some(r=>r.client_id===t.device_id));
+  const steps=[
+    [running,'启动模拟设备',running?(sim.apps||0)+' 个应用已安装':'在 ATOM Connect 中启动','启动',()=>{showPage('simulator');simAsk('start');}],
+    [running&&sim.direct_ms!=null,'本机直连',running?'Mac ⇄ 模拟设备 '+sim.direct_ms+' ms，不经过服务器':'模拟设备启动后自动检测'],
+    [relayOk,'这台 Mac 连上中继服务器',relayOk?hostOf(s.relay_url):s.connection_error||'在「设备与连接」里填写服务器','去设置',()=>showPage('devices')],
+    [simRelay,'模拟设备连上同一个中继',!running?'等模拟设备启动':!d.configured?'模拟设备尚未注册':d.error?d.error:!sameRelay?'模拟设备连的是 '+hostOf(d.relay_url):hostOf(d.relay_url)],
+    [bothOnline,'模拟设备与这台 Mac 经中继配对',bothOnline?'双方都能看到对方在线'+(p.e2e==='on'?' · 端到端加密':''):paired?'已配对，等待双方上线':'自动完成配对码、认领和设备确认','一键配对',simRelay&&!paired?pairSim:null],
+    [!!simTask,'从模拟设备发起一次电脑任务',simTask?'已收到：'+(simTask.title||'任务')+' · '+(statuses[simTask.status]||simTask.status):'在模拟设备打开「我的电脑」，选这台 Mac 发一个任务'],
+    [realOnline.length>0,'真机配对并在线',realOnline.length?realOnline.map(x=>x.name).join('、'):real.length?real.map(x=>x.name).join('、')+' 离线':'在小电脑上显示配对码，到「设备与连接」输入','去配对',()=>showPage('devices')],
+    [!!realTask,'从真机发起一次电脑任务',realTask?'已收到：'+(realTask.title||'任务')+' · '+(statuses[realTask.status]||realTask.status):'和模拟设备的步骤相同，链路一致即可上线']
+  ];
+  const first=steps.findIndex(x=>!x[0]);
+  $('launch-steps').replaceChildren(...steps.map(([done,title,detail,action,run],i)=>h('li',{class:done?'ok':i===first?'now':''},
+    h('span',{class:'step-mark',text:done?'✓':String(i+1)}),h('div',{class:'step-main'},h('strong',{text:title}),h('small',{text:detail||''})),
+    !done&&action&&run&&(i===first||i===4)?h('button',{class:'btn small'+(i===first?' primary':''),text:action,onclick:run}):null)));
+}
+async function pairSim(){if(simPairing)return;simPairing=true;renderSimulator();note('正在经中继配对模拟设备…');
+  try{simState=await api('simulator/pair',{});note('模拟设备已与这台 Mac 配对');await refresh();}catch(e){note(e.message,true);}finally{simPairing=false;refreshSimulator();}}
+$('sim-pair').onclick=pairSim;
+$('sim-toggle').onclick=()=>{if(simState?.running){simAsk('stop');simNative='stopped';}else{simAsk('start');simNative='starting';}renderSimulator();setTimeout(refreshSimulator,600);};
+refreshSimulator();setInterval(refreshSimulator,2000);

@@ -333,3 +333,31 @@ iframe{color-scheme:inherit}
 .work-detail-cover{display:block;width:100%;max-height:300px;object-fit:contain;border-radius:14px;background:var(--surface-2);margin-bottom:18px}
 .cover-uploader{display:grid;grid-template-columns:180px 1fr;gap:10px 18px;margin:5px 0 20px}.cover-uploader h3{grid-column:1/-1;margin:0;font-size:16px}.cover-upload-preview{grid-row:2/5;aspect-ratio:4/3;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:grid;place-items:center;color:var(--text-3);font-size:12px;text-align:center;padding:8px}.cover-upload-preview.has-cover{padding:0}.cover-upload-image{width:100%;height:100%;object-fit:cover}.cover-uploader input{display:block;max-width:100%;font-size:12px;margin-top:8px}.cover-uploader p{font-size:12px;line-height:1.5;margin:0}.cover-uploader label{min-width:0}.cover-uploader input::file-selector-button{border:0;background:var(--accent);color:#fff;border-radius:8px;padding:8px 12px;margin-right:8px;cursor:pointer}
 @media(max-width:600px){.cover-uploader{grid-template-columns:1fr}.cover-upload-preview{grid-row:auto;max-height:180px}.cover-uploader h3{grid-column:auto}}
+
+/* Link lanes: two test links for the simulator, then the production link to the real device. */
+.links{display:flex;flex-direction:column;padding:6px 0}
+.link-row{display:flex;align-items:center;gap:8px;padding:10px 20px;border-top:1px solid var(--line)}
+.link-row:first-child{border-top:0}
+.link-label{flex:0 0 150px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.link-label strong{font-size:13px}
+.link-label small{color:var(--text-3);font-size:12px;line-height:1.4}
+.topology.compact{flex:1;min-width:0;padding:6px 0}
+.topology.compact .node-icon{width:38px;height:38px;border-radius:10px;margin-bottom:4px}
+.topology.compact .node-icon svg{width:19px;height:19px}
+.topology.compact .wire{margin-bottom:40px}
+.wire-label{position:absolute;left:50%;top:-20px;transform:translateX(-50%);font-style:normal;font-size:11px;color:var(--text-3);white-space:nowrap;font-variant-numeric:tabular-nums}
+.launch-steps{list-style:none;margin:0;padding:6px 0;counter-reset:step}
+.launch-steps li{display:flex;align-items:center;gap:12px;padding:10px 18px;border-top:1px solid var(--line)}
+.launch-steps li:first-child{border-top:0}
+.launch-steps .step-mark{flex:0 0 22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:600;background:var(--surface-2);color:var(--text-3);box-shadow:0 0 0 1px var(--line)}
+.launch-steps li.ok .step-mark{background:var(--ok);color:#fff;box-shadow:none}
+.launch-steps li.bad .step-mark{background:var(--bad);color:#fff;box-shadow:none}
+.launch-steps li.now .step-mark{background:var(--accent);color:#fff;box-shadow:none}
+.launch-steps .step-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.launch-steps .step-main strong{font-size:13px;font-weight:500}
+.launch-steps .step-main small{color:var(--text-3);font-size:12px}
+.launch-steps li.ok .step-main strong{color:var(--text-2)}
+.head-actions{display:flex;align-items:center;gap:8px}
+.sim-stage{position:relative;height:calc(100vh - 150px);min-height:420px;overflow:hidden;display:grid;place-items:center}
+.sim-stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#1b1d22}
+.sim-stage .empty{text-align:center}

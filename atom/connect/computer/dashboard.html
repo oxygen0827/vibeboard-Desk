@@ -42,7 +42,7 @@
     <button data-page="overview"><svg><use href="#i-overview"/></svg>概览</button>
     <div class="nav-group">互联</div>
     <button data-page="devices"><svg><use href="#i-link"/></svg>设备与连接<i class="nav-dot" id="nav-devices"></i></button>
-    <button type="button" id="open-simulator" hidden title="在这台 Mac 上运行 ATOM 小电脑和全部应用"><svg><use href="#i-device"/></svg>ATOM 模拟器</button>
+    <button data-page="simulator"><svg><use href="#i-device"/></svg>模拟设备<i class="nav-dot" id="nav-simulator"></i></button>
     <div class="nav-group">电脑 Agent</div>
     <button data-page="tasks"><svg><use href="#i-tasks"/></svg>任务<i class="nav-count" id="nav-tasks"></i></button>
     <button data-page="agents"><svg><use href="#i-agent"/></svg>Agent<i class="nav-dot" id="nav-agents"></i></button>
@@ -66,13 +66,38 @@
 <!-- 概览 -->
 <section data-panel="overview">
   <header class="page-head"><div><h1>概览</h1><p id="overview-sub">这台电脑与 ATOM 的连接情况</p></div></header>
-  <div class="topology card" id="topology">
-    <div class="node" id="node-mac"><span class="node-icon"><svg><use href="#i-mac"/></svg></span><strong>这台 Mac</strong><small></small><span class="badge"></span></div>
-    <div class="wire" id="wire-relay"><i></i></div>
-    <div class="node" id="node-relay"><span class="node-icon"><svg><use href="#i-server"/></svg></span><strong>中继服务器</strong><small></small><span class="badge"></span></div>
-    <div class="wire" id="wire-device"><i></i></div>
-    <div class="node" id="node-device"><span class="node-icon"><svg><use href="#i-device"/></svg></span><strong>ATOM 设备</strong><small></small><span class="badge"></span></div>
+  <div class="links card">
+    <div class="link-row">
+      <div class="link-label"><strong>测试 · 本机直连</strong><small>不经过服务器，验证模拟设备本身</small></div>
+      <div class="topology compact">
+        <div class="node" id="node-sim-mac"><span class="node-icon"><svg><use href="#i-mac"/></svg></span><strong>这台 Mac</strong><small></small><span class="badge"></span></div>
+        <div class="wire" id="wire-sim-direct"><i></i><em class="wire-label" id="wire-sim-direct-label"></em></div>
+        <div class="node" id="node-sim"><span class="node-icon"><svg><use href="#i-device"/></svg></span><strong>模拟设备</strong><small></small><span class="badge"></span></div>
+      </div>
+    </div>
+    <div class="link-row">
+      <div class="link-label"><strong>测试 · 经中继</strong><small>和真机完全相同的配对与任务链路</small></div>
+      <div class="topology compact">
+        <div class="node" id="node-simr-mac"><span class="node-icon"><svg><use href="#i-mac"/></svg></span><strong>这台 Mac</strong><small></small><span class="badge"></span></div>
+        <div class="wire" id="wire-simr-relay"><i></i></div>
+        <div class="node" id="node-simr-relay"><span class="node-icon"><svg><use href="#i-server"/></svg></span><strong>中继服务器</strong><small></small><span class="badge"></span></div>
+        <div class="wire" id="wire-simr-device"><i></i></div>
+        <div class="node" id="node-simr"><span class="node-icon"><svg><use href="#i-device"/></svg></span><strong>模拟设备</strong><small></small><span class="badge"></span></div>
+      </div>
+    </div>
+    <div class="link-row">
+      <div class="link-label"><strong>正式 · 真机</strong><small>测试通过后走这条链路</small></div>
+      <div class="topology compact" id="topology">
+        <div class="node" id="node-mac"><span class="node-icon"><svg><use href="#i-mac"/></svg></span><strong>这台 Mac</strong><small></small><span class="badge"></span></div>
+        <div class="wire" id="wire-relay"><i></i></div>
+        <div class="node" id="node-relay"><span class="node-icon"><svg><use href="#i-server"/></svg></span><strong>中继服务器</strong><small></small><span class="badge"></span></div>
+        <div class="wire" id="wire-device"><i></i></div>
+        <div class="node" id="node-device"><span class="node-icon"><svg><use href="#i-device"/></svg></span><strong>ATOM 小电脑</strong><small></small><span class="badge"></span></div>
+      </div>
+    </div>
   </div>
+  <div class="section-head"><h2>上线步骤</h2><small class="muted">先在模拟设备上跑通，再换真机</small></div>
+  <ol class="launch-steps card" id="launch-steps"></ol>
   <div class="health" id="health"></div>
   <div class="tiles">
     <button class="tile" data-page="agents"><span class="tile-head"><svg><use href="#i-agent"/></svg>电脑 Agent</span><strong id="tile-agent">—</strong><small id="tile-agent-sub"></small></button>
@@ -81,6 +106,13 @@
   </div>
   <div class="section-head"><h2>最近活动</h2><button class="link" data-page="tasks">全部任务<svg><use href="#i-chevron"/></svg></button></div>
   <div class="list card" id="activity"></div>
+</section>
+
+<!-- 模拟设备 -->
+<section data-panel="simulator" hidden>
+  <header class="page-head"><div><h1>模拟设备</h1><p id="sim-sub">在这台 Mac 上运行 ATOM 小电脑和全部应用</p></div>
+    <div class="head-actions"><span id="sim-pill"></span><button class="btn" id="sim-pair" hidden>经中继配对</button><button class="btn" id="sim-toggle">启动</button></div></header>
+  <div class="sim-stage card" id="sim-stage"><div class="empty" id="sim-empty"><strong>模拟设备未启动</strong><span id="sim-empty-detail">点「启动」后，屏幕会显示在这里。</span></div><iframe id="sim-frame" title="ATOM 模拟设备" hidden allow="autoplay; microphone"></iframe></div>
 </section>
 
 <!-- 设备与连接 -->
