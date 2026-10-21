@@ -1,6 +1,7 @@
 import AppKit
 import WebKit
 import Foundation
+import UniformTypeIdentifiers
 
 final class ConnectApplication: NSObject, NSApplicationDelegate, WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler {
     var window: NSWindow!
@@ -13,6 +14,7 @@ final class ConnectApplication: NSObject, NSApplicationDelegate, WKNavigationDel
     func applicationDidFinishLaunching(_ notification: Notification) {
         let config = WKWebViewConfiguration()
         config.userContentController.add(self, name: "chooseFolder")
+        config.userContentController.add(self, name: "savePhoto")
         web = WKWebView(frame: .zero, configuration: config)
         web.navigationDelegate = self
         web.uiDelegate = self
@@ -80,8 +82,32 @@ final class ConnectApplication: NSObject, NSApplicationDelegate, WKNavigationDel
     }
     @objc func showWindow() { window.makeKeyAndOrderFront(nil); NSApplication.shared.activate(ignoringOtherApps: true) }
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        guard message.name == "chooseFolder", message.frameInfo.isMainFrame, let url = message.frameInfo.request.url, let base = origin, url.scheme == base.scheme, url.host == base.host, url.port == base.port else { return }
-        chooseFolder()
+        guard message.frameInfo.isMainFrame, let url = message.frameInfo.request.url, let base = origin, url.scheme == base.scheme, url.host == base.host, url.port == base.port else { return }
+        if message.name == "chooseFolder" { chooseFolder(); return }
+        if message.name == "savePhoto", let body = message.body as? [String: String], let requestID = body["id"], requestID.count < 128,
+           let value = body["data_url"], value.count <= 6 * 1024 * 1024,
+           let split = value.firstIndex(of: ","), ["data:image/jpeg;base64", "data:image/png;base64", "data:image/webp;base64"].contains(String(value[..<split])),
+           let data = Data(base64Encoded: String(value[value.index(after: split)...])) {
+            let panel = NSSavePanel()
+            panel.nameFieldStringValue = (body["name"] ?? "photo").replacingOccurrences(of: "/", with: "_")
+            panel.allowedContentTypes = value.hasPrefix("data:image/png") ? [.png] : value.hasPrefix("data:image/webp") ? [.webP] : [.jpeg]
+            panel.beginSheetModal(for: window) { [weak self] response in
+                var result: [String: Any] = ["id": requestID, "ok": false, "error": "已取消导出"]
+                if response == .OK, let destination = panel.url {
+                    do { try data.write(to: destination, options: .atomic); result = ["id": requestID, "ok": true] }
+                    catch { result["error"] = "照片无法保存到所选位置" }
+                }
+                if let encoded = try? JSONSerialization.data(withJSONObject: result), let literal = String(data: encoded, encoding: .utf8) {
+                    self?.web.evaluateJavaScript("window.dispatchEvent(new CustomEvent('atom:photo-export',{detail:\(literal)}))")
+                }
+            }
+        }
+    }
+    func webView(_ webView: WKWebView, runOpenPanelWith parameters: WKOpenPanelParameters, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping ([URL]?) -> Void) {
+        guard let url = frame.request.url, let base = origin, url.host == base.host, url.port == base.port, url.path.hasPrefix("/photo-album/") else { completionHandler(nil); return }
+        let panel = NSOpenPanel(); panel.canChooseFiles = true; panel.canChooseDirectories = false
+        panel.allowsMultipleSelection = parameters.allowsMultipleSelection; panel.allowedContentTypes = [.jpeg, .png, .webP]
+        panel.beginSheetModal(for: window) { response in completionHandler(response == .OK ? Array(panel.urls.prefix(20)) : nil) }
     }
     @objc func chooseFolder() {
         showWindow()

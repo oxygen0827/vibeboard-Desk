@@ -32,6 +32,10 @@ async function increment() {
 
 使用bg/ink/accent/action/muted/line/card或对应atom别名；图标为透明currentColor字形，主题提供外观。正文优先16px，主要点击目标至少44px，一屏一个主要任务。状态用真实数据驱动，不能以表情或虚假进度替代录音、网络或模型检查结果。动画应尊重prefers-reduced-motion。
 
+### 相册能力
+
+声明 `capabilities: ["photos"]` 后，通过 `atom:photos` / `atom:photos-result` 消息使用账号私有相册，消息包括 `id`、`action`、`data`。系统按安装实例、账号、能力显式授权并校验当前 iframe；预览不获得权限。设备支持 state、list、get、update、delete、generate、jobs、job；`generate` 必须有幂等 request_id，删除必须带当前 revision 和 confirm。图片不保存在 AtomApp 的 64 KiB 状态中。照片由服务器保存与处理，不能宣称端到端加密；发起改图前必须告知用户参考照片会发送给模型服务。电脑导入、原图导出通过受保护的本机后台完成，app 不持有账号或模型凭据。
+
 ## 验证
 
 结构检查tools/check_app.py；生命周期和保存协议tests/app-host.test.cjs。真机需检查初始化、空/失败状态、保存重开、单屏尺寸、局部列表滚动、Home/长按、主题和资源退出。静态检查不能保证审美或所有运行行为。

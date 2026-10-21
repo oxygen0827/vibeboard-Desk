@@ -1,0 +1,40 @@
+{
+  "date": "2026-10-21",
+  "device": "RK3566 / Debian / Chromium 91 / 480x360",
+  "deployed": {
+    "device_app_id": "photo-album",
+    "desktop_position": "appended; updates retain position",
+    "computer": "ATOM Connect macOS package rebuilt and installed",
+    "market": "official-photo-album version 3; cloud source matches local bundle",
+    "server_release": "20261021T051231Z",
+    "guide_release": "20261021T051234Z"
+  },
+  "verified": [
+    "32 marketplace/photo backend tests",
+    "13 device server tests",
+    "6 device product-client tests",
+    "13 Studio tests including photo route/account guards; computer dashboard regression tests passed",
+    "AtomApp host/runtime lifecycle tests",
+    "Photo component UI at 480x360 and 960x700: paging, before/after, failure state, suspend cleanup",
+    "Real cloud upload of seven isolated test fixtures through computer UI",
+    "Original browser download and favorite synchronization",
+    "Real device pagination (6 + 1), fullscreen photo, six-second slideshow and return to source desktop page",
+    "Packaged computer UI fixed viewport at 1200x800 and compact browser UI at 820x560",
+    "Purpose-specific icon visually checked on actual themed desktop",
+    "Test photos removed; production browser restored without remote-debugging flags"
+  ],
+  "image_provider": {
+    "provider": "Volcengine Ark",
+    "model": "doubao-seedream-5-0-flash-260915",
+    "private_configuration_saved": true,
+    "live_generation_passed": false,
+    "live_response": "ModelNotOpen: provider account has not activated the selected model",
+    "live_reference_edit_passed": false,
+    "generation_pipeline_unit_test": "fake provider; not evidence of actual model quality"
+  },
+  "limitations": [
+    "Native macOS file-open/save panel compiled; native UI interaction not exercised because computer-use permission was unavailable. Browser upload/download was verified.",
+    "New album voice message routing is implemented; no new spoken-audio acceptance recording was made in this run.",
+    "Cloud photo storage is account-private and server-readable, not end-to-end encrypted; no persistent offline photo cache."
+  ]
+}

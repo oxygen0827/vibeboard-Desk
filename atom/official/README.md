@@ -7,6 +7,7 @@
 - **任务伙伴 task-pal（已整合至 Agent 小屋）**：只读系统 `atom:task-state` 状态，呈现实际电脑任务与审批、失败、完成。未连接或断网明确显示，没有假任务、假百分比或假进度。通过「我的电脑」发起和审批。
 
 - **今日 today**：与电脑工作台共享真实日程和待办；离线 pending 持久保存、重连同步、冲突显式保留两份，账号数据隔离。
+- **相册 photo-album**：照片导入、账号私有云端同步、收藏、全屏轮播、文字生图与照片风格改写。[构建、使用和边界](photo-album/README.md)。新增资源单独运行 `python3 atom/official/photo-album/build.py`，同时更新电脑端嵌入资源。
 - **声音实验室 sound-lab**：原生 WebAudio 的四轨十六步节拍编排，速度、音量与节拍可保存，暂停与退出释放音频资源。
 
 运行 `python3 atom/official/build.py` 重新生成五个完整 bundle；之后运行 `python3 atom/tools/prepare_icon_bundles.py`。市场服务按 `catalog.json` 导入：跳过退役的云朵伙伴和任务伙伴，并从 `../experiences/` 加入共生世界、语言炼金、合奏伙伴、Agent 小屋。电脑与设备端读取同一目录。导入为不可变版本后，源码改变不会偷偷修改已发布版本，应按市场新版本流程发布。

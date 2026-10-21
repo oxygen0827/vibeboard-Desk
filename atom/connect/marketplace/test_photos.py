@@ -1,0 +1,151 @@
+import base64
+import io
+import json
+from pathlib import Path
+import secrets
+import sys
+import tempfile
+import threading
+import time
+import unittest
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from PIL import Image
+from service import Marketplace, MarketError
+from photos import ArkImages, PhotoError, data_url
+
+
+def picture(color='orange', size=(160, 100)):
+    out = io.BytesIO()
+    Image.new('RGB', size, color).save(out, 'PNG')
+    return out.getvalue()
+
+
+class FakeProvider:
+    model = 'test-images'
+    def __init__(self):
+        self.calls = []
+        self.gate = threading.Event()
+        self.gate.set()
+    def enabled(self, uid): return True
+    def generate(self, prompt, reference=None):
+        self.calls.append((prompt, reference))
+        self.gate.wait(5)
+        return picture('blue')
+
+
+class PhotosTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.path = str(Path(self.temp.name) / 'market.sqlite3')
+        self.market = Marketplace(self.path, seeds=Path(self.temp.name)/'none')
+        self.a = self.market.handle('POST', '/market/v1/register', body={'username':'alice','password':'test-password-1234'})
+        self.b = self.market.handle('POST', '/market/v1/register', body={'username':'bobby','password':'test-password-5678'})
+        self.fake = FakeProvider()
+        self.market.photos.provider = self.fake
+
+    def tearDown(self):
+        self.fake.gate.set()
+        self.market.close()
+        self.temp.cleanup()
+
+    def call(self, suffix='', body=None, account=None):
+        return self.market.handle('GET' if body is None else 'POST', '/market/v1/photos'+suffix,
+                                  (account or self.a)['token'], body)
+
+    def upload(self, name='test.png', photo_id=None, raw=None):
+        return self.call(body={'id':photo_id or secrets.token_hex(16),'name':name,'data_url':data_url(raw or picture(),'image/png')})['photo']
+
+    def denied(self, status, fn):
+        with self.assertRaises(MarketError) as caught: fn()
+        self.assertEqual(status, caught.exception.status)
+
+    def finish(self, ident):
+        for _ in range(100):
+            job = self.call('/jobs/'+ident)['job']
+            if job['status'] not in ('queued','generating','saving'): return job
+            time.sleep(.02)
+        self.fail('job did not finish')
+
+    def test_original_thumbnail_account_isolation_and_atomic_backup(self):
+        raw = picture()
+        p = self.upload(raw=raw)
+        self.assertEqual(base64.b64decode(self.call('/'+p['id']+'/original')['data_url'].split(',')[1]), raw)
+        listing = self.call()
+        self.assertEqual(listing['total'], 1)
+        self.assertTrue(listing['items'][0]['thumbnail'].startswith('data:image/jpeg;'))
+        self.assertEqual(self.call(account=self.b)['items'], [])
+        for path in ('/'+p['id'], '/'+p['id']+'/original'):
+            self.denied(404, lambda: self.call(path, account=self.b))
+        self.denied(401, lambda: self.market.handle('GET','/market/v1/photos', ''))
+        import sqlite3
+        backup = sqlite3.connect(':memory:')
+        self.market.db.backup(backup)
+        self.assertEqual(backup.execute('SELECT original FROM photo_media').fetchone()[0], raw)
+        backup.close()
+
+    def test_upload_idempotency_validation_and_revision(self):
+        key = secrets.token_hex(16)
+        p = self.upload(photo_id=key)
+        self.assertEqual(self.upload(photo_id=key), p)
+        self.denied(409, lambda: self.upload(photo_id=key,raw=picture('red')))
+        self.denied(400, lambda: self.call(body={'id':secrets.token_hex(16),'name':'bad','data_url':data_url(b'<svg/>','image/png')}))
+        self.denied(400, lambda: self.call('/'+p['id']+'/delete', {'revision':1}))
+        updated = self.call('/'+p['id']+'/update', {'revision':1,'favorite':True})['photo']
+        self.assertEqual(self.call('?filter=favorites')['total'],1)
+        self.denied(409,lambda:self.call('/'+p['id']+'/update',{'revision':1,'favorite':False}))
+        self.call('/'+p['id']+'/delete',{'revision':updated['revision'],'confirm':True})
+        self.assertEqual(self.call()['total'],0)
+        self.assertEqual(self.market.row('SELECT COUNT(*) n FROM photo_media')['n'],0)
+
+    def test_generation_reference_saved_without_overwriting_and_no_double_billing(self):
+        p = self.upload()
+        request = {'request_id':secrets.token_hex(16),'source_id':p['id'],'style':'clay','prompt':'蓝色的天空'}
+        self.fake.gate.clear()
+        job = self.call('/generate',request)['job']
+        self.assertEqual(self.call('/generate',request)['job']['id'],job['id'])
+        self.denied(409, lambda:self.call('/generate',{**request,'request_id':secrets.token_hex(16)}))
+        self.denied(404,lambda:self.call('/jobs/'+job['id'],account=self.b))
+        self.fake.gate.set()
+        done = self.finish(job['id'])
+        self.assertEqual(done['status'],'completed')
+        result = self.call('/'+done['photo_id'])['photo']
+        self.assertEqual(result['parent_id'],p['id'])
+        self.assertTrue(result['generated'])
+        self.assertEqual(self.call()['total'],2)
+        self.assertEqual(len(self.fake.calls),1)
+        self.assertTrue(self.fake.calls[0][1].startswith('data:image/jpeg;base64,'))
+        self.call('/'+p['id']+'/delete',{'revision':1,'confirm':True})
+        self.assertEqual(self.call()['total'],1)
+        self.assertEqual(self.call('/generate',request)['job']['id'],job['id'])
+
+    def test_unauthorized_reference_and_bad_input_never_reach_provider(self):
+        p = self.upload()
+        self.denied(404,lambda:self.call('/generate',{'request_id':secrets.token_hex(16),'source_id':p['id'],'style':'clay'},self.b))
+        self.denied(400,lambda:self.call('/generate',{'request_id':secrets.token_hex(16),'prompt':{'not':'text'}}))
+        self.denied(400,lambda:self.call('/generate',{'request_id':secrets.token_hex(16),'prompt':'   '}))
+        self.assertEqual(self.fake.calls,[])
+
+    def test_restart_preserves_media_and_interrupts_unfinished_job(self):
+        p=self.upload()
+        job={'id':secrets.token_hex(16),'status':'generating','user_id':self.a['user']['id']}
+        with self.market.db:
+            self.market.db.execute('INSERT INTO photo_jobs VALUES(?,?,?,?,?)',(job['id'],self.a['user']['id'],secrets.token_hex(16),'hash',json.dumps(job)))
+        self.market.close()
+        self.market=Marketplace(self.path,seeds=Path(self.temp.name)/'none')
+        self.assertEqual(self.call('/jobs/'+job['id'])['job']['status'],'interrupted')
+        self.assertEqual(self.call('/'+p['id'])['photo']['name'],'test.png')
+
+    def test_provider_errors_do_not_echo_secret(self):
+        from urllib.error import HTTPError
+        provider=ArkImages();provider.key='private-test-credential'
+        class Opener:
+            def open(self,*args,**kwargs):
+                raise HTTPError('https://example.invalid',404,'bad',{},io.BytesIO(json.dumps({'error':{'code':'ModelNotOpen','message':'private-test-credential'}}).encode()))
+        provider.opener=Opener()
+        with self.assertRaises(PhotoError) as caught:provider.generate('test')
+        self.assertEqual(caught.exception.code,'model_not_open')
+        self.assertNotIn(provider.key,caught.exception.message)
+
+
+if __name__=='__main__': unittest.main()

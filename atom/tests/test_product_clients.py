@@ -7,6 +7,16 @@ from relay_bridge import BridgeError
 from release_store import ReleaseStore
 from server import install_app, apps, validate_manifest
 class ProductClients(unittest.TestCase):
+    def test_photo_proxy_is_account_bound_and_uses_fixed_routes(self):
+        with tempfile.TemporaryDirectory() as d:
+            c=self.setup_client(d)
+            with mock.patch.object(c,'request',return_value={'items':[]}) as req:
+                with self.assertRaises(BridgeError):c.execute('photo-list',{'expected_user_id':'other'})
+                with self.assertRaises(BridgeError):c.execute('photo-get',{'id':'../../keys'})
+                req.assert_not_called()
+                c.execute('photo-list',{'expected_user_id':'alice','page':0,'filter':'all','limit':6})
+                self.assertEqual(req.call_args.args[0],'photos?page=0&filter=all&limit=6')
+                self.assertTrue(req.call_args.kwargs['authenticated'])
     def setup_client(self,folder):
         connect=mock.Mock();connect.config={'relay_url':'http://127.0.0.1:19441'}
         c=MarketClient(Path(folder).resolve(),connect);c.save({'relay_url':connect.config['relay_url'],'token':'private-market-token'*3,'user':{'id':'alice','username':'Alice'}});return c

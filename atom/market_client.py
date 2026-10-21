@@ -49,11 +49,12 @@ class MarketClient:
             if not token:raise BridgeError('请先登录应用市场账号',401,'market_login_required')
             headers['Authorization']='Bearer '+token
         body=None if data is None else json.dumps(data,ensure_ascii=False).encode('utf-8')
-        if body and len(body)>2*1024*1024:raise BridgeError('请求内容过大')
+        limit=6*1024*1024 if route=='photos' or route.startswith('photos/') or route.startswith('photos?') else 2*1024*1024
+        if body and len(body)>limit:raise BridgeError('请求内容过大')
         try:
             with self.opener.open(Request(self.base()+'/market/v1/'+route,data=body,headers=headers),timeout=10) as response:
-                raw=response.read(2*1024*1024+1)
-                if len(raw)>2*1024*1024:raise BridgeError('市场响应过大',502)
+                raw=response.read(limit+1)
+                if len(raw)>limit:raise BridgeError('市场响应过大',502)
                 result=json.loads(raw.decode('utf-8'))
                 if not isinstance(result,dict):raise BridgeError('市场响应无效',502)
                 return result
@@ -71,6 +72,22 @@ class MarketClient:
             raise BridgeError('市场返回格式无效',502)
     def execute(self, action, data):
         if not isinstance(data,dict):raise BridgeError('请求格式无效')
+        if action.startswith('photo-'):
+            with self.lock:
+                expected=data.get('expected_user_id')
+                if expected is not None and expected!=self.current().get('user',{}).get('id'):
+                    raise BridgeError('账号已切换，请重新打开相册',401)
+                name=action[6:]
+                if name=='state':return self.request('photos/state',authenticated=True)
+                if name=='list':return self.request('photos?'+urlencode({k:data[k] for k in ('page','filter','limit') if k in data}),authenticated=True)
+                if name=='jobs':return self.request('photos/jobs',authenticated=True)
+                if name=='job':return self.request('photos/jobs/'+identifier(data.get('id'),'任务'),authenticated=True)
+                if name=='generate':return self.request('photos/generate',{k:data[k] for k in ('request_id','prompt','style','source_id') if k in data},True)
+                if name in ('get','update','delete'):
+                    route='photos/'+identifier(data.get('id'),'照片')
+                    if name=='get':return self.request(route,authenticated=True)
+                    return self.request(route+'/'+name,{k:data[k] for k in ('revision','name','favorite','confirm') if k in data},True)
+                raise BridgeError('相册操作不支持')
         if action=='state':
             value=self.current();user=value.get('user') or {}
             return dict(configured=bool(self.connect.config.get('relay_url')),authenticated=bool(value.get('token')),user={k:user[k] for k in ('id','username') if k in user},

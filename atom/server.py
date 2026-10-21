@@ -165,7 +165,7 @@ def validate_manifest(value, trusted_connect=False):
     if 'icon' in value: result['icon'] = value['icon']
     if 'capabilities' in value:
         caps = value['capabilities']
-        if not isinstance(caps,list) or len(caps)>3 or any(not isinstance(c,str) or c not in ('notes','agenda','task-state') for c in caps) or len(set(caps))!=len(caps): raise ValueError('invalid app capabilities')
+        if not isinstance(caps,list) or len(caps)>4 or any(not isinstance(c,str) or c not in ('notes','agenda','task-state','photos') for c in caps) or len(set(caps))!=len(caps): raise ValueError('invalid app capabilities')
         result['capabilities'] = caps
     if 'theme_ui' in value:
         if value['theme_ui'] != 'controls': raise ValueError('invalid theme_ui')

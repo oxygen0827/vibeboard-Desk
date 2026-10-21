@@ -1,16 +1,27 @@
 # ATOM Connect 公网部署（ldcx.tech/atom）
 
-把中继与市场服务（`connect/relay/server.py`，仅 Python 标准库）部署到阿里云 ldcx 主机，经 Docker 内的 nginx 以 `https://ldcx.tech/atom` 对外提供。设备与电脑端的服务器地址都填 `https://ldcx.tech/atom`。
+把中继与市场服务（`connect/relay/server.py`，中继使用 Python 标准库，相册使用 Pillow）部署到阿里云 ldcx 主机，经 Docker 内的 nginx 以 `https://ldcx.tech/atom` 对外提供。设备与电脑端的服务器地址都填 `https://ldcx.tech/atom`。
 
 | 项 | 值 |
 | --- | --- |
 | 代码 | `/opt/atom/releases/<时间戳>`，`/opt/atom/connect`、`/opt/atom/official`、`/opt/atom/experiences` 为指向当前版本的链接，保留最近 3 个版本 |
 | 数据 | `/var/lib/atom/relay.sqlite3`、`relay.marketplace.sqlite3`（目录 0700，属 `atom` 系统用户） |
+
 | 监听 | `172.17.0.1:9092`（Docker 网桥网关），只供 nginx 容器经 `host.docker.internal` 访问，不对公网开放 |
 | 真实 IP | nginx 写入 `X-Real-IP`；服务只信任来自 `172.17.0.0/16` 的该请求头（`--trusted-proxy`），用于注册/登录/配对限流 |
 | 边缘限流 | nginx `limit_req` 每 IP 10 r/s，突发 40 |
 | 备份 | 每天主机时间 04:20 做一致性快照，打包上传 OSS 私有前缀，本地保留 3 份 |
 | 监控 | 每 5 分钟检查健康、服务、备份、磁盘、证书，异常时发邮件（需 `smtp.env`） |
+
+### 相册与图片生成
+
+相册需要 Pillow；部署前运行 `python3 -m pip install --target /opt/atom/python-deps -r atom/connect/server/requirements.txt`。服务通过 `PYTHONPATH` 加载，依赖目录保持 root 所有且不可被服务写入。
+
+将 `images.env.example` 复制为 `/etc/atom/images.env`，设为 root 所有、0600，填写方舟 API Key、已开通的模型 ID 和可使用该付费服务的 ATOM 账号 ID 白名单。配置修改后重启 `atom-connect`。服务不会把密钥返回给电脑或设备客户端。
+
+在现有 TLS server 中合并 `nginx-photos.conf`，`nginx -t` 成功后 reload。只有照片上传精确路径扩到 6 MiB，其他 API 保持原限制。`photo_media` 的原图/预览/缩略图 BLOB、元数据和持久生成任务均在市场 SQLite 中，因此现有备份与恢复流程完整覆盖相册。
+
+照片按账号隔离但服务器可读，只有用户点击生成才将参考预览与提示词发送给模型商；与便签/日程的端到端加密分开说明。单张上传上限 4 MiB / 1600 万像素；每账号 64 MiB，所有相册合计 128 MiB。详细行为见 [相册说明](../../official/photo-album/README.md)。
 
 ## 首次部署
 

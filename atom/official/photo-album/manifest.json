@@ -1,0 +1,1 @@
+{"id":"photo-album","name":"相册","description":"电脑与 ATOM 同步的私有相册：原图、收藏、全屏相框，以及文字生图和照片风格改写。","entry":"index.html","icon":"icon.svg","theme_ui":"controls","layout":"fullscreen","capabilities":["photos"]}

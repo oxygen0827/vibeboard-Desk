@@ -13,7 +13,9 @@ export function dashboard(companion,{port=8788}={}){
   if(req.headers.host!==new URL(origin).host)return send(403,{error:'本地地址无效'});
   const url=new URL(req.url,origin);
   if(req.method==='GET'&&url.pathname==='/'){res.setHeader('Set-Cookie','atom_connect='+session+'; HttpOnly; SameSite=Strict; Path=/');res.writeHead(200,{'Content-Type':'text/html; charset=utf-8'});return res.end(fs.readFileSync(new URL('./dashboard.html',import.meta.url),'utf8'));}
+  if(req.method==='GET'&&url.pathname==='/photos.js'){res.writeHead(200,{'Content-Type':'text/javascript'});return res.end(fs.readFileSync(new URL('./photos.js',import.meta.url)));}
   if(req.method==='GET'&&url.pathname==='/studio.js'){res.writeHead(200,{'Content-Type':'text/javascript'});return res.end(fs.readFileSync(new URL('./studio.js',import.meta.url)));}
+  if(req.method==='GET'&&/^\/photo-album\/(index.html|app.js|style.css|icon.svg)$/.test(url.pathname)){const name=url.pathname.split('/').pop();res.setHeader('Content-Security-Policy',"default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; frame-ancestors 'self'; object-src 'none'; base-uri 'none'");res.writeHead(200,{'Content-Type':({'html':'text/html; charset=utf-8','js':'text/javascript','css':'text/css','svg':'image/svg+xml'})[name.split('.').pop()]});return res.end(fs.readFileSync(new URL('./photo-album/'+name,import.meta.url)));}
   if(req.method==='GET'&&url.pathname==='/dashboard.js'){res.writeHead(200,{'Content-Type':'text/javascript'});return res.end(fs.readFileSync(new URL('./dashboard.js',import.meta.url)));}
   if(req.method==='GET'&&url.pathname==='/dashboard.css'){res.writeHead(200,{'Content-Type':'text/css'});return res.end(fs.readFileSync(new URL('./dashboard.css',import.meta.url)));}
   if(!(req.headers.cookie||'').split(';').some(c=>c.trim()==='atom_connect='+session))return send(401,{error:'请从本地控制台首页打开'});
@@ -21,7 +23,7 @@ export function dashboard(companion,{port=8788}={}){
   if(req.method==='GET'&&url.pathname.startsWith('/api/studio/')){try{return send(200,await companion.studio.handle('GET',url.pathname.slice('/api/studio'.length)+url.search));}catch(e){return send(e.status||400,{error:e.message,code:e.code,...(e.status===409?{conflict:e.details}: {})});}}
   if(req.method==='GET'&&url.pathname==='/api/state')return send(200,{...companion.state(),csrf});
   if(req.method!=='POST'||req.headers.origin!==origin||req.headers['x-atom-csrf']!==csrf||!String(req.headers['content-type']).startsWith('application/json'))return send(403,{error:'请求来源无效'});
-  let text='';try{for await(const chunk of req){text+=chunk;if(Buffer.byteLength(text)>(url.pathname.startsWith('/api/studio/')?2*1024*1024:32768))return send(413,{error:'请求过大'});}const body=JSON.parse(text||'{}');let result={ok:true};
+  let text='';try{for await(const chunk of req){text+=chunk;if(Buffer.byteLength(text)>(url.pathname==='/api/studio/photos'?6*1024*1024:url.pathname.startsWith('/api/studio/')?2*1024*1024:32768))return send(413,{error:'请求过大'});}const body=JSON.parse(text||'{}');let result={ok:true};
    if(url.pathname.startsWith('/api/studio/'))result=await companion.studio.handle('POST',url.pathname.slice('/api/studio'.length),body);
    else if(url.pathname==='/api/configure')await companion.configure(body);
    else if(url.pathname==='/api/projects')result=companion.addProject(body);

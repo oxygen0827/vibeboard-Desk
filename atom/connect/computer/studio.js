@@ -16,7 +16,7 @@ el('dialog-close').onclick=()=>dialog.close();
 async function studioState(){const s=await call('/state');account=s.user;window.studioJobs=s.jobs||[];
   el('account-avatar').replaceChildren(account?account.username.slice(0,1).toUpperCase():icon('user'));el('account-avatar').classList.toggle('on',!!account);
   el('account-name').textContent=account?account.username:'未登录';
-  el('account-detail').textContent=!account?'登录市场账号以同步':s.encryption==='locked'||s.encryption==='recovery'?'随手记已锁定，点此解锁':s.pending_notes?s.pending_notes+' 条便签待同步':'已加密同步';
+  el('account-detail').textContent=!account?'登录市场账号以同步':s.encryption==='locked'||s.encryption==='recovery'?'随手记已锁定，点此解锁':s.pending_notes?s.pending_notes+' 条便签待同步':'随手记与今日已加密';
   encryption=s.encryption;window.renderActivity?.();if(s.recovery_code&&!dialog.open)showRecovery(s.recovery_code);return s;}
 let encryption='none';
 function showRecovery(code){const box=clearDialog('请保存恢复密钥'),ok=h('input',{type:'checkbox'});
@@ -66,6 +66,7 @@ function accountDialog(){const box=clearDialog(account?'市场账号':'登录市
       password.value='';dialog.close();await studioState();note(mode==='forgot'?'密码已重置并登录':'市场账号已连接');window.dispatchEvent(new CustomEvent('atom:page',{detail:currentPage}));}
     catch(err){status.textContent=err.message;status.className='';}finally{submit.disabled=false;}};
   box.append(form);sync();user.focus();}
+window.atomAlbumLogin=()=>accountDialog();
 el('studio-account').onclick=async()=>{try{await studioState();accountDialog();}catch(e){error(e);}};
 
 // Source viewer shared by market and dialogs

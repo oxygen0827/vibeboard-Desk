@@ -1,4 +1,4 @@
-"""Self-hosted ATOM source marketplace. No server-side builds or model credentials."""
+"""Self-hosted ATOM source marketplace and account-private sync services."""
 import hashlib
 from datetime import datetime
 import hmac
@@ -16,6 +16,7 @@ from urllib.parse import urlsplit, parse_qs
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from mailer import Mailer, settings as mailer_settings
+from photos import PhotoLibrary, PhotoError
 
 CATEGORIES = {'life', 'companion', 'sound', 'play', 'connect'}
 LICENSES = {'MIT', 'Apache-2.0', 'BSD-2-Clause', 'BSD-3-Clause', 'CC0-1.0', 'MPL-2.0', 'GPL-3.0-only', 'GPL-3.0-or-later'}
@@ -79,7 +80,7 @@ def validate_bundle(bundle, official=False):
     require('layout' not in manifest or manifest['layout'] == 'fullscreen', 'Invalid layout')
     if 'capabilities' in manifest:
         caps=manifest['capabilities']
-        require(isinstance(caps,list) and len(caps)<=3 and all(isinstance(c,str) and c in ('notes','agenda','task-state') for c in caps) and len(set(caps))==len(caps),'Invalid capability declaration')
+        require(isinstance(caps,list) and len(caps)<=4 and all(isinstance(c,str) and c in ('notes','agenda','task-state','photos') for c in caps) and len(set(caps))==len(caps),'Invalid capability declaration')
     require(not any(k in manifest for k in ('theme_mode', 'theme_id')), 'Apps must follow the active system theme')
     require(2 <= len(files) <= 100 and 'index.html' in files and 'icon.svg' in files, 'Complete app files required')
     for name, content in files.items():
@@ -129,6 +130,7 @@ class Marketplace:
         self._schema()
         self.seed_root = Path(seeds) if seeds else Path(__file__).resolve().parents[2] / 'official'
         self.import_official()
+        self.photos = PhotoLibrary(self)
 
     def _prepare_path(self, target):
         target.parent.mkdir(parents=True, mode=0o700, exist_ok=True)
@@ -164,6 +166,7 @@ class Marketplace:
             self.db.commit()
 
     def close(self):
+        self.photos.close()
         self.db.close()
 
     def row(self, sql, args=()):
@@ -305,6 +308,11 @@ class Marketplace:
     def handle(self, method, target, token='', body=None, peer='local'):
         body = body if body is not None else {}
         path = urlsplit(target).path.rstrip('/')[len('/market/v1'):]
+        if path == '/photos' or path.startswith('/photos/'):
+            try:
+                return self.photos.handle(method, target, token, body)
+            except PhotoError as exc:
+                raise MarketError(exc.status, exc.message, exc.code)
         if method == 'POST' and path in ('/register', '/login'):
             return self.sign_in(path, body, peer)
         if method == 'POST' and path == '/password/reset':

@@ -1,7 +1,7 @@
 /* ATOM Connect local console: connection, computer agent and shell. Studio pages live in studio.js. */
 let csrf='',currentPage='overview',lastState=null,refreshing=false,taskFilter='all';
 const $=id=>document.getElementById(id);
-const pages=['overview','devices','tasks','agents','projects','notes','agenda','market','creations'];
+const pages=['overview','devices','tasks','agents','projects','notes','agenda','photos','market','creations'];
 const statuses={queued:'等待执行',running:'正在执行',waiting_approval:'等待审批',saving:'正在保存',completed:'已完成',failed:'失败',cancelled:'已取消',interrupted:'已中断',conflict:'有冲突'};
 const statusTone={queued:'info',running:'info',waiting_approval:'warn',saving:'info',completed:'ok',failed:'bad',cancelled:'',interrupted:'bad',conflict:'warn'};
 const ACTIVE=['queued','running','waiting_approval','saving'];

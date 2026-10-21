@@ -7,7 +7,8 @@
     "symbiotic-world": "play",
     "language-alchemy": "play",
     "ai-duet": "sound",
-    "agent-studio": "connect"
+    "agent-studio": "connect",
+    "photo-album": "life"
   },
   "extra_sources": [
     "../experiences/world/bundle.json",

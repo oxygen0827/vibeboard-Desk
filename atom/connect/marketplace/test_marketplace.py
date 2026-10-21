@@ -245,7 +245,9 @@ class MarketplaceTests(unittest.TestCase):
         try:
             works=current.handle('GET','/market/v1/catalog')['works']
             self.assertEqual({w['category'] for w in works},{'life','sound','play','connect'})
-            self.assertEqual(len(works),7)
+            self.assertEqual(len(works),8)
+            album=next(w for w in works if w['id']=='official-photo-album')
+            self.assertEqual(album['category'],'life')
             ids={w['id'] for w in works}
             self.assertNotIn('official-official-companion',ids)
             self.assertNotIn('official-task-pal',ids)
