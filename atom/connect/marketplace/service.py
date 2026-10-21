@@ -25,6 +25,22 @@ ID = re.compile(r'^[A-Za-z0-9_-]{1,100}$')
 MAX_BUNDLE = 1024 * 1024
 EMAIL = re.compile(r'^[^@\s]{1,64}@[A-Za-z0-9.-]{1,189}\.[A-Za-z]{2,24}$')
 CODE_TTL, CODE_ATTEMPTS = 900, 5
+B64 = re.compile(r'^[A-Za-z0-9_-]+$')
+
+
+def envelope(value, plain_limit, label='content'):
+    # AES-GCM envelope from atom/e2e.py; the server never sees the key.
+    require(isinstance(value, dict) and set(value) == {'v', 'iv', 'ct'} and value['v'] == 1 and isinstance(value['iv'], str) and len(value['iv']) == 16 and B64.fullmatch(value['iv'])
+            and isinstance(value['ct'], str) and 22 <= len(value['ct']) <= (plain_limit * 3 + 16) * 4 // 3 + 4 and B64.fullmatch(value['ct']), 'Invalid encrypted ' + label)
+    return value
+
+
+def key_record(value):
+    require(isinstance(value, dict) and value.get('v') == 1 and isinstance(value.get('key_id'), str) and B64.fullmatch(value['key_id']) and len(value['key_id']) <= 16
+            and isinstance(value.get('salt'), str) and B64.fullmatch(value['salt']) and len(value['salt']) <= 32
+            and type(value.get('iterations')) is int and 100000 <= value['iterations'] <= 2000000, 'Invalid key record')
+    return dict(v=1, key_id=value['key_id'], salt=value['salt'], iterations=value['iterations'],
+                by_password=envelope(value.get('by_password'), 64, 'key'), by_recovery=envelope(value.get('by_recovery'), 64, 'key'))
 
 
 class MarketError(Exception):
@@ -138,6 +154,7 @@ class Marketplace:
         CREATE INDEX IF NOT EXISTS drafts_user ON drafts(user);
         CREATE INDEX IF NOT EXISTS notes_user ON notes(user);
         CREATE INDEX IF NOT EXISTS versions_work ON versions(work);
+        CREATE TABLE IF NOT EXISTS account_keys(user TEXT PRIMARY KEY,data TEXT,updated REAL);
         CREATE TABLE IF NOT EXISTS verifications(user TEXT,purpose TEXT,hash TEXT,email TEXT,expires REAL,attempts INTEGER DEFAULT 0,PRIMARY KEY(user,purpose));
         ''')
         columns = {r[1] for r in self.db.execute('PRAGMA table_info(users)')}
@@ -356,16 +373,39 @@ class Marketplace:
             user = self.auth(token)
             self.rate(('change', user['id']), 10, 3600)
             old, new = text(body, 'old_password', 256), self.new_password(body)
+            record = key_record(body['keys']) if 'keys' in body else None
         require(hmac.compare_digest(self.hash_password(old, user['salt']), user['password_hash']), '当前密码不正确', 401, 'invalid_credentials')
         salt = secrets.token_hex(16)
         computed = self.hash_password(new, salt)
         with self.lock, self.db:
             current = self.auth(token)
             require(current['salt'] == user['salt'], '密码已在其他地方修改，请重新登录', 409, 'password_changed')
+            if record:
+                # The data key rewrapped for the new password lands in the same transaction.
+                keys = self.keys_of(current)
+                require(keys and keys['key_id'] == record['key_id'], 'Encryption key changed; unlock again', 409, 'keys_changed')
+                self.db.execute('UPDATE account_keys SET data=?,updated=? WHERE user=?', (packed(record), self.clock(), user['id']))
             self.db.execute('UPDATE users SET salt=?,password_hash=? WHERE id=?', (salt, computed, user['id']))
             # Keep this session, sign out every other one.
             self.db.execute('DELETE FROM sessions WHERE user=? AND hash<>?', (user['id'], hashlib.sha256(token.encode()).hexdigest()))
             return {'ok': True}
+
+    def keys_of(self, user):
+        row = self.row('SELECT data FROM account_keys WHERE user=?', (user['id'],))
+        return json.loads(row['data']) if row else None
+
+    def sealed_item(self, user, body, current, plain_fields):
+        """For accounts with keys: content travels only as 'enc' under the current key id."""
+        keys = self.keys_of(user)
+        if not keys:
+            require('enc' not in body, 'Set up encryption before sending encrypted content')
+            return None
+        require(not any(k in body for k in plain_fields), 'This account stores notes and agenda encrypted; update the app', 400, 'encryption_required')
+        if 'enc' in body:
+            require(body.get('key_id') == keys['key_id'], 'Encryption key changed; unlock again', 409, 'keys_changed')
+            return dict(enc=envelope(body['enc'], 4000 * 3 + 64), key_id=keys['key_id'])
+        require(current and 'enc' in current, 'Encrypted content required', 400, 'encryption_required')
+        return dict(enc=current['enc'], key_id=current.get('key_id'))
 
     def mail(self, to, subject, body):
         require(self.mailer.configured, '服务器暂未配置邮件发送', 503, 'mail_unavailable')
@@ -408,6 +448,18 @@ class Marketplace:
         user=self.auth(token)
         if path=='/me' and method=='GET':
             return {'user':{'id':user['id'],'username':user['username'],'email':user['email'] or '','email_verified':bool(user['email_verified'])}}
+        if path=='/keys' and method=='GET':
+            return {'keys':self.keys_of(user)}
+        if path=='/keys' and method=='POST':
+            record=key_record(body.get('keys'))
+            current=self.keys_of(user)
+            if current and record['key_id']!=current['key_id']:
+                # A new data key makes every existing encrypted note unreadable: only on explicit request.
+                require(body.get('reset') is True and body.get('confirm') is True,'Encryption already set up',409,'keys_exist')
+                self.db.execute('DELETE FROM notes WHERE user=?',(user['id'],))
+                self.db.execute('DELETE FROM agenda WHERE user=?',(user['id'],))
+            self.db.execute('INSERT OR REPLACE INTO account_keys VALUES(?,?,?)',(user['id'],packed(record),self.clock()))
+            return {'keys':record}
         if path=='/email/start' and method=='POST':
             email=text(body,'email',254).strip()
             require(EMAIL.fullmatch(email),'请输入有效的邮箱地址')
@@ -469,16 +521,18 @@ class Marketplace:
                 raise MarketError(409,'Item has changed; resolve conflict without overwriting','revision_conflict',current=current)
             if not current: require(revision is None or type(revision) is int and revision==0,'Invalid initial item revision')
             require(current or self.row('SELECT COUNT(*) n FROM agenda WHERE user=?',(user['id'],))['n']<200,'Agenda quota reached',409,'quota_exceeded')
-            title=text(body,'title',200)
+            sealed=self.sealed_item(user,body,current,('title','starts_at'))
+            title=None if sealed else text(body,'title',200)
             kind=body.get('kind',current['kind'] if current else 'todo')
             require(kind in ('event','todo'),'Invalid agenda kind')
-            starts=text(body,'starts_at',64,True) if 'starts_at' in body else (current['starts_at'] if current else '')
+            starts='' if sealed else text(body,'starts_at',64,True) if 'starts_at' in body else (current.get('starts_at','') if current else '')
             if starts:
                 try: datetime.fromisoformat(starts.replace('Z','+00:00'))
                 except ValueError: raise MarketError(400,'Invalid ISO start time')
             done,deleted=body.get('done',current['done'] if current else False),body.get('deleted',current['deleted'] if current else False)
             require(type(done) is bool and type(deleted) is bool,'Invalid item flags')
-            item=dict(id=ident,title=title,kind=kind,starts_at=starts,done=done,deleted=deleted,revision=(current['revision'] if current else 0)+1,updated_at=self.clock())
+            item=dict(id=ident,kind=kind,done=done,deleted=deleted,revision=(current['revision'] if current else 0)+1,updated_at=self.clock())
+            item.update(sealed or dict(title=title,starts_at=starts))
             self.db.execute('INSERT OR REPLACE INTO agenda VALUES(?,?,?)',(ident,user['id'],packed(item)))
             return {'item':item}
         if path=='/notes' and method=='GET':
@@ -494,10 +548,12 @@ class Marketplace:
                 raise MarketError(409,'Note has changed; keep your local copy and resolve conflict','revision_conflict',current=current)
             if not current: require(revision is None or type(revision) is int and revision==0,'Invalid initial note revision')
             require(current or self.row('SELECT COUNT(*) n FROM notes WHERE user=?',(user['id'],))['n']<200,'Note quota reached',409,'quota_exceeded')
-            value=text(body,'text',4000,True) if 'text' in body else (current['text'] if current else '')
+            sealed=self.sealed_item(user,body,current,('text',))
+            value=None if sealed else text(body,'text',4000,True) if 'text' in body else (current.get('text','') if current else '')
             pinned,deleted=body.get('pinned',current['pinned'] if current else False),body.get('deleted',current['deleted'] if current else False)
             require(type(pinned) is bool and type(deleted) is bool,'Invalid note flags')
-            note=dict(id=ident,text=value,pinned=pinned,deleted=deleted,revision=(current['revision'] if current else 0)+1,updated_at=self.clock())
+            note=dict(id=ident,pinned=pinned,deleted=deleted,revision=(current['revision'] if current else 0)+1,updated_at=self.clock())
+            note.update(sealed or dict(text=value))
             self.db.execute('INSERT OR REPLACE INTO notes VALUES(?,?,?)',(ident,user['id'],packed(note)))
             return {'note':note}
         raise MarketError(404,'Endpoint not found','not_found')

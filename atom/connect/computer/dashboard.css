@@ -296,3 +296,5 @@ dialog[open]{display:flex;flex-direction:column}
   .split-list{width:220px}
   .pair-card{flex-direction:column;align-items:stretch}
 }
+
+.recovery{margin:0;padding:14px;border-radius:8px;background:var(--surface-2);font:600 17px var(--mono);letter-spacing:.06em;text-align:center;user-select:all}

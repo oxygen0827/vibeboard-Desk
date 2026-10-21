@@ -16,8 +16,14 @@ el('dialog-close').onclick=()=>dialog.close();
 async function studioState(){const s=await call('/state');account=s.user;window.studioJobs=s.jobs||[];
   el('account-avatar').replaceChildren(account?account.username.slice(0,1).toUpperCase():icon('user'));el('account-avatar').classList.toggle('on',!!account);
   el('account-name').textContent=account?account.username:'未登录';
-  el('account-detail').textContent=!account?'登录市场账号以同步':s.pending_notes?s.pending_notes+' 条便签待同步':'市场账号 · 已同步';
-  window.renderActivity?.();return s;}
+  el('account-detail').textContent=!account?'登录市场账号以同步':s.encryption==='locked'||s.encryption==='recovery'?'随手记已锁定，点此解锁':s.pending_notes?s.pending_notes+' 条便签待同步':'已加密同步';
+  encryption=s.encryption;window.renderActivity?.();if(s.recovery_code&&!dialog.open)showRecovery(s.recovery_code);return s;}
+let encryption='none';
+function showRecovery(code){const box=clearDialog('请保存恢复密钥'),ok=h('input',{type:'checkbox'});
+  box.append(text('p','随手记和今日已开启端到端加密，服务器只保存密文。忘记密码并通过邮件重置后，需要这串恢复密钥才能解开原来的内容。它只显示这一次，请抄写或存进密码管理器。'),
+    h('pre',{class:'recovery',text:code}),h('label',{class:'check'},ok,h('span',{text:'我已经把恢复密钥保存在安全的地方'})),
+    h('div',{class:'form-actions'},button('完成',async()=>{if(!ok.checked)throw Error('请先确认已保存恢复密钥');await call('/recovery-ack',{});dialog.close();},'btn primary')));}
+function lockedState(target){target.replaceChildren(h('div',{class:'card'},emptyState('随手记和今日已加密','在账号里输入一次密码即可解锁，内容只在你的设备上解密'),h('div',{class:'form-actions'},button('输入密码解锁',()=>accountDialog(),'btn primary'))));}
 async function needAccount(){await studioState();if(!account){accountDialog();return false;}return true;}
 function field(label,attrs){const input=h('input',attrs);return [h('label',{},label,input),input];}
 function accountDialog(){const box=clearDialog(account?'市场账号':'登录市场账号');
@@ -34,7 +40,13 @@ function accountDialog(){const box=clearDialog(account?'市场账号':'登录市
       const save=h('button',{type:'submit',class:'btn primary',text:'保存新密码'}),form=h('form',{},oldLabel,newLabel,text('p','修改后，其他设备上的登录会失效，需要重新登录。','muted'),h('div',{class:'form-actions'},button('取消',show,'btn ghost'),save));
       form.onsubmit=async e=>{e.preventDefault();save.disabled=true;try{await call('/password/change',{old_password:old.value,new_password:fresh.value});old.value=fresh.value='';show();note('密码已修改');}catch(err){error(err);}finally{save.disabled=false;}};
       panel.replaceChildren(form);old.focus();}
-    box.append(head,panel);show();call('/me').then(r=>{me=r.user;show();}).catch(()=>{status.textContent='暂时无法读取邮箱状态';});return;}
+    const lock=h('div');
+    if(encryption==='locked'){const [label,pw]=field('输入密码解锁随手记和今日',{type:'password',autocomplete:'current-password',required:true}),go=h('button',{class:'btn primary',text:'解锁'}),f=h('form',{},label,h('div',{class:'form-actions'},go));
+      f.onsubmit=async e=>{e.preventDefault();go.disabled=true;try{await call('/unlock',{password:pw.value});pw.value='';await studioState();dialog.close();note('已解锁');window.dispatchEvent(new CustomEvent('atom:page',{detail:currentPage}));}catch(err){error(err);}finally{go.disabled=false;}};lock.append(f);}
+    else if(encryption==='recovery'){const [label,code]=field('恢复密钥',{placeholder:'XXXX-XXXX-XXXX-XXXX-XXXX-XXXX',autocomplete:'off',spellcheck:'false'}),go=h('button',{class:'btn primary',text:'用恢复密钥解锁'}),f=h('form',{},text('p','密码已经改过，原来的加密内容需要恢复密钥才能解开。','muted'),label,h('div',{class:'form-actions'},button('没有恢复密钥，放弃旧内容',async()=>{if(!confirm('放弃后，服务器上无法解密的旧随手记和今日会被删除，无法找回。确定吗？'))return;if(!confirm('再确认一次：旧内容将永久丢失。'))return;await call('/reset-keys',{confirm:true});await studioState();},'btn ghost'),go));
+      f.onsubmit=async e=>{e.preventDefault();go.disabled=true;try{await call('/recover',{code:code.value});await studioState();dialog.close();note('已用恢复密钥解锁');}catch(err){error(err);}finally{go.disabled=false;}};lock.append(f);}
+    else if(encryption==='on')lock.append(text('p','随手记和今日：端到端加密已开启','muted'));
+    box.append(head,lock,panel);show();call('/me').then(r=>{me=r.user;show();}).catch(()=>{status.textContent='暂时无法读取邮箱状态';});return;}
   let mode='login';
   const [userLabel,user]=field('用户名',{name:'username',autocomplete:'username',required:true});
   const [passLabel,password]=field('密码',{type:'password',name:'password',placeholder:'至少 12 位',autocomplete:'current-password',minlength:'12'});
@@ -159,7 +171,7 @@ function drawNotes(){const q=el('notes-filter').value.trim().toLowerCase(),list=
   el('notes-list').replaceChildren(...list.map(n=>{const [flag,cls]=noteFlag(n);const b=h('button',{type:'button',class:'note-item'+(n.deleted?' deleted':'')+(selectedNote?.id===n.id?' selected':''),onclick:()=>setNote(n)},h('p',{text:n.text}),h('small',{},n.pinned?icon('pin'):null,h('span',{class:cls,text:flag})));b.dataset.id=n.id;return b;}));
   if(!list.length)el('notes-list').append(emptyState(q?'没有匹配的便签':'还没有便签',q?'':'在右侧写下第一条想法'));
   el('nav-notes').textContent=notes.filter(n=>!n.deleted).length||'';}
-async function loadNotes(){if(!await needAccount())return;const r=await call('/notes');notes=r.notes||[];drawNotes();
+async function loadNotes(){if(!await needAccount())return;let r;try{r=await call('/notes');}catch(e){if(e.details?.code==='notes_locked'||e.status===423){lockedState(el('notes-list'));return;}throw e;}notes=r.notes||[];drawNotes();
   if(selectedNote){const updated=notes.find(n=>n.id===selectedNote.id);setNote(updated||null);}else setNote(null);
   el('notes-sub').textContent=r.offline?'当前离线，修改先保存在这台电脑':r.pending?r.pending+' 条等待同步':'与 ATOM 同步 · 共 '+notes.filter(n=>!n.deleted).length+' 条';
   updateSyncTile();}
@@ -177,7 +189,7 @@ function agendaRow(a){const r=h('div',{class:'agenda-row'+(a.done?' done':'')+(a
   if(a.conflict)r.append(pill('同步冲突','warn'),button('保留服务器',async()=>{await call('/agenda/resolve',{id:a.id,decision:'server'});await loadAgenda();},'btn small'),button('另存副本',async()=>{await call('/agenda/resolve',{id:a.id,decision:'copy'});await loadAgenda();},'btn small'));
   else r.append(h('div',{class:'row-actions'},button(a.deleted?'恢复':'删除',async()=>{await call('/agenda',{...a,deleted:!a.deleted});await loadAgenda();},'btn ghost small')));
   return r;}
-async function loadAgenda(){if(!await needAccount())return;const r=await call('/agenda');agenda=r.items||[];
+async function loadAgenda(){if(!await needAccount())return;let r;try{r=await call('/agenda');}catch(e){if(e.details?.code==='notes_locked'||e.status===423){lockedState(el('agenda-list'));return;}throw e;}agenda=r.items||[];
   const live=agenda.filter(a=>!a.deleted),byTime=(a,b)=>(a.starts_at||'z').localeCompare(b.starts_at||'z');
   const groups=[['待办',live.filter(a=>a.kind==='todo'&&!a.done)],['日程',live.filter(a=>a.kind==='event'&&!a.done).sort(byTime)],['已完成',live.filter(a=>a.done)],['已删除',agenda.filter(a=>a.deleted)]];
   el('agenda-list').replaceChildren(...groups.filter(([,items])=>items.length).map(([title,items])=>h('div',{class:'agenda-group'},h('h2',{text:title+' · '+items.length}),h('div',{class:'card list'},...items.sort((a,b)=>title==='日程'?0:byTime(a,b)).map(agendaRow)))));

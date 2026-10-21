@@ -2,6 +2,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { writePrivate } from './store.mjs';
+import * as e2e from './e2e.mjs';
+const LOCKED='随手记和今日已加密，请在账号里输入密码解锁';
 import { validateArtifact, appPrompt } from './artifact.mjs';
 import {StudioCodex}from './studio-codex.mjs';
 import {organizePrompt,parseOrganization}from './organize.mjs';
@@ -26,17 +28,42 @@ export class Studio {
  scope(){const a=this.requireAccount();return crypto.createHash('sha256').update(a.relay_url+'\0'+a.user.id).digest('hex').slice(0,24);}
  profile(){const key=this.scope();if(!this.data.profiles[key])this.data.profiles[key]={drafts:{},notes:[],pending:[]};const p=this.data.profiles[key];p.agenda=p.agenda||[];p.agenda_pending=p.agenda_pending||[];return p;}
  activitySummary(){let account;try{account=this.account();}catch{return null;}if(!account)return null;const jobs=Object.values(this.data.jobs).filter(j=>j.scope===this.scope());const j=jobs.find(j=>this.active?.id===j.id)||jobs.slice(-1)[0];if(!j)return null;const status=['saving','waiting_approval'].includes(j.status)?'running':j.status==='conflict'?'failed':j.status;return {id:j.id,type:j.kind==='notes-organize'?'notes-organize':'app-modify',status,updated_at:Math.floor((['queued','running'].includes(status)?Date.now():Date.parse(j.finished_at||j.created_at)||Date.now())/1000)};}
- state(){let account=null,configured=false;try{configured=!!this.url();account=this.account();}catch{}const profile=account?this.profile():null;return {configured,authenticated:!!account,user:account?.user||null,pending_notes:profile?.pending.length||0,jobs:Object.values(this.data.jobs).filter(j=>account&&j.scope===this.scope()).map(({id,draft_id,kind,status,created_at,finished_at,error})=>({id,draft_id,kind:kind||'app-modify',status,created_at,finished_at,error}))};}
- async remote(route,{method='GET',body,publicRead=false,token}={}){
-  if(!/^\/(?:register|login|logout|me|email\/(?:start|verify)|password\/(?:forgot|reset|change)|catalog|works(?:\/[A-Za-z0-9_-]+)?|versions\/[A-Za-z0-9_-]+|forks|drafts(?:\/[A-Za-z0-9_-]+(?:\/(?:save|publish))?)?|notes|agenda|health)(?:\?[^#]*)?$/.test(route))throw problem('不支持的市场接口');
+ state(){let account=null,configured=false;try{configured=!!this.url();account=this.account();}catch{}const profile=account?this.profile():null;return {configured,authenticated:!!account,encryption:this.encryption(),...(this.recoveryCode?{recovery_code:this.recoveryCode}:{}),user:account?.user||null,pending_notes:profile?.pending.length||0,jobs:Object.values(this.data.jobs).filter(j=>account&&j.scope===this.scope()).map(({id,draft_id,kind,status,created_at,finished_at,error})=>({id,draft_id,kind:kind||'app-modify',status,created_at,finished_at,error}))};}
+ // Notes and agenda leave this computer sealed with the account data key and are opened on arrival.
+ dataKey(){const k=this.account()?.data_key;return k?e2e.unb64(k,32):null;}
+ sealPrivate(route,body,key,uid){if(!key||!body)return body;const b={...body};b.id||=crypto.randomBytes(16).toString('hex');const fields=route==='/notes'?['text']:['title','starts_at'];
+  if(fields.some(f=>f in b)){const v={};for(const f of fields){v[f]=b[f]??'';delete b[f];}b.enc=e2e.sealJSON(key,v,(route==='/notes'?'note|':'agenda|')+uid+'|'+b.id);}b.key_id=this.account().key_id;return b;}
+ revealPrivate(route,item,key,uid){if(!item||typeof item!=='object'||!('enc' in item))return item;if(!key)throw problem(LOCKED,423,'notes_locked');let v;
+  try{v=e2e.openJSON(key,item.enc,(route==='/notes'?'note|':'agenda|')+uid+'|'+item.id);}catch{v=route==='/notes'?{text:'[无法解密]'}:{title:'[无法解密]',starts_at:''};}delete item.enc;delete item.key_id;Object.assign(item,v);return item;}
+ async remote(route,opts={}){if(route!=='/notes'&&route!=='/agenda')return this.transportRemote(route,opts);
+  const key=this.dataKey(),uid=this.account()?.user?.id||'',body=this.sealPrivate(route,opts.body,key,uid);let result;
+  try{result=await this.transportRemote(route,{...opts,body});}catch(e){if(e.details?.current)this.revealPrivate(route,e.details.current,key,uid);if(!key&&body&&e.code==='encryption_required')throw problem(LOCKED,423,'notes_locked');throw e;}
+  for(const name of ['notes','items'])for(const item of result[name]||[])this.revealPrivate(route,item,key,uid);
+  for(const name of ['note','item'])if(result[name])this.revealPrivate(route,result[name],key,uid);return result;}
+ encryption(){const a=this.account();return !a?'none':a.data_key?'on':this.pendingKeys?'recovery':'locked';}
+ storeKey(key,keyId){Object.assign(this.data.account,{data_key:e2e.b64(key),key_id:keyId});this.pendingKeys=null;this.save();}
+ async afterSignIn(password){const {keys}=await this.transportRemote('/keys');
+  if(!keys){const {dataKey,code,record}=e2e.newAccountKeys(password);await this.transportRemote('/keys',{method:'POST',body:{keys:record}});this.storeKey(dataKey,record.key_id);this.recoveryCode=code;await this.migrate(dataKey,record.key_id);return;}
+  try{this.storeKey(e2e.unlockWithPassword(keys,password),keys.key_id);}catch{this.pendingKeys={password,keys};}}
+ async migrate(key,keyId){const uid=this.account().user.id;
+  for(const n of (await this.transportRemote('/notes')).notes||[])if('text' in n){try{await this.transportRemote('/notes',{method:'POST',body:{id:n.id,revision:n.revision,pinned:!!n.pinned,deleted:!!n.deleted,key_id:keyId,enc:e2e.sealJSON(key,{text:n.text},'note|'+uid+'|'+n.id)}});}catch{}}
+  for(const a of (await this.transportRemote('/agenda')).items||[])if('title' in a){try{await this.transportRemote('/agenda',{method:'POST',body:{id:a.id,revision:a.revision,kind:a.kind||'todo',done:!!a.done,deleted:!!a.deleted,key_id:keyId,enc:e2e.sealJSON(key,{title:a.title,starts_at:a.starts_at||''},'agenda|'+uid+'|'+a.id)}});}catch{}}}
+ async recover(code){if(!this.pendingKeys)throw problem('请先用新密码登录');let key;try{key=e2e.unlockWithRecovery(this.pendingKeys.keys,String(code||''));}catch{throw problem('恢复密钥不正确');}
+  const record=e2e.rewrapPassword(this.pendingKeys.keys,key,this.pendingKeys.password);await this.transportRemote('/keys',{method:'POST',body:{keys:record}});this.storeKey(key,record.key_id);return this.state();}
+ async resetKeys(confirm){if(!this.pendingKeys||confirm!==true)throw problem('请确认放弃无法解密的旧内容');const {dataKey,code,record}=e2e.newAccountKeys(this.pendingKeys.password);
+  await this.transportRemote('/keys',{method:'POST',body:{keys:record,reset:true,confirm:true}});this.storeKey(dataKey,record.key_id);this.recoveryCode=code;const p=this.profile();p.notes=[];p.agenda=[];p.pending=[];p.agenda_pending=[];this.save();return this.state();}
+ async changePassword(body){const b={old_password:body.old_password,new_password:body.new_password},key=this.dataKey();
+  if(key){const {keys}=await this.transportRemote('/keys');if(keys)b.keys=e2e.rewrapPassword(keys,key,String(body.new_password||''));}return this.transportRemote('/password/change',{method:'POST',body:b});}
+ async transportRemote(route,{method='GET',body,publicRead=false,token}={}){
+  if(!/^\/(?:register|login|logout|me|keys|email\/(?:start|verify)|password\/(?:forgot|reset|change)|catalog|works(?:\/[A-Za-z0-9_-]+)?|versions\/[A-Za-z0-9_-]+|forks|drafts(?:\/[A-Za-z0-9_-]+(?:\/(?:save|publish))?)?|notes|agenda|health)(?:\?[^#]*)?$/.test(route))throw problem('不支持的市场接口');
   const relay=this.url();const account=this.account();const auth=token||(publicRead?null:account?.token);if(!publicRead&&!auth&&!['/register','/login','/password/forgot','/password/reset'].includes(route))throw problem('请先登录创作账号',401);
   let response;try{response=await this.transport(relay+'/market/v1'+route,{method,headers:{'Content-Type':'application/json',...(auth?{Authorization:'Bearer '+auth}:{})},body:body===undefined?undefined:JSON.stringify(body),signal:AbortSignal.timeout(20000),redirect:'error'});}catch{throw problem('市场暂时无法连接，内容已保留在本机',503,'offline');}
   let result;try{result=await response.json();}catch{throw problem('市场返回无效响应',502);}
   if(this.url()!==relay||(!publicRead&&account?.token!==this.account()?.token))throw problem('账号或服务器已改变，请重新打开内容',409);
   if(!response.ok){const error=problem(String(result.error||'市场操作失败').slice(0,500),response.status,result.code);error.details=result;throw error;}return result;
  }
- async login(route,body){if(this.active)throw problem('请先结束 AI 修改再切换账号');const result=await this.remote(route,{method:'POST',body,publicRead:true});if(typeof result.token!=='string'||!result.user?.id)throw problem('登录响应无效',502);this.data.account={relay_url:this.url(),token:result.token,user:result.user};this.profile();this.save();return {user:result.user,authenticated:true};}
- async logout(){if(this.active)throw problem('请先结束 AI 修改再退出');try{await this.remote('/logout',{method:'POST',body:{}});}catch{}this.data.account=null;this.save();return {ok:true};}
+ async login(route,body){if(this.active)throw problem('请先结束 AI 修改再切换账号');const result=await this.remote(route,{method:'POST',body,publicRead:true});if(typeof result.token!=='string'||!result.user?.id)throw problem('登录响应无效',502);this.data.account={relay_url:this.url(),token:result.token,user:result.user};this.recoveryCode=null;this.pendingKeys=null;this.profile();this.save();const password=body.password||body.new_password;if(password){try{await this.afterSignIn(String(password));}catch{}}return {user:result.user,authenticated:true,encryption:this.encryption()};}
+ async logout(){if(this.active)throw problem('请先结束 AI 修改再退出');try{await this.remote('/logout',{method:'POST',body:{}});}catch{}this.data.account=null;this.recoveryCode=null;this.pendingKeys=null;this.save();return {ok:true};}
  workspace(draftId){return this.safePath(path.join(this.dir,'workspaces',this.scope(),id(draftId)));}
  cached(draftId){const entry=this.profile().drafts[id(draftId)];if(!entry)throw problem('请先打开此草稿源码',404);return entry;}
  snapshot(draftId,label){const entry=this.cached(draftId);const snapshot={id:crypto.randomUUID(),created_at:this.now(),label:String(label).slice(0,120),bundle:clone(entry.bundle),revision:entry.draft.revision};const dir=path.join(this.workspace(draftId),'snapshots');writePrivate(this.safePath(path.join(dir,snapshot.id+'.json')),snapshot);entry.snapshots=entry.snapshots||[];entry.snapshots.push({id:snapshot.id,created_at:snapshot.created_at,label:snapshot.label,revision:snapshot.revision});if(entry.snapshots.length>80){const removed=entry.snapshots.shift();fs.rmSync(path.join(dir,removed.id+'.json'),{force:true});}this.save();return entry.snapshots.slice(-1)[0];}
@@ -86,7 +113,12 @@ export class Studio {
   if(route==='/state')return this.state();
   if(method==='POST'&&['/register','/login','/password/reset'].includes(route))return this.login(route,body);
   if(method==='POST'&&route==='/password/forgot')return this.remote(route,{method:'POST',body,publicRead:true});
-  if(method==='POST'&&['/email/start','/email/verify','/password/change'].includes(route))return this.remote(route,{method:'POST',body});
+  if(method==='POST'&&['/email/start','/email/verify'].includes(route))return this.remote(route,{method:'POST',body});
+  if(method==='POST'&&route==='/password/change')return this.changePassword(body);
+  if(method==='POST'&&route==='/unlock')return this.login('/login',{username:this.account()?.user?.username||'',password:String(body.password||'')});
+  if(method==='POST'&&route==='/recover')return this.recover(body.code);
+  if(method==='POST'&&route==='/reset-keys')return this.resetKeys(body.confirm);
+  if(method==='POST'&&route==='/recovery-ack'){this.recoveryCode=null;return this.state();};
   if(method==='POST'&&route==='/logout')return this.logout();
   if(route==='/me'){const result=await this.remote('/me');return {user:result.user};}
   if(method==='GET'&&route.startsWith('/catalog'))return this.remote(route,{publicRead:true});

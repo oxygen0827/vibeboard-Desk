@@ -208,7 +208,7 @@ class MarketplaceTests(unittest.TestCase):
             self.assertEqual(request('GET','/v1/state',headers=auth)[0],401)
             source=bundle();source['files']['large.txt']='x'*150000
             self.assertEqual(request('POST','/market/v1/drafts',dict(title='Large source',description='',category='life',license='MIT',bundle=source),auth)[0],200)
-            self.assertEqual(request('POST','/v1/clients/register',{'x':'x'*150000})[0],413)
+            self.assertEqual(request('POST','/v1/clients/register',{'x':'x'*200000})[0],413)
             # Market writes retain the larger two-MiB transport bound.
             self.assertEqual(request('POST','/market/v1/notes',{},dict(auth, **{'Content-Length':str(2*1024*1024+1)}))[0],413)
             status,note=request('POST','/market/v1/notes',{'id':'note-1','text':'original'},auth)
@@ -398,5 +398,43 @@ class MarketplaceTests(unittest.TestCase):
         self.assertTrue(mailer.send('a@example.com','主题','正文 123456',wait=True))
         self.assertEqual((sent[0]['To'],sent[0]['From']),('a@example.com','ATOM <noreply@example.com>'))
         self.assertIn('123456',sent[0].get_content())
+
+    def keyset(self,key_id='k1'):
+        env={'v':1,'iv':'A'*16,'ct':'B'*64}
+        return {'v':1,'key_id':key_id,'salt':'c2FsdHNhbHRzYWx0','iterations':310000,'by_password':env,'by_recovery':env}
+
+    def test_encrypted_notes_and_agenda_after_keys(self):
+        env=lambda c='B':{'v':1,'iv':'A'*16,'ct':c*40}
+        plain=self.call('/notes',{'text':'before encryption'},self.a)['note']
+        self.denied(400,lambda:self.call('/notes',{'enc':env(),'key_id':'k1'},self.a))
+        self.assertIsNone(self.call('/keys',who=self.a)['keys'])
+        self.call('/keys',{'keys':self.keyset()},self.a)
+        self.assertEqual(self.call('/keys',who=self.a)['keys']['key_id'],'k1')
+        self.assertIsNone(self.call('/keys',who=self.b)['keys'],'keys are per account')
+        e=self.denied(400,lambda:self.call('/notes',{'text':'leak'},self.a))
+        self.assertEqual(e.code,'encryption_required')
+        self.denied(409,lambda:self.call('/notes',{'enc':env(),'key_id':'old'},self.a))
+        n=self.call('/notes',{'enc':env(),'key_id':'k1'},self.a)['note']
+        self.assertNotIn('text',n)
+        # Flag-only update keeps the ciphertext; migration of an old plaintext note replaces its text.
+        self.assertEqual(self.call('/notes',{'id':n['id'],'revision':n['revision'],'pinned':True},self.a)['note']['enc'],env())
+        migrated=self.call('/notes',{'id':plain['id'],'revision':plain['revision'],'enc':env('C'),'key_id':'k1'},self.a)['note']
+        self.assertNotIn('text',migrated)
+        self.denied(400,lambda:self.call('/agenda',{'title':'leak','kind':'todo'},self.a))
+        item=self.call('/agenda',{'enc':env(),'key_id':'k1','kind':'event'},self.a)['item']
+        self.assertEqual((item['kind'],'title' in item,'starts_at' in item),('event',False,False))
+        stored=str([tuple(r) for r in self.market.rows('SELECT * FROM notes')])
+        self.assertNotIn('before encryption',stored)
+        # Same key id may be rewrapped (password change); a new key id needs an explicit reset that drops old content.
+        self.call('/keys',{'keys':dict(self.keyset(),salt='bmV3c2FsdA')},self.a)
+        self.denied(409,lambda:self.call('/keys',{'keys':self.keyset('k2')},self.a))
+        self.call('/keys',{'keys':self.keyset('k2'),'reset':True,'confirm':True},self.a)
+        self.assertEqual(self.call('/notes',who=self.a)['notes'],[])
+        self.assertEqual(self.call('/agenda',who=self.a)['items'],[])
+        moved=dict(self.keyset('k2'),salt='cmV3cmFw')
+        self.denied(409,lambda:self.call('/password/change',{'old_password':'long-test-password-a','new_password':'brand-new-password-a','keys':self.keyset('zz')},self.a))
+        self.call('/login',dict(username='alice',password='long-test-password-a'))
+        self.call('/password/change',{'old_password':'long-test-password-a','new_password':'brand-new-password-a','keys':moved},self.a)
+        self.assertEqual(self.call('/keys',who=self.a)['keys']['salt'],'cmV3cmFw')
 
 if __name__=='__main__':unittest.main()

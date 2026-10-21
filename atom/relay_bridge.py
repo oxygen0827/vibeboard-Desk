@@ -75,7 +75,7 @@ class DeviceBridge:
         if entry is None and computer_id in self.key_cache: return self.key_cache[computer_id]
         if entry is None:
             entry = next((p for p in self._request('/v1/state').get('paired', []) if p.get('client_id') == computer_id), None)
-            if entry is None: raise BridgeError('电脑未配对', 403)
+            if entry is None: return dict(state='off')  # not paired: the relay refuses the request itself
         if not e2e or not self.config.get('e2e_private'): return dict(state='off')
         mine = e2e.public_key(self.config['e2e_private'])
         if entry.get('own_key') is None:
