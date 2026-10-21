@@ -74,11 +74,11 @@ class RobotTests(unittest.TestCase):
         self.assertIn('豆豆', chat['messages'][0]['content'])
         self.assertEqual([m['role'] for m in chat['messages']], ['system', 'user', 'assistant', 'user'])
         speech = [b['input'] for url, b in opener.requests if url.endswith('/audio/speech')]
-        self.assertEqual(speech, ['好呀，我在！', '让我想想今天聊什么。'])
-        self.assertEqual(len(player.stdin.getvalue()), 2 * 4800 * 2)
+        self.assertEqual(speech, ['好呀，我在！让我想想今天聊什么。'], 'one synthesis per reply: the provider cue plays once')
+        self.assertEqual(len(player.stdin.getvalue()), 4800 * 2)
         job_state = talk.job
         self.assertEqual([s['emotion'] for s in job_state['segments']], ['happy', 'thinking'])
-        self.assertEqual(job_state['segments'][1]['at'], 0.2)
+        self.assertAlmostEqual(job_state['segments'][1]['at'], 0.1 + 0.1 * 6 / 16)
         self.assertTrue(all(level > 0.5 for level in job_state['levels']))
 
     def test_status_follows_playback_position(self):

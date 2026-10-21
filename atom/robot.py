@@ -30,6 +30,7 @@ STYLES = {
     'scholar': '博学冷静、条理清楚，喜欢用简单的话讲清楚道理',
 }
 RATE, FRAME = 24000, 1200  # 16-bit mono PCM at 24 kHz; loudness frames of 50 ms
+CUE_SECONDS = 0.6  # provider's AI-content audio label at the start of each clip; kept, never stripped
 TAG = re.compile(r'^\s*[\[【]([^\]】]{1,4})[\]】]\s*')
 SENTENCE_END = re.compile(r'[。！？!?；;…\n]')
 EMOJI = re.compile('[\U0001F000-\U0001FAFF☀-➿️]')
@@ -206,34 +207,44 @@ class RobotTalk:
                 process.stdin.flush()
 
     def _run(self, job, base, key, voice, messages):
+        # The provider prefixes every synthesized clip with a mandatory AI-content audio cue (about 0.6 s),
+        # so the whole reply is synthesized in one request and the cue plays once per reply, not per sentence.
         sentences = queue.Queue()
         threading.Thread(target=self._sentences, args=(job, base, key, messages, sentences), daemon=True).start()
         process = None
         try:
+            parts = []
             while True:
                 item = sentences.get(timeout=60)
                 if item is None or job['cancelled']: break
-                emotion, text = item
-                if not job['speech']:
-                    job['segments'].append(dict(at=0.0, emotion=emotion, text=text)); job['emotion'] = emotion
-                    continue
+                parts.append(item)
+                job['emotion'] = item[0]
+            if job['cancelled']: return
+            if job.get('llm_error'): raise ValueError(job['llm_error'])
+            if not parts: raise ValueError('没有听清，再说一次吧')
+            text = ''.join(t for _, t in parts)
+            job['segments'] = [dict(at=0.0 if i == 0 else float('inf'), emotion=e, text=t) for i, (e, t) in enumerate(parts)]
+            try:
                 with self.lock:
-                    if job['cancelled']: break
-                    if process is None: process = job['process'] = self.player()
+                    if job['cancelled']: return
+                    process = job['process'] = self.player()
                     job['phase'] = 'speaking'
-                job['segments'].append(dict(at=len(job['levels']) * FRAME / RATE, emotion=emotion, text=text))
-                try:
-                    self._speak(job, base, key, voice, text, process)
-                except (HTTPError, URLError, OSError, ValueError):
-                    # Keep the conversation going as subtitles when speech is unavailable.
-                    job['speech'] = False; job['error'] = '语音播报暂不可用，已显示文字'
-                    job['segments'][-1]['at'] = 0.0
+                self._speak(job, base, key, voice, text, process)
+                # Place each sentence in the audio by its share of the text, after the leading cue.
+                total = len(job['levels']) * FRAME / RATE
+                cue = min(CUE_SECONDS, total / 2)
+                done = 0
+                for segment in job['segments']:
+                    segment['at'] = cue + (total - cue) * done / max(1, len(text)) if done else 0.0
+                    done += len(segment['text'])
+            except (HTTPError, URLError, OSError, ValueError):
+                # Keep the conversation going as subtitles when speech is unavailable.
+                job['speech'], job['error'] = False, '语音播报暂不可用，已显示文字'
+                for segment in job['segments']: segment['at'] = 0.0
             if process and not job['cancelled']:
                 process.stdin.close()
                 process.wait(timeout=120)
             if job['cancelled']: return
-            if job.get('llm_error'): raise ValueError(job['llm_error'])
-            if not job['reply']: raise ValueError('没有听清，再说一次吧')
             job['phase'] = 'done'
         except queue.Empty:
             job['error'], job['phase'] = '回答超时，请再试一次', 'error'

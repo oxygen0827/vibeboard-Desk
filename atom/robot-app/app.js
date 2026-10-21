@@ -95,8 +95,9 @@ function frame(t){if(!alive)return;raf=requestAnimationFrame(frame);if(document.
 
 // ---------------------------------------------------------------- text overlays
 const subtitle=$('subtitle'),heard=$('heard');
-function say(text,error){subtitle.textContent=text||'';subtitle.classList.toggle('on',!!text);subtitle.classList.toggle('error',!!error);}
-function hint(){$('hint').textContent=({idle:'长按空格和我说话 · 回车打字 · Tab 设置',listening:'在听呢，说完松开空格',transcribing:'听清楚你说的…',thinking:'想一想…',speaking:'按住空格可以打断我',asleep:'我睡着了，按任意键叫醒我',error:'长按空格再试一次'})[state]||'';}
+function say(text,error){subtitle.textContent=text||'';subtitle.classList.toggle('on',!!text);subtitle.classList.toggle('error',!!error);hint();}
+// One quiet line, only when nothing else is on screen.
+function hint(){const el=$('hint'),show=['idle','asleep','error'].includes(state)&&!subtitle.textContent;el.textContent='长按空格开始聊天';el.classList.toggle('off',!show);}
 
 // ---------------------------------------------------------------- conversation
 let data={settings:{name:'小原',style:'lively',voice:'tongtong',note:''},history:[]},job=null,poll=0,levelInfo={level:0,ahead:[],at:0};
@@ -152,8 +153,8 @@ addEventListener('pointerdown',wake);
 // ---------------------------------------------------------------- lifecycle
 runtime.onSuspend(()=>{if(!alive)return;alive=false;cancelAnimationFrame(raf);clearTimeout(poll);if(job)parent.postMessage({type:'atom:robot',id:'suspend',action:'stop',data:{}},'*');for(const p of waiting.values()){clearTimeout(p.timer);p.reject(Error('应用已退出'));}waiting.clear();});
 (async()=>{try{const saved=await runtime.load(data);if(saved&&typeof saved==='object'){data={settings:{...data.settings,...(saved.settings||{})},history:Array.isArray(saved.history)?saved.history.slice(-16):[]};}}catch{}
-  setState('idle');setExpression('happy');say(data.history.length?'又见面啦！':'嗨，我是'+data.settings.name+'。长按空格和我说话吧');
-  setTimeout(()=>{if(state==='idle'&&!location.hash.startsWith('#preview=')){setExpression('calm');say('');}},3500);
+  setState('idle');setExpression('happy');
+  setTimeout(()=>{if(state==='idle'&&!location.hash.startsWith('#preview='))setExpression('calm');},2500);
   // Design preview only: #preview=<expression>[,<state>] freezes one look for screenshots.
   const preview=/^#preview=(\w+)(?:,(\w+))?/.exec(location.hash);if(preview){nextBlink=Infinity;lastActive=Infinity;setTimeout(()=>{if(preview[2])state=preview[2];setExpression(preview[1]);say(preview[1]);if(state==='listening')mic=.7;},50);}
   raf=requestAnimationFrame(frame);runtime.ready();})();
