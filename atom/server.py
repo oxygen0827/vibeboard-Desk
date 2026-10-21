@@ -62,13 +62,20 @@ def validate_delivery_bundle(bundle, trusted_connect=False, maximum=96*1024):
 
 
 def model_config(service):
-    """The device's own model key when set; otherwise the ATOM official channel for a signed-in account."""
+    """The device's own keys where set; otherwise the ATOM official channel for a signed-in account.
+
+    Text generation and voice (robot chat, transcription, speech) are decided separately, so a person
+    can bring their own generation key and still use the official voice, or the other way round."""
     config = service.workshop.read_private_config()
-    if config.get('api_key'): return config
+    own_voice = config.get('stt_api_key') or config.get('tts_api_key')
+    if config.get('api_key') and own_voice: return config
     account = service.market.current()
     if not account.get('token'): return config
     import official_ai
-    return official_ai.overlay(config, service.market.base(), account['token'])
+    relay, token = service.market.base(), account['token']
+    if not config.get('api_key'): config = official_ai.overlay(config, relay, token)
+    if not own_voice: config = official_ai.voice_overlay(config, relay, token)
+    return config
 
 
 def official_status(service):
@@ -583,13 +590,13 @@ class Handler(SimpleHTTPRequestHandler):
                     result = service.voice.start(quiet_fan=data.get('quiet_fan') is True)
                 elif path == '/api/voice/speak':
                     if service.voice.public_status()['recording']: raise ValueError('请先结束录音再朗读')
-                    result = service.speech.start(service.workshop.read_private_config(), data.get('text'))
+                    result = service.speech.start(model_config(service), data.get('text'))
                 elif path == '/api/voice/speech-stop': result = service.speech.stop(data.get('speech_id'))
                 elif path == '/api/voice/stop': result = service.voice.stop(data.get('recording_id'))
                 elif path == '/api/voice/transcribe':
                     from stt import transcribe
                     recording = service.voice.recording_path(data.get('recording_id'))
-                    result = transcribe(service.workshop.read_private_config(), recording)
+                    result = transcribe(model_config(service), recording)
                     recording.unlink()
                 else: raise ValueError('unknown endpoint')
                 self.json_response(200, result)
@@ -604,7 +611,7 @@ class Handler(SimpleHTTPRequestHandler):
             elif path.startswith('/api/robot/'):
                 service = features(self.server)
                 action = path.rsplit('/', 1)[-1]
-                if action == 'chat': result = service.robot.start(service.workshop.read_private_config(), data)
+                if action == 'chat': result = service.robot.start(model_config(service), data)
                 elif action == 'status': result = service.robot.status(str(data.get('job_id', ''))[:64])
                 elif action == 'stop': result = service.robot.stop()
                 else: raise ValueError('unknown endpoint')

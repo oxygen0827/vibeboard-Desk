@@ -19,10 +19,10 @@
 
 将 `images.env.example` 复制为 `/etc/atom/images.env`，设为 root 所有、0600，填写方舟 API Key、已开通的模型 ID 和可使用该付费服务的 ATOM 账号 ID 白名单。配置修改后重启 `atom-connect`。服务不会把密钥返回给电脑或设备客户端。
 
-**ATOM 官方 AI**：没填自己模型 Key、但登录了 ATOM 账号的设备，工作坊和 AI 体验走服务器的智谱 Key，按账号每月计次（默认 30 次，失败不计）。服务器只存次数，提示词和结果只在内存里等设备取走。用 `ai.env.example` 写 `/etc/atom/ai.env`（root、0600），Key 在终端里输入、不经过聊天记录：
+**ATOM 官方 AI**：没填自己模型 Key、但登录了 ATOM 账号的设备走服务器的智谱 Key，按账号每月计次，失败不计：工作坊和 AI 体验生成 30 次；机器人对话 300 次；语音（转写和朗读，机器人每句话朗读一次）1500 次。机器人和语音经 `/market/v1/ai/zhipu/*` 流式透传，设备侧代码不变；额度用完时机器人会自己说出来。服务器只存次数，提示词和结果只在内存里等设备取走。用 `ai.env.example` 写 `/etc/atom/ai.env`（root、0600），Key 在终端里输入、不经过聊天记录：
 
 ```sh
-umask 077; read -s -p "智谱 API Key: " k; echo; printf 'ATOM_AI_ZHIPU_KEY=%s\nATOM_AI_GENERATE_MODEL=glm-4.5-air\nATOM_AI_QUOTA_GENERATE=30\n' "$k" > /etc/atom/ai.env; unset k; systemctl restart atom-connect
+umask 077; read -s -p "智谱 API Key: " k; echo; printf 'ATOM_AI_ZHIPU_KEY=%s\nATOM_AI_GENERATE_MODEL=glm-4.5-air\nATOM_AI_QUOTA_GENERATE=30\nATOM_AI_QUOTA_CHAT=300\nATOM_AI_QUOTA_VOICE=1500\n' "$k" > /etc/atom/ai.env; unset k; systemctl restart atom-connect
 ```
 
 生成是「提交任务 → 轮询」，不受 nginx 30 秒读超时限制。

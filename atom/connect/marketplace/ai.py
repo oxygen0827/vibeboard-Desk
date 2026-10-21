@@ -17,7 +17,12 @@ from urllib.request import Request, urlopen
 from .service import MarketError, require
 
 ENDPOINT = 'https://open.bigmodel.cn/api/paas/v4/chat/completions'  # ATOM_AI_ENDPOINT overrides (tests, other OpenAI-compatible providers)
-PURPOSES = ('generate',)
+PURPOSES = ('generate', 'chat', 'voice')
+# Zhipu-compatible passthrough for the robot and voice features, which stream and must stay unchanged.
+ZHIPU_BASE = 'https://open.bigmodel.cn/api/paas/v4'  # ATOM_AI_ZHIPU_BASE overrides (tests)
+ROUTES = {'/chat/completions': 'chat', '/audio/speech': 'voice', '/audio/transcriptions': 'voice'}
+CHAT_MODELS = ('glm-4.5-air', 'glm-4-flash-250414')
+QUOTA_LINE = '[难过]这个月的聊天额度用完啦，下个月一号再来找我聊吧。'
 MAX_PAYLOAD = 400 * 1024
 JOB_TTL = 900
 
@@ -26,7 +31,9 @@ def settings():
     return dict(
         key=os.environ.get('ATOM_AI_ZHIPU_KEY', '').strip(),
         model=os.environ.get('ATOM_AI_GENERATE_MODEL', 'glm-4.5-air').strip(),
-        quota={'generate': int(os.environ.get('ATOM_AI_QUOTA_GENERATE', '30'))},
+        quota={'generate': int(os.environ.get('ATOM_AI_QUOTA_GENERATE', '30')),
+               'chat': int(os.environ.get('ATOM_AI_QUOTA_CHAT', '300')),
+               'voice': int(os.environ.get('ATOM_AI_QUOTA_VOICE', '1500'))},
     )
 
 
@@ -77,7 +84,7 @@ class OfficialAI:
         conf = settings()
         require(conf['key'], 'ATOM 官方 AI 暂未开通，请在工作坊填写自己的模型 Key', 503, 'ai_unavailable')
         purpose = body.get('purpose')
-        require(purpose in PURPOSES, 'Invalid purpose')
+        require(purpose == 'generate', 'Invalid purpose')
         messages = body.get('messages')
         require(isinstance(messages, list) and 1 <= len(messages) <= 8 and all(isinstance(m, dict) and m.get('role') in ('system', 'user', 'assistant') and isinstance(m.get('content'), str) for m in messages), 'Invalid messages')
         require(len(json.dumps(messages, ensure_ascii=False).encode()) <= MAX_PAYLOAD, '需求太长', 413)
@@ -123,6 +130,91 @@ class OfficialAI:
     def expire(self):
         for job in [j for j, v in self.jobs.items() if self.clock() - v['created'] > JOB_TTL]:
             self.jobs.pop(job)
+
+    def proxy(self, handler, sub):
+        """Stream one Zhipu call for the robot and voice features (HTTP handler level, no JSON envelope)."""
+        def reply(status, value, kind='application/json; charset=utf-8'):
+            data = value if isinstance(value, bytes) else json.dumps(value, ensure_ascii=False).encode()
+            handler.send_response(status)
+            handler.send_header('Content-Type', kind)
+            handler.send_header('Content-Length', str(len(data)))
+            handler.send_header('Cache-Control', 'no-store')
+            handler.end_headers()
+            handler.wfile.write(data)
+        purpose = ROUTES.get(sub)
+        if not purpose:
+            return reply(404, {'error': 'Not found'})
+        auth = handler.headers.get('Authorization', '')
+        try:
+            user = self.market.auth(auth[7:] if auth.startswith('Bearer ') else '')['id']
+        except MarketError:
+            return reply(401, {'error': '账号登录已过期，请在应用市场重新登录'})
+        try:
+            length = int(handler.headers.get('Content-Length', '0'))
+        except ValueError:
+            length = -1
+        if not 0 < length <= 3 * 1024 * 1024:
+            return reply(413, {'error': 'Request too large'})
+        raw, kind = handler.rfile.read(length), handler.headers.get('Content-Type', '')
+        if sub == '/audio/transcriptions':
+            if not kind.startswith('multipart/form-data'):
+                return reply(415, {'error': 'Multipart audio required'})
+        else:
+            try:
+                body = json.loads(raw.decode('utf-8'))
+            except (ValueError, UnicodeError):
+                return reply(400, {'error': 'Invalid JSON request'})
+            if sub == '/chat/completions':
+                messages = body.get('messages')
+                if not (isinstance(messages, list) and 1 <= len(messages) <= 20 and len(json.dumps(messages, ensure_ascii=False).encode()) <= 64 * 1024):
+                    return reply(400, {'error': 'Invalid messages'})
+                body = dict(model=body.get('model') if body.get('model') in CHAT_MODELS else CHAT_MODELS[0], messages=messages,
+                            stream=body.get('stream') is True, max_tokens=min(int(body.get('max_tokens') or 400), 600), temperature=body.get('temperature', 0.8))
+                if body['model'].startswith('glm-4.5'):
+                    body['thinking'] = {'type': 'disabled'}
+            else:
+                if not (isinstance(body.get('input'), str) and 1 <= len(body['input']) <= 1024):
+                    return reply(400, {'error': 'Invalid speech text'})
+                body = {k: body[k] for k in ('input', 'voice', 'response_format', 'stream', 'encode_format', 'speed', 'volume') if k in body}
+                body['model'] = 'glm-tts'
+            raw, kind = json.dumps(body, ensure_ascii=False).encode('utf-8'), 'application/json'
+        conf = settings()
+        if not conf['key']:
+            return reply(503, {'error': 'ATOM 官方 AI 暂未开通'})
+        with self.lock:
+            exhausted = self.used(user, purpose) >= conf['quota'][purpose]
+            if not exhausted:
+                self.adjust(user, purpose, 1)
+        if exhausted:
+            if sub == '/chat/completions' and body.get('stream'):
+                # Said in character by the robot instead of an error code it cannot explain.
+                event = {'choices': [{'index': 0, 'delta': {'role': 'assistant', 'content': QUOTA_LINE}, 'finish_reason': 'stop'}]}
+                return reply(200, ('data: ' + json.dumps(event, ensure_ascii=False) + '\n\ndata: [DONE]\n\n').encode(), 'text/event-stream')
+            return reply(429, {'error': '本月 ATOM 官方' + ('聊天' if purpose == 'chat' else '语音') + '额度已用完，下月 1 日恢复'})
+        request = Request(os.environ.get('ATOM_AI_ZHIPU_BASE', ZHIPU_BASE) + sub, data=raw, headers={'Authorization': 'Bearer ' + conf['key'], 'Content-Type': kind})
+        try:
+            response = urlopen(request, timeout=25)
+        except HTTPError as exc:
+            with self.lock:
+                self.adjust(user, purpose, -1)
+            # The provider's own error body: the robot recognises its content-filter code.
+            return reply(exc.code, exc.read(64 * 1024) or b'{}')
+        except (URLError, OSError):
+            with self.lock:
+                self.adjust(user, purpose, -1)
+            return reply(502, {'error': '模型服务暂时无法连接'})
+        with response:
+            handler.send_response(200)
+            handler.send_header('Content-Type', response.headers.get('Content-Type', 'application/octet-stream'))
+            handler.send_header('Cache-Control', 'no-store')
+            handler.send_header('Connection', 'close')
+            handler.end_headers()
+            while True:
+                chunk = response.read1(16384) if hasattr(response, 'read1') else response.read(16384)
+                if not chunk:
+                    break
+                handler.wfile.write(chunk)
+                handler.wfile.flush()
 
     @staticmethod
     def upstream(key, payload):

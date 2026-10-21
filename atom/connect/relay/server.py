@@ -493,6 +493,12 @@ class Handler(BaseHTTPRequestHandler):
         try:
             require(len(self.path) <= 2048, 'URL too long', 414)
             require(self.command != 'POST' or self.headers.get('Origin') is None, 'Browser-origin mutations are not permitted', 403)
+            if self.command == 'POST' and self.path.startswith('/market/v1/ai/zhipu/'):
+                # Streaming passthrough for the robot and voice; it writes its own response.
+                self.connection.settimeout(30)
+                self.server.relay.ai.proxy(self, self.path[len('/market/v1/ai/zhipu'):])
+                self.close_connection = True
+                return
             length = int(self.headers.get('Content-Length', '0'))
             limit = 28 * 1024 * 1024 if self.path == '/market/v1/photos' else (2 * 1024 * 1024 if url_is_market(self.path) else MAX_BODY)
             require(0 <= length <= limit, 'Request too large', 413)

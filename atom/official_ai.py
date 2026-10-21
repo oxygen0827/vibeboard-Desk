@@ -25,6 +25,13 @@ def overlay(config, relay, token):
     return dict(config, provider='atom', protocol='openai', model='atom-official', base_url=relay.rstrip('/'), api_key=token, official=True)
 
 
+def voice_overlay(config, relay, token):
+    """Robot chat, transcription and speech through the service's Zhipu-compatible proxy."""
+    base = relay.rstrip('/') + '/market/v1/ai/zhipu'
+    return dict(config, stt_base_url=base, stt_model='glm-asr-2512', stt_api_key=token,
+                tts_base_url=base, tts_model='glm-tts', tts_api_key=token, official_voice=True)
+
+
 def _call(config, method, path, body=None):
     url = urlsplit(config['base_url'])
     if not (url.scheme == 'https' or (url.scheme == 'http' and url.hostname in ('127.0.0.1', 'localhost'))):

@@ -381,6 +381,66 @@ class RelayTests(unittest.TestCase):
             fresh = self.relay.handle('POST', '/market/v1/login', body={'username': 'alice', 'password': 'long-test-password-a'})
             self.assertEqual(ai(fresh['token'], 'GET', '/market/v1/ai/quota')['generate']['used'], 0, 'a new month starts fresh')
 
+    def test_official_voice_proxy_streams_and_meters(self):
+        from unittest import mock
+        from http.server import BaseHTTPRequestHandler
+        seen = []
+        class Zhipu(BaseHTTPRequestHandler):
+            def do_POST(self):
+                body = self.rfile.read(int(self.headers['Content-Length']))
+                seen.append((self.path, self.headers.get('Authorization'), body))
+                if self.path == '/chat/completions' and b'bad words' in body:
+                    data = b'{"error":{"code":"1301","message":"sensitive"}}'
+                    self.send_response(400); self.send_header('Content-Length', str(len(data))); self.end_headers(); self.wfile.write(data); return
+                if self.path == '/chat/completions':
+                    self.send_response(200); self.send_header('Content-Type', 'text/event-stream'); self.end_headers()
+                    for piece in ('[开心]你', '好呀'):
+                        self.wfile.write(('data: ' + json.dumps({'choices': [{'delta': {'content': piece}}]}, ensure_ascii=False) + '\n\n').encode()); self.wfile.flush()
+                    self.wfile.write(b'data: [DONE]\n\n'); return
+                data = b'RIFFfakewav'
+                self.send_response(200); self.send_header('Content-Type', 'audio/wav'); self.send_header('Content-Length', str(len(data))); self.end_headers(); self.wfile.write(data)
+            def log_message(self, *args):
+                pass
+        upstream = module.ThreadingHTTPServer(('127.0.0.1', 0), Zhipu)
+        server = module.ThreadingHTTPServer(('127.0.0.1', 0), module.Handler)
+        server.relay = self.relay
+        for s in (upstream, server):
+            threading.Thread(target=s.serve_forever, daemon=True).start()
+        alice = self.relay.handle('POST', '/market/v1/register', body={'username': 'alice', 'password': 'long-test-password-a'})
+        def post(path, body, token=alice['token'], kind='application/json'):
+            conn = http.client.HTTPConnection(*server.server_address, timeout=5)
+            conn.request('POST', '/market/v1/ai/zhipu' + path, body if isinstance(body, bytes) else json.dumps(body, ensure_ascii=False).encode(), {'Authorization': 'Bearer ' + token, 'Content-Type': kind})
+            res = conn.getresponse(); data = res.read(); conn.close()
+            return res.status, data
+        chat = {'model': 'glm-4.5-air', 'messages': [{'role': 'user', 'content': '你好'}], 'stream': True, 'max_tokens': 5000}
+        env = {'ATOM_AI_ZHIPU_KEY': 'server-key', 'ATOM_AI_ZHIPU_BASE': 'http://%s:%d' % upstream.server_address, 'ATOM_AI_QUOTA_CHAT': '2', 'ATOM_AI_QUOTA_VOICE': '5'}
+        try:
+            with mock.patch.dict(os.environ, env):
+                self.assertEqual(post('/chat/completions', chat, token='x' * 40)[0], 401)
+                status, data = post('/chat/completions', chat)
+                self.assertEqual(status, 200)
+                self.assertIn('好呀', data.decode())
+                path, auth, sent = seen[-1]
+                self.assertEqual(auth, 'Bearer server-key', 'the device token never reaches the provider')
+                self.assertEqual(json.loads(sent)['max_tokens'], 600)
+                self.assertEqual(json.loads(sent)['thinking'], {'type': 'disabled'})
+                status, data = post('/chat/completions', dict(chat, messages=[{'role': 'user', 'content': 'bad words'}]))
+                self.assertEqual(status, 400)
+                self.assertIn(b'1301', data, 'the content-filter code passes through for the robot')
+                self.assertEqual(self.relay.ai.quota(alice['user']['id'])['chat']['used'], 1, 'rejected calls are refunded')
+                self.assertEqual(post('/audio/speech', {'model': 'anything', 'input': '你好', 'voice': 'tongtong', 'response_format': 'wav'}), (200, b'RIFFfakewav'))
+                self.assertEqual(json.loads(seen[-1][2])['model'], 'glm-tts')
+                self.assertEqual(post('/audio/transcriptions', {'x': 1})[0], 415)
+                self.assertEqual(post('/audio/transcriptions', b'--b\r\n', kind='multipart/form-data; boundary=b')[0], 200)
+                post('/chat/completions', chat)
+                status, data = post('/chat/completions', chat)
+                self.assertEqual(status, 200)
+                self.assertIn('额度用完', data.decode(), 'the robot says it in character when the month is used up')
+                self.assertEqual(post('/nope', chat)[0], 404)
+        finally:
+            for s in (upstream, server):
+                s.shutdown(); s.server_close()
+
     def test_auth_roles_and_bounds(self):
         self.denied(lambda: self.relay.handle('GET', '/v1/state', self.device['client_id']), 401)
         self.denied(lambda: self.call(self.pc, '/v1/pair/code', {}), 403)
