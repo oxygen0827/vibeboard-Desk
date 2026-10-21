@@ -19,6 +19,14 @@
 
 将 `images.env.example` 复制为 `/etc/atom/images.env`，设为 root 所有、0600，填写方舟 API Key、已开通的模型 ID 和可使用该付费服务的 ATOM 账号 ID 白名单。配置修改后重启 `atom-connect`。服务不会把密钥返回给电脑或设备客户端。
 
+**ATOM 官方 AI**：没填自己模型 Key、但登录了 ATOM 账号的设备，工作坊和 AI 体验走服务器的智谱 Key，按账号每月计次（默认 30 次，失败不计）。服务器只存次数，提示词和结果只在内存里等设备取走。用 `ai.env.example` 写 `/etc/atom/ai.env`（root、0600），Key 在终端里输入、不经过聊天记录：
+
+```sh
+umask 077; read -s -p "智谱 API Key: " k; echo; printf 'ATOM_AI_ZHIPU_KEY=%s\nATOM_AI_GENERATE_MODEL=glm-4.5-air\nATOM_AI_QUOTA_GENERATE=30\n' "$k" > /etc/atom/ai.env; unset k; systemctl restart atom-connect
+```
+
+生成是「提交任务 → 轮询」，不受 nginx 30 秒读超时限制。
+
 在现有 TLS server 中合并 `nginx-photos.conf`，`nginx -t` 成功后 reload。只有照片上传精确路径扩到 28 MiB（容纳 20 MiB 图片的 Base64），其他 API 保持原限制。`photo_media` 的原图/预览/缩略图 BLOB、元数据和持久生成任务均在市场 SQLite 中，因此现有备份与恢复流程完整覆盖相册。
 
 照片按账号隔离但服务器可读，只有用户点击生成才将参考预览与提示词发送给模型商；与便签/日程的端到端加密分开说明。单张上传上限 20 MiB / 6400 万像素；每账号 64 MiB，所有相册合计 128 MiB。详细行为见 [相册说明](../../official/photo-album/README.md)。

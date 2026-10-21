@@ -61,6 +61,29 @@ def validate_delivery_bundle(bundle, trusted_connect=False, maximum=96*1024):
     return validate_generated(bundle, trusted_connect=trusted_connect)
 
 
+def model_config(service):
+    """The device's own model key when set; otherwise the ATOM official channel for a signed-in account."""
+    config = service.workshop.read_private_config()
+    if config.get('api_key'): return config
+    account = service.market.current()
+    if not account.get('token'): return config
+    import official_ai
+    return official_ai.overlay(config, service.market.base(), account['token'])
+
+
+def official_status(service):
+    config = service.workshop.read_private_config()
+    if config.get('api_key'): return dict(active=False)
+    account = service.market.current()
+    if not account.get('token'): return dict(active=False, reason='sign_in')
+    import official_ai
+    try:
+        q = official_ai.quota(model_config(service))
+        return dict(active=bool(q.get('available')), remaining=q.get('generate', {}).get('remaining'), limit=q.get('generate', {}).get('limit'), reason=None if q.get('available') else 'unavailable')
+    except official_ai.OfficialError as exc:
+        return dict(active=False, reason='error', error=str(exc))
+
+
 def features(http):
     with FEATURE_LOCK:
         if not hasattr(http, 'workshop'):
@@ -378,7 +401,7 @@ class Handler(SimpleHTTPRequestHandler):
             try:
                 if path == '/api/connect/state': result = service.connect.state()
                 elif path == '/api/themes': result = service.theme_store.list_themes()
-                elif path == '/api/model-config': result = service.workshop.public_config()
+                elif path == '/api/model-config': result = dict(service.workshop.public_config(), official=official_status(service))
                 elif path == '/api/voice/speech-status': result = service.speech.public_status()
                 elif path == '/api/voice/status':
                     result = service.voice.public_status()
@@ -534,7 +557,7 @@ class Handler(SimpleHTTPRequestHandler):
                 elif path == '/api/workshop/generate':
                     data.setdefault('theme_id', service.theme_store.active)
                     service.theme_store.css(data.get('theme_id'))
-                    result = service.workshop.start_generation(data)
+                    result = service.workshop.start_generation(data, model_config(service))
                 elif path == '/api/workshop/install':
                     job = service.workshop.get_job(data.get('job_id'))
                     if job['status'] != 'ready': raise ValueError('应用尚未完成生成')
@@ -573,7 +596,7 @@ class Handler(SimpleHTTPRequestHandler):
             elif path.startswith('/api/experiences/'):
                 service = features(self.server)
                 action = path.rsplit('/', 1)[-1]
-                if action == 'generate': result = service.experiences.start(service.workshop.read_private_config(), data)
+                if action == 'generate': result = service.experiences.start(model_config(service), data)
                 elif action == 'job': result = service.experiences.status(data.get('job_id'), data.get('kind'))
                 elif action == 'cancel': result = service.experiences.cancel(data.get('job_id'), data.get('kind'))
                 else: raise ValueError('unknown endpoint')

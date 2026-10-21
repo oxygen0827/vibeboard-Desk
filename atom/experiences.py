@@ -8,6 +8,7 @@ import uuid
 from urllib.request import Request, build_opener
 from urllib.parse import urlsplit
 from workshop import NoRedirect
+import official_ai
 
 KINDS = ('world', 'visual', 'duet')
 
@@ -106,7 +107,7 @@ class Experiences:
         kind=data.get('kind'); prompt=data.get('prompt'); state=data.get('state',{})
         if kind not in KINDS or not isinstance(prompt,str) or not 1<=len(prompt.strip())<=2000: raise ValueError('请输入不超过2000字的创作需求')
         if len(json.dumps(state,ensure_ascii=False).encode())>65536: raise ValueError('当前作品过大')
-        if not config.get('api_key'): raise ValueError('请先在工作坊设置模型 API')
+        if not config.get('api_key'): raise ValueError('登录 ATOM 账号即可使用官方额度，或在工作坊填写自己的模型 Key')
         with self.lock:
             if sum(j['status'] in ('queued','generating','validating') for j in self.jobs.values())>=2: raise ValueError('已有两个创作任务，请完成或取消后重试')
             # Retain a bounded task history without storing user credentials.
@@ -131,7 +132,7 @@ class Experiences:
         try:
             if not self._set(jid,status='generating',phase='模型正在创作'): return
             url=urlsplit(config['base_url'])
-            if url.scheme!='https' or not url.hostname or url.username or url.password or url.query or url.fragment: raise ValueError('模型地址必须为 HTTPS')
+            if not config.get('official') and (url.scheme!='https' or not url.hostname or url.username or url.password or url.query or url.fragment): raise ValueError('模型地址必须为 HTTPS')
             system='You are the creative planner for an ATOM interactive artwork. Return ONLY valid JSON, no markdown, code fences or explanations. Never output credentials. Required schema: '+SCHEMAS[kind]
             message=json.dumps(dict(request=prompt,current=state),ensure_ascii=False)
             headers={'Content-Type':'application/json'}
@@ -142,11 +143,14 @@ class Experiences:
                 endpoint='/chat/completions';headers['Authorization']='Bearer '+config['api_key']
                 payload=dict(model=config['model'],max_tokens=5000,messages=[dict(role='system',content=system),dict(role='user',content=message)])
                 if config.get('provider')=='deepseek': payload.update(thinking={'type':'disabled'},response_format={'type':'json_object'})
-            request=Request(config['base_url'].rstrip('/')+endpoint,data=json.dumps(payload).encode(),headers=headers)
-            with build_opener(NoRedirect()).open(request,timeout=100) as response:
-                raw=response.read(128*1024+1)
-                if len(raw)>128*1024: raise ValueError('模型回复过大')
-            value=json.loads(raw)
+            if config.get('official'):
+                value=official_ai.complete(config,payload['messages'],payload['max_tokens'],True)
+            else:
+                request=Request(config['base_url'].rstrip('/')+endpoint,data=json.dumps(payload).encode(),headers=headers)
+                with build_opener(NoRedirect()).open(request,timeout=100) as response:
+                    raw=response.read(128*1024+1)
+                    if len(raw)>128*1024: raise ValueError('模型回复过大')
+                value=json.loads(raw)
             if config.get('protocol')=='anthropic': text=''.join(p.get('text','') for p in value.get('content',[]) if p.get('type')=='text')
             else: text=value['choices'][0]['message']['content']
             if not self._set(jid,status='validating',phase='检查作品参数'): return
@@ -156,5 +160,5 @@ class Experiences:
             self._set(jid,status='completed',phase='作品已生成',result=result)
         except Exception as error:
             # Upstream bodies/URLs can contain sensitive material. Only validated local errors are public.
-            message='模型生成失败，请稍后重试或检查工作坊模型设置'
+            message=str(error) if isinstance(error,official_ai.OfficialError) else '模型生成失败，请稍后重试或检查工作坊模型设置'
             self._set(jid,status='failed',phase='生成失败',error=message)

@@ -17,6 +17,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from marketplace.service import Marketplace, MarketError
+from marketplace.ai import OfficialAI
 
 TERMINAL = {'completed', 'failed', 'cancelled', 'interrupted'}
 STATUSES = {'queued', 'running', 'waiting_approval'} | TERMINAL
@@ -77,6 +78,7 @@ class Relay:
         self.clock, self.lease = clock, lease
         market_path = str(Path(path).with_name(Path(path).stem + '.marketplace.sqlite3')) if path != ':memory:' else ':memory:'
         self.marketplace = Marketplace(market_path, clock=clock)
+        self.ai = OfficialAI(str(Path(path).with_name(Path(path).stem + '.ai.sqlite3')) if path != ':memory:' else ':memory:', self.marketplace, clock=clock)
         self.lock = threading.RLock()
         if path != ':memory:':
             os.makedirs(os.path.dirname(os.path.abspath(path)), mode=0o700, exist_ok=True)
@@ -109,6 +111,7 @@ class Relay:
             os.chmod(path, 0o600)
 
     def close(self):
+        self.ai.close()
         self.marketplace.close()
         self.db.close()
 
@@ -141,6 +144,9 @@ class Relay:
                         (item['id'], computer, task, json.dumps(item)))
 
     def handle(self, method, target, token='', body=None, peer='local'):
+        if urllib.parse.urlsplit(target).path.startswith('/market/v1/ai/'):
+            # Outside every lock: a model call takes minutes and must not stall the marketplace.
+            return self.ai.handle(method, urllib.parse.urlsplit(target).path.rstrip('/'), token, body or {})
         if url_is_market(target):
             return self.marketplace.handle(method, target, token, body, peer)
         with self.lock, self.db:

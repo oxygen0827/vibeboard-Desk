@@ -13,6 +13,7 @@ from urllib.error import HTTPError
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from app_icons import ensure_icon
+import official_ai
 
 class GenerationError(ValueError):
     pass
@@ -140,15 +141,15 @@ class Workshop:
                 if os.path.exists(name): os.unlink(name)
             return self.public_config()
 
-    def start_generation(self,data):
+    def start_generation(self,data,config=None):
         if not isinstance(data,dict) or not isinstance(data.get('prompt'),str) or not 1 <= len(data['prompt'].strip()) <= 4000: raise ValueError('请输入 1–4000 字的应用需求')
         theme = data.get('theme_id','default')
         if not isinstance(theme,str) or len(theme) > 80: raise ValueError('主题无效')
         css = self.theme_css_fn(theme)
         if not isinstance(css,str): raise ValueError('主题无效')
         with self.lock:
-            config = self._config()
-            if not all(config.get(x) for x in ('api_key','base_url','model')): raise ValueError('尚未配置模型，请填写模型地址、名称和 API key')
+            config = config or self._config()
+            if not all(config.get(x) for x in ('api_key','base_url','model')): raise ValueError('尚未配置模型：登录 ATOM 账号即可使用官方额度，或填写自己的模型 API key')
             if sum(j['status'] in ('queued','generating','checking') for j in self.jobs.values()) >= 2: raise ValueError('已有生成任务，请稍后重试')
             if len(self.jobs) >= 30:
                 for old_id in list(self.jobs):
@@ -169,7 +170,7 @@ class Workshop:
 
     def _call_model(self,config,prompt,css):
         url = urlsplit(config['base_url'])
-        if url.scheme != 'https' or not url.hostname or url.username or url.password or url.query or url.fragment: raise ValueError('invalid HTTPS endpoint')
+        if not config.get('official') and (url.scheme != 'https' or not url.hostname or url.username or url.password or url.query or url.fragment): raise ValueError('invalid HTTPS endpoint')
         system = ('Generate a complete functional ATOM Web app bundle. Output ONLY JSON {"manifest":{"id":"unique-lowercase-id","name":"中文名称","description":"用途","entry":"index.html","layout":"fullscreen","icon":"icon.svg"},"files":{"index.html":"...","icon.svg":"..."}}. '
                   'Viewport 480x360 CSS pixels, Chromium 91. Fullscreen app: no permanent system header, nav, Home bar or duplicate shell controls. Set html/body height:100%; body height:100vh; margin:0; prevent root scrolling through a complete bounded layout. Default operation view must fit one screen. If content does not fit, split into views or steps. Never hide overflow to clip primary actions. Long song lists or long reading content may scroll only in an explicitly marked .atom-scroll or [data-atom-scroll] bounded-height region; keep local navigation and primary actions outside and fixed.  No CDN, external fonts, libraries, network dependencies or fake live data. HTML/CSS/JS UTF-8 local files only. '
                   'Run in sandbox iframe without allow-same-origin: no direct device API, no localStorage assumptions. Use semantic buttons, visible focus, 16px+ body text, complete states and real local logic. '
@@ -190,6 +191,15 @@ class Workshop:
             payload = dict(model=config['model'],messages=[dict(role='system',content=system),dict(role='user',content=prompt)],max_tokens=8000)
             if config['provider'] == 'deepseek':
                 payload.update(thinking={'type':'disabled'}, response_format={'type':'json_object'}, stream=True)
+        if config.get('official'):
+            try:
+                result = official_ai.complete(config,payload['messages'],payload['max_tokens'],True,on_wait=lambda s: config.get('_job_id') and self._set(config['_job_id'],progress_text='ATOM 官方 AI 正在生成…'))
+            except official_ai.OfficialError as exc:
+                raise GenerationError(str(exc))
+            choice = result['choices'][0]
+            if choice.get('finish_reason') == 'length': raise GenerationError('模型输出被长度上限截断，请缩小应用需求后重试')
+            if not choice['message'].get('content'): raise GenerationError('模型没有返回应用内容，请重试')
+            return choice['message']['content']
         headers['Content-Type'] = 'application/json'
         request = Request(config['base_url']+endpoint,data=json.dumps(payload).encode('utf-8'),headers=headers)
         with build_opener(NoRedirect()).open(request,timeout=90) as response:

@@ -335,6 +335,52 @@ class RelayTests(unittest.TestCase):
         self.call(self.device, '/v1/account/unlink', {})
         self.assertEqual(self.call(self.pc, '/v1/account/peers')['peers'], [])
 
+    def test_official_ai_jobs_are_metered_per_account(self):
+        import time as _time
+        from unittest import mock
+        alice = self.relay.handle('POST', '/market/v1/register', body={'username': 'alice', 'password': 'long-test-password-a'})
+        bob = self.relay.handle('POST', '/market/v1/register', body={'username': 'bobby', 'password': 'long-test-password-b'})
+        ai = lambda token, method, path, body=None: self.relay.handle(method, path, token, body)
+        def refused(fn, status):
+            with self.assertRaises(module.MarketError) as caught:
+                fn()
+            self.assertEqual(caught.exception.status, status)
+        msg = {'purpose': 'generate', 'messages': [{'role': 'user', 'content': '做一个计时器'}], 'json': True}
+        with mock.patch.dict(os.environ, {'ATOM_AI_ZHIPU_KEY': '', 'ATOM_AI_QUOTA_GENERATE': '2'}):
+            refused(lambda: ai(alice['token'], 'POST', '/market/v1/ai/jobs', msg), 503)
+        seen = []
+        def fake(key, payload):
+            seen.append((key, payload))
+            if payload['messages'][-1]['content'] == 'fail':
+                raise module.MarketError(502, 'upstream down')
+            return {'choices': [{'message': {'role': 'assistant', 'content': '{}'}, 'finish_reason': 'stop'}]}
+        self.relay.ai.call = fake
+        def wait(token, job):
+            for _ in range(100):
+                r = ai(token, 'GET', '/market/v1/ai/jobs/' + job)
+                if r['status'] != 'running':
+                    return r
+                _time.sleep(0.01)
+        with mock.patch.dict(os.environ, {'ATOM_AI_ZHIPU_KEY': 'server-key', 'ATOM_AI_QUOTA_GENERATE': '2', 'ATOM_AI_GENERATE_MODEL': 'glm-4.5-air'}):
+            refused(lambda: ai('x' * 40, 'POST', '/market/v1/ai/jobs', msg), 401)
+            job = ai(alice['token'], 'POST', '/market/v1/ai/jobs', msg)['job_id']
+            refused(lambda: ai(bob['token'], 'GET', '/market/v1/ai/jobs/' + job), 404)
+            done = wait(alice['token'], job)
+            self.assertEqual(done['status'], 'completed')
+            self.assertEqual(done['result']['choices'][0]['message']['content'], '{}')
+            self.assertEqual(seen[0][0], 'server-key')
+            self.assertEqual(seen[0][1]['model'], 'glm-4.5-air', 'the server picks the model, not the device')
+            self.assertEqual(seen[0][1]['response_format'], {'type': 'json_object'})
+            failed = wait(alice['token'], ai(alice['token'], 'POST', '/market/v1/ai/jobs', dict(msg, messages=[{'role': 'user', 'content': 'fail'}]))['job_id'])
+            self.assertEqual(failed['status'], 'failed')
+            self.assertEqual(ai(alice['token'], 'GET', '/market/v1/ai/quota')['generate']['used'], 1, 'failed calls are refunded')
+            wait(alice['token'], ai(alice['token'], 'POST', '/market/v1/ai/jobs', msg)['job_id'])
+            refused(lambda: ai(alice['token'], 'POST', '/market/v1/ai/jobs', msg), 429)
+            self.assertEqual(ai(bob['token'], 'GET', '/market/v1/ai/quota')['generate']['remaining'], 2, 'quotas are per account')
+            self.now[0] += 40 * 86400
+            fresh = self.relay.handle('POST', '/market/v1/login', body={'username': 'alice', 'password': 'long-test-password-a'})
+            self.assertEqual(ai(fresh['token'], 'GET', '/market/v1/ai/quota')['generate']['used'], 0, 'a new month starts fresh')
+
     def test_auth_roles_and_bounds(self):
         self.denied(lambda: self.relay.handle('GET', '/v1/state', self.device['client_id']), 401)
         self.denied(lambda: self.call(self.pc, '/v1/pair/code', {}), 403)
