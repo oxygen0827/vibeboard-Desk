@@ -245,9 +245,10 @@ class MarketplaceTests(unittest.TestCase):
         try:
             works=current.handle('GET','/market/v1/catalog')['works']
             self.assertEqual({w['category'] for w in works},{'life','sound','play','connect'})
-            self.assertEqual(len(works),8)
+            self.assertEqual(len(works),7)
             ids={w['id'] for w in works}
             self.assertNotIn('official-official-companion',ids)
+            self.assertNotIn('official-task-pal',ids)
             self.assertTrue({'official-symbiotic-world','official-language-alchemy','official-ai-duet','official-agent-studio'} <= ids)
             self.assertTrue(all(current.version(w['latest_version_id'])['official'] for w in works))
         finally:current.close()

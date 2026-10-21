@@ -1,1 +1,12 @@
-{"id":"agent-studio","name":"Agent 小屋","description":"观察真实电脑任务，进入工作室查看、确认和接收作品。","entry":"index.html","icon":"icon.svg","theme_ui":"controls","layout":"fullscreen","capabilities":["task-state"]}
+{
+  "id": "agent-studio",
+  "name": "Agent 小屋",
+  "description": "关注不同电脑的真实任务，记住关注项，优先处理确认请求，进入任务详情与作品交付。",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "theme_ui": "controls",
+  "layout": "fullscreen",
+  "capabilities": [
+    "task-state"
+  ]
+}

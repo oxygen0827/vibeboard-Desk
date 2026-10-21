@@ -9,7 +9,7 @@ var workshop={prompt:read('atom.workshopDraft',''),theme_id:'',job:null,busy:fal
 paths.workshop='<path d="M7 29l3-10L24 5l7 7-14 14zM10 19l7 7M23 6l7 7M5 31h26"/>';
 paths.themes='<circle cx="18" cy="18" r="13"/><path d="M18 5v26M18 5a13 13 0 000 26" fill="currentColor"/><circle cx="25" cy="12" r="2"/>';
 function read(k,f){try{var v=localStorage.getItem(k);return v===null?f:JSON.parse(v);}catch(e){return f;}}
-function readAppState(k,f){var v=localStorage.getItem(k);return v===null?f:JSON.parse(v);}
+function readAppState(k,f){var v=localStorage.getItem(k);if(v===null&&k==='atom.app.v1.agent-studio'){var legacy=localStorage.getItem('atom.app.v1.task-pal');if(legacy!==null){var old=JSON.parse(legacy);if(old&&typeof old.computer==='string'&&typeof old.task==='string')return {computer:old.computer.slice(0,128),task:old.task.slice(0,128)};}}return v===null?f:JSON.parse(v);}
 function writeAppState(k,v){localStorage.setItem(k,JSON.stringify(v));return true;}
 function write(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true;}catch(e){return false;}}
 var speechFeedback=read('atom.speechFeedback',true);

@@ -58,7 +58,7 @@ python3 -m unittest discover -s atom/connect/marketplace -p 'test_*.py' -v
 - ai-duet：sound。
 - agent-studio：connect。
 - pixel-lab：play。
-- task-pal：connect。
+- task-pal：已整合至 agent-studio，旧入口下架，历史源码保留。
 - today：life。
 - sound-lab：sound。
 

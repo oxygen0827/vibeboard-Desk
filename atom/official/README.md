@@ -1,15 +1,15 @@
 # ATOM 原创官方作品
 
-本目录保留早期五个作品源码，当前上架其中四个；云朵伙伴已退役。作品使用原生 Canvas/HTML/CSS 与 AtomApp v1，无外链、无模型密钥、无复制的第三方素材。每个目录含完整源码、独立 currentColor 图标、MIT 许可（前三个作品另附 `SOURCE.md`），`bundle.json` 是完整可安装/发布快照。
+本目录保留早期五个作品源码，当前上架其中三个；云朵伙伴已退役，任务伙伴已并入 Agent 小屋。作品使用原生 Canvas/HTML/CSS 与 AtomApp v1，无外链、无模型密钥、无复制的第三方素材。每个目录含完整源码、独立 currentColor 图标、MIT 许可（前三个作品另附 `SOURCE.md`），`bundle.json` 是完整可安装/发布快照。
 
 - **云朵伙伴 official-companion（已退役）**：平滑视线追踪、自然眨眼、轻点回应、粒子与三种心情；遵守减少动态效果，表情偏好可保存。
 - **像素实验室 pixel-lab**：80×44 点阵上的真实生命规则、重力沙粒、衰减涟漪。可绘制、添加种子、暂停、清空及撤销五步。没有将预录动画当模拟。
-- **任务伙伴 task-pal**：只读系统 `atom:task-state` 状态，呈现实际电脑任务与审批、失败、完成。未连接或断网明确显示，没有假任务、假百分比或假进度。通过「我的电脑」发起和审批。
+- **任务伙伴 task-pal（已整合至 Agent 小屋）**：只读系统 `atom:task-state` 状态，呈现实际电脑任务与审批、失败、完成。未连接或断网明确显示，没有假任务、假百分比或假进度。通过「我的电脑」发起和审批。
 
 - **今日 today**：与电脑工作台共享真实日程和待办；离线 pending 持久保存、重连同步、冲突显式保留两份，账号数据隔离。
 - **声音实验室 sound-lab**：原生 WebAudio 的四轨十六步节拍编排，速度、音量与节拍可保存，暂停与退出释放音频资源。
 
-运行 `python3 atom/official/build.py` 重新生成五个完整 bundle；之后运行 `python3 atom/tools/prepare_icon_bundles.py`。市场服务按 `catalog.json` 导入：跳过退役的云朵伙伴，并从 `../experiences/` 加入共生世界、语言炼金、合奏伙伴、Agent 小屋。电脑与设备端读取同一目录。导入为不可变版本后，源码改变不会偷偷修改已发布版本，应按市场新版本流程发布。
+运行 `python3 atom/official/build.py` 重新生成五个完整 bundle；之后运行 `python3 atom/tools/prepare_icon_bundles.py`。市场服务按 `catalog.json` 导入：跳过退役的云朵伙伴和任务伙伴，并从 `../experiences/` 加入共生世界、语言炼金、合奏伙伴、Agent 小屋。电脑与设备端读取同一目录。导入为不可变版本后，源码改变不会偷偷修改已发布版本，应按市场新版本流程发布。
 
 真实 Chrome + 父桥 fixtures 测试在 `atom/market-app/ui.test.cjs`，覆盖表情互动、物理绘制/撤销与诚实任务状态。真机性能与真实服务器集成须由独立验收记录确认。
 
