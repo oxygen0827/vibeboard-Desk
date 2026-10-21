@@ -386,7 +386,7 @@ def system_status():
 class Handler(SimpleHTTPRequestHandler):
     def end_headers(self):
         # System shell changes must not retain an obsolete bridge or keyboard handler.
-        if urlsplit(self.path).path in ('/', '/index.html', '/app.js', '/home-key.js', '/style.css', '/app-runtime.js', '/app-host.js', '/companion.js', '/system-appearance.css', '/app-appearance.css', '/theme-controls.css', '/atom-ui.css'):
+        if urlsplit(self.path).path in ('/', '/index.html', '/app.js', '/home-key.js', '/style.css', '/app-runtime.js', '/app-host.js', '/companion.js', '/maintenance.js', '/system-settings.js', '/system-appearance.css', '/app-appearance.css', '/theme-controls.css', '/atom-ui.css'):
             self.send_header('Cache-Control', 'no-store')
         # Public application assets must load inside opaque-origin sandbox frames.
         if self.command in ('GET', 'HEAD') and urlsplit(self.path).path.startswith('/user-apps/'):
@@ -435,6 +435,12 @@ class Handler(SimpleHTTPRequestHandler):
             self.json_response(200, system_status())
         elif path == '/api/system/update':
             self.json_response(200, system_update.status())
+        elif path in ('/api/system/time', '/api/bluetooth'):
+            import system_tools, bluetooth
+            try:
+                if path == '/api/system/time': self.json_response(200, system_tools.time_status())
+                else: self.json_response(200, dict(status=bluetooth.status(), devices=bluetooth.devices()))
+            except (system_tools.SystemError_, bluetooth.BluetoothError) as exc: self.json_response(503, dict(error=str(exc)))
         elif path == '/api/wifi':
             import wifi
             try: self.json_response(200, dict(status=wifi.status(), networks=wifi.networks()))
@@ -703,6 +709,29 @@ class Handler(SimpleHTTPRequestHandler):
                     else: result = system_update.request_install(str(data.get('version', '')))
                     self.json_response(200, result)
                 except system_update.UpdateError as exc: self.json_response(400, dict(error=str(exc)))
+            elif path in ('/api/system/power', '/api/system/timezone', '/api/system/automatic-time'):
+                import system_tools
+                try:
+                    if path == '/api/system/power':
+                        if data.get('confirm') is not True: raise system_tools.SystemError_('请确认' + ('重启' if data.get('action') == 'reboot' else '关机'))
+                        if system_update.status()['installing']: raise system_tools.SystemError_('系统正在更新，请等更新完成')
+                        result = system_tools.power(data.get('action'))
+                    elif path == '/api/system/timezone': result = system_tools.set_timezone(data.get('zone'))
+                    else: result = system_tools.set_automatic(data.get('enabled'))
+                    self.json_response(200, result)
+                except system_tools.SystemError_ as exc: self.json_response(400, dict(error=str(exc)))
+            elif path.startswith('/api/bluetooth/'):
+                import bluetooth
+                action = path.rsplit('/', 1)[-1]
+                try:
+                    if action == 'power': result = bluetooth.power(data.get('on'))
+                    elif action == 'scan': result = bluetooth.scan()
+                    elif action == 'connect': result = bluetooth.connect(data.get('address'))
+                    elif action == 'disconnect': result = bluetooth.disconnect(data.get('address'))
+                    elif action == 'forget': result = bluetooth.forget(data.get('address'))
+                    else: raise bluetooth.BluetoothError('不支持的蓝牙操作')
+                    self.json_response(200, result)
+                except bluetooth.BluetoothError as exc: self.json_response(400, dict(error=str(exc)))
             elif path in ('/api/wifi/scan', '/api/wifi/connect'):
                 import wifi
                 try:

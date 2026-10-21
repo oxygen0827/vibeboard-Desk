@@ -1,0 +1,9 @@
+# Lets the ATOM service (user linaro, outside a login session) restart or power off the device and set the
+# time zone and automatic time from Settings. Install as root to
+# /etc/polkit-1/localauthority/50-local.d/atom-system.pkla (polkit 0.105, Debian 10). Nothing else is granted.
+[ATOM power and time]
+Identity=unix-user:linaro
+Action=org.freedesktop.login1.reboot;org.freedesktop.login1.reboot-multiple-sessions;org.freedesktop.login1.power-off;org.freedesktop.login1.power-off-multiple-sessions;org.freedesktop.timedate1.set-timezone;org.freedesktop.timedate1.set-ntp
+ResultAny=yes
+ResultInactive=yes
+ResultActive=yes
