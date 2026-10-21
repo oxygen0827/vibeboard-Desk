@@ -24,8 +24,8 @@ from relay_bridge import DeviceBridge, BridgeError
 MAX_BODY = 2 * 1024 * 1024
 ID = re.compile(r'^[a-z][a-z0-9_-]{0,47}$')
 BUILTINS = [dict(id='clock', name='时钟', description='桌面时钟', entry='/#clock'), dict(id='timer', name='计时器', description='倒计时提醒', entry='/#timer'), dict(id='status', name='设备状态', description='系统与连接状态', entry='/#status')]
-TRUSTED_CLIENT_IDS = {'my-computer', 'market', 'quick-notes', 'today', 'task-pal'}
-RESERVED_IDS = {a['id'] for a in BUILTINS} | {'notes', 'settings', 'developer', 'manager', 'home', 'widgets', 'workshop', 'themes', 'my-computer', 'connect-preview', 'market', 'quick-notes', 'today', 'task-pal', 'app-library'}
+TRUSTED_CLIENT_IDS = {'my-computer', 'market', 'quick-notes', 'today', 'task-pal', 'robot'}
+RESERVED_IDS = {a['id'] for a in BUILTINS} | {'notes', 'settings', 'developer', 'manager', 'home', 'widgets', 'workshop', 'themes', 'my-computer', 'connect-preview', 'market', 'quick-notes', 'today', 'task-pal', 'app-library', 'robot'}
 LOCK = threading.Lock()
 FEATURE_LOCK = threading.Lock()
 
@@ -76,6 +76,8 @@ def features(http):
             http.connect = DeviceBridge(state)
             from market_client import MarketClient
             http.market = MarketClient(state, http.connect)
+            from robot import RobotTalk
+            http.robot = RobotTalk()
             from release_store import ReleaseStore
             http.releases = ReleaseStore(state / 'app-releases')
     return http
@@ -551,6 +553,7 @@ class Handler(SimpleHTTPRequestHandler):
                 elif path == '/api/voice/playback-stop': result = service.voice.stop_playback()
                 elif path == '/api/voice/start':
                     service.speech.stop()
+                    service.robot.stop()
                     service.voice.stop_playback()
                     result = service.voice.start(quiet_fan=data.get('quiet_fan') is True)
                 elif path == '/api/voice/speak':
@@ -563,6 +566,14 @@ class Handler(SimpleHTTPRequestHandler):
                     recording = service.voice.recording_path(data.get('recording_id'))
                     result = transcribe(service.workshop.read_private_config(), recording)
                     recording.unlink()
+                else: raise ValueError('unknown endpoint')
+                self.json_response(200, result)
+            elif path.startswith('/api/robot/'):
+                service = features(self.server)
+                action = path.rsplit('/', 1)[-1]
+                if action == 'chat': result = service.robot.start(service.workshop.read_private_config(), data)
+                elif action == 'status': result = service.robot.status(str(data.get('job_id', ''))[:64])
+                elif action == 'stop': result = service.robot.stop()
                 else: raise ValueError('unknown endpoint')
                 self.json_response(200, result)
             elif path in ('/api/apps/install', '/api/apps/update'):

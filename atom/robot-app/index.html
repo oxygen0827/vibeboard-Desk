@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>机器人</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-atom-app="robot">
+<canvas id="face" width="480" height="360" aria-hidden="true"></canvas>
+<div id="hint" class="hint" aria-live="polite"></div>
+<div id="heard" class="heard" hidden></div>
+<div id="subtitle" class="subtitle" aria-live="polite"></div>
+<form id="typing" class="typing" hidden autocomplete="off">
+  <input id="message" maxlength="500" placeholder="想说什么？回车发送，Esc 取消" aria-label="输入想说的话">
+</form>
+<section id="settings" class="settings atom-scroll" hidden aria-label="机器人设置">
+  <h2>机器人设置</h2>
+  <label>名字<input id="name" maxlength="12"></label>
+  <label>性格<select id="style">
+    <option value="lively">活泼开朗</option><option value="gentle">温柔体贴</option><option value="witty">机智幽默</option><option value="scholar">博学冷静</option>
+  </select></label>
+  <label>声音<select id="voice">
+    <option value="tongtong">彤彤</option><option value="xiaochen">小陈</option><option value="chuichui">锤锤</option>
+    <option value="jam">动物圈 · Jam</option><option value="kazi">动物圈 · 卡兹</option><option value="douji">动物圈 · 豆几</option><option value="luodo">动物圈 · 罗多</option>
+  </select></label>
+  <label>想对它说的设定<input id="note" maxlength="200" placeholder="例如：叫我小王，说话带点东北味"></label>
+  <div class="row"><button type="button" id="forget">清空记忆</button><span id="memory"></span></div>
+  <div class="row"><button type="button" id="save-settings" class="primary">保存</button><button type="button" id="close-settings">取消</button></div>
+</section>
+<script src="app.js"></script>
+</body>
+</html>

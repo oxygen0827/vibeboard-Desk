@@ -1,0 +1,1 @@
+{"id":"robot","name":"机器人","description":"会说话的桌面机器人伙伴：长按空格和它聊天，它会用表情和声音回应你。","entry":"index.html","layout":"fullscreen","icon":"icon.svg","theme_ui":"controls"}

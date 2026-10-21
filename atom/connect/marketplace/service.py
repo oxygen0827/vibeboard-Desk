@@ -19,7 +19,7 @@ from mailer import Mailer, settings as mailer_settings
 
 CATEGORIES = {'life', 'companion', 'sound', 'play', 'connect'}
 LICENSES = {'MIT', 'Apache-2.0', 'BSD-2-Clause', 'BSD-3-Clause', 'CC0-1.0', 'MPL-2.0', 'GPL-3.0-only', 'GPL-3.0-or-later'}
-RESERVED = {'clock','timer','notes','status','settings','developer','manager','home','widgets','workshop','themes','my-computer','market','quick-notes','connect-preview','today','task-pal','app-library'}
+RESERVED = {'clock','timer','notes','status','settings','developer','manager','home','widgets','workshop','themes','my-computer','market','quick-notes','connect-preview','today','task-pal','app-library','robot'}
 APP_ID = re.compile(r'^[a-z][a-z0-9_-]{0,47}$')
 ID = re.compile(r'^[A-Za-z0-9_-]{1,100}$')
 MAX_BUNDLE = 1024 * 1024
