@@ -1,0 +1,20 @@
+{
+  "version": "2026.10.22.10.3",
+  "checks": {
+    "starts_in_app_grid_and_top_edge_stays_in_apps": true,
+    "vertical_same_column_all_three": true,
+    "top_row_paging": true,
+    "bottom_row_paging": true,
+    "wheel_preserves_grid_cell": true,
+    "rapid_paging_replaces_animation_without_focus_reset": true,
+    "no_browser_errors": true,
+    "last_page_lane_restore": true,
+    "apps_unchanged": true,
+    "identities_unchanged": true,
+    "diagnostic_port_closed": true,
+    "normal_kiosk_running": true
+  },
+  "method": "Keyboard arrows on real gray-board Chromium; Space remains confirm. No apps or model settings changed.",
+  "last_page_app_count": 6,
+  "partial_page_test": "Passed local shell integration with a four-app last page; real device last page has six apps."
+}
