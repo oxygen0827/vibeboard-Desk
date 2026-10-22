@@ -28,7 +28,7 @@ if a.python_root:
         if item.name.startswith(('cryptography','cffi','_cffi_backend','pycparser')):
             if item.is_dir():shutil.copytree(item,site/item.name,ignore=shutil.ignore_patterns('__pycache__','tests'))
             else:shutil.copy2(item,site/item.name)
-    subprocess.run([str(dest/'bin/python3'),'-c','import ssl,sqlite3,cryptography.hazmat.primitives.ciphers.aead'],check=True)
+    subprocess.run([str(dest/'bin/python3'),'-B','-c','import ssl,sqlite3,cryptography.hazmat.primitives.ciphers.aead'],check=True)
 # ATOM device simulator: the real device backend plus every repository app, prebuilt.
 atom=base.parents[1];device=resources/'device';skip=shutil.ignore_patterns('__pycache__','*.pyc','.DS_Store')
 device.mkdir()

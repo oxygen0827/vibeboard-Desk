@@ -219,7 +219,7 @@ final class SimulatorController: NSObject {
         try? FileManager.default.createDirectory(at: home, withIntermediateDirectories: true, attributes: [.posixPermissions: 0o700])
         let p = Process()
         p.executableURL = python
-        p.arguments = ["-u", script.path, "--no-open", "--seed", seed.path, "--home", home.path, "--port", String(port)]
+        p.arguments = ["-B", "-u", script.path, "--no-open", "--seed", seed.path, "--home", home.path, "--port", String(port)]
         let out = Pipe(); pipe = out; buffer = ""; ready = false
         p.standardOutput = out; p.standardError = out
         out.fileHandleForReading.readabilityHandler = { [weak self] handle in
