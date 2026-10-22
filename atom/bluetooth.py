@@ -1,6 +1,6 @@
 """Bluetooth through BlueZ (bluetoothctl): adapter state, scan, pair, connect and forget devices.
 
-Aimed at speakers, headphones and keyboards that pair without typing a code. The service user must be
+Interactive pairing is handled by a scoped BlueZ Agent1 in bluetooth_pairing. The service user must be
 in the `bluetooth` group (BlueZ's D-Bus policy); audio devices also need pulseaudio-module-bluetooth.
 """
 import re
@@ -92,21 +92,28 @@ def scan(seconds=8):
     return dict(status=status(), devices=devices())
 
 
-def connect(address):
-    mac = _mac(address)
-    info = _info(mac)
-    if info.get('Paired') != 'yes':
-        code, out = _ctl(['--agent', 'DisplayYesNo', 'pair', mac], timeout=40)
-        if 'Pairing successful' not in out and 'AlreadyExists' not in out:
-            if 'AuthenticationFailed' in out or 'passkey' in out.lower():
-                raise BluetoothError('这个设备需要输入配对码，请先使用 Debian 蓝牙设置完成配对，再回到这里连接')
-            raise BluetoothError('配对没有成功，请让设备进入配对模式后重试')
-    _ctl(['trust', mac])
-    code, out = _ctl(['connect', mac], timeout=30)
-    if 'Connection successful' not in out:
-        hint = '，播放声音还需要安装蓝牙音频支持' if KINDS.get(info.get('Icon', '')) == 'audio' else ''
-        raise BluetoothError('已配对，但没有连上' + hint + '，请确认设备已开机并在附近')
-    return dict(status=status(), devices=devices())
+def connect(address, confirm=False, request_id=None):
+    """Start an explicit, asynchronous pairing/connection flow; poll for challenges."""
+    return pairing('start', dict(address=address, confirm=confirm, id=request_id))
+
+
+def pairing(action, data):
+    import bluetooth_pairing
+    try:
+        service = bluetooth_pairing.manager()
+        if action == 'start':
+            result = service.start(_mac(data.get('address')), data.get('confirm'), data.get('id'))
+        elif action == 'status':
+            result = service.poll(data.get('id'))
+        elif action == 'respond':
+            result = service.respond(data.get('id'), data.get('challenge'), data.get('value'))
+        elif action == 'cancel':
+            result = service.cancel(data.get('id'))
+        else:
+            raise BluetoothError('不支持的配对操作')
+        return dict(pairing=result)
+    except bluetooth_pairing.PairingError as exc:
+        raise BluetoothError(str(exc))
 
 
 def disconnect(address):

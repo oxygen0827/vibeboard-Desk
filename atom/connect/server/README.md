@@ -70,7 +70,9 @@ umask 077; read -s -p "智谱 API Key: " k; echo; printf 'ATOM_AI_ZHIPU_KEY=%s\n
 ```sh
 umask 077; read -p "SMTP 服务器: " h; read -p "端口(465 或 587): " p; read -p "发信账号: " u; read -s -p "发信密码: " k; echo; read -p "发件地址: " f; read -p "告警收件人: " t
 printf "SMTP_HOST=%s\nSMTP_PORT=%s\nSMTP_USER=%s\nSMTP_PASSWORD=%s\nSMTP_FROM=%s\nALERT_TO=%s\n" "$h" "$p" "$u" "$k" "$f" "$t" > /etc/atom/smtp.env
-systemctl restart atom-connect && sudo -u atom env $(cat /etc/atom/smtp.env | xargs) python3 /opt/atom/connect/server/monitor.py --test-mail
+systemctl restart atom-connect
+# 只有准备好接收测试邮件时才执行。systemd 从私有文件加载，密码不会出现在进程参数里。
+systemd-run --wait --pipe --uid=atom --property=EnvironmentFile=/etc/atom/smtp.env /usr/bin/python3 /opt/atom/connect/server/monitor.py --test-mail
 ```
 
 - 465 端口使用 SSL，587 使用 STARTTLS。没有这个文件时，绑定邮箱、找回密码会提示「服务器暂未配置邮件发送」，监控照常运行但不发信。

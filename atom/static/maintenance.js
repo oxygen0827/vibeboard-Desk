@@ -3,7 +3,7 @@
 var keys=['atom.desktop.v2','atom.widget','atom.timer','atom.notes','atom.speechFeedback','atom.experienceAnimations','atom.appearance','atom.appearance.v1'],state=null,busy=false,error='',message='',page='menu',applying=false,loading=false,attempted=false;
 function allowed(k){return keys.indexOf(k)>=0||/^atom\.app\.v1\.[a-z][a-z0-9_-]{0,47}$/.test(k);}
 function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
-function call(action,data){return fetch('/api/device-data/'+action,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data||{})}).then(function(r){return r.json().then(function(v){if(!r.ok)throw Error(v.error||'操作未完成');return v;});});}
+function call(action,data){return window.AtomRequest('/api/device-data/'+action,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data||{})});}
 // Decided before app.js runs: the shell writes default layouts at once, which must not count as user data.
 var startedEmpty=(function(){try{for(var i=0;i<localStorage.length;i++)if(allowed(localStorage.key(i)))return false;return true;}catch(e){return false;}})(),checked=false;
 function capture(){var out={};for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(allowed(k))out[k]=localStorage.getItem(k);}return out;}

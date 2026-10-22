@@ -30,6 +30,9 @@ function shell(initial, backend) {
     setTimeout: fn => { timers.push(fn); return timers.length; }, clearTimeout() {}, setInterval() {}, addEventListener() {},
     document: {addEventListener() {}, getElementById: () => null}, window: {}, URL, Blob: class {}, console};
   context.window = context;
+  const httpContext = {window: {}, fetch, AbortController, setTimeout, clearTimeout};
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../static/request.js'), 'utf8'), httpContext);
+  context.AtomRequest = httpContext.window.AtomRequest;
   vm.runInNewContext(source, context);
   return {store, calls, backend, context, reloaded: () => reloaded, runTimers: async () => { while (timers.length) { await timers.shift()(); await new Promise(r => setImmediate(r)); } }};
 }

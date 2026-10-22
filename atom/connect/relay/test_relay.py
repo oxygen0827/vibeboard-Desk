@@ -545,6 +545,42 @@ class RelayTests(unittest.TestCase):
         finally:
             server.shutdown(); server.server_close()
 
+    def test_qr_registration_requires_recovery_and_preserves_keys_on_retry(self):
+        from unittest.mock import patch
+        qr = lambda action, body=None: self.relay.handle('POST', '/market/v1/qr-login/' + action, '', body or {})
+        start = qr('start')
+        envelope = {'v': 1, 'iv': 'A'*16, 'ct': 'B'*80}
+        record = dict(v=1, key_id='C'*12, salt='D'*22, iterations=310000, by_password=envelope, by_recovery=envelope)
+        body = dict(code=start['code'], attempt='x'*43, username='phone_new', password='long-test-password-a', mode='register', keys=record)
+        with self.assertRaises(module.MarketError): qr('approve', body)
+        self.assertIsNone(self.relay.marketplace.row('SELECT 1 FROM users WHERE username=?', ('phone_new',)))
+        body['recovery_confirmed'] = True
+        # The account is created once even if its first key write fails.
+        original = self.relay.marketplace.handle
+        def interrupted(method, path, *args, **kwargs):
+            if method == 'POST' and path == '/market/v1/keys': raise RuntimeError('test write interrupted')
+            return original(method, path, *args, **kwargs)
+        with patch.object(self.relay.marketplace, 'handle', side_effect=interrupted):
+            with self.assertRaises(RuntimeError): qr('approve', body)
+        approved = qr('approve', body)
+        self.assertEqual(qr('approve', body), approved)
+        self.assertEqual(approved['keys'], record)
+        self.assertEqual(self.relay.marketplace.row('SELECT COUNT(*) n FROM users WHERE username=?', ('phone_new',))['n'], 1)
+        with self.assertRaises(module.MarketError): qr('seal', dict(code=start['code'], handoff=approved['handoff'], sealed=None))
+        qr('seal', dict(code=start['code'], handoff=approved['handoff'], sealed=envelope))
+        ready = qr('poll', {'poll': start['poll']})
+        self.assertEqual(ready['key_id'], record['key_id'])
+        self.assertEqual(ready['user']['username'], 'phone_new')
+        # Cancel revokes access, without deleting the deliberately created account.
+        qr('cancel', {'poll': start['poll']})
+        with self.assertRaises(module.MarketError): self.relay.marketplace.handle('GET', '/market/v1/me', ready['token'])
+        again = qr('start')
+        with self.assertRaises(module.MarketError) as existing:
+            qr('approve', dict(body, code=again['code']))
+        self.assertEqual(existing.exception.code, 'username_unavailable')
+        session = self.relay.marketplace.handle('POST', '/market/v1/login', body={'username':'phone_new','password':body['password']})
+        self.assertEqual(self.relay.marketplace.handle('GET', '/market/v1/keys', session['token'])['keys'], record)
+
     def test_auth_roles_and_bounds(self):
         self.denied(lambda: self.relay.handle('GET', '/v1/state', self.device['client_id']), 401)
         self.denied(lambda: self.call(self.pc, '/v1/pair/code', {}), 403)

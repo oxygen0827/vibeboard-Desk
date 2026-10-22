@@ -26,6 +26,15 @@ if __name__=='__main__':
         threading.Thread(target=cloud.serve_forever,daemon=True).start()
         class Device(server.Handler):
             def log_message(self,*args):pass
+            def do_POST(self):
+                if self.path=='/test/recovery-match':
+                    body=json.loads(self.rfile.read(int(self.headers.get('Content-Length','0'))))
+                    market=server.features(self.server).market
+                    keys=market.request('keys',authenticated=True)['keys']
+                    matched=e2e.unlock_with_recovery(keys,body['recovery'])==e2e.unlock_with_password(keys,body['password'])==market.data_key()
+                    data=json.dumps({'matches':matched}).encode()
+                    self.send_response(200);self.send_header('Content-Length',str(len(data)));self.end_headers();self.wfile.write(data)
+                else:super().do_POST()
             def do_GET(self):
                 if self.path=='/test/key-match':
                     data=json.dumps({'matches':server.features(self.server).market.data_key()==key}).encode()

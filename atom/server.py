@@ -390,7 +390,7 @@ def system_status():
 class Handler(SimpleHTTPRequestHandler):
     def end_headers(self):
         # System shell changes must not retain an obsolete bridge or keyboard handler.
-        if urlsplit(self.path).path in ('/', '/index.html', '/app.js', '/home-key.js', '/style.css', '/app-runtime.js', '/app-input-standard.json', '/input-navigation.js', '/app-host.js', '/companion.js', '/maintenance.js', '/system-settings.js', '/system-appearance.css', '/app-appearance.css', '/theme-controls.css', '/atom-ui.css'):
+        if urlsplit(self.path).path in ('/', '/index.html', '/app.js', '/request.js', '/home-key.js', '/style.css', '/app-runtime.js', '/app-input-standard.json', '/input-navigation.js', '/app-host.js', '/companion.js', '/maintenance.js', '/system-settings.js', '/system-appearance.css', '/app-appearance.css', '/theme-controls.css', '/atom-ui.css'):
             self.send_header('Cache-Control', 'no-store')
         # Public application assets must load inside opaque-origin sandbox frames.
         if self.command in ('GET', 'HEAD') and urlsplit(self.path).path.startswith('/user-apps/'):
@@ -732,7 +732,9 @@ class Handler(SimpleHTTPRequestHandler):
                     if getattr(self.server, 'is_simulator', False): raise bluetooth.BluetoothError('请在小电脑上操作蓝牙；模拟设备不会修改电脑的蓝牙')
                     if action == 'power': result = bluetooth.power(data.get('on'))
                     elif action == 'scan': result = bluetooth.scan()
-                    elif action == 'connect': result = bluetooth.connect(data.get('address'))
+                    elif action == 'connect': result = bluetooth.connect(data.get('address'), data.get('confirm'), data.get('id'))
+                    elif action in ('pair-start', 'pair-status', 'pair-respond', 'pair-cancel'):
+                        result = bluetooth.pairing(action[5:], data)
                     elif action == 'disconnect': result = bluetooth.disconnect(data.get('address'))
                     elif action == 'forget': result = bluetooth.forget(data.get('address'))
                     else: raise bluetooth.BluetoothError('不支持的蓝牙操作')

@@ -76,10 +76,10 @@ class DeviceBridge:
 
     def pairing(self, computer_id, entry=None):
         """Encryption state of one pairing from a /v1/state entry: off, on, or a refusal reason."""
-        if entry is None and computer_id in self.key_cache: return self.key_cache[computer_id]
+        # Always revalidate the peer before sending: cached keys can outlive a pairing.
         if entry is None:
             entry = next((p for p in self._request('/v1/state').get('paired', []) if p.get('client_id') == computer_id), None)
-            if entry is None: return dict(state='off')  # not paired: the relay refuses the request itself
+            if entry is None: return dict(state='changed' if self.config.get('peers', {}).get(computer_id) else 'off')
         if not e2e or not self.config.get('e2e_private'): return dict(state='off')
         mine = e2e.public_key(self.config['e2e_private'])
         if entry.get('own_key') is None:
@@ -87,7 +87,7 @@ class DeviceBridge:
             entry['own_key'] = mine
         if entry['own_key'] != mine: return dict(state='mismatch')
         peer, pinned = entry.get('public_key'), self.config.get('peers', {}).get(computer_id)
-        if not peer: return dict(state='off')
+        if not peer: return dict(state='changed' if pinned else 'off')
         if pinned and pinned != peer: return dict(state='changed')
         if not pinned:
             self._save(dict(self.config, peers=dict(self.config.get('peers', {}), **{computer_id: peer})))
@@ -134,6 +134,7 @@ class DeviceBridge:
         finally:
             if os.path.exists(name): os.unlink(name)
         self.config = config
+        self.key_cache.clear()
 
     def _request(self, path, data=None, config=None, authenticated=True):
         config = config or self.config
@@ -182,6 +183,7 @@ class DeviceBridge:
         if not public['configured']: return public
         try:
             response = self._request('/v1/state')
+            self.key_cache.clear()
             # Never expose the private config or arbitrary relay response properties.
             for key in ('client_id','role','paired','pair_requests','tasks'):
                 if key in response: public[key] = response[key]
