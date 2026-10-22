@@ -1,0 +1,35 @@
+{
+  "version": "2026.10.22.10.4",
+  "state": "completed",
+  "duration_hours": 8.000023333297836,
+  "browser_samples": 480,
+  "browser_errors": [],
+  "version_changes": 0,
+  "hidden_samples": 0,
+  "frame_count_min": 570,
+  "frame_count_max": 599,
+  "frame_age_max_ms": 10003,
+  "browser_gap_max_seconds": 60.054,
+  "kernel_samples": 2828,
+  "kernel_gap_max_seconds": 10.242839097976685,
+  "kernel_coverage_edge_seconds": [
+    1.680640697479248,
+    2.9882004261016846
+  ],
+  "boot_count": 1,
+  "missing_display_samples": 0,
+  "xorg_missing_samples": 0,
+  "D_state_samples": 0,
+  "temperature_c_min_max": [
+    50.625,
+    62.222
+  ],
+  "available_memory_mib_min_max": [
+    1513.05078125,
+    1577.765625
+  ],
+  "available_memory_first_last_10min_avg": [
+    1544.6021484375,
+    1521.4313802083334
+  ]
+}
