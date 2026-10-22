@@ -1,0 +1,42 @@
+{
+  "version": "2026.10.22.10.2",
+  "checks": {
+    "directional_focus": true,
+    "single_ring": true,
+    "ios_navigation": true,
+    "parent_back_restoration": true,
+    "legacy_title_clear_of_back": true,
+    "installed_app_injection": true,
+    "space_activation_and_source_page_return": true,
+    "browser_errors": [],
+    "hold_space_starts_real_recording": true,
+    "recording_quiets_fan": true,
+    "cancel_stops_recording_and_restores_fan": true,
+    "workshop_draft_unchanged": true,
+    "test_audio_not_transcribed": true,
+    "test_audio_removed": true,
+    "apps_and_installation_order_unchanged": true,
+    "app_count": 36,
+    "identity_files_unchanged": true,
+    "diagnostics_closed": true,
+    "atom_and_lightdm_active": true,
+    "kiosk_running": true
+  },
+  "limitations": [
+    "No real hardware joystick attached; keyboard Space used.",
+    "Speech recognition accuracy and real utterance insertion are not certified by this navigation test."
+  ],
+  "browser": {
+    "viewport": [
+      508,
+      360
+    ],
+    "mainWidth": 480
+  },
+  "test_capture_seconds": "Brief capture, cancelled immediately after observing recording; not an ASR accuracy test",
+  "asr_configured": false,
+  "notes": [
+    "Device was updated through signed core staging; existing .9/.10 stability and Bluetooth work was merged first.",
+    "This is a gray-device-only test release; the public latest channel was not advanced."
+  ]
+}
