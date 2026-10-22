@@ -17,6 +17,27 @@ class DeviceBridgeTests(unittest.TestCase):
             with mock.patch.object(bridge,'_request',side_effect=responses):r=bridge.configure(dict(relay_url='http://localhost:8787'))
             self.assertNotIn('token',json.dumps(r));self.assertEqual(stat.S_IMODE(bridge.path.stat().st_mode),0o600)
             self.assertEqual(DeviceBridge(Path(d).resolve()).config['client_id'],'device_1')
+    def test_cached_pairing_cannot_hide_a_changed_peer(self):
+        import e2e
+        with tempfile.TemporaryDirectory() as d:
+            bridge=DeviceBridge(Path(d).resolve())
+            private=e2e.new_private_key()
+            old=e2e.public_key(e2e.new_private_key())
+            new=e2e.public_key(e2e.new_private_key())
+            bridge._save(dict(relay_url='https://relay.example',client_id='device',token='s'*32,e2e_private=private,peers={'computer':old}))
+            bridge.key_cache['computer']={'state':'on','key':b'old'}
+            response={'paired':[{'client_id':'computer','own_key':e2e.public_key(private),'public_key':new}]}
+            with mock.patch.object(bridge,'_request',return_value=response) as request:
+                self.assertEqual(bridge.pairing('computer')['state'],'changed')
+                with self.assertRaisesRegex(BridgeError,'密钥发生'):
+                    bridge.execute('create-task',dict(request_id='r',computer_id='computer',project_id='p',agent_id='codex',prompt='hello'))
+                self.assertTrue(all(c.args[0]=='/v1/state' for c in request.call_args_list))
+            response['paired'][0]['public_key']=None
+            with mock.patch.object(bridge,'_request',return_value=response):
+                self.assertEqual(bridge.pairing('computer')['state'],'changed')
+            with mock.patch.object(bridge,'_request',return_value={'paired':[]}):
+                self.assertEqual(bridge.pairing('computer')['state'],'changed')
+
     def test_invalid_paths_and_input_are_not_forwarded(self):
         with tempfile.TemporaryDirectory() as d:
             bridge=DeviceBridge(Path(d).resolve())

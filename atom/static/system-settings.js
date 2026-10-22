@@ -1,11 +1,11 @@
 /* Settings pages for power, date & time and Bluetooth. Each page paints into its own panel. */
 (function(){'use strict';
-var time=null,bt=null,busy=false,error='',message='',confirming='';
+var time=null,bt=null,busy=false,error='',message='',confirming='',pageEpoch=0;
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
-function request(path,data){return fetch(path,data===undefined?{}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(function(r){return r.json().then(function(v){if(!r.ok)throw Error(v.error||'操作未完成');return v;});});}
+function request(path,data){return window.AtomRequest(path,data===undefined?{}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});}
 function paint(){var el=document.getElementById('system-panel');if(el)el.innerHTML=body(el.dataset.page);}
 function notice(){return (error?'<p class="update-error" role="alert">'+esc(error)+'</p>':'')+(message?'<p class="update-ok">'+esc(message)+'</p>':'');}
-function run(promise,done){busy=true;error='';message='';paint();return promise.then(function(v){if(done)done(v);}).catch(function(e){error=e.message;}).then(function(){busy=false;paint();});}
+function run(promise,done){var epoch=pageEpoch;busy=true;error='';message='';paint();return promise.then(function(v){if(epoch===pageEpoch&&done)done(v);}).catch(function(e){if(epoch===pageEpoch)error=e.message;}).then(function(){if(epoch===pageEpoch){busy=false;paint();}});}
 function load(page){error='';message='';if(page==='time')run(request('/api/system/time'),function(v){time=v;});if(page==='bluetooth')run(request('/api/bluetooth'),function(v){bt=v;});}
 // The pairing page owns its request. Navigation revokes it, including a late start response.
 var selected=null,pair=null,pairId='',pairEpoch=0,pairTimer=0,pairPolling=false,pairBusy=false,pairError='',pairInput='';
@@ -68,5 +68,5 @@ document.addEventListener('click',function(e){var b=e.target.closest('[data-sys]
   if(a==='bt-scan'){run(request('/api/bluetooth/scan',{}),function(v){bt=v;});return;}
   if(a==='bt-disconnect'||a==='bt-forget'){if(a==='bt-forget'&&!confirm('忘记这个蓝牙设备？以后需要重新配对。'))return;run(request('/api/bluetooth/'+a.slice(3),{address:address}),function(v){bt=v;message=a==='bt-forget'?'已移除':'已断开';});}});
 document.addEventListener('change',function(e){if(e.target.id!=='sys-zone'||busy)return;run(request('/api/system/timezone',{zone:e.target.value}),function(v){time=v;message='时区已更新';});});
-window.AtomSystemSettings={html:function(page){if(page!=='bluetooth')disposePair();confirming='';error='';message='';setTimeout(function(){load(page);},0);return '<div id="system-panel" class="system-panel" data-page="'+page+'">'+body(page)+'</div>';}};
+window.AtomSystemSettings={html:function(page){var active=document.getElementById('system-panel');if(active&&active.dataset.page===page)return '<div id="system-panel" class="system-panel" data-page="'+page+'">'+body(page)+'</div>';var epoch=++pageEpoch;busy=false;if(page!=='bluetooth')disposePair();confirming='';error='';message='';setTimeout(function(){var el=document.getElementById('system-panel');if(epoch===pageEpoch&&el&&el.dataset.page===page)load(page);},0);return '<div id="system-panel" class="system-panel" data-page="'+page+'">'+body(page)+'</div>';}};
 })();
