@@ -21,7 +21,7 @@ function shell(initial, backend) {
     if (action === 'status') value = {size: backend.saved ? 100 : 0, backups: [], pending: backend.pending || null};
     else if (action === 'recover') { backend.pending = {id: 'p1', data: backend.saved, source: 'recover'}; value = {pending: 'p1'}; }
     else if (action === 'ack') { backend.pending = null; value = {ok: true}; }
-    else if (action === 'capture') { backend.saved = body.data; value = {}; }
+    else if (action === 'capture') { if(backend.failSave) return {ok:false,json:async()=>({error:'disk unavailable'})}; backend.saved = body.data; value = {}; }
     else value = {};
     return {ok: true, json: async () => value};
   };
@@ -63,4 +63,13 @@ test('a fresh device with nothing saved just starts capturing', async () => {
   await new Promise(r => setTimeout(r, 20));
   assert.ok(!s.calls.includes('recover'));
   assert.deepEqual(s.backend.saved, {'atom.desktop.v2': '{"order":["default"]}'});
+});
+
+test('application save waits for the device and rolls back failed writes', async () => {
+  const s=shell({'atom.app.v1.robot':'{"n":1}'},{saved:SAVED,failSave:true});
+  await assert.rejects(s.context.AtomMaintenance.persist('atom.app.v1.robot',{n:2}),/disk unavailable/);
+  assert.equal(s.store.get('atom.app.v1.robot'),' {"n":1}'.trim());
+  s.backend.failSave=false;
+  assert.equal(await s.context.AtomMaintenance.persist('atom.app.v1.robot',{n:3}),true);
+  assert.equal(s.backend.saved['atom.app.v1.robot'],'{"n":3}');
 });

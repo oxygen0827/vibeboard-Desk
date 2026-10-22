@@ -4,6 +4,7 @@ Aimed at speakers, headphones and keyboards that pair without typing a code. The
 in the `bluetooth` group (BlueZ's D-Bus policy); audio devices also need pulseaudio-module-bluetooth.
 """
 import re
+import time
 import subprocess
 
 MAC = re.compile(r'^[0-9A-F]{2}(?::[0-9A-F]{2}){5}$')
@@ -38,7 +39,7 @@ def _mac(value):
 
 
 def _info(mac):
-    _, out = _ctl(['info', mac], timeout=10)
+    _, out = _ctl(['info', mac], timeout=2)
     fields = {}
     for line in out.splitlines():
         if ':' in line and line.startswith('\t'):
@@ -56,10 +57,13 @@ def status():
 def devices():
     _, out = _ctl(['devices'], timeout=10)
     found = []
+    deadline = time.monotonic() + 6
     for line in out.splitlines():
         m = re.match(r'^Device ([0-9A-F:]{17}) (.+)$', line.strip())
         if not m:
             continue
+        if len(found) >= 24 or time.monotonic() >= deadline:
+            break
         info = _info(m.group(1))
         name = info.get('Alias') or m.group(2)
         if re.fullmatch(r'([0-9A-F]{2}-){5}[0-9A-F]{2}', name):
@@ -74,15 +78,17 @@ def power(on):
     if type(on) is not bool:
         raise BluetoothError('请选择打开或关闭蓝牙')
     code, out = _ctl(['power', 'on' if on else 'off'])
-    if 'succeeded' not in out and code != 0:
+    if code != 0 or 'Failed' in out or status()['powered'] != on:
         raise BluetoothError('蓝牙开关没有切换成功')
     return dict(status=status(), devices=devices())
 
 
 def scan(seconds=8):
     if not status()['powered']:
-        _ctl(['power', 'on'])
-    _ctl(['--timeout', str(seconds), 'scan', 'on'], timeout=seconds + 10)
+        power(True)
+    code, out = _ctl(['--timeout', str(seconds), 'scan', 'on'], timeout=seconds + 10)
+    if 'Failed' in out or code not in (0, 124):
+        raise BluetoothError('未能开始扫描，请确认蓝牙已打开后重试')
     return dict(status=status(), devices=devices())
 
 
@@ -90,10 +96,10 @@ def connect(address):
     mac = _mac(address)
     info = _info(mac)
     if info.get('Paired') != 'yes':
-        code, out = _ctl(['pair', mac], timeout=40)
+        code, out = _ctl(['--agent', 'DisplayYesNo', 'pair', mac], timeout=40)
         if 'Pairing successful' not in out and 'AlreadyExists' not in out:
             if 'AuthenticationFailed' in out or 'passkey' in out.lower():
-                raise BluetoothError('这个设备需要输入配对码，目前请在设备上切换到免密码配对模式后重试')
+                raise BluetoothError('这个设备需要输入配对码，请先使用 Debian 蓝牙设置完成配对，再回到这里连接')
             raise BluetoothError('配对没有成功，请让设备进入配对模式后重试')
     _ctl(['trust', mac])
     code, out = _ctl(['connect', mac], timeout=30)
@@ -104,12 +110,15 @@ def connect(address):
 
 
 def disconnect(address):
-    _ctl(['disconnect', _mac(address)])
+    mac = _mac(address)
+    code, out = _ctl(['disconnect', mac])
+    if code != 0 or 'Failed' in out or _info(mac).get('Connected') == 'yes':
+        raise BluetoothError('没有断开连接，请重试')
     return dict(status=status(), devices=devices())
 
 
 def forget(address):
     code, out = _ctl(['remove', _mac(address)])
-    if 'removed' not in out.lower() and code != 0:
+    if code != 0 or 'Failed' in out or 'removed' not in out.lower():
         raise BluetoothError('没能移除这个设备')
     return dict(status=status(), devices=devices())

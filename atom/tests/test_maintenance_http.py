@@ -34,6 +34,22 @@ class MaintenanceHTTP(unittest.TestCase):
         self.http.is_simulator=False
         with self.assertRaises(urllib.error.HTTPError):self.post('preview',{'data':{}})
 
+    def test_power_requires_real_device_confirmation_and_no_update(self):
+        import system_tools
+        def power(data):
+            req=urllib.request.Request(self.base+'/api/system/power',data=json.dumps(data).encode(),headers={'Origin':self.base,'Content-Type':'application/json'})
+            with urllib.request.urlopen(req) as r:return json.load(r)
+        with patch.object(system_tools,'power',return_value={'ok':True}) as command, patch.object(system_update,'status',return_value={'installing':False}):
+            with self.assertRaises(urllib.error.HTTPError):power({'action':'reboot','confirm':True})
+            self.http.is_simulator=False
+            with self.assertRaises(urllib.error.HTTPError):power({'action':'reboot'})
+            command.assert_not_called()
+            self.assertTrue(power({'action':'reboot','confirm':True})['ok'])
+            command.assert_called_once_with('reboot')
+        with patch.object(system_tools,'power') as command, patch.object(system_update,'status',return_value={'installing':True}):
+            with self.assertRaises(urllib.error.HTTPError):power({'action':'poweroff','confirm':True})
+            command.assert_not_called()
+
 class ModelFallback(unittest.TestCase):
     def test_own_transcription_and_official_speech_are_independent(self):
         config={'api_key':'own-text','stt_api_key':'own-stt','stt_base_url':'https://own','stt_model':'own'}

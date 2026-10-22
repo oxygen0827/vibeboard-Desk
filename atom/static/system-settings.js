@@ -9,11 +9,11 @@ function run(promise,done){busy=true;error='';message='';paint();return promise.
 function load(page){error='';message='';if(page==='time')run(request('/api/system/time'),function(v){time=v;});if(page==='bluetooth')run(request('/api/bluetooth'),function(v){bt=v;});}
 function body(page){var d=busy?' disabled':'';
   if(page==='power'){
-    if(confirming)return '<div class="maintenance-copy"><h2>'+(confirming==='reboot'?'重启这台设备？':'关闭这台设备？')+'</h2><p>'+(confirming==='reboot'?'大约一分钟后回到桌面。正在进行的任务会中断。':'关机后需要按设备上的电源键或重新通电才能开机，远程无法唤醒。')+'</p><div class="maintenance-actions"><button data-sys="cancel">取消</button><button class="danger" data-sys="'+confirming+'-confirm"'+d+'>'+(confirming==='reboot'?'重启':'关机')+'</button></div></div>'+notice();
-    return '<div class="settings-menu"><button data-sys="reboot"'+d+'>重启 <span>重新启动系统，约一分钟回到桌面</span></button><button data-sys="poweroff"'+d+'>关机 <span>需要在设备上手动开机</span></button></div>'+notice();}
+    if(confirming)return '<div class="maintenance-copy"><h2>'+(confirming==='reboot'?'重启这台设备？':'关闭这台设备？')+'</h2><p>'+(confirming==='reboot'?'重启完成后回到桌面。正在进行的任务会中断。':'关机后需要按设备上的电源键或重新通电才能开机，远程无法唤醒。')+'</p><div class="maintenance-actions"><button data-sys="cancel">取消</button><button class="danger" data-sys="'+confirming+'-confirm"'+d+'>'+(confirming==='reboot'?'重启':'关机')+'</button></div></div>'+notice();
+    return '<div class="settings-menu"><button data-sys="reboot"'+d+'>重启 <span>重新启动系统，正在进行的任务会中断</span></button><button data-sys="poweroff"'+d+'>关机 <span>需要在设备上手动开机</span></button></div>'+notice();}
   if(page==='time'){if(!time)return (error?'':'<p class="subtitle">正在读取时间…</p>')+notice()+(error?'<button data-sys="retry">重试</button>':'');
     var now=new Date(time.now);
-    return '<div class="row"><h2>现在</h2><span>'+esc(now.toLocaleString('zh-CN',{hour12:false}))+'</span></div>'+
+    return '<div class="row"><h2>现在</h2><span>'+esc(now.toLocaleString('zh-CN',{hour12:false,timeZone:time.timezone||undefined}))+'</span></div>'+
       '<div class="row"><h2>时区</h2><select id="sys-zone" aria-label="时区"'+d+'>'+time.zones.map(function(z){return '<option value="'+esc(z)+'"'+(z===time.timezone?' selected':'')+'>'+esc(z)+'</option>';}).join('')+'</select></div>'+
       '<div class="row"><h2>自动校时</h2><button data-sys="ntp"'+d+(time.automatic_available?'':' disabled')+'>'+(time.automatic?'已开启 · 点击关闭':'已关闭 · 点击开启')+'</button></div>'+
       (time.automatic_available?(time.automatic?'<p class="subtitle">'+(time.synchronized?'已和网络时间同步':'正在和网络时间同步')+'</p>':''):'<p class="subtitle">这台设备没有安装自动校时服务</p>')+notice();}
@@ -33,5 +33,5 @@ document.addEventListener('click',function(e){var b=e.target.closest('[data-sys]
   if(a==='bt-scan'){run(request('/api/bluetooth/scan',{}),function(v){bt=v;});return;}
   if(a==='bt-connect'||a==='bt-disconnect'||a==='bt-forget'){if(a==='bt-forget'&&!confirm('忘记这个蓝牙设备？以后需要重新配对。'))return;run(request('/api/bluetooth/'+a.slice(3),{address:address}),function(v){bt=v;message=a==='bt-connect'?'已连接':a==='bt-forget'?'已移除':'已断开';});}});
 document.addEventListener('change',function(e){if(e.target.id!=='sys-zone'||busy)return;run(request('/api/system/timezone',{zone:e.target.value}),function(v){time=v;message='时区已更新';});});
-window.AtomSystemSettings={html:function(page){confirming='';error='';message='';setTimeout(function(){load(page);},0);return '<div id="system-panel" class="list-scroll" data-page="'+page+'">'+body(page)+'</div>';}};
+window.AtomSystemSettings={html:function(page){confirming='';error='';message='';setTimeout(function(){load(page);},0);return '<div id="system-panel" class="system-panel" data-page="'+page+'">'+body(page)+'</div>';}};
 })();

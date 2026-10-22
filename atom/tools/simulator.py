@@ -66,7 +66,10 @@ def seed(apps_root, seed_root):
         target = apps_root / source.name
         fresh = not (target / 'manifest.json').is_file()
         if fresh or changed(source, target):
+            manifest_stat = None if fresh else (target / 'manifest.json').stat()
             shutil.copytree(source, target, dirs_exist_ok=True)
+            if manifest_stat:
+                os.utime(target / 'manifest.json', ns=(manifest_stat.st_atime_ns, manifest_stat.st_mtime_ns))
             if fresh:  # keep the seed order on first install; updates keep their desktop position
                 os.utime(target / 'manifest.json')
                 time.sleep(0.002)

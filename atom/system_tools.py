@@ -48,7 +48,7 @@ def time_status():
     _, units, _ = _run(['systemctl', 'list-unit-files', 'systemd-timesyncd.service', '--no-legend'], timeout=10)
     return dict(now=datetime.now().astimezone().isoformat(timespec='seconds'), timezone=zone,
                 automatic=values.get('NTP') == 'yes', synchronized=values.get('NTPSynchronized') == 'yes',
-                automatic_available='systemd-timesyncd' in units, zones=COMMON_ZONES if zone in COMMON_ZONES or not zone else [zone] + COMMON_ZONES)
+                automatic_available=values.get('CanNTP') == 'yes' or ('systemd-timesyncd' in units and 'masked' not in units), zones=COMMON_ZONES if zone in COMMON_ZONES or not zone else [zone] + COMMON_ZONES)
 
 
 def set_timezone(zone):

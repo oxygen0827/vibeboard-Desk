@@ -712,6 +712,7 @@ class Handler(SimpleHTTPRequestHandler):
             elif path in ('/api/system/power', '/api/system/timezone', '/api/system/automatic-time'):
                 import system_tools
                 try:
+                    if getattr(self.server, 'is_simulator', False): raise system_tools.SystemError_('模拟设备不能修改电脑的电源或时间，请在小电脑上操作')
                     if path == '/api/system/power':
                         if data.get('confirm') is not True: raise system_tools.SystemError_('请确认' + ('重启' if data.get('action') == 'reboot' else '关机'))
                         if system_update.status()['installing']: raise system_tools.SystemError_('系统正在更新，请等更新完成')
@@ -724,6 +725,7 @@ class Handler(SimpleHTTPRequestHandler):
                 import bluetooth
                 action = path.rsplit('/', 1)[-1]
                 try:
+                    if getattr(self.server, 'is_simulator', False): raise bluetooth.BluetoothError('请在小电脑上操作蓝牙；模拟设备不会修改电脑的蓝牙')
                     if action == 'power': result = bluetooth.power(data.get('on'))
                     elif action == 'scan': result = bluetooth.scan()
                     elif action == 'connect': result = bluetooth.connect(data.get('address'))

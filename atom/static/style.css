@@ -64,3 +64,9 @@ body[data-view=workshop] #workshop-tts-text{width:100%;height:172px;resize:none;
 .update-ok{margin:0;font-size:13px;color:var(--ink);font-weight:600}
 .update-error{margin:0;font-size:13px;color:var(--action)}
 .maintenance-copy{font-size:15px;line-height:1.5}.maintenance-copy h2{font-size:21px;margin:6px 0}.maintenance-copy p{margin:7px 0}.maintenance-actions{display:flex;gap:10px;margin:8px 0}.maintenance-actions button{flex:1}.maintenance-list{min-height:0;max-height:180px}.maintenance-backup{padding:12px 0;border-bottom:1px solid var(--line)}.maintenance-backup strong{font-size:16px}.maintenance-backup>div{display:flex;gap:8px;margin-top:8px}.maintenance-backup button{flex:1}#maintenance-panel{min-height:0;display:flex;flex-direction:column;gap:4px}#maintenance-panel>.subtitle{font-size:14px;margin:4px 0}#maintenance-panel .settings-menu button{min-height:43px;padding:9px 13px}#maintenance-panel .settings-menu button span{font-size:12px}
+.welcome-qr{display:flex;gap:14px;align-items:center}
+.welcome-qr-code{flex:none;background:#fff;border-radius:10px;padding:4px;line-height:0}
+.welcome-qr-code svg{width:150px;height:150px}
+.welcome-qr .welcome-code{margin:4px 0;font-size:20px!important;letter-spacing:3px}
+
+.system-panel{display:flex;flex-direction:column;gap:10px;flex:1;min-height:0;overflow:hidden}.system-panel>.maintenance-list{flex:1;min-height:0;overflow:auto}.welcome-qr-code{flex:0 0 174px;width:174px;height:174px}.welcome-qr-code svg{width:100%;height:100%}

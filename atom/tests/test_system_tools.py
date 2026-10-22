@@ -76,15 +76,24 @@ class BluetoothTests(unittest.TestCase):
 
     def test_connect_pairs_trusts_and_connects(self):
         run, calls = fake([(['bluetoothctl', 'show'], SHOW), (['bluetoothctl', 'devices'], DEVICES), (['bluetoothctl', 'info'], info),
-                           (['bluetoothctl', 'pair'], (0, 'Attempting to pair with AA:BB:CC:DD:EE:02\nPairing successful\n', '')),
+                           (['bluetoothctl', '--agent', 'DisplayYesNo', 'pair'], (0, 'Attempting to pair with AA:BB:CC:DD:EE:02\nPairing successful\n', '')),
                            (['bluetoothctl', 'connect'], (0, 'Connection successful\n', ''))])
         with mock.patch('subprocess.run', run):
             bluetooth.connect('aa:bb:cc:dd:ee:02')
-        names = [c[1] for c in calls if c[0] == 'bluetoothctl' and c[1] in ('pair', 'trust', 'connect')]
+        names = [c[-2] for c in calls if c[0] == 'bluetoothctl' and c[-2] in ('pair', 'trust', 'connect')]
         self.assertEqual(names, ['pair', 'trust', 'connect'])
 
+    def test_exit_zero_does_not_mean_bluetooth_succeeded(self):
+        run, _ = fake([(['bluetoothctl', 'power'], (0, 'Failed to set power: org.bluez.Error.Failed', '')),
+                       (['bluetoothctl', 'disconnect'], (0, 'Failed to disconnect', '')),
+                       (['bluetoothctl', 'remove'], (0, 'Failed to remove device', ''))])
+        with mock.patch('subprocess.run', run):
+            for action in (lambda: bluetooth.power(False), lambda: bluetooth.disconnect('AA:BB:CC:DD:EE:01'),
+                           lambda: bluetooth.forget('AA:BB:CC:DD:EE:01')):
+                with self.assertRaises(bluetooth.BluetoothError): action()
+
     def test_failures_and_validation(self):
-        run, _ = fake([(['bluetoothctl', 'info'], info), (['bluetoothctl', 'pair'], (1, 'Failed to pair: org.bluez.Error.AuthenticationFailed\n', '')),
+        run, _ = fake([(['bluetoothctl', 'info'], info), (['bluetoothctl', '--agent', 'DisplayYesNo', 'pair'], (1, 'Failed to pair: org.bluez.Error.AuthenticationFailed\n', '')),
                        (['bluetoothctl', 'show'], (1, 'No default controller available\n', ''))])
         with mock.patch('subprocess.run', run):
             with self.assertRaisesRegex(bluetooth.BluetoothError, '配对码'):

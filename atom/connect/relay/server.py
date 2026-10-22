@@ -19,6 +19,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from marketplace.service import Marketplace, MarketError
 from marketplace.ai import OfficialAI
 from marketplace.releases import Releases
+from marketplace.qrlogin import QRLogin
 
 TERMINAL = {'completed', 'failed', 'cancelled', 'interrupted'}
 STATUSES = {'queued', 'running', 'waiting_approval'} | TERMINAL
@@ -35,7 +36,9 @@ MAX_PAIR_REQUESTS = 50000
 MAX_TASK_EVENTS = 4096
 MAX_TASK_EVENT_BYTES = 8 * 1024 * 1024
 # Per-peer (count, window seconds). A client registers once, so open enrollment cannot cheaply exhaust MAX_CLIENTS.
-PEER_LIMITS = {'/v1/clients/register': (10, 3600), '/v1/pair/claim': (30, 60)}
+WEB_POSTS = ('/market/v1/qr-login/approve', '/market/v1/qr-login/seal')
+WEB_ORIGINS = tuple(o.strip() for o in os.environ.get('ATOM_WEB_ORIGINS', 'https://ldcx.tech').split(',') if o.strip())
+PEER_LIMITS = {'/v1/clients/register': (10, 3600), '/v1/pair/claim': (30, 60), '/market/v1/qr-login/start': (30, 3600)}
 
 
 def url_is_market(target):
@@ -80,6 +83,7 @@ class Relay:
         market_path = str(Path(path).with_name(Path(path).stem + '.marketplace.sqlite3')) if path != ':memory:' else ':memory:'
         self.marketplace = Marketplace(market_path, clock=clock)
         self.releases = Releases(Path(path).parent / 'system' if path != ':memory:' else Path('/nonexistent'))
+        self.qrlogin = QRLogin(self.marketplace, clock=clock)
         self.ai = OfficialAI(str(Path(path).with_name(Path(path).stem + '.ai.sqlite3')) if path != ':memory:' else ':memory:', self.marketplace, clock=clock)
         self.lock = threading.RLock()
         if path != ':memory:':
@@ -147,6 +151,8 @@ class Relay:
                         (item['id'], computer, task, json.dumps(item)))
 
     def handle(self, method, target, token='', body=None, peer='local'):
+        if urllib.parse.urlsplit(target).path.startswith('/market/v1/qr-login/'):
+            return self.qrlogin.handle(method, urllib.parse.urlsplit(target).path.rstrip('/'), body if body is not None else {}, peer)
         if urllib.parse.urlsplit(target).path.startswith('/market/v1/system/'):
             return self.releases.handle(method, urllib.parse.urlsplit(target).path.rstrip('/'))
         if urllib.parse.urlsplit(target).path.startswith('/market/v1/ai/'):
@@ -516,6 +522,20 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self, *args):
         pass
 
+    def login_page(self):
+        page = (Path(__file__).resolve().parents[1] / 'marketplace' / 'qr-login.html').read_bytes()
+        self.send_response(200)
+        self.send_header('Content-Type', 'text/html; charset=utf-8')
+        self.send_header('Content-Length', str(len(page)))
+        self.send_header('Cache-Control', 'no-store')
+        self.send_header('X-Content-Type-Options', 'nosniff')
+        self.send_header('Referrer-Policy', 'no-referrer')
+        self.send_header('Content-Security-Policy', "default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'")
+        self.send_header('Connection', 'close')
+        self.end_headers()
+        self.wfile.write(page)
+        self.close_connection = True
+
     def do_GET(self):
         self.dispatch()
 
@@ -525,7 +545,14 @@ class Handler(BaseHTTPRequestHandler):
     def dispatch(self):
         try:
             require(len(self.path) <= 2048, 'URL too long', 414)
-            require(self.command != 'POST' or self.headers.get('Origin') is None, 'Browser-origin mutations are not permitted', 403)
+            if self.command == 'GET' and self.path.split('?')[0].split('#')[0] in ('/login', '/login/'):
+                return self.login_page()
+            route = urllib.parse.urlsplit(self.path).path.rstrip('/')
+            if route in WEB_POSTS:
+                # The phone sign-in page posts from the ATOM site itself, and only from there.
+                require(self.headers.get('Origin') in WEB_ORIGINS, 'Browser-origin mutations are not permitted', 403)
+            else:
+                require(self.command != 'POST' or self.headers.get('Origin') is None, 'Browser-origin mutations are not permitted', 403)
             if self.command == 'POST' and self.path.startswith('/market/v1/ai/zhipu/'):
                 # Streaming passthrough for the robot and voice; it writes its own response.
                 self.connection.settimeout(30)
@@ -539,14 +566,14 @@ class Handler(BaseHTTPRequestHandler):
             self.connection.settimeout(10)
             require(length == 0 or self.headers.get('Content-Type', '').split(';')[0].strip() == 'application/json', 'JSON content type required', 415)
             peer = self.peer()
-            if self.path in PEER_LIMITS:
+            if route in PEER_LIMITS:
                 with self.server.relay.lock:
                     stamp = time.monotonic()
                     buckets = getattr(self.server, 'rate_buckets', {})
                     buckets = {k: v for k, v in buckets.items() if stamp-v[0] < PEER_LIMITS[k[1]][1]}
-                    key = (peer, self.path)
+                    key = (peer, route)
                     start, count = buckets.get(key, (stamp, 0))
-                    require(count < PEER_LIMITS[self.path][0] and (key in buckets or len(buckets) < 10000), 'Please retry later', 429)
+                    require(count < PEER_LIMITS[route][0] and (key in buckets or len(buckets) < 10000), 'Please retry later', 429)
                     buckets[key] = (start, count+1)
                     self.server.rate_buckets = buckets
             body = json.loads(self.rfile.read(length).decode('utf-8')) if length else {}

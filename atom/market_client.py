@@ -19,6 +19,7 @@ class MarketClient:
         # Memory only: a recovery code waiting to be shown, and the password while recovery is pending.
         self.recovery_code=None;self.pending=None
         self.linked=None  # market token already joined to this device's relay identity
+        self.qr=None  # phone sign-in in progress: poll token and transfer key, memory only
         try:
             if self.path.is_symlink():raise ValueError('symlink')
             value=json.loads(self.path.read_text(encoding='utf-8'))
@@ -88,6 +89,15 @@ class MarketClient:
         except (ValueError,UnicodeError) as exc:
             if isinstance(exc,BridgeError):raise
             raise BridgeError('市场返回格式无效',502)
+    def cancel_qr(self, code=None):
+        with self.lock:
+            qr=self.qr
+            if not qr or (code is not None and code!=qr['code']):return
+            self.qr=None
+            if qr['base']==self.base():
+                try:self.request('qr-login/cancel',{'poll':qr['poll']})
+                except BridgeError:pass  # server expires undelivered sessions after five minutes
+
     def execute(self, action, data):
         if not isinstance(data,dict):raise BridgeError('请求格式无效')
         if action.startswith('photo-'):
@@ -111,10 +121,45 @@ class MarketClient:
             if value.get('token') and self.linked!=value.get('token'):threading.Thread(target=self.link_account,daemon=True).start()
             return dict(configured=bool(self.relay()),authenticated=bool(value.get('token')),user={k:user[k] for k in ('id','username') if k in user},
                         encryption=self.encryption(),**({'recovery_code':self.recovery_code} if self.recovery_code else {}))
+        if action=='qr-cancel':
+            self.cancel_qr(data.get('code'))
+            return dict(ok=True)
+        if action=='qr-start':
+            with self.lock:
+                self.cancel_qr()
+                result=self.request('qr-login/start',{})
+                if not isinstance(result.get('code'),str) or not isinstance(result.get('poll'),str):raise BridgeError('二维码生成失败，请重试',502)
+                transfer=os.urandom(32)
+                self.qr=dict(poll=result['poll'],transfer=transfer,code=result['code'],base=self.base())
+                url=self.base()+'/login#c='+result['code']+'&k='+base64.urlsafe_b64encode(transfer).rstrip(b'=').decode()
+                return dict(url=url,code=result['code'],confirm=result['code'][:4]+' '+result['code'][4:],expires_in=result.get('expires_in',300))
+        if action=='qr-poll':
+            with self.lock:
+                qr=self.qr
+                if not qr or qr['base']!=self.base() or (data.get('code') and data['code']!=qr['code']):return dict(status='expired')
+                result=self.request('qr-login/poll',{'poll':qr['poll']})
+                if result.get('status')!='ready':
+                    if result.get('status')=='expired':self.qr=None
+                    return dict(status=result.get('status','pending'))
+                if not isinstance(result.get('token'),str) or not isinstance(result.get('user'),dict):raise BridgeError('账号响应无效',502)
+                value=dict(relay_url=self.base(),token=result['token'],user={k:result['user'][k] for k in ('id','username') if k in result['user']})
+                if e2e and result.get('sealed') and result.get('key_id'):
+                    try:
+                        key=e2e.unb64(e2e.open_sealed(qr['transfer'],result['sealed'],'atom-qr-login'),32)
+                        value.update(data_key=e2e.b64(key),key_id=result['key_id'])
+                    except e2e.E2EError:pass  # account page offers password unlock
+                self.save(value)  # persist before acknowledgement; repeated polls return the same session
+                self.recovery_code=self.pending=None
+                try:self.request('qr-login/ack',{'poll':qr['poll']})
+                except BridgeError:pass  # a delivered session survives expiry if its ack was lost
+                self.qr=None
+                self.link_account()
+                return dict(self.execute('state',{}),status='ready')
         if action in ('register','login'):
             username=data.get('username');password=data.get('password')
             if not isinstance(username,str) or not isinstance(password,str):raise BridgeError('请输入账号和密码')
             with self.lock:
+                self.cancel_qr()
                 result=self.request(action,{'username':username,'password':password})
                 if not isinstance(result.get('token'),str) or not isinstance(result.get('user'),dict):raise BridgeError('账号响应无效',502)
                 self.save(dict(relay_url=self.base(),token=result['token'],user={k:result['user'][k] for k in ('id','username') if k in result['user']}))
@@ -162,6 +207,7 @@ class MarketClient:
             values={k:data.get(k) for k in ('username','code','new_password')}
             if not all(isinstance(v,str) and v for v in values.values()):raise BridgeError('请输入账号、验证码和新密码')
             with self.lock:
+                self.cancel_qr()
                 result=self.request('password/reset',values)
                 if not isinstance(result.get('token'),str) or not isinstance(result.get('user'),dict):raise BridgeError('账号响应无效',502)
                 self.save(dict(relay_url=self.base(),token=result['token'],user={k:result['user'][k] for k in ('id','username') if k in result['user']}))
@@ -170,6 +216,7 @@ class MarketClient:
                 except BridgeError:pass
             return self.execute('state',{})
         if action=='logout':
+            self.cancel_qr()
             self.recovery_code=self.pending=None
             revoked=True
             if self.connect.config.get('token'):

@@ -53,6 +53,7 @@ class DeviceData:
         self.closed = False
         self.last_sent = {}
         self.last_error = ''
+        self.backup_error = ''
         self.sending = False
 
     def _read(self, path, default):
@@ -66,11 +67,21 @@ class DeviceData:
     def current(self):
         """The authoritative copy; falls back to the previous version if the newest file is damaged."""
         try:
-            return self._read(self.path, {})
+            value = self._read(self.path, {})
+            if not isinstance(value, dict) or (not value and self.path.exists()):
+                raise ValueError('本机记录格式无效')
+            if value:
+                version, size = validate(value.get('data') if isinstance(value, dict) else None)
+                if version != value.get('version') or size != value.get('size'):
+                    raise ValueError('本机记录校验失败')
+            return value
         except ValueError:
             value = self._read(self.previous, None)
             if value is None:
                 raise
+            version, size = validate(value.get('data') if isinstance(value, dict) else None)
+            if version != value.get('version') or size != value.get('size'):
+                raise ValueError('前一份记录校验失败；已有数据没有被覆盖')
             return value
 
     def capture(self, data):
@@ -84,7 +95,11 @@ class DeviceData:
                     _write(self.previous, old)
                 _write(self.path, dict(version=version, data=data, size=size, updated=time.time()))
                 if data:
-                    self._daily(version, data)
+                    try:
+                        self._daily(version, data)
+                        self.backup_error = ''
+                    except OSError:
+                        self.backup_error = '记录已保存，但自动备份未完成，请检查可用空间'
         self.push()
         return dict(version=version, size=size)
 
@@ -116,7 +131,7 @@ class DeviceData:
             snap = self.current()
             return dict(backups=backups, mirror=self._read(self.mirror_path, {}).get('enabled', False),
                         mirror_clear_pending=self._read(self.mirror_path, {}).get('clear_pending', False),
-                        mirror_error=self.last_error, version=snap.get('version'), size=snap.get('size', 0),
+                        mirror_error=self.last_error, backup_error=self.backup_error, version=snap.get('version'), size=snap.get('size', 0),
                         pending=self._read(self.pending, None))
 
     def backup(self, data):

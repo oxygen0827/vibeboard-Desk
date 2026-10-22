@@ -11,3 +11,8 @@ systemctl daemon-reload
 systemctl enable atom-update-recover.service atom-update.path
 systemctl start atom-update-recover.service
 systemctl start atom-update.path
+
+# Narrow system actions used by Settings on the supported Debian 10 image.
+install -d -m 0755 /etc/polkit-1/localauthority/50-local.d
+install -o root -g root -m 0644 "$ATOM_ROOT/deploy/atom-system.pkla" /etc/polkit-1/localauthority/50-local.d/atom-system.pkla
+if getent group bluetooth >/dev/null; then usermod -a -G bluetooth linaro; fi

@@ -38,7 +38,7 @@ for d in ('static','templates'):shutil.copytree(atom/d,device/d,ignore=skip)
 (device/'tools').mkdir()
 for f in ('simulator.py','simulator.html'):shutil.copy2(atom/'tools'/f,device/'tools'/f)
 subprocess.run(['python3',str(atom/'tools/simulator.py'),'--build-seed',str(device/'seed-apps')],check=True)
-info=dict(CFBundleIdentifier='local.atom.connect',CFBundleName='ATOM Connect',CFBundleDisplayName='ATOM Connect',CFBundleExecutable='ATOMConnect',CFBundlePackageType='APPL',CFBundleShortVersionString='0.6.0',CFBundleVersion='20261022',LSMinimumSystemVersion='13.0',LSUIElement=True,NSHighResolutionCapable=True,NSAppTransportSecurity={'NSAllowsLocalNetworking':True},CFBundleIconFile='AppIcon')
+info=dict(CFBundleIdentifier='local.atom.connect',CFBundleName='ATOM Connect',CFBundleDisplayName='ATOM Connect',CFBundleExecutable='ATOMConnect',CFBundlePackageType='APPL',CFBundleShortVersionString='0.6.1',CFBundleVersion='20261022.7',LSMinimumSystemVersion='13.0',LSUIElement=True,NSHighResolutionCapable=True,NSAppTransportSecurity={'NSAllowsLocalNetworking':True},CFBundleIconFile='AppIcon')
 (app/'Contents/Info.plist').write_bytes(plistlib.dumps(info))
 subprocess.run(['swiftc','-O','-framework','AppKit','-framework','WebKit',str(base/'ATOMConnect.swift'),'-o',str(mac/'ATOMConnect')],check=True)
 # Original AppKit vector icon; no Apple artwork or external assets.

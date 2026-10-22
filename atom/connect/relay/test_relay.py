@@ -476,6 +476,75 @@ class RelayTests(unittest.TestCase):
         self.call(self.device,'/v1/pair/remove',{'client_id':self.pc['client_id']})
         self.assertFalse(self.relay.one('SELECT 1 FROM snapshots'))
 
+    def test_qr_login_hands_over_a_session_once(self):
+        self.relay.handle('POST', '/market/v1/register', body={'username': 'alice', 'password': 'long-test-password-a'})
+        qr = lambda action, body=None: self.relay.handle('POST', '/market/v1/qr-login/' + action, '', body or {})
+        def refused(fn, status):
+            with self.assertRaises(module.MarketError) as caught:
+                fn()
+            self.assertEqual(caught.exception.status, status)
+        start = qr('start')
+        self.assertEqual(qr('poll', {'poll': start['poll']})['status'], 'pending')
+        refused(lambda: qr('approve', {'code': 'ZZZZZZZZ', 'username': 'alice', 'password': 'long-test-password-a', 'attempt':'x'*43}), 404)
+        refused(lambda: qr('seal', {'code': start['code'], 'sealed': None}), 409)
+        refused(lambda: qr('approve', {'code': start['code'], 'username': 'alice', 'password': 'wrong-password-xx', 'attempt':'x'*43}), 401)
+        approved = qr('approve', {'code': start['code'], 'username': 'alice', 'password': 'long-test-password-a', 'attempt':'x'*43})
+        self.assertEqual(approved['user'], {'username': 'alice'})
+        refused(lambda: qr('approve', {'code': start['code'], 'username': 'alice', 'password': 'long-test-password-a', 'attempt':'y'*43}), 409)
+        self.assertEqual(qr('poll', {'poll': start['poll']})['status'], 'signing-in')
+        refused(lambda: qr('seal', {'code': start['code'], 'sealed': None}), 403)
+        qr('seal', {'code': start['code'], 'handoff': approved['handoff'], 'sealed': {'v': 1, 'iv': 'A'*16, 'ct': 'B'*80}})
+        ready = qr('poll', {'poll': start['poll']})
+        self.assertEqual((ready['status'], ready['user']['username'], ready['sealed']['ct']), ('ready', 'alice', 'B'*80))
+        self.assertEqual(self.relay.handle('GET', '/market/v1/me', ready['token'])['user']['username'], 'alice', 'a real session')
+        self.assertEqual(qr('poll', {'poll': start['poll']}), ready, 'lost response can be retried')
+        qr('ack', {'poll':start['poll']})
+        self.assertEqual(qr('poll', {'poll':start['poll']})['status'], 'expired')
+        late = qr('start')
+        self.now[0] += 301
+        self.assertEqual(qr('poll', {'poll': late['poll']})['status'], 'expired')
+        refused(lambda: qr('approve', {'code': late['code'], 'username': 'alice', 'password': 'long-test-password-a', 'attempt':'x'*43}), 404)
+
+    def test_qr_cancel_expiry_and_approval_retry(self):
+        self.relay.handle('POST','/market/v1/register',body={'username':'phone','password':'long-test-password-a'})
+        qr=lambda action,body={}:self.relay.handle('POST','/market/v1/qr-login/'+action,'',body)
+        for mode in ('cancel','expire'):
+            start=qr('start');body=dict(code=start['code'],username='phone',password='long-test-password-a',attempt='r'*43)
+            approved=qr('approve',body)
+            self.assertEqual(qr('approve',body),approved,'lost approval response is retryable')
+            token=self.relay.qrlogin.requests[start['code']]['token']
+            if mode=='cancel':qr('cancel',{'poll':start['poll']})
+            else:self.now[0]+=301
+            self.assertEqual(qr('poll',{'poll':start['poll']})['status'],'expired')
+            with self.assertRaises(module.MarketError):self.relay.handle('GET','/market/v1/me',token)
+        start=qr('start')
+        self.assertEqual(qr('poll',{'poll':'z'*43})['status'],'expired')
+        self.assertEqual(qr('poll',{'poll':start['poll']})['status'],'pending')
+        with self.assertRaises(module.MarketError):qr('approve',[])
+
+    def test_qr_login_page_and_web_origin(self):
+        server = module.ThreadingHTTPServer(('127.0.0.1', 0), module.Handler)
+        server.relay = self.relay
+        threading.Thread(target=server.serve_forever, daemon=True).start()
+        def request(method, path, body=None, headers=None):
+            conn = http.client.HTTPConnection(*server.server_address, timeout=3)
+            conn.request(method, path, body, headers or {})
+            res = conn.getresponse(); data = res.read(); conn.close()
+            return res.status, res.getheader('Content-Security-Policy') or '', data
+        try:
+            status, csp, page = request('GET', '/login')
+            self.assertEqual(status, 200)
+            self.assertIn(b'qr-login', page)
+            self.assertIn("frame-ancestors 'none'", csp)
+            json_headers = {'Content-Type': 'application/json'}
+            for origin in (None, 'https://evil.example'):
+                headers = dict(json_headers, **({'Origin': origin} if origin else {}))
+                self.assertEqual(request('POST', '/market/v1/qr-login/approve', '{}', headers)[0], 403, origin)
+            self.assertEqual(request('POST', '/market/v1/qr-login/approve', '{"code":"ZZZZZZZZ"}', dict(json_headers, Origin=module.WEB_ORIGINS[0]))[0], 404)
+            self.assertEqual(request('POST', '/market/v1/qr-login/start', '{}', dict(json_headers, Origin=module.WEB_ORIGINS[0]))[0], 403, 'only the page posts carry an origin')
+        finally:
+            server.shutdown(); server.server_close()
+
     def test_auth_roles_and_bounds(self):
         self.denied(lambda: self.relay.handle('GET', '/v1/state', self.device['client_id']), 401)
         self.denied(lambda: self.call(self.pc, '/v1/pair/code', {}), 403)

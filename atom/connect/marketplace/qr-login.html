@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<title>登录 ATOM 小电脑</title>
+<style>
+:root{--bg:#f3f3f6;--card:#fff;--ink:#1c1c1e;--muted:#6c6c70;--line:#d9d9df;--accent:#0a66d6;--bad:#c4332b;--ok:#1f7a3a;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#101114;--card:#1d2026;--ink:#f2f3f5;--muted:#a0a5b1;--line:#34373f;--accent:#78b4ff;--bad:#ff8a80;--ok:#6fcf8a;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);font:16px/1.55 -apple-system,BlinkMacSystemFont,"PingFang SC","Noto Sans CJK SC",sans-serif;display:flex;justify-content:center;padding:max(24px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) 24px max(18px,env(safe-area-inset-left))}
+main{width:100%;max-width:400px;display:flex;flex-direction:column;gap:14px}
+h1{margin:12px 0 0;font-size:24px}
+p{margin:0;color:var(--muted)}
+[hidden]{display:none!important}
+form{display:flex;flex-direction:column;gap:10px;background:var(--card);border-radius:16px;padding:18px}
+label{display:flex;flex-direction:column;gap:5px;font-size:14px;color:var(--muted)}
+input{font:inherit;font-size:17px;padding:11px 13px;border:1px solid var(--line);border-radius:11px;background:var(--bg);color:var(--ink)}
+button{font:inherit;font-weight:600;font-size:17px;padding:12px;border:0;border-radius:12px;background:var(--accent);color:#fff}
+button:disabled{opacity:.5}
+.code{font:600 18px ui-monospace,Menlo,monospace;letter-spacing:2px;color:var(--ink)}
+.status{min-height:1.5em}
+.status.bad{color:var(--bad)} .status.ok{color:var(--ok);font-weight:600}
+small{color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<main>
+  <h1>登录 ATOM 小电脑</h1>
+  <p id="intro">核对小电脑屏幕上的确认码一致后，输入你的 ATOM 账号。</p>
+  <p>确认码 <span class="code" id="code">—</span></p>
+  <form id="form" autocomplete="on">
+    <label>用户名<input id="username" name="username" autocomplete="username" autocapitalize="off" spellcheck="false" required maxlength="32"></label>
+    <label>密码<input id="password" name="password" type="password" autocomplete="current-password" required></label>
+    <button id="submit" type="submit">登录小电脑</button>
+    <p class="status" id="status" role="status"></p>
+  </form>
+  <small>密码只用于这次登录，随手记和日程的加密密钥在这部手机上转交给小电脑，服务器看不到。</small>
+</main>
+<script>
+(() => {
+  'use strict';
+  const params = new URLSearchParams(location.hash.slice(1));
+  const code = params.get('c') || '', transfer = params.get('k') || '';
+  const api = location.pathname.replace(/login\/?$/, '') + 'market/v1/qr-login/';
+  const $ = id => document.getElementById(id);
+  const say = (text, tone) => { $('status').textContent = text; $('status').className = 'status ' + (tone || ''); };
+  const unb64 = text => Uint8Array.from(atob(text.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - text.length % 4) % 4)), c => c.charCodeAt(0));
+  const b64 = bytes => btoa(String.fromCharCode(...new Uint8Array(bytes))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  const utf8 = text => new TextEncoder().encode(text);
+  $('code').textContent = code.replace(/(.{4})(.{4})/, '$1 $2') || '—';
+  let valid = false;
+  try { valid = /^[A-Z2-9]{8}$/.test(code) && unb64(transfer).length === 32; } catch (_) {}
+  if (!valid) {
+    $('intro').textContent = '请用 ATOM 小电脑上显示的二维码打开这个页面。';
+    $('form').hidden = true;
+    return;
+  }
+  history.replaceState(null, '', location.pathname);  // keep the key out of history and screenshots of the URL
+  async function post(action, body) {
+    const r = await fetch(api + action, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body), credentials: 'omit'});
+    const value = await r.json().catch(() => ({}));
+    if (!r.ok) throw Error(value.error || '登录失败，请重试');
+    return value;
+  }
+  // The account data key is wrapped with the password (PBKDF2-SHA256 + AES-GCM, as in atom/e2e.py).
+  async function sealDataKey(keys, password) {
+    if (!keys || !keys.by_password || !crypto.subtle) return null;
+    try {
+      const base = await crypto.subtle.importKey('raw', utf8(password), 'PBKDF2', false, ['deriveKey']);
+      const wrap = await crypto.subtle.deriveKey({name: 'PBKDF2', hash: 'SHA-256', salt: unb64(keys.salt), iterations: keys.iterations || 310000}, base, {name: 'AES-GCM', length: 256}, false, ['decrypt']);
+      const plain = await crypto.subtle.decrypt({name: 'AES-GCM', iv: unb64(keys.by_password.iv), additionalData: utf8('atom-account-key')}, wrap, unb64(keys.by_password.ct));
+      const handoff = await crypto.subtle.importKey('raw', unb64(transfer), 'AES-GCM', false, ['encrypt']);
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+      const ct = await crypto.subtle.encrypt({name: 'AES-GCM', iv, additionalData: utf8('atom-qr-login')}, handoff, plain);
+      return {v: 1, iv: b64(iv), ct: b64(ct)};
+    } catch (e) {
+      return null;  // the device can still unlock with the password later
+    }
+  }
+  const attempt = b64(crypto.getRandomValues(new Uint8Array(32)));
+  let approved = null, sealed;
+  $('form').addEventListener('submit', async e => {
+    e.preventDefault();
+    $('submit').disabled = true;
+    say('正在登录…');
+    try {
+      const password = $('password').value;
+      if (!approved) approved = await post('approve', {code, attempt, username: $('username').value.trim(), password});
+      $('username').disabled = true; $('password').disabled = true;
+      say('正在把加密密钥交给小电脑…');
+      if (sealed === undefined) sealed = await sealDataKey(approved.keys, password);
+      await post('seal', {code, handoff: approved.handoff, sealed});
+      $('password').value = '';
+      $('form').hidden = true;
+      $('intro').textContent = '已登录为 ' + approved.user.username + '。回到小电脑，几秒内会自动进入。' + (!sealed ? '这部手机没能转交加密密钥，小电脑上的随手记和日程需要再输入一次密码解锁。' : '');
+      $('intro').className = 'status ok';
+    } catch (err) {
+      say(err.message, 'bad');
+      $('submit').disabled = false;
+      $('submit').textContent = approved ? '重试完成登录' : '重试登录';
+    }
+  });
+})();
+</script>
+</body>
+</html>

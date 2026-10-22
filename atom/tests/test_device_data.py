@@ -71,3 +71,20 @@ class DataTests(unittest.TestCase):
         self.store.close()
         with self.assertRaises(ValueError): self.store.capture(self.data)
         self.assertFalse(self.store.path.exists())
+
+    def test_valid_json_with_bad_checksum_cannot_replace_saved_data(self):
+        self.store.capture(self.data)
+        self.store.capture(dict(self.data, **{'atom.timer':'42'}))
+        bad=json.loads(self.store.path.read_text());bad['data']['atom.timer']='99'
+        self.store.path.write_text(json.dumps(bad))
+        self.assertEqual(self.store.current()['data'],self.data)
+        self.store.previous.write_text('[]')
+        with self.assertRaises(ValueError):self.store.capture(self.data)
+        self.assertEqual(json.loads(self.store.path.read_text()),bad)
+
+    def test_optional_daily_backup_failure_does_not_undo_durable_save(self):
+        from unittest.mock import patch
+        with patch.object(self.store,'_daily',side_effect=OSError('full')):
+            result=self.store.capture(self.data)
+        self.assertEqual(self.store.current()['version'],result['version'])
+        self.assertIn('自动备份未完成',self.store.status()['backup_error'])
