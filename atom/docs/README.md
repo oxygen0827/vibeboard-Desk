@@ -10,6 +10,7 @@
 | 官方应用视觉改版 | [official-ui-refresh.md](official-ui-refresh.md) |
 | 灰色板迁移、四个交互作品与连接验证 | [gray-migration.md](gray-migration.md) |
 | 系统更新、备份重置、模拟设备镜像与 Mac 发行 | [system-maintenance.md](system-maintenance.md) |
+| 最新系统补齐与最终验收边界 | [system-completion-2026-10-22.md](system-completion-2026-10-22.md) |
 | 本轮维护交付与真实测试 | [maintenance-delivery-2026-10-22.md](maintenance-delivery-2026-10-22.md) |
 | 部署、运行服务、回退 | [deployment.md](deployment.md) |
 | 麦克风、单端实验、风扇、按住说话 | [audio-diagnostics.md](audio-diagnostics.md) |

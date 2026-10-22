@@ -1,0 +1,164 @@
+{
+  "version": "2026.10.22.9",
+  "results": [
+    {
+      "id": "photon-chip",
+      "view": "photon-chip",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "w": 480,
+        "h": 360
+      },
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 480,
+        "h": 360
+      },
+      "chrome": false,
+      "error": false,
+      "returnedToPage": 6
+    },
+    {
+      "id": "photon-runner",
+      "view": "photon-runner",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "w": 480,
+        "h": 360
+      },
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 480,
+        "h": 360
+      },
+      "chrome": false,
+      "error": false,
+      "returnedToPage": 6
+    },
+    {
+      "id": "finger-fireworks",
+      "view": "finger-fireworks",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "w": 480,
+        "h": 360
+      },
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 480,
+        "h": 360
+      },
+      "chrome": false,
+      "error": false,
+      "returnedToPage": 6
+    },
+    {
+      "id": "mini-piano",
+      "view": "mini-piano",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "w": 480,
+        "h": 360
+      },
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 480,
+        "h": 360
+      },
+      "chrome": false,
+      "error": false,
+      "returnedToPage": 6
+    },
+    {
+      "panel": "time",
+      "body": [
+        480,
+        360
+      ],
+      "main": [
+        360,
+        360
+      ],
+      "alert": ""
+    },
+    {
+      "panel": "bluetooth",
+      "body": [
+        480,
+        360
+      ],
+      "main": [
+        360,
+        360
+      ],
+      "alert": ""
+    },
+    {
+      "panel": "power",
+      "body": [
+        480,
+        360
+      ],
+      "main": [
+        360,
+        360
+      ],
+      "alert": ""
+    }
+  ],
+  "errors": [],
+  "device": "gray RK3566, physical display 480×360",
+  "capture": "Direct remote Chromium rendering; physical 480×360 viewport clip, no image modification.",
+  "bluetooth_api": {
+    "available": true,
+    "powered": true,
+    "visible_devices": 0,
+    "absent_device_confirmed_from_bluez": true,
+    "pair_start_terminal": "failed",
+    "failure_message": "没有找到这台外设，请重新扫描后选择",
+    "cancel_idempotent": true,
+    "late_start_prevented": true,
+    "pairing_workers_remaining": 0,
+    "real_peripheral_paired": false
+  },
+  "preservation": {
+    "installed_apps": 36,
+    "manifest_sha256_and_mtime_unchanged": true,
+    "connection_identity_hashes_unchanged": true
+  },
+  "navigation": {
+    "settings_exit_page": 2,
+    "desktop_home_page": 1,
+    "no_power_action_executed": true
+  },
+  "cleanup": {
+    "debug_disabled": true,
+    "cdp_port_closed": true,
+    "single_main_chromium": true,
+    "main_has_no_debug_flag": true,
+    "services": {
+      "atom": "active",
+      "lightdm": "active",
+      "frpc": "active",
+      "taishan-fan": "active"
+    },
+    "launchers": {
+      "atom-session.sh": "755",
+      "start-atom.sh": "755"
+    },
+    "local_debug_tunnel_closed": true,
+    "display_server_restarted": false
+  },
+  "limits": [
+    "No Bluetooth peripheral is available; real PIN confirmation, audio and input-device interoperability remain untested.",
+    "Existing Wi-Fi network and user account were not changed."
+  ]
+}

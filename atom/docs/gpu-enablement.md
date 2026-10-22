@@ -21,3 +21,7 @@ GPU rasterization、视频解码和Vulkan未启用。图形会话重启后启动
 补充atom-display-guard.service，作为原型兜底：只在ATOM会话运行时，连续两次检测DSI控制器active但无ACTIVE显示层，先强制DSI modeset，仍失败才重启LightDM；每分钟最多恢复一次。正常时不重启、不改GPU能力。原生NPU、硬解和应用资源不受此守护服务修改。守护判断有单元测试，但本次没有主动破坏实体scanout以验证故障注入。停用方式sudo systemctl disable --now atom-display-guard.service。
 
 用户补充可能切到其他虚拟桌面后，核实Openbox为4桌面，默认包含滚轮GoToDesktop、Ctrl+Alt方向键、Super+F1–F4、Super+D隐藏窗口入口。ATOM会话现改用deploy/atom-openbox.xml：单个ATOM桌面、无切换/发送/隐藏/最小化快捷键、无桌面滚轮切换动作；原LXDE配置保持原样。重启LightDM后确认desktop count=1、current=0、showing_desktop=0，模拟Ctrl+Alt左右、Super+D、Super+F2后保持不变。该配置消除了已确认的误切空桌面风险；不将它直接等同于先前DRM丢plane的已证明触发原因。
+
+## 2026-10-22 安全恢复修订
+
+`.9` 已移除显示守护中自动重启 LightDM 的旧兜底。每次连续丢失 scanout 只尝试一次 modeset；若 Xorg 已处于内核 D 状态则不再向它发送恢复命令。故障结构信息写入 root 私有的 `/var/lib/atom/display-diagnostics.json`，不包含用户应用内容。本文早期记录中的热重启操作不应作为灰色板日常刷新方式。灰色板当前仍保持守护服务停用；该改动减少危险恢复路径，并未证明 BSP 驱动卡住的根因已修复。需要受控复现、内核堆栈和长时间运行验收后才能关闭此项。
