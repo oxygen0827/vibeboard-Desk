@@ -39,3 +39,10 @@ async function increment() {
 ## 验证
 
 结构检查tools/check_app.py；生命周期和保存协议tests/app-host.test.cjs。真机需检查初始化、空/失败状态、保存重开、单屏尺寸、局部列表滚动、Home/长按、主题和资源退出。静态检查不能保证审美或所有运行行为。
+
+## 五向摇杆导航
+
+方向键移动焦点，Enter 短按确认、长按语音、松开结束。文本框聚焦时长按直接语音输入，不自动提交。
+使用语义化按钮与输入框，不要全局拦截 Enter 和方向键。Canvas 核心操作应提供 DOM 按钮。
+系统提供左上角返回控件，预留 48×48 空间。多级应用通过 `AtomApp.navigation.setBackHandler(fn)` 逐层返回，根页面调用 `AtomApp.home()`。
+完整接入说明与阶段边界见 [五向摇杆导航](five-way-navigation.md)。

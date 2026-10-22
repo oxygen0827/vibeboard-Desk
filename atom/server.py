@@ -386,7 +386,7 @@ def system_status():
 class Handler(SimpleHTTPRequestHandler):
     def end_headers(self):
         # System shell changes must not retain an obsolete bridge or keyboard handler.
-        if urlsplit(self.path).path in ('/', '/index.html', '/app.js', '/home-key.js', '/style.css', '/app-runtime.js', '/app-host.js', '/companion.js', '/maintenance.js', '/system-settings.js', '/system-appearance.css', '/app-appearance.css', '/theme-controls.css', '/atom-ui.css'):
+        if urlsplit(self.path).path in ('/', '/index.html', '/app.js', '/home-key.js', '/style.css', '/app-runtime.js', '/input-navigation.js', '/app-host.js', '/companion.js', '/maintenance.js', '/system-settings.js', '/system-appearance.css', '/app-appearance.css', '/theme-controls.css', '/atom-ui.css'):
             self.send_header('Cache-Control', 'no-store')
         # Public application assets must load inside opaque-origin sandbox frames.
         if self.command in ('GET', 'HEAD') and urlsplit(self.path).path.startswith('/user-apps/'):
@@ -494,7 +494,7 @@ class Handler(SimpleHTTPRequestHandler):
                 policy += (BASE / 'static' / appearance).read_text(encoding='utf-8')
                 style = '<style data-atom-theme>' + css + policy + '</style>'
                 content = content.replace('</head>', style + '</head>', 1) if '</head>' in content else style + content
-                runtime = '<script src="/app-runtime.js"></script>'
+                runtime = '<script src="/input-navigation.js"></script><script src="/app-runtime.js"></script>'
                 content = re.sub(r'<head\b[^>]*>', lambda match: match.group(0) + runtime, content, count=1, flags=re.I) if re.search(r'<head\b', content, re.I) else runtime + content
                 relay = '<script src="/home-key.js"></script>'
                 content = content.replace('</body>', relay + '</body>', 1) if '</body>' in content else content + relay

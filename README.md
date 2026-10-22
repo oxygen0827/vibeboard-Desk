@@ -235,3 +235,7 @@ atom/
 ## 早期网页生成平台
 
 根目录原有的 Node/Web 平台代码保持保留，原运行方法见[早期网页平台说明](docs/vibeboard-web-legacy.md)。当前小电脑的桌面、工作坊与语音实现都在 atom/。
+
+### 五向摇杆输入开发分支
+
+`codex/five-way-navigation` 实现方向焦点导航、Enter 短按确认/长按语音、文本框语音输入及应用返回接口。键盘可模拟五向输入；真实摇杆和全量第三方应用适配仍需验收。详见 [技术方案与接入规范](atom/docs/five-way-navigation.md)。

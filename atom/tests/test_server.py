@@ -44,7 +44,7 @@ class APITests(unittest.TestCase):
         return {'manifest': {'id': 'demo', 'name': 'Demo', 'entry': 'index.html'}, 'files': {'index.html': '<h1>Hello</h1>', 'nested/main.js': 'hello'}}
 
     def test_system_shell_is_not_cached(self):
-        for path in ('/', '/app.js', '/home-key.js', '/style.css', '/app-runtime.js', '/app-host.js', '/companion.js'):
+        for path in ('/', '/app.js', '/home-key.js', '/style.css', '/app-runtime.js', '/input-navigation.js', '/app-host.js', '/companion.js'):
             with urllib.request.urlopen(self.url + path) as response:
                 self.assertEqual(response.headers.get('Cache-Control'), 'no-store')
 
@@ -72,6 +72,7 @@ class APITests(unittest.TestCase):
         self.assertLess(html.index('/app-runtime.js'), html.index('window.sdkSeen'))
         self.assertEqual(html.count('src="/app-runtime.js"'), 1)
         self.assertIn('/home-key.js', html)
+        self.assertIn('/input-navigation.js', html)
 
     def test_developer_persistence_and_body_validation(self):
         self.assertEqual(self.request('/api/developer', {'enabled': False})[0], 200)
