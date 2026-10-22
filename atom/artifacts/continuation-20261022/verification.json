@@ -1,0 +1,108 @@
+{
+  "date": "2026-10-22",
+  "device": "gray RK3566 480x360",
+  "release": "2026.10.22.8",
+  "source_commit": "55e7d23",
+  "ota": {
+    "previous": "2026.10.22.7",
+    "ok": true,
+    "rolled_back": false,
+    "recovery_required": false,
+    "launcher_modes": [
+      "0755",
+      "0755"
+    ]
+  },
+  "preservation": {
+    "installed_apps": 36,
+    "all_manifest_hashes_and_mtimes_equal": true,
+    "connection_identity_equal": true,
+    "paired_computers": 1,
+    "online_computers": 1,
+    "encrypted_computers": 1
+  },
+  "ui": {
+    "visible_content": [
+      480,
+      360
+    ],
+    "desktop_pages": 6,
+    "wheel_all_pages": true,
+    "apps": [
+      {
+        "id": "photon-chip",
+        "frame": [
+          480,
+          360
+        ],
+        "permanent_chrome": false,
+        "returned_page": 6
+      },
+      {
+        "id": "photon-runner",
+        "frame": [
+          480,
+          360
+        ],
+        "permanent_chrome": false,
+        "returned_page": 6
+      },
+      {
+        "id": "finger-fireworks",
+        "frame": [
+          480,
+          360
+        ],
+        "permanent_chrome": false,
+        "returned_page": 6
+      },
+      {
+        "id": "mini-piano",
+        "frame": [
+          480,
+          360
+        ],
+        "permanent_chrome": false,
+        "returned_page": 6
+      }
+    ],
+    "settings_no_whole_page_scroll": [
+      "time",
+      "bluetooth",
+      "power"
+    ],
+    "power_confirmation_cancelled": true,
+    "space_on_desktop_returns_first_page": true,
+    "page_errors": []
+  },
+  "persistence": {
+    "real_capture_http_status": 200,
+    "acknowledged": true,
+    "existing_record_value_unchanged": true,
+    "pending_restore": false,
+    "recovery_tests_used_isolated_directory": true
+  },
+  "tests": {
+    "core_local": 124,
+    "device_python37": 30
+  },
+  "bluetooth": {
+    "controller_available": true,
+    "power_and_scan_verified": true,
+    "module_version": "13.99.3-1",
+    "packages_added": [
+      "pulseaudio-module-bluetooth"
+    ],
+    "packages_removed": [],
+    "packages_downgraded": [],
+    "discover_policy_loaded": true,
+    "rk809_and_mic_retained": true,
+    "external_pairing_or_audio_tested": false
+  },
+  "finish": {
+    "debug_listener_closed": true,
+    "home_first_page": true,
+    "lightdm_hot_restart": false,
+    "operator_reboot_or_poweroff": false
+  }
+}

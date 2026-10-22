@@ -35,7 +35,7 @@ systemctl status atom atom-update.path atom-update-recover.service
 
 ## 构建与发布
 
-需要 Python `cryptography`。提交审核后的核心后再构建，构建器拒绝未提交的核心改动。私钥保存在维护者私有目录，**不得进入仓库**；仓库只包含设备信任的 `deploy/release-public.key`。
+需要 Python `cryptography`。提交审核后的核心后再构建，构建器拒绝未提交的核心改动，并要求 `deploy/atom-session.sh` 与 `deploy/start-atom.sh` 均为可执行文件（0755）；Git 必须保留执行位，避免更新后无法进入 ATOM 会话。私钥保存在维护者私有目录，**不得进入仓库**；仓库只包含设备信任的 `deploy/release-public.key`。
 
 ```sh
 python3 atom/tools/build_release.py --notes "本版更新说明" --out /private/path/release
@@ -63,7 +63,7 @@ python3 atom/connect/desktop/build-macos.py \
 
 自动化覆盖签名与篡改、路径拒绝、复制中断、服务启动失败回滚、断电日志恢复、暂存文件篡改、数据校验与恢复确认、镜像授权边界、跨账号/未配对访问拒绝、版本去重以及 HTTP 重置流程。浏览器以 480×360 验证备份、恢复、重置和页面高度。破坏性恢复测试使用隔离目录；不会清空用户真机数据。
 
-真机及线上验收结果见 [本轮维护交付记录](maintenance-delivery-2026-10-22.md)。
+真机及线上验收结果见 [本轮维护交付记录](maintenance-delivery-2026-10-22.md) 与 [后续 .8 实机收尾](continuation-2026-10-22.md)。
 
 ## 手机扫码登录
 
@@ -77,3 +77,13 @@ python3 atom/connect/desktop/build-macos.py \
 云端 `ATOM_WEB_ORIGINS` 默认只接受 `https://ldcx.tech`。自建服务需设置自己的 HTTPS Origin，
 二维码页与 API 必须同源。登录请求保存在内存，服务重启后重新生成即可；过期且未领取的会话会被撤销。
 已领取但确认响应丢失的会话会保留，避免设备刚保存就被意外注销。
+
+## 灰色板蓝牙音频依赖
+
+该样机的 PulseAudio/libpulse0 为 13.99.3-1，不能直接安装 buster 源中依赖 12.2 的蓝牙模块。此次从 Debian 官方 snapshot 取得同版本 arm64 包，只新增 `pulseaudio-module-bluetooth`，模拟安装确认没有降级或移除依赖后才实际安装。
+
+- 包索引：<https://snapshot.debian.org/mr/binary/pulseaudio-module-bluetooth/13.99.3-1/binfiles>
+- 文件 SHA-1（用于匹配官方快照）：`24b7619a2bf012865adb8695333c8b9a131022a2`
+- 下载入口：<https://snapshot.debian.org/file/24b7619a2bf012865adb8695333c8b9a131022a2>
+
+现有 `/etc/pulse/default.pa` 已有条件加载蓝牙发现与策略模块的配置，安装后在当前音频会话加载模块，不重启现有音频服务。原 RK809 声卡和咪头输入仍可用。此方案仅适用相同 PulseAudio 版本的样机；其他镜像先核对版本及依赖，不可照抄降级。外设需由用户选择，再做实际连接和声音测试。
