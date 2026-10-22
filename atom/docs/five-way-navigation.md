@@ -65,3 +65,8 @@ python3 -m unittest discover -s atom/tests -p test_server.py -q
 ## 强制准入
 
 本实现的应用声明及发布规则以 [五向输入强制规范 v1](input-standard.md) 为准。共享校验位于 `atom/app_input.py`，缺少声明的新安装/更新和新发布版本会被拒绝；历史种子兼容不代表完整适配。
+
+## 共享动效
+
+框架内置一个不接收指针的移动选框，所有语义控件自动复用。系统把动画设置发送给当前应用 iframe；应用不读取父页面存储。详见强制规范第 7 节。
+新增验证：`node atom/tests/focus-motion.integration.cjs`，覆盖即时焦点、移动动画中断、尺寸变化、鼠标隐藏、减少动态效果和移除目标清理。
