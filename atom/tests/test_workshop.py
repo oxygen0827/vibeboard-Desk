@@ -8,7 +8,7 @@ from pathlib import Path
 from unittest import mock
 spec = importlib.util.spec_from_file_location('workshop',str(Path(__file__).resolve().parents[1]/'workshop.py'))
 w = importlib.util.module_from_spec(spec); spec.loader.exec_module(w)
-BUNDLE = dict(manifest=dict(id='myapp',name='Example',entry='index.html'),files={'index.html':'<button>Start</button>'})
+BUNDLE = dict(manifest=dict(id='myapp',name='Example',entry='index.html',input={'version':1,'profile':'five-way','back':'root'}),files={'index.html':'<button>Start</button>'})
 
 class WorkshopTests(unittest.TestCase):
     def setUp(self):

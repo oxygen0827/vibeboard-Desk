@@ -8,7 +8,7 @@ ATOM=$(cd "$(dirname "$0")/../.." && pwd)
 SSH="ssh -i $KEY -o BatchMode=yes"
 RELEASE=$(date -u +%Y%m%dT%H%M%SZ)
 
-COPYFILE_DISABLE=1 tar --no-xattrs -C "$ATOM" --exclude '__pycache__' --exclude 'test_*.py' -czf - connect/relay connect/marketplace connect/server official experiences \
+COPYFILE_DISABLE=1 tar --no-xattrs -C "$ATOM" --exclude '__pycache__' --exclude 'test_*.py' -czf - connect/relay connect/marketplace connect/server official experiences app_input.py \
   | $SSH "$HOST" "mkdir -p /opt/atom/releases/$RELEASE && tar -xzf - -C /opt/atom/releases/$RELEASE"
 
 $SSH "$HOST" sh -s "$RELEASE" <<'REMOTE'

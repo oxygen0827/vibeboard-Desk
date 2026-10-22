@@ -35,7 +35,7 @@ class DeviceBridgeTests(unittest.TestCase):
 
 class AppDeliveryTests(unittest.TestCase):
     def bundle(self):
-        return {'manifest':{'id':'connect-test','name':'测试应用','description':'测试','entry':'index.html','icon':'icon.svg'},'files':{'index.html':'<!doctype html><html><body>test</body></html>','icon.svg':'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="currentColor"><circle cx="32" cy="32" r="20"/></svg>'}}
+        return {'manifest':{'id':'connect-test','name':'测试应用','description':'测试','entry':'index.html','icon':'icon.svg','input':{'version':1,'profile':'five-way','back':'root'}},'files':{'index.html':'<!doctype html><html><body>test</body></html>','icon.svg':'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="currentColor"><circle cx="32" cy="32" r="20"/></svg>'}}
     def test_valid_delivery_follows_system_theme(self):
         from server import connect_app_bundle
         b=self.bundle();b['manifest'].update(theme_mode='fixed',theme_id='old')

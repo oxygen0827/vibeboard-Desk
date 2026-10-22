@@ -44,7 +44,7 @@ class ProductClients(unittest.TestCase):
                     with self.assertRaises(BridgeError):c.execute(action,body)
                 req.assert_not_called()
     def bundle(self,text):
-        return {'manifest':{'id':'history-demo','name':'History','entry':'index.html','icon':'icon.svg','capabilities':['agenda']},'files':{'index.html':text,'icon.svg':'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="currentColor"><circle cx="32" cy="32" r="20"/></svg>','lib/helper.js':'complete resource'}}
+        return {'manifest':{'id':'history-demo','name':'History','entry':'index.html','input':{'version':1,'profile':'five-way','back':'root'},'icon':'icon.svg','capabilities':['agenda']},'files':{'index.html':text,'icon.svg':'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="currentColor"><circle cx="32" cy="32" r="20"/></svg>','lib/helper.js':'complete resource'}}
     def test_resource_restore_keeps_full_files_and_desktop_position(self):
         with tempfile.TemporaryDirectory() as d:
             root=Path(d).resolve();folder=root/'apps';store=ReleaseStore(root/'private')

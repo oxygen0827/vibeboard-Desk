@@ -9,6 +9,7 @@ from pathlib import Path, PurePosixPath
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from app_icons import validate_svg
+from app_input import validate_input_bundle
 
 
 class HTMLScan(HTMLParser):
@@ -91,6 +92,10 @@ def check_directory(root):
                     elif not re.search(r'(?<![-\w])(?:height|max-height|block-size|max-block-size)\s*:', body, re.I):
                         warnings.append(name + ': marked scroll region has no local height bound; verify inherited/grid bounds on device')
         if re.search(r'https?://|@import\s', re.sub(r'xmlns=[\"\']http://www.w3.org/2000/svg[\"\']', '', text)): warnings.append(name + ': network references/imports detected; verify offline behavior')
+    try:
+        input_files = {p.relative_to(root).as_posix(): p.read_text(encoding='utf-8') for p in root.rglob('*') if p.is_file() and not p.is_symlink() and p.suffix.lower() in ('.html', '.htm', '.js', '.mjs') and p.stat().st_size <= 2*1024*1024}
+        validate_input_bundle({'manifest': manifest, 'files': input_files})
+    except (ValueError, OSError, UnicodeError) as exc: errors.append(str(exc))
     joined = '\n'.join(all_text)
     if count > 100: errors.append('more than 100 app files')
     if size > 2 * 1024 * 1024: errors.append('bundle exceeds 2 MiB')

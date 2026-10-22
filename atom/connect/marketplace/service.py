@@ -18,6 +18,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from mailer import Mailer, settings as mailer_settings
 from photos import PhotoLibrary, PhotoError
 import covers
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from app_input import validate_input_bundle
 
 CATEGORIES = {'life', 'companion', 'sound', 'play', 'connect'}
 LICENSES = {'MIT', 'Apache-2.0', 'BSD-2-Clause', 'BSD-3-Clause', 'CC0-1.0', 'MPL-2.0', 'GPL-3.0-only', 'GPL-3.0-or-later'}
@@ -72,6 +74,8 @@ def validate_bundle(bundle, official=False):
     require(isinstance(bundle, dict) and isinstance(bundle.get('manifest'), dict) and isinstance(bundle.get('files'), dict), 'Complete manifest and files required')
     require(len(packed(bundle).encode('utf-8')) <= MAX_BUNDLE, 'Bundle exceeds 1 MiB')
     manifest, files = bundle['manifest'], bundle['files']
+    try: validate_input_bundle(bundle, required=False)
+    except ValueError as exc: raise MarketError(400, str(exc), 'input_contract_invalid')
     aid = manifest.get('id')
     require(isinstance(aid, str) and APP_ID.fullmatch(aid) and (aid not in RESERVED or official and aid in ('today','task-pal')), 'Invalid or protected app ID')
     text(manifest, 'name', 80)
@@ -230,6 +234,8 @@ class Marketplace:
         bundle = validate_bundle(json.loads(row['bundle']))
         self.check_parent_license(draft, bundle)
         scan_publish(bundle)
+        try: validate_input_bundle(bundle)
+        except ValueError as exc: raise MarketError(400, str(exc), 'input_contract_required')
         require(self.row('SELECT COUNT(*) n FROM versions')['n'] < 10000, 'Marketplace version quota reached', 409, 'quota_exceeded')
         work_id = draft.get('work_id') or secrets.token_hex(16)
         old = self.row('SELECT * FROM works WHERE id=?', (work_id,))

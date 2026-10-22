@@ -35,7 +35,7 @@ def build(destination):
 
     def install(bundle, source=None):
         aid = bundle['manifest']['id']
-        server.install_app(apps, bundle, trusted_connect=aid in server.TRUSTED_CLIENT_IDS)
+        server.install_app(apps, bundle, trusted_connect=aid in server.TRUSTED_CLIENT_IDS, require_input=False)
         # The entry-only port bundles are NOT the whole application.
         if source:
             for item in source.iterdir():

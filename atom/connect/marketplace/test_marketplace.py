@@ -15,7 +15,7 @@ spec.loader.exec_module(m)
 ICON='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M8 8H56V56H8Z" stroke="currentColor" fill="none"/></svg>'
 
 def bundle(aid='my-sample'):
-    return {'manifest':{'id':aid,'name':'Sample','entry':'index.html','icon':'icon.svg','theme_ui':'controls'},'files':{'index.html':'<!doctype html><html><body><button>Hello</button></body></html>','icon.svg':ICON,'logic.js':'console.log("Hello");','LICENSE':'Original MIT copyright'}}
+    return {'manifest':{'id':aid,'name':'Sample','entry':'index.html','icon':'icon.svg','theme_ui':'controls','input':{'version':1,'profile':'five-way','back':'root'}},'files':{'index.html':'<!doctype html><html><body><button>Hello</button></body></html>','icon.svg':ICON,'logic.js':'console.log("Hello");','LICENSE':'Original MIT copyright'}}
 
 class MarketplaceTests(unittest.TestCase):
     def setUp(self):
@@ -44,6 +44,13 @@ class MarketplaceTests(unittest.TestCase):
 
     def publish(self,draft,who=None):
         return self.call('/drafts/'+draft['id']+'/publish',dict(revision=draft['revision'],confirm=True,changelog='Initial snapshot'),who or self.a)
+
+    def test_legacy_draft_can_be_edited_but_new_publication_requires_input_contract(self):
+        legacy = bundle(); del legacy['manifest']['input']
+        draft = self.draft(source=legacy)
+        error = self.denied(400, lambda: self.publish(draft))
+        self.assertEqual(error.code, 'input_contract_required')
+        self.assertEqual(self.call('/catalog')['works'], [])
 
     def test_account_password_hash_session_logout_expiry(self):
         user=self.market.row('SELECT * FROM users WHERE username=?',('alice',))

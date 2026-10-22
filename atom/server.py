@@ -20,6 +20,7 @@ from urllib.parse import urlsplit, unquote
 BASE = Path(__file__).resolve().parent
 if str(BASE) not in sys.path: sys.path.insert(0, str(BASE))
 from app_icons import ensure_icon, validate_svg, theme_glyph
+from app_input import validate_input_manifest, validate_input_bundle
 import system_update
 from relay_bridge import DeviceBridge, BridgeError
 MAX_BODY = 2 * 1024 * 1024
@@ -202,6 +203,8 @@ def validate_manifest(value, trusted_connect=False):
     if 'icon' in value and value['icon'] != 'icon.svg': raise ValueError('icon must be icon.svg')
     result = dict(id=value['id'], name=value['name'], description=value.get('description', ''), entry='index.html')
     if 'icon' in value: result['icon'] = value['icon']
+    input_declaration = validate_input_manifest(value, required=False)
+    if input_declaration is not None: result['input'] = input_declaration
     if 'capabilities' in value:
         caps = value['capabilities']
         if not isinstance(caps,list) or len(caps)>4 or any(not isinstance(c,str) or c not in ('notes','agenda','task-state','photos') for c in caps) or len(set(caps))!=len(caps): raise ValueError('invalid app capabilities')
@@ -227,9 +230,10 @@ def ensure_safe_root(root):
         raise ValueError('symlink parent')
 
 
-def install_app(root, data, update=False, trusted_connect=False):
+def install_app(root, data, update=False, trusted_connect=False, require_input=True):
     provided_icon = isinstance(data,dict) and isinstance(data.get('manifest'),dict) and 'icon' in data['manifest']
     data = ensure_icon(data)
+    validate_input_bundle(data, required=require_input)
     manifest = validate_manifest(data.get('manifest'), trusted_connect=trusted_connect)
     files = data.get('files')
     if not isinstance(files, dict) or not 1 <= len(files) <= 100 or 'index.html' not in files:

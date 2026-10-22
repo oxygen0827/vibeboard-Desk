@@ -23,6 +23,21 @@ class APITests(unittest.TestCase):
         self.thread = threading.Thread(target=self.http.serve_forever, daemon=True); self.thread.start()
         self.url = 'http://127.0.0.1:' + str(self.http.server_port)
 
+    def test_install_gate_rejects_undeclared_input_without_writing_files(self):
+        package = self.package(); del package['manifest']['input']
+        code, body = self.request('/api/apps/install', package)
+        self.assertEqual(code, 400)
+        self.assertIn('manifest.input', body.decode())
+        self.assertFalse((self.root / 'demo').exists())
+
+    def test_legacy_seed_remains_readable_but_updates_need_input_contract(self):
+        package = self.package(); del package['manifest']['input']
+        server.install_app(self.root, package, require_input=False)
+        original = (self.root / 'demo' / 'manifest.json').read_bytes()
+        self.assertIn('demo', [item['id'] for item in server.apps(self.root)])
+        with self.assertRaises(ValueError): server.install_app(self.root, package, update=True)
+        self.assertEqual((self.root / 'demo' / 'manifest.json').read_bytes(), original)
+
     def test_expired_workshop_job_is_not_a_retryable_bad_request(self):
         code,body=self.request('/api/workshop/jobs/'+'a'*32)
         self.assertEqual(code,404)
@@ -41,7 +56,7 @@ class APITests(unittest.TestCase):
         return response.status, response.read()
 
     def package(self):
-        return {'manifest': {'id': 'demo', 'name': 'Demo', 'entry': 'index.html'}, 'files': {'index.html': '<h1>Hello</h1>', 'nested/main.js': 'hello'}}
+        return {'manifest': {'id': 'demo', 'name': 'Demo', 'entry': 'index.html', 'input': {'version':1,'profile':'five-way','back':'root'}}, 'files': {'index.html': '<h1>Hello</h1>', 'nested/main.js': 'hello'}}
 
     def test_system_shell_is_not_cached(self):
         for path in ('/', '/app.js', '/home-key.js', '/style.css', '/app-runtime.js', '/input-navigation.js', '/app-host.js', '/companion.js'):
@@ -177,7 +192,7 @@ class APITests(unittest.TestCase):
     def test_market_install_does_not_require_developer_mode(self):
         self.request('/api/developer', {'enabled': False})
         icon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M8 8H56V56H8Z" stroke="currentColor" fill="none"/></svg>'
-        source = {'bundle': {'manifest': {'id': 'market-demo', 'name': 'Market Demo', 'entry': 'index.html', 'icon': 'icon.svg'}, 'files': {'index.html': '<h1>Hi</h1>', 'icon.svg': icon}},
+        source = {'bundle': {'manifest': {'id': 'market-demo', 'name': 'Market Demo', 'entry': 'index.html', 'input': {'version':1,'profile':'five-way','back':'root'}, 'icon': 'icon.svg'}, 'files': {'index.html': '<h1>Hi</h1>', 'icon.svg': icon}},
                   'version': {'id': 'v1', 'work_id': 'w1'}, 'license': 'MIT', 'author': 'alice', 'official': False}
         service = server.features(self.http)
         with mock.patch.object(service.market, 'execute', return_value=source):

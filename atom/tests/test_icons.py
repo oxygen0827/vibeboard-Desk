@@ -4,7 +4,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from app_icons import generate_icon,validate_svg,ensure_icon,theme_glyph
 import server
 class Icons(unittest.TestCase):
- def bundle(self):return dict(manifest=dict(id='icon-test',name='Icon Test',entry='index.html'),files={'index.html':'<button>OK</button>'})
+ def bundle(self):return dict(manifest=dict(id='icon-test',name='Icon Test',entry='index.html',input={'version':1,'profile':'five-way','back':'root'}),files={'index.html':'<button>OK</button>'})
  def test_old_bundle_gains_icon_and_api_exposes_path(self):
   with tempfile.TemporaryDirectory() as t:
    root=Path(t).resolve()/'apps';m=server.install_app(root,self.bundle());self.assertEqual(m['icon'],'icon.svg');validate_svg((root/'icon-test/icon.svg').read_text());self.assertEqual(server.apps(root)[-1]['icon'],'/user-apps/icon-test/icon.svg')

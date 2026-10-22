@@ -116,7 +116,7 @@ def sync(apps_root):
                 if app_id in seen or app_id in skip:
                     continue
                 exists = (apps_root / app_id).is_dir()
-                server.install_app(apps_root, bundle, update=exists, trusted_connect=app_id in server.TRUSTED_CLIENT_IDS)
+                server.install_app(apps_root, bundle, update=exists, trusted_connect=app_id in server.TRUSTED_CLIENT_IDS, require_input=False)
                 if path.name == 'bundle.json':
                     copy_assets(path.parent, apps_root / app_id)
                 seen.append(app_id)

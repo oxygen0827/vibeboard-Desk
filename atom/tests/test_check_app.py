@@ -9,7 +9,7 @@ checker = importlib.util.module_from_spec(spec); spec.loader.exec_module(checker
 class BundleChecks(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory(); self.root = Path(self.temp.name)
-        (self.root / 'manifest.json').write_text(json.dumps(dict(id='example',name='Example',entry='index.html',icon='icon.svg')))
+        (self.root / 'manifest.json').write_text(json.dumps(dict(id='example',name='Example',entry='index.html',icon='icon.svg',input={'version':1,'profile':'five-way','back':'root'})))
         (self.root / 'icon.svg').write_text('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><circle cx="32" cy="32" r="20"/></svg>')
         (self.root / 'index.html').write_text('<meta name="viewport" content="width=device-width"><button>Start</button>')
     def tearDown(self): self.temp.cleanup()
@@ -26,7 +26,7 @@ class BundleChecks(unittest.TestCase):
         self.assertTrue(checker.check(self.root)[0])
     def test_json_bundle_and_unsafe_paths(self):
         bundle = self.root / 'bundle.json'
-        value = dict(manifest=dict(id='example',name='Example',entry='index.html',icon='icon.svg'), files={'index.html':'<meta name="viewport"><button>Start</button>', 'icon.svg':(self.root/'icon.svg').read_text()})
+        value = dict(manifest=dict(id='example',name='Example',entry='index.html',icon='icon.svg',input={'version':1,'profile':'five-way','back':'root'}), files={'index.html':'<meta name="viewport"><button>Start</button>', 'icon.svg':(self.root/'icon.svg').read_text()})
         bundle.write_text(json.dumps(value))
         self.assertEqual(checker.check(bundle), ([], []))
         value['files']['../escape'] = 'bad'

@@ -46,3 +46,5 @@ async function increment() {
 使用语义化按钮与输入框，不要全局拦截 Enter 和方向键。Canvas 核心操作应提供 DOM 按钮。
 系统提供左上角返回控件，预留 48×48 空间。多级应用通过 `AtomApp.navigation.setBackHandler(fn)` 逐层返回，根页面调用 `AtomApp.home()`。
 完整接入说明与阶段边界见 [五向摇杆导航](five-way-navigation.md)。
+
+新生成、安装/更新、发布应用必须遵守 [五向输入强制规范 v1](input-standard.md)，声明 `manifest.input` 并通过共享准入校验。声明不等同于实际操作验收。
