@@ -59,7 +59,7 @@ class APITests(unittest.TestCase):
         return {'manifest': {'id': 'demo', 'name': 'Demo', 'entry': 'index.html', 'input': {'version':1,'profile':'five-way','back':'root'}}, 'files': {'index.html': '<h1>Hello</h1>', 'nested/main.js': 'hello'}}
 
     def test_system_shell_is_not_cached(self):
-        for path in ('/', '/app.js', '/home-key.js', '/style.css', '/app-runtime.js', '/input-navigation.js', '/app-host.js', '/companion.js'):
+        for path in ('/', '/app.js', '/home-key.js', '/style.css', '/app-runtime.js', '/app-input-standard.json', '/input-navigation.js', '/app-host.js', '/companion.js'):
             with urllib.request.urlopen(self.url + path) as response:
                 self.assertEqual(response.headers.get('Cache-Control'), 'no-store')
 

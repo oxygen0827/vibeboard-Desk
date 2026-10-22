@@ -86,3 +86,12 @@
 模态切换、页面重建采用淡入，避免选框横穿不相关界面；列表滚动后选框跟随控件。
 尊重 prefers-reduced-motion，以及「设置 → 陪伴与交互 → 动画」；禁用动画时仍保留清晰的静态焦点框。
 主题可提供 --atom-focus-color；默认使用当前主题的操作色。持续渲染不用于选框，位置跟踪只在短暂的交互动画窗口与滚动/尺寸事件中执行。
+
+## 8. 两端生成入口必须携带规范
+
+机器可分发规则位于 `atom/static/app-input-standard.json`，与本文同版本维护，修改规范必须同步并测试提示词注入。
+小电脑 `workshop.py` 通过 `app_input.generation_input_standard()` 将完整规则加入模型 system 消息；包含官方 AI 与自填模型的调用。
+Mac `connect/computer/artifact.mjs` 的 `appPrompt()` 将同一 JSON 规则加入任务；`companion.mjs` 的新建应用和 `studio.mjs` 的 AI 改造/二次创作共用它。
+Mac 打包器把该 JSON 复制进 Resources/computer，离线也能读取；缺失/无效规范时拒绝生成，不静默跳过。设备核心包通过 static 目录携带规范。
+仓库 AGENTS.md 提醒直接在仓库工作的编码 Agent 阅读本文；其他外部 Agent 可通过设备开发指南读取 `/app-input-standard.json`。普通聊天任务不会被强行改成应用生成任务。
+源码接入不等于已安装旧客户端自动升级，需要发布新版设备核心及 Mac 安装包。

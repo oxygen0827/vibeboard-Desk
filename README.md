@@ -241,3 +241,5 @@ atom/
 `codex/five-way-navigation` 实现方向焦点导航、Space 短按确认/长按语音、文本框语音输入及应用返回接口。键盘可模拟五向输入；真实摇杆和全量第三方应用适配仍需验收。详见 [技术方案与接入规范](atom/docs/five-way-navigation.md)。
 
 应用开发必读：[五向输入强制规范 v1](atom/docs/input-standard.md)。新生成、安装/更新、发布的应用须声明 `manifest.input`；设备与市场复用 `atom/app_input.py` 校验，历史应用按兼容策略逐个迁移。
+
+五向输入规则随包分发于 [app-input-standard.json](atom/static/app-input-standard.json)，由小电脑工作坊及 Mac 新建/AI改造任务自动注入。外部 Agent 也可从设备开发指南读取；安装与发布校验是额外门禁。

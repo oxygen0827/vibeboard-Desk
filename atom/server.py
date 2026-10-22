@@ -390,7 +390,7 @@ def system_status():
 class Handler(SimpleHTTPRequestHandler):
     def end_headers(self):
         # System shell changes must not retain an obsolete bridge or keyboard handler.
-        if urlsplit(self.path).path in ('/', '/index.html', '/app.js', '/home-key.js', '/style.css', '/app-runtime.js', '/input-navigation.js', '/app-host.js', '/companion.js', '/maintenance.js', '/system-settings.js', '/system-appearance.css', '/app-appearance.css', '/theme-controls.css', '/atom-ui.css'):
+        if urlsplit(self.path).path in ('/', '/index.html', '/app.js', '/home-key.js', '/style.css', '/app-runtime.js', '/app-input-standard.json', '/input-navigation.js', '/app-host.js', '/companion.js', '/maintenance.js', '/system-settings.js', '/system-appearance.css', '/app-appearance.css', '/theme-controls.css', '/atom-ui.css'):
             self.send_header('Cache-Control', 'no-store')
         # Public application assets must load inside opaque-origin sandbox frames.
         if self.command in ('GET', 'HEAD') and urlsplit(self.path).path.startswith('/user-apps/'):

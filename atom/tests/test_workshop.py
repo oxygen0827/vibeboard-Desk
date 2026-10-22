@@ -57,6 +57,7 @@ class WorkshopTests(unittest.TestCase):
         self.assertEqual(payload['thinking'], {'type':'disabled'})
         self.assertEqual(payload['response_format'], {'type':'json_object'})
         self.assertTrue(payload['stream'])
+        self.assertIn(w.generation_input_standard(), payload['messages'][0]['content'])
     def test_changing_endpoint_does_not_reuse_key(self):
         self.configure(stt_base_url='https://speech.example/v1',stt_api_key='speech-key')
         self.work.save_config({'base_url':'https://other.example/v1','stt_base_url':'https://other-speech.example/v1'})

@@ -1,4 +1,6 @@
 """Shared five-way admission rules. Static admission is not behavioral certification."""
+import json
+from pathlib import Path
 import re
 from html.parser import HTMLParser
 
@@ -57,3 +59,14 @@ def validate_input_bundle(bundle, required=True):
         if not re.search(r'AtomApp\s*\.\s*navigation\s*\.\s*setBackHandler\s*\(', source):
             raise ValueError('五向输入规范：多级页面须注册 AtomApp.navigation.setBackHandler')
     return declaration
+
+
+def generation_input_standard():
+    """Return the exact bundled policy that is also shipped with ATOM Connect."""
+    try:
+        document = json.loads((Path(__file__).resolve().parent / 'static' / 'app-input-standard.json').read_text(encoding='utf-8'))
+    except (OSError, ValueError) as exc:
+        raise ValueError('应用输入规范缺失或无效，无法启动应用生成') from exc
+    if not isinstance(document, dict) or document.get('id') != 'atom-five-way-input' or type(document.get('version')) is not int or document.get('version') != 1 or not isinstance(document.get('rules'), list) or not document['rules'] or not all(isinstance(rule, str) and rule for rule in document['rules']):
+        raise ValueError('应用输入规范缺失或版本无效，无法启动应用生成')
+    return 'ATOM REQUIRED INPUT STANDARD v1:\n' + '\n'.join('- ' + rule for rule in document['rules'])

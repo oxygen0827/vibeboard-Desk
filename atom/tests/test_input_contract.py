@@ -2,10 +2,19 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import unittest
-from app_input import validate_input_bundle, validate_input_manifest
+import json
+from unittest import mock
+from app_input import validate_input_bundle, validate_input_manifest, generation_input_standard
 
 
 class InputContractTests(unittest.TestCase):
+    def test_generation_prompt_reads_the_bundled_policy_and_fails_closed(self):
+        policy = json.loads((Path(__file__).resolve().parents[1] / 'static/app-input-standard.json').read_text())
+        expected = 'ATOM REQUIRED INPUT STANDARD v1:\n' + '\n'.join('- ' + rule for rule in policy['rules'])
+        self.assertEqual(generation_input_standard(), expected)
+        with mock.patch.object(Path, 'read_text', side_effect=OSError('missing')):
+            with self.assertRaises(ValueError): generation_input_standard()
+
     def bundle(self):
         return {'manifest': {'input': {'version': 1, 'profile': 'five-way', 'back': 'root'}}, 'files': {'index.html': '<button>启动</button>'}}
 

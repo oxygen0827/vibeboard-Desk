@@ -14,6 +14,8 @@ node=pathlib.Path(a.node).resolve()
 if not node.is_file():raise SystemExit('Node runtime missing')
 shutil.copy2(node,resources/'runtime/node');os.chmod(resources/'runtime/node',0o755)
 shutil.copytree(base.parent/'computer',resources/'computer',ignore=shutil.ignore_patterns('node_modules','test','state','*.sqlite*','state.json','*.log'))
+# The same policy ships with the device core and every desktop Agent task.
+shutil.copy2(base.parent.parent/'static'/'app-input-standard.json',resources/'computer'/'app-input-standard.json')
 # Bundle a relocatable Python without unrelated workspace libraries or credentials.
 if a.python_root:
     prefix=pathlib.Path(a.python_root).resolve();py=prefix/'bin/python3';dest=resources/'runtime/python'
