@@ -12,6 +12,14 @@ from pathlib import Path
 
 ATOM = Path(__file__).resolve().parents[1]
 CORE_DIRS = ('static', 'templates', 'deploy')
+REQUIRED_EXECUTABLES = ('deploy/atom-session.sh', 'deploy/start-atom.sh')
+
+def validate_launchers(root=ATOM):
+    for name in REQUIRED_EXECUTABLES:
+        path = root / name
+        if not path.is_file() or path.stat().st_mode & 0o111 != 0o111:
+            raise SystemExit('Desktop launcher must be executable before release: ' + name)
+
 
 
 def core_files():
@@ -30,6 +38,7 @@ def main():
     dirty = subprocess.run(['git', '-C', str(ATOM), 'status', '--porcelain', '--', '*.py', 'VERSION', 'static', 'templates', 'deploy'], stdout=subprocess.PIPE, check=True).stdout
     if dirty:
         raise SystemExit('Commit reviewed core changes before building a release')
+    validate_launchers()
     from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
     from cryptography.hazmat.primitives import serialization
     key = Ed25519PrivateKey.from_private_bytes(base64.b64decode(Path(args.key).expanduser().read_text().strip()))

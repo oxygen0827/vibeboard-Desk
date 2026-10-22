@@ -10,7 +10,9 @@ def package(files):
     buffer = io.BytesIO()
     with tarfile.open(fileobj=buffer, mode='w:gz') as tar:
         for name, data in files.items():
-            info = tarfile.TarInfo(name); info.size = len(data); tar.addfile(info, io.BytesIO(data))
+            mode = 0o644
+            if isinstance(data, tuple): data, mode = data
+            info = tarfile.TarInfo(name); info.mode = mode; info.size = len(data); tar.addfile(info, io.BytesIO(data))
     return buffer.getvalue()
 
 
@@ -152,3 +154,29 @@ class InstallRecovery(SystemUpdate):
         self.prepare()
         with self.assertRaisesRegex(su.UpdateError, '尚未结束'): su.request_install('1.1')
         with self.assertRaisesRegex(su.UpdateError, '尚未结束'): su.stage('https://x')
+
+    def test_signed_launcher_permissions_survive_install(self):
+        files={'server.py':b'new','VERSION':b'1.1','static/app.js':b'//',
+               'deploy/atom-session.sh':(b'#!/bin/sh\nexit 0\n',0o755),
+               'deploy/start-atom.sh':(b'#!/bin/sh\nexit 0\n',0o755)}
+        with self.release(files=files):su.stage('https://x')
+        su.request_install('1.1')
+        with mock.patch.object(su,'_restart_and_wait',return_value=True):su.apply()
+        import os,subprocess
+        for name in ('atom-session.sh','start-atom.sh'):
+            path=self.base/'deploy'/name
+            self.assertTrue(os.access(str(path),os.X_OK))
+            self.assertEqual(subprocess.call([str(path)]),0)
+
+class ReleaseLauncherGuard(unittest.TestCase):
+    def test_build_refuses_nonexecutable_launchers(self):
+        import importlib.util
+        spec=importlib.util.spec_from_file_location('release_builder',Path(__file__).resolve().parents[1]/'tools/build_release.py')
+        builder=importlib.util.module_from_spec(spec);spec.loader.exec_module(builder)
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder);(root/'deploy').mkdir()
+            for name in builder.REQUIRED_EXECUTABLES:
+                (root/name).write_text('#!/bin/sh\n');(root/name).chmod(0o644)
+            with self.assertRaisesRegex(SystemExit,'must be executable'):builder.validate_launchers(root)
+            for name in builder.REQUIRED_EXECUTABLES:(root/name).chmod(0o755)
+            builder.validate_launchers(root)
