@@ -19,6 +19,10 @@ label{display:flex;flex-direction:column;gap:5px;font-size:14px;color:var(--mute
 input{font:inherit;font-size:17px;padding:11px 13px;border:1px solid var(--line);border-radius:11px;background:var(--bg);color:var(--ink)}
 button{font:inherit;font-weight:600;font-size:17px;padding:12px;border:0;border-radius:12px;background:var(--accent);color:#fff}
 button:disabled{opacity:.5}
+.secondary{background:transparent;color:var(--accent);font-size:15px}
+.recovery{display:flex;flex-direction:column;gap:14px;background:var(--card);border-radius:16px;padding:18px}
+.recovery h2{font-size:20px;margin:0}.recovery .code{padding:14px;background:var(--bg);border-radius:10px;line-height:1.8;overflow-wrap:anywhere;user-select:all}
+.check{flex-direction:row;align-items:flex-start;gap:10px;color:var(--ink)}.check input{width:20px;height:20px;flex:none;margin:2px 0}
 .code{font:600 18px ui-monospace,Menlo,monospace;letter-spacing:2px;color:var(--ink)}
 .status{min-height:1.5em}
 .status.bad{color:var(--bad)} .status.ok{color:var(--ok);font-weight:600}
@@ -33,16 +37,28 @@ small{color:var(--muted);font-size:13px}
   <form id="form" autocomplete="on">
     <label>用户名<input id="username" name="username" autocomplete="username" autocapitalize="off" spellcheck="false" required maxlength="32"></label>
     <label>密码<input id="password" name="password" type="password" autocomplete="current-password" required></label>
+    <label id="confirm-label" hidden>确认密码<input id="confirm-password" name="confirm-password" type="password" autocomplete="new-password"></label>
     <button id="submit" type="submit">登录小电脑</button>
-    <p class="status" id="status" role="status"></p>
+    <button id="mode" class="secondary" type="button">没有账号？创建账号</button>
   </form>
-  <small>密码只用于这次登录，随手记和日程的加密密钥在这部手机上转交给小电脑，服务器看不到。</small>
+  <section id="recovery" class="recovery" hidden aria-labelledby="recovery-title">
+    <h2 id="recovery-title">先保存恢复密钥</h2>
+    <p>密码重置后，需要它恢复随手记和日程的加密内容。请保存到安全的地方，服务器无法替你找回。</p>
+    <div id="recovery-code" class="code"></div>
+    <label class="check"><input id="saved" type="checkbox">我已保存恢复密钥</label>
+    <button id="create" type="button" disabled>创建账号并登录</button>
+    <button id="back" class="secondary" type="button">返回修改</button>
+  </section>
+  <p class="status" id="status" role="status"></p>
+  <small>密码通过加密连接提交用于账号验证。随手记和日程的数据密钥在手机上生成或解锁，再加密转交给小电脑。</small>
 </main>
 <script>
 (() => {
   'use strict';
   const params = new URLSearchParams(location.hash.slice(1));
   const code = params.get('c') || '', transfer = params.get('k') || '';
+  // Scanning a new QR in an already-open tab can be a same-document hash navigation.
+  addEventListener('hashchange', () => { if (location.hash) location.reload(); });
   const api = location.pathname.replace(/login\/?$/, '') + 'market/v1/qr-login/';
   const $ = id => document.getElementById(id);
   const say = (text, tone) => { $('status').textContent = text; $('status').className = 'status ' + (tone || ''); };
@@ -61,7 +77,7 @@ small{color:var(--muted);font-size:13px}
   async function post(action, body) {
     const r = await fetch(api + action, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body), credentials: 'omit'});
     const value = await r.json().catch(() => ({}));
-    if (!r.ok) throw Error(value.error || '登录失败，请重试');
+    if (!r.ok) { const error = Error(value.error || '登录失败，请重试'); error.status = r.status; throw error; }
     return value;
   }
   // The account data key is wrapped with the password (PBKDF2-SHA256 + AES-GCM, as in atom/e2e.py).
@@ -79,28 +95,96 @@ small{color:var(--muted);font-size:13px}
       return null;  // the device can still unlock with the password later
     }
   }
+  async function newAccount(password) {
+    if (!crypto.subtle) throw Error('请使用支持安全加密的浏览器打开 HTTPS 页面');
+    const data = crypto.getRandomValues(new Uint8Array(32)), rawRecovery = crypto.getRandomValues(new Uint8Array(15));
+    const salt = crypto.getRandomValues(new Uint8Array(16)), alphabet = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
+    let bits = 0, count = 0, chars = '';
+    for (const byte of rawRecovery) { bits = (bits << 8) | byte; count += 8; while (count >= 5) { count -= 5; chars += alphabet[(bits >> count) & 31]; } bits &= (1 << count) - 1; }
+    const base = await crypto.subtle.importKey('raw', utf8(password), 'PBKDF2', false, ['deriveKey']);
+    const passwordKey = await crypto.subtle.deriveKey({name:'PBKDF2', hash:'SHA-256', salt, iterations:310000}, base, {name:'AES-GCM',length:256}, false, ['encrypt']);
+    const recoveryBase = await crypto.subtle.importKey('raw', rawRecovery, 'HKDF', false, ['deriveKey']);
+    const recoveryKey = await crypto.subtle.deriveKey({name:'HKDF',hash:'SHA-256',salt:utf8('atom-e2e-v1'),info:utf8('atom-recovery')}, recoveryBase, {name:'AES-GCM',length:256}, false, ['encrypt']);
+    async function wrap(key) {
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+      return {v:1, iv:b64(iv), ct:b64(await crypto.subtle.encrypt({name:'AES-GCM',iv,additionalData:utf8('atom-account-key')}, key, utf8(b64(data))))};
+    }
+    return {code:chars.match(/.{4}/g).join('-'), record:{v:1, key_id:b64(new Uint8Array(await crypto.subtle.digest('SHA-256',data)).slice(0,9)), salt:b64(salt), iterations:310000, by_password:await wrap(passwordKey), by_recovery:await wrap(recoveryKey)}};
+  }
   const attempt = b64(crypto.getRandomValues(new Uint8Array(32)));
-  let approved = null, sealed;
-  $('form').addEventListener('submit', async e => {
-    e.preventDefault();
-    $('submit').disabled = true;
-    say('正在登录…');
+  let mode = 'login', busy = false, approved = null, sealed, registration = null, approvalUnknown = false;
+  function setBusy(value) {
+    busy = value;
+    for (const id of ['username','password','mode','confirm-password','back']) $(id).disabled = value || !!approved || approvalUnknown;
+    $('submit').disabled = value;
+    $('create').disabled = value || !$('saved').checked;
+    $('saved').disabled = value;
+  }
+  function formMode() {
+    $('confirm-label').hidden = mode !== 'register';
+    $('confirm-password').required = mode === 'register';
+    $('password').autocomplete = mode === 'register' ? 'new-password' : 'current-password';
+    $('submit').textContent = mode === 'register' ? '创建账号' : '登录小电脑';
+    $('mode').textContent = mode === 'register' ? '已有账号？登录' : '没有账号？创建账号';
+    $('intro').textContent = mode === 'register' ? '确认码一致后，创建 ATOM 账号。用户名为 3–32 位字母、数字、下划线或连字符，密码至少 12 位。' : '核对小电脑屏幕上的确认码一致后，输入你的 ATOM 账号。';
+  }
+  $('mode').onclick = () => { if (busy || approved) return; mode = mode === 'login' ? 'register' : 'login'; registration = null; $('confirm-password').value = ''; say(''); formMode(); };
+  $('saved').onchange = () => { $('create').disabled = busy || !$('saved').checked; };
+  $('back').onclick = () => { if (busy || approved) return; $('recovery').hidden = true; $('form').hidden = false; registration = null; $('recovery-code').textContent = ''; say(''); };
+  async function finish() {
+    if (busy) return;
+    setBusy(true); say(mode === 'register' ? '正在创建账号…' : '正在登录…');
     try {
       const password = $('password').value;
-      if (!approved) approved = await post('approve', {code, attempt, username: $('username').value.trim(), password});
-      $('username').disabled = true; $('password').disabled = true;
+      const body = {code, attempt, username:$('username').value.trim(), password, mode};
+      if (mode === 'register') { body.keys = registration.record; body.recovery_confirmed = $('saved').checked; }
+      if (!approved) approved = await post('approve', body);
+      if (mode === 'register') {
+        const expected = registration.record, actual = approved.keys;
+        const same = actual && ['v','key_id','salt','iterations'].every(k => actual[k] === expected[k]) &&
+          ['by_password','by_recovery'].every(k => actual[k] && ['v','iv','ct'].every(field => actual[k][field] === expected[k][field]));
+        if (!same) throw Error('账号的加密密钥与刚才保存的恢复密钥不一致。请重新扫码，使用已有账号登录；这次不会向小电脑交付密钥。');
+      }
+      $('back').hidden = true;
       say('正在把加密密钥交给小电脑…');
       if (sealed === undefined) sealed = await sealDataKey(approved.keys, password);
-      await post('seal', {code, handoff: approved.handoff, sealed});
-      $('password').value = '';
-      $('form').hidden = true;
-      $('intro').textContent = '已登录为 ' + approved.user.username + '。回到小电脑，几秒内会自动进入。' + (!sealed ? '这部手机没能转交加密密钥，小电脑上的随手记和日程需要再输入一次密码解锁。' : '');
+      if (mode === 'register' && !sealed) throw Error('密钥转交失败，请重试；账号已经创建');
+      await post('seal', {code, handoff:approved.handoff, sealed});
+      const transferred = !!sealed;
+      $('password').value = ''; $('confirm-password').value = ''; $('recovery-code').textContent = '';
+      registration = null; sealed = undefined;
+      $('form').hidden = true; $('recovery').hidden = true; say('');
+      $('intro').textContent = '已登录为 ' + approved.user.username + '。回到小电脑，几秒内会自动进入。' + (!transferred ? '这部手机没能转交加密密钥，小电脑上的随手记和日程需要再输入一次密码解锁。' : '');
       $('intro').className = 'status ok';
     } catch (err) {
       say(err.message, 'bad');
-      $('submit').disabled = false;
-      $('submit').textContent = approved ? '重试完成登录' : '重试登录';
+      approvalUnknown = !approved && (!err.status || err.status >= 500);
+      if (mode === 'register' && !approved && err.status >= 400 && err.status < 500) {
+        $('recovery').hidden = true; $('form').hidden = false;
+      }
+      $('submit').textContent = approved ? '重试完成登录' : mode === 'register' ? '重试创建账号' : '重试登录';
+      $('create').textContent = '重试完成注册';
+      // Retry generating the transfer envelope if this phone temporarily failed WebCrypto.
+      if (mode === 'register' && !sealed) sealed = undefined;
+      setBusy(false);
     }
+  }
+  $('create').onclick = () => { if ($('saved').checked && registration) finish(); };
+  $('form').addEventListener('submit', async e => {
+    e.preventDefault();
+    if (busy) return;
+    if (mode === 'login' || approved || approvalUnknown) return finish();
+    if ($('password').value.length < 12) return say('密码至少需要 12 位', 'bad');
+    if ($('password').value !== $('confirm-password').value) return say('两次输入的密码不一致', 'bad');
+    if (!/^[a-z0-9][a-z0-9_-]{2,31}$/i.test($('username').value.trim())) return say('请使用 3–32 位字母、数字、下划线或连字符作为用户名', 'bad');
+    setBusy(true); say('正在生成你的加密密钥…');
+    try {
+      registration = await newAccount($('password').value);
+      $('recovery-code').textContent = registration.code;
+      $('saved').checked = false; $('back').hidden = false;
+      $('form').hidden = true; $('recovery').hidden = false; say('');
+    } catch (err) { say(err.message, 'bad'); }
+    finally { setBusy(false); }
   });
 })();
 </script>

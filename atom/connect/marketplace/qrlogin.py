@@ -8,7 +8,7 @@ import hashlib
 import secrets
 import threading
 import time
-from .service import MarketError, require
+from .service import MarketError, require, key_record
 
 TTL = 300
 ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'
@@ -94,20 +94,32 @@ class QRLogin:
                 require(_secret(body.get('attempt')), 'Invalid sign-in attempt')
                 attempt = _hash(body['attempt'])
                 if item['state'] == 'pending':
-                    session = self.market.handle('POST', '/market/v1/login', '', {k: body.get(k) for k in ('username', 'password')}, peer)
-                    try:
-                        keys = self.market.handle('GET', '/market/v1/keys', session['token'], {}).get('keys')
-                    except Exception:
-                        self._revoke(session)
-                        raise
-                    item.update(state='approved', token=session['token'], user=session['user'], keys=keys,
-                                key_id=(keys or {}).get('key_id'), attempt=attempt, handoff=secrets.token_urlsafe(32))
+                    mode = body.get('mode', 'login')
+                    require(mode in ('login', 'register'), 'Invalid sign-in mode')
+                    initial_keys = None
+                    if mode == 'register':
+                        require(body.get('recovery_confirmed') is True, '请先保存恢复密钥')
+                        initial_keys = key_record(body.get('keys'))
+                    session = self.market.handle('POST', '/market/v1/' + mode, '', {k: body.get(k) for k in ('username', 'password')}, peer)
+                    # Keep the created session before key setup: a lost response or a transient write
+                    # failure must retry this same account, rather than attempting registration again.
+                    item.update(state='approved', token=session['token'], user=session['user'], keys=None,
+                                mode=mode, pending_keys=initial_keys, attempt=attempt, handoff=secrets.token_urlsafe(32))
                 require(secrets.compare_digest(item.get('attempt', ''), attempt), '这个二维码已经用过了', 409, 'used')
+                if item.get('pending_keys') is not None:
+                    self.market.handle('POST', '/market/v1/keys', item['token'], {'keys': item['pending_keys']})
+                    item['pending_keys'] = None
+                if item.get('keys') is None:
+                    item['keys'] = self.market.handle('GET', '/market/v1/keys', item['token'], {}).get('keys')
+                    item['key_id'] = (item['keys'] or {}).get('key_id')
                 return dict(user={'username': item['user']['username']}, keys=item['keys'], handoff=item['handoff'])
             if action == 'seal':
                 require(item['state'] in ('approved', 'ready'), '请先登录', 409, 'not_approved')
                 require(_secret(body.get('handoff')) and secrets.compare_digest(item['handoff'], body['handoff']), '登录确认无效', 403, 'forbidden')
                 require(_sealed(body.get('sealed')), 'Invalid sealed key')
+                require(item.get('pending_keys') is None, '请先完成账号初始化', 409, 'not_ready')
+                if item.get('mode') == 'register':
+                    require(item.get('keys') and body.get('sealed') is not None, '请先完成加密密钥转交', 409, 'not_ready')
                 if item['state'] == 'ready':
                     require(item.get('sealed') == body.get('sealed'), '登录已确认', 409, 'used')
                 else:

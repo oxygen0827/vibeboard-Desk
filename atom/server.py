@@ -728,7 +728,9 @@ class Handler(SimpleHTTPRequestHandler):
                     if getattr(self.server, 'is_simulator', False): raise bluetooth.BluetoothError('请在小电脑上操作蓝牙；模拟设备不会修改电脑的蓝牙')
                     if action == 'power': result = bluetooth.power(data.get('on'))
                     elif action == 'scan': result = bluetooth.scan()
-                    elif action == 'connect': result = bluetooth.connect(data.get('address'))
+                    elif action == 'connect': result = bluetooth.connect(data.get('address'), data.get('confirm'), data.get('id'))
+                    elif action in ('pair-start', 'pair-status', 'pair-respond', 'pair-cancel'):
+                        result = bluetooth.pairing(action[5:], data)
                     elif action == 'disconnect': result = bluetooth.disconnect(data.get('address'))
                     elif action == 'forget': result = bluetooth.forget(data.get('address'))
                     else: raise bluetooth.BluetoothError('不支持的蓝牙操作')
