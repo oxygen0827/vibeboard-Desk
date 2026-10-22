@@ -85,3 +85,12 @@ body[data-view=settings][data-subpage=personal] .row{min-height:42px}
 :root[data-theme=system-dark] #return-toast{background:#e5eaf2f2;color:#19202c}
 :root[data-theme=system-dark] button.primary,:root[data-theme=system-dark] .toggle.on,:root[data-theme=system-dark] .timer #toggle-timer{color:var(--accent-ink)}
 :root[data-theme=system-dark] .installed .danger,:root[data-theme=system-dark] .app-action-danger,:root[data-theme=system-dark] #app-action-error{color:#ff8d85}
+
+/* App-local iOS-style navigation: independent centered title, named parent on the left. */
+body.app-mode .page-heading.atom-navigation-header{position:relative;display:flex;align-items:center;justify-content:flex-end;min-height:44px;padding:0;flex-shrink:0}
+body.app-mode .atom-navigation-header h1{position:absolute;left:50%;transform:translateX(-50%);max-width:calc(100% - 208px);margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center;pointer-events:none}
+body.app-mode .atom-navigation-header #atom-app-back{position:absolute;left:0;top:0;width:auto;max-width:104px;height:44px;border:0;border-radius:9px;background:transparent;box-shadow:none;color:var(--accent);display:flex;align-items:center;gap:4px;padding:0 4px 0 0;font-family:inherit;font-size:16px;font-weight:500;line-height:1.2}
+body.app-mode #atom-app-back svg{width:14px;height:24px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+body.app-mode #atom-app-back span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body.app-mode #atom-app-back.atom-navigation-floating{width:auto;max-width:120px;display:flex;align-items:center;gap:4px;padding:0 8px;color:var(--accent);font-size:16px}
+body.app-mode .atom-navigation-header>button:not(#atom-app-back){max-width:100px;margin-left:auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
