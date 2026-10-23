@@ -1,0 +1,15 @@
+{
+  "id": "rain-radio",
+  "name": "雨夜电台",
+  "description": "可混合的雨声、海浪与壁炉合成声景；睡眠定时和动态窗景。",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "layout": "fullscreen",
+  "theme_ui": "controls",
+  "input": {
+    "version": 1,
+    "profile": "five-way",
+    "back": "custom",
+    "scene": "none"
+  }
+}

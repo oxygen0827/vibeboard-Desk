@@ -7,8 +7,15 @@ KEY=${ATOM_SSH_KEY:-$HOME/.ssh/ldcx_ed25519}
 ATOM=$(cd "$(dirname "$0")/../.." && pwd)
 SSH="ssh -i $KEY -o BatchMode=yes"
 RELEASE=$(date -u +%Y%m%dT%H%M%SZ)
+# Refuse a release before uploading when it would consume the final 512 MiB.
+NEEDED=$(du -sk "$ATOM/connect/relay" "$ATOM/connect/marketplace" "$ATOM/connect/server" "$ATOM/official" "$ATOM/experiences" "$ATOM/ports" | awk '{n+=$1} END {print n+524288}')
+$SSH "$HOST" sh -s "$NEEDED" <<'SPACE'
+set -eu
+AVAILABLE=$(df -Pk /opt | awk 'NR==2 {print $4}')
+[ "$AVAILABLE" -ge "$1" ] || { echo "Insufficient deployment headroom; free space or expand storage first" >&2; exit 1; }
+SPACE
 
-COPYFILE_DISABLE=1 tar --no-xattrs -C "$ATOM" --exclude '__pycache__' --exclude 'test_*.py' -czf - connect/relay connect/marketplace connect/server official experiences app_input.py \
+COPYFILE_DISABLE=1 tar --no-xattrs -C "$ATOM" --exclude '__pycache__' --exclude 'test_*.py' -czf - connect/relay connect/marketplace connect/server official experiences ports app_input.py \
   | $SSH "$HOST" "mkdir -p /opt/atom/releases/$RELEASE && tar -xzf - -C /opt/atom/releases/$RELEASE"
 
 $SSH "$HOST" sh -s "$RELEASE" <<'REMOTE'
@@ -21,7 +28,7 @@ install -d -o root -g root -m 0700 /etc/atom
 chown -R root:root /opt/atom/releases/$RELEASE
 chmod -R go-w /opt/atom/releases/$RELEASE
 chmod 755 /opt/atom /opt/atom/releases
-for d in connect official experiences; do ln -sfn releases/$RELEASE/$d /opt/atom/$d.new && mv -Tf /opt/atom/$d.new /opt/atom/$d; done
+for d in connect official experiences ports; do ln -sfn releases/$RELEASE/$d /opt/atom/$d.new && mv -Tf /opt/atom/$d.new /opt/atom/$d; done
 install -m 0644 /opt/atom/connect/server/atom-connect.service /opt/atom/connect/server/atom-connect-backup.service /opt/atom/connect/server/atom-connect-backup.timer /opt/atom/connect/server/atom-connect-monitor.service /opt/atom/connect/server/atom-connect-monitor.timer /etc/systemd/system/
 systemctl daemon-reload
 systemctl enable atom-connect.service >/dev/null

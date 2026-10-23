@@ -14,12 +14,30 @@
     "photon-chip": "play",
     "photon-runner": "play",
     "finger-fireworks": "play",
-    "mini-piano": "sound"
+    "mini-piano": "sound",
+    "oracle-tarot": "life",
+    "zodiac-atlas": "life",
+    "echo-book": "life",
+    "moon-letter": "life",
+    "rain-radio": "sound",
+    "personality-planet": "life",
+    "natal-whispers": "life",
+    "glass-ecosystem": "play",
+    "element-sandbox": "play"
   },
   "extra_sources": [
     "../experiences/world/bundle.json",
     "../experiences/visual/bundle.json",
     "../experiences/duet/bundle.json",
-    "../experiences/agents/bundle.json"
+    "../experiences/agents/bundle.json",
+    "../ports/oracle-tarot/bundle.json",
+    "../ports/zodiac-atlas/bundle.json",
+    "../ports/echo-book/bundle.json",
+    "../ports/moon-letter/bundle.json",
+    "../ports/rain-radio/bundle.json",
+    "../ports/personality-planet/bundle.json",
+    "../ports/natal-whispers/bundle.json",
+    "../ports/glass-ecosystem/bundle.json",
+    "../ports/element-sandbox/bundle.json"
   ]
 }

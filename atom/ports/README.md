@@ -59,3 +59,9 @@ tools/build_visual_ports.py基于atom/vendor中的固定上游源码生成ports�
 在480×360的ATOM实际沙箱iframe中，短时3秒rAF测量：体积流场21FPS、生命纹理28FPS、月光海洋47FPS、物理实验台62FPS、模型检视台62FPS；音乐界面62FPS不代表音频性能。所有WebGL应用glError=0，所有六款无pageerror/资源404/着色器错误，scrollHeight=innerHeight=360，空格返回home。
 
 已操作体积换色/流场与相机、生命纹理预设/播种/暂停、海洋日落/风力、三种物理场景及弹弓真实释放（launched=true/elasticRemoved=true）、音乐播放/保存/退出后恢复/拒绝非法存档、OBJ四边形解析成2面、二进制STL解析成1面并显示10×20×30模型单位。音乐走PulseAudio硬件sink，3秒loopback采样261380个s16样本，peak1049、RMS115.59，确认有非零音频输出；不替代用户对扬声器音质的实际听感验证。结果见 `atom/artifacts/complex-apps-verification.json`。此为短时功能测试，不保证任意大模型或持续高负载时的帧率。
+
+## 2026-10-23 生活与仪式应用
+
+新增 `moon-letter` 月亮来信、`rain-radio` 雨夜电台、`personality-planet` 我的人格星球、`natal-whispers` 星盘密语、`glass-ecosystem` 玻璃生态瓶、`element-sandbox` 掌心造物沙盘；以及前一轮 `oracle-tarot`、`zodiac-atlas`、`echo-book`。
+
+各目录包含完整文本资源、独立主题图标、五向声明和 SOURCE.md。用 `python3 atom/tools/rebuild_life_bundles.py` 重建九项 JSON 包，然后运行图标准备、check_app.py 和真实流程测试。改编范围、三端部署与完整资源同步记录见 [交付说明](../docs/life-apps-delivery-2026-10-23.md)。

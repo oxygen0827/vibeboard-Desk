@@ -1,0 +1,15 @@
+{
+  "id": "glass-ecosystem",
+  "name": "玻璃生态瓶",
+  "description": "可持续运行的水生微世界：植物、鱼群、光照与氧气平衡；可保存恢复。",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "layout": "fullscreen",
+  "theme_ui": "controls",
+  "input": {
+    "version": 1,
+    "profile": "five-way",
+    "back": "custom",
+    "scene": "controls"
+  }
+}

@@ -54,5 +54,41 @@
   "photon-runner": {
     "source": "site/assets/apps/photon-runner.png",
     "capture": "Reviewed application UI; empty/demo state for private-data applications"
+  },
+  "oracle-tarot": {
+    "source": "artifacts/oracles-20261023/gray-oracle-tarot.png",
+    "capture": "Actual rendered homepage; empty/demo data; no private user content"
+  },
+  "zodiac-atlas": {
+    "source": "artifacts/oracles-20261023/gray-zodiac-atlas.png",
+    "capture": "Actual rendered homepage; empty/demo data; no private user content"
+  },
+  "echo-book": {
+    "source": "artifacts/oracles-20261023/gray-echo-book.png",
+    "capture": "Actual rendered homepage; empty/demo data; no private user content"
+  },
+  "moon-letter": {
+    "source": "artifacts/life-apps-20261023/moon-letter.png",
+    "capture": "Actual rendered homepage; empty/demo data; no private user content"
+  },
+  "rain-radio": {
+    "source": "artifacts/life-apps-20261023/rain-radio.png",
+    "capture": "Actual rendered homepage; empty/demo data; no private user content"
+  },
+  "personality-planet": {
+    "source": "artifacts/life-apps-20261023/personality-planet.png",
+    "capture": "Actual rendered homepage; empty/demo data; no private user content"
+  },
+  "natal-whispers": {
+    "source": "artifacts/life-apps-20261023/natal-whispers.png",
+    "capture": "Actual rendered homepage; empty/demo data; no private user content"
+  },
+  "glass-ecosystem": {
+    "source": "artifacts/life-apps-20261023/glass-ecosystem.png",
+    "capture": "Actual rendered homepage; empty/demo data; no private user content"
+  },
+  "element-sandbox": {
+    "source": "artifacts/life-apps-20261023/element-sandbox.png",
+    "capture": "Actual rendered homepage; empty/demo data; no private user content"
   }
 }

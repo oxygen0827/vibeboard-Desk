@@ -1,0 +1,15 @@
+{
+  "id": "personality-planet",
+  "name": "我的人格星球",
+  "description": "20 道自我观察题，生成五维人格星球与可回看的结果。",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "layout": "fullscreen",
+  "theme_ui": "controls",
+  "input": {
+    "version": 1,
+    "profile": "five-way",
+    "back": "custom",
+    "scene": "none"
+  }
+}

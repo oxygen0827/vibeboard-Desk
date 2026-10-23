@@ -1,0 +1,15 @@
+{
+  "id": "element-sandbox",
+  "name": "掌心造物沙盘",
+  "description": "沙、水、火与植物的像素物理反应；摇杆可用预设投放口操作。",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "layout": "fullscreen",
+  "theme_ui": "controls",
+  "input": {
+    "version": 1,
+    "profile": "five-way",
+    "back": "custom",
+    "scene": "controls"
+  }
+}

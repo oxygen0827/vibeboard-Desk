@@ -1,0 +1,15 @@
+{
+  "id": "moon-letter",
+  "name": "月亮来信",
+  "description": "真实月相、距下次满月、每日心情与私人月光手记。",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "layout": "fullscreen",
+  "theme_ui": "controls",
+  "input": {
+    "version": 1,
+    "profile": "five-way",
+    "back": "custom",
+    "scene": "none"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "natal-whispers",
+  "name": "星盘密语",
+  "description": "离线出生星盘计算、七颗天体位置和十二宫环；支持地点与时间输入。",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "layout": "fullscreen",
+  "theme_ui": "controls",
+  "input": {
+    "version": 1,
+    "profile": "five-way",
+    "back": "custom",
+    "scene": "none"
+  }
+}
