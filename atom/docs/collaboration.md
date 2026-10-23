@@ -2,7 +2,7 @@
 
 ## 从这里开始
 
-本仓库包含早期 VibeBoard 项目与 `atom/` 独立设备系统。ATOM 的设备服务、桌面、官方应用、电脑伴侣与中继都在 `atom/`，不要用它覆盖仓库其他历史项目。
+本仓库维护当前 ATOM 产品。设备服务、桌面、官方应用、电脑伴侣与中继都在 `atom/`；旧 VibeBoard 网页平台已删除，原始代码可从 Git 历史追溯。
 
 ```sh
 git clone https://github.com/wangqioo/vibeboard-Desk.git

@@ -107,7 +107,7 @@ node atom/tests/joystick-shell.integration.cjs
 | `atom/site/` | 产品官网、指南与应用目录 |
 | `atom/docs/`、`atom/artifacts/` | 维护文档与实测证据 |
 
-根目录早期 Node/Web 平台与 ATOM 分开保留，运行方法见[旧网页平台说明](docs/vibeboard-web-legacy.md)。不要把设备部署目录覆盖到旧项目。
+仓库仅维护当前 ATOM 产品。旧 VibeBoard 网页平台、启动脚本及历史资料已移除，需要追溯时查阅 Git 历史。
 
 ## 原型边界与许可
 
