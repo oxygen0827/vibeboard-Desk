@@ -1,0 +1,15 @@
+{
+  "id": "echo-book",
+  "name": "回声之书",
+  "description": "原创中文答案、纸页翻动与收藏；离线的思考仪式。",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "layout": "fullscreen",
+  "theme_ui": "controls",
+  "input": {
+    "version": 1,
+    "profile": "five-way",
+    "back": "custom",
+    "scene": "none"
+  }
+}

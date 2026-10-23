@@ -1,0 +1,15 @@
+{
+  "id": "zodiac-atlas",
+  "name": "十二星座漫游",
+  "description": "真实星座连线、黄道环与十二星座故事；离线星图艺术展。",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "layout": "fullscreen",
+  "theme_ui": "controls",
+  "input": {
+    "version": 1,
+    "profile": "five-way",
+    "back": "custom",
+    "scene": "none"
+  }
+}

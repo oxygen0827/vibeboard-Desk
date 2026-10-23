@@ -1,0 +1,15 @@
+{
+  "id": "oracle-tarot",
+  "name": "星幕塔罗",
+  "description": "22 张原创大阿卡纳图形、单牌与三牌翻阅；离线自我提问。",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "layout": "fullscreen",
+  "theme_ui": "controls",
+  "input": {
+    "version": 1,
+    "profile": "five-way",
+    "back": "custom",
+    "scene": "none"
+  }
+}
