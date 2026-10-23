@@ -36,7 +36,7 @@ function accountDialog(){const box=clearDialog(account?'市场账号':'登录市
       const send=h('button',{type:'submit',class:'btn primary',text:'发送验证码'}),form=h('form',{},emailLabel,codeLabel,h('div',{class:'form-actions'},button('取消',show,'btn ghost'),send));
       form.onsubmit=async e=>{e.preventDefault();send.disabled=true;try{if(codeLabel.hidden){await call('/email/start',{email:email.value.trim()});codeLabel.hidden=false;email.readOnly=true;send.textContent='验证';code.focus();note('验证码已发送到 '+email.value.trim());}else{await call('/email/verify',{code:code.value.trim()});me=(await call('/me')).user;show();note('邮箱已验证');}}catch(err){error(err);}finally{send.disabled=false;}};
       panel.replaceChildren(form);email.focus();}
-    function passwordForm(){const [oldLabel,old]=field('当前密码',{type:'password',autocomplete:'current-password',required:true}),[newLabel,fresh]=field('新密码（至少 12 位）',{type:'password',autocomplete:'new-password',minlength:'12',required:true});
+    function passwordForm(){const [oldLabel,old]=field('当前密码',{type:'password',autocomplete:'current-password',required:true}),[newLabel,fresh]=field('新密码（至少 8 位）',{type:'password',autocomplete:'new-password',minlength:'8',required:true});
       const save=h('button',{type:'submit',class:'btn primary',text:'保存新密码'}),form=h('form',{},oldLabel,newLabel,text('p','修改后，其他设备上的登录会失效，需要重新登录。','muted'),h('div',{class:'form-actions'},button('取消',show,'btn ghost'),save));
       form.onsubmit=async e=>{e.preventDefault();save.disabled=true;try{await call('/password/change',{old_password:old.value,new_password:fresh.value});old.value=fresh.value='';show();note('密码已修改');}catch(err){error(err);}finally{save.disabled=false;}};
       panel.replaceChildren(form);old.focus();}
@@ -49,11 +49,11 @@ function accountDialog(){const box=clearDialog(account?'市场账号':'登录市
     box.append(head,lock,panel);show();call('/me').then(r=>{me=r.user;show();}).catch(()=>{status.textContent='暂时无法读取邮箱状态';});return;}
   let mode='login';
   const [userLabel,user]=field('用户名',{name:'username',autocomplete:'username',required:true});
-  const [passLabel,password]=field('密码',{type:'password',name:'password',placeholder:'至少 12 位',autocomplete:'current-password',minlength:'12'});
+  const [passLabel,password]=field('密码',{type:'password',name:'password',placeholder:'至少 8 位',autocomplete:'current-password',minlength:'8'});
   const [codeLabel,code]=field('邮件里的 6 位验证码',{inputmode:'numeric',maxlength:'6'});
   const submit=h('button',{class:'btn primary',text:'登录'}),status=text('p','','muted');
   let codeSent=false;
-  const labels={login:['登录','市场账号与 Codex 等模型账号相互独立；密码不会发送给 AI。'],register:['创建并登录','用户名 3–32 位字母、数字、下划线或连字符；密码至少 12 位。'],forgot:['发送验证码','验证码会发到这个账号已验证的邮箱。没有绑定邮箱的账号请联系管理员。']};
+  const labels={login:['登录','市场账号与 Codex 等模型账号相互独立；密码不会发送给 AI。'],register:['创建并登录','用户名 3–32 位字母、数字、下划线或连字符；密码至少 8 位。'],forgot:['发送验证码','验证码会发到这个账号已验证的邮箱。没有绑定邮箱的账号请联系管理员。']};
   function sync(){const [action,hint]=labels[mode];submit.textContent=mode==='forgot'&&codeSent?'重置密码并登录':action;status.textContent=hint;status.className='muted';
     passLabel.hidden=mode==='forgot'&&!codeSent;codeLabel.hidden=!(mode==='forgot'&&codeSent);user.readOnly=mode==='forgot'&&codeSent;
     passLabel.firstChild.textContent=mode==='forgot'?'新密码':'密码';password.autocomplete=mode==='login'?'current-password':'new-password';password.required=!passLabel.hidden;}

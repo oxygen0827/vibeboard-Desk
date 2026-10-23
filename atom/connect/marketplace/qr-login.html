@@ -126,7 +126,7 @@ small{color:var(--muted);font-size:13px}
     $('password').autocomplete = mode === 'register' ? 'new-password' : 'current-password';
     $('submit').textContent = mode === 'register' ? '创建账号' : '登录小电脑';
     $('mode').textContent = mode === 'register' ? '已有账号？登录' : '没有账号？创建账号';
-    $('intro').textContent = mode === 'register' ? '确认码一致后，创建 ATOM 账号。用户名为 3–32 位字母、数字、下划线或连字符，密码至少 12 位。' : '核对小电脑屏幕上的确认码一致后，输入你的 ATOM 账号。';
+    $('intro').textContent = mode === 'register' ? '确认码一致后，创建 ATOM 账号。用户名为 3–32 位字母、数字、下划线或连字符，密码至少 8 位。' : '核对小电脑屏幕上的确认码一致后，输入你的 ATOM 账号。';
   }
   $('mode').onclick = () => { if (busy || approved) return; mode = mode === 'login' ? 'register' : 'login'; registration = null; $('confirm-password').value = ''; say(''); formMode(); };
   $('saved').onchange = () => { $('create').disabled = busy || !$('saved').checked; };
@@ -174,7 +174,7 @@ small{color:var(--muted);font-size:13px}
     e.preventDefault();
     if (busy) return;
     if (mode === 'login' || approved || approvalUnknown) return finish();
-    if ($('password').value.length < 12) return say('密码至少需要 12 位', 'bad');
+    if ($('password').value.length < 8) return say('密码至少需要 8 位', 'bad');
     if ($('password').value !== $('confirm-password').value) return say('两次输入的密码不一致', 'bad');
     if (!/^[a-z0-9][a-z0-9_-]{2,31}$/i.test($('username').value.trim())) return say('请使用 3–32 位字母、数字、下划线或连字符作为用户名', 'bad');
     setBusy(true); say('正在生成你的加密密钥…');

@@ -387,7 +387,7 @@ class Marketplace:
         username = text(body,'username',32).strip().lower()
         require(re.fullmatch(r'[a-z0-9][a-z0-9_-]{2,31}',username), '用户名需为 3–32 位小写字母、数字、下划线或连字符')
         password = text(body,'password',256)
-        require(len(password)>=12, '密码至少需要 12 位')
+        require(len(password)>=8, '密码至少需要 8 位')
         return username, password
 
     def sign_in(self, path, body, peer):
@@ -437,7 +437,7 @@ class Marketplace:
 
     def new_password(self, body, key='new_password'):
         password = text(body, key, 256)
-        require(len(password) >= 12, '密码至少需要 12 位')
+        require(len(password) >= 8, '密码至少需要 8 位')
         return password
 
     def reset_password(self, body, peer):

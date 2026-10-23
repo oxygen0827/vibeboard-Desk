@@ -11,7 +11,7 @@ python3 -m unittest discover -s atom/connect/marketplace -p 'test_*.py' -v
 
 ## 账号与来源
 
-- 注册/登录使用 username/password，用户名 3–32 位 ASCII 字母数字、下划线或连字符（统一小写），密码 12–256 字符。
+- 注册/登录使用 username/password，用户名 3–32 位 ASCII 字母数字、下划线或连字符（统一小写），密码 8–256 字符。
 - 密码 PBKDF2-HMAC-SHA256，310,000 次迭代、每个账号独立随机盐。随机会话 token 仅返回一次，数据库只保存 SHA-256；有效期 30 天，每账号最多 20 个会话。
 - 电脑/设备本地代理保存 token，应用 iframe 不能得到 token 或模型密码。模型账号和市场账号是两回事，账号密码不应放进 AI 修改提示词。
 - 公开目录与版本源码无需登录；草稿、保存、分叉、发布和个人数据需要 `Authorization: Bearer <market token>`，不接受 Connect 设备令牌替代。

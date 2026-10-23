@@ -111,7 +111,7 @@ Claude 依据：[官方 SDK 概览](https://code.claude.com/docs/en/agent-sdk/ov
 | 方法与路径 | 请求 / 返回 |
 |---|---|
 | GET /state | configured, authenticated, user, pending_notes, jobs 摘要 |
-| POST /register 或 /login | `{username,password}` → `{user,authenticated}`；密码至少 12 位 |
+| POST /register 或 /login | `{username,password}` → `{user,authenticated}`；密码至少 8 位 |
 | POST /logout | `{}` |
 | GET /catalog?q=&category= | `{works}`，分类 life/companion/sound/play/connect |
 | GET /works/:id | 作品、版本列表与衍生作品 |

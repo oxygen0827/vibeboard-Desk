@@ -27,6 +27,14 @@ class MarketplaceTests(unittest.TestCase):
         self.a=self.call('/register',{'username':'alice','password':'long-test-password-a'})
         self.b=self.call('/register',{'username':'bobby','password':'long-test-password-b'})
 
+    def test_eight_character_password_policy(self):
+        account=self.call('/register',{'username':'eight-user','password':'test1234'})
+        self.assertEqual(self.call('/login',{'username':'eight-user','password':'test1234'})['user']['id'],account['user']['id'])
+        with self.assertRaises(m.MarketError):
+            self.call('/register',{'username':'too-short','password':'test123'})
+        self.call('/password/change',{'old_password':'test1234','new_password':'next1234'},account)
+        self.assertEqual(self.call('/login',{'username':'eight-user','password':'next1234'})['user']['id'],account['user']['id'])
+
     def tearDown(self):
         self.market.close()
         self.tmp.cleanup()
