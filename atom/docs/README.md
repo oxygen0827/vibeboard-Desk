@@ -38,6 +38,7 @@
 ## 硬件与专项资料
 
 - [硬件能力](hardware-capabilities.md)、[GPU 接入](gpu-enablement.md)、[音频诊断](audio-diagnostics.md)、[智谱语音](voice-zhipu.md)、[蓝牙配对](bluetooth-pairing.md)。
+- [显示与八小时运行验收](display-endurance-2026-10-22.md)。
 - [灰色板迁移记录](gray-migration.md)：历史迁移与恢复线索，当前版本以研发基线为准。
 - [应用上游与许可](../ports/README.md)、[官方应用](../official/README.md)、[生活应用](life-apps-delivery-2026-10-23.md)、[探索应用](oracle-apps-2026-10-23.md)、[点阵](dot-waves.md)、[复杂移植](sandbox-extras.md)。
 - [设计研究](design-research.md)、[官方 UI 专项记录](official-ui-refresh.md)、[AI 原生体验](../experiences/README.md)。

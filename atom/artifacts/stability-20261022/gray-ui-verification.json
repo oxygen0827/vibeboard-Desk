@@ -1,0 +1,118 @@
+{
+  "version": "2026.10.22.10.4",
+  "results": [
+    {
+      "id": "photon-chip",
+      "view": "photon-chip",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "w": 480,
+        "h": 360
+      },
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 480,
+        "h": 360
+      },
+      "chrome": false,
+      "error": false,
+      "returnedToPage": 6
+    },
+    {
+      "id": "photon-runner",
+      "view": "photon-runner",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "w": 480,
+        "h": 360
+      },
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 480,
+        "h": 360
+      },
+      "chrome": false,
+      "error": false,
+      "returnedToPage": 6
+    },
+    {
+      "id": "finger-fireworks",
+      "view": "finger-fireworks",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "w": 480,
+        "h": 360
+      },
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 480,
+        "h": 360
+      },
+      "chrome": false,
+      "error": false,
+      "returnedToPage": 6
+    },
+    {
+      "id": "mini-piano",
+      "view": "mini-piano",
+      "main": {
+        "x": 0,
+        "y": 0,
+        "w": 480,
+        "h": 360
+      },
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 480,
+        "h": 360
+      },
+      "chrome": false,
+      "error": false,
+      "returnedToPage": 6
+    },
+    {
+      "panel": "time",
+      "body": [
+        480,
+        360
+      ],
+      "main": [
+        360,
+        360
+      ],
+      "alert": ""
+    },
+    {
+      "panel": "bluetooth",
+      "body": [
+        480,
+        360
+      ],
+      "main": [
+        360,
+        360
+      ],
+      "alert": ""
+    },
+    {
+      "panel": "power",
+      "body": [
+        480,
+        360
+      ],
+      "main": [
+        360,
+        360
+      ],
+      "alert": ""
+    }
+  ],
+  "errors": []
+}

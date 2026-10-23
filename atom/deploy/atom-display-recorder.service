@@ -1,0 +1,18 @@
+[Unit]
+Description=Passive ATOM display stability diagnostics
+After=systemd-journald.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /usr/local/lib/atom/display-recorder.py
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/atom/display-health
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

@@ -113,6 +113,6 @@ node atom/tests/joystick-shell.integration.cjs
 
 当前样机基于 RK3566、Mali-G52、Debian 10 / Linux 4.19 / Chromium 91。EGL/WebGL、H.264 硬解、RGA 和 NPU 示例各有实测记录，但不代表所有浏览器编码、语音/OCR 或持续负载已验证，详见[硬件能力](atom/docs/hardware-capabilities.md)。
 
-真实摇杆、所有旧应用逐项五向迁移、蓝牙外设出声、换网与长期电源循环仍需验收。旧 BSP 显示卡住的根因未根治；避免反复热重启 LightDM/Xorg。Mac 当前是内部 ad-hoc 签名包，Developer ID、公证和 SMTP 尚未完成。完整未验收清单见[当前状态](atom/docs/current-status.md)。
+真实摇杆、所有旧应用逐项五向迁移、蓝牙外设出声、换网与长期电源循环仍需验收。三次正常重启及八小时单应用运行已验收；历史 BSP 显示专项已按用户要求关闭跟进，不代表根因修复，日常避免反复热重启 LightDM/Xorg。Mac 当前是内部 ad-hoc 签名包，Developer ID、公证和 SMTP 尚未完成。完整未验收清单见[当前状态](atom/docs/current-status.md)。
 
 旧浏览器及 `--no-sandbox` 属于原型限制，正式发行需升级受维护底座并完成安全验证。模型凭据、账号、设备状态、个人记录和构建缓存不得提交。各移植项目授权不同，保留各目录 LICENSE、SOURCE 和素材来源；仓库总览不替代上游许可。
