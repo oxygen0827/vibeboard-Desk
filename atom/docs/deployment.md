@@ -9,7 +9,7 @@
 3. 选择 ATOM 图形会话。启动器使用 `/usr/lib/chromium/chromium-bin`、LD_LIBRARY_PATH 与 EGL；不要误用会强制禁用 GPU 的 BSP wrapper。
 4. 显示保护可按样机配置安装 `deploy/atom-display-guard.service`，服务使用 `deploy/display-guard.py`；审核路径后执行 systemctl daemon-reload 和 enable --now。`deploy/xorg/20-modesetting.conf` 是本样机已验证配置，不应直接覆盖其他显卡配置。
 
-后端 8770 仅监听回环，远程通过 SSH 转发。写请求要求一致的 Host/Origin。`deploy/start-atom.sh` 启动全屏浏览器，`atom-session.sh` 保持单工作区并恢复浏览器。退出应用使用空格/Home，不用 Alt+F4。
+后端 8770 仅监听回环，远程通过 SSH 转发。写请求要求一致的 Host/Origin。`deploy/start-atom.sh` 启动全屏浏览器，`atom-session.sh` 保持单工作区并恢复浏览器。返回使用左上角箭头或 Home；Space 短按用于确认、长按用于语音，不用 Alt+F4 退出宿主。
 
 ## 完整移植资源
 

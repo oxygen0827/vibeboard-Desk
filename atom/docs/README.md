@@ -1,34 +1,45 @@
-# ATOM 文档索引
+# ATOM 开发文档
 
-更新至 2026-10-22。以下文档描述当前实现；历史验收记录保留各自的测试范围。
+更新：2026-10-23。当前状态、长期契约和专项实测分开维护；旧计划及重复交付日志已合并，不再作为操作指南。
+
+## 开始开发
 
 | 阅读目的 | 文档 |
 | --- | --- |
-| 当前交付、快速启动、功能边界 | [项目 README](../README.md) |
-| Studio、源码市场、双端应用本轮交付 | [studio-delivery.md](studio-delivery.md) |
-| 团队协作与本地开发 | [collaboration.md](collaboration.md) |
-| 官方应用视觉改版 | [official-ui-refresh.md](official-ui-refresh.md) |
-| 灰色板迁移、四个交互作品与连接验证 | [gray-migration.md](gray-migration.md) |
-| 系统更新、备份重置、模拟设备镜像与 Mac 发行 | [system-maintenance.md](system-maintenance.md) |
-| 最新系统补齐与最终验收边界 | [system-completion-2026-10-22.md](system-completion-2026-10-22.md) |
-| 本轮维护交付与真实测试 | [maintenance-delivery-2026-10-22.md](maintenance-delivery-2026-10-22.md) |
-| 部署、运行服务、回退 | [deployment.md](deployment.md) |
-| 麦克风、单端实验、风扇、按住说话 | [audio-diagnostics.md](audio-diagnostics.md) |
-| 云端语音与官方接口 | [voice-zhipu.md](voice-zhipu.md) |
-| 应用运行与保存协议 | [app-contract.md](app-contract.md) |
-| 创建、安装和更新应用 | [developer-guide.md](developer-guide.md) |
-| 统一视觉、布局和主题 | [design-system.md](design-system.md) |
-| 工作坊、主题和模型适配 | [workshop-and-themes.md](workshop-and-themes.md)、[workshop-api.md](workshop-api.md) |
-| 本地设备 API | [api.md](api.md) |
-| GPU/VPU/RGA/NPU 的真实验证 | [hardware-capabilities.md](hardware-capabilities.md)、[gpu-enablement.md](gpu-enablement.md) |
-| 应用上游、许可、适配与资源 | [ports/README.md](../ports/README.md) |
-| 点阵/复杂应用专门说明 | [dot-waves.md](dot-waves.md)、[sandbox-extras.md](sandbox-extras.md) |
-| 开发阶段记录 | [development-plan.md](development-plan.md)、[product-experience-plan.md](product-experience-plan.md)、[system-audit.md](system-audit.md) |
-| 设计与模型生成研究 | [design-research.md](design-research.md)、[generation-validation.md](generation-validation.md) |
+| 产品、快速启动、代码地图 | [仓库首页](../../README.md) |
+| 当前版本、部署范围、待验收 | [研发基线](current-status.md) |
+| 分支协作、构建与测试 | [协作开发](collaboration.md) |
+| 创建、安装和更新应用 | [开发指南](developer-guide.md) |
+| 产品定位 | [定位说明](product-positioning.md) |
 
-历史记录保留当时的测量环境、版本与测试数量。与当前行为冲突时，以 README、应用协议及实际代码为准。
+## 应用强制契约
 
-## AI 体验与产品网站（2026-10-21）
+| 内容 | 文档 |
+| --- | --- |
+| 五向输入与共享动画 | [强制规范 v1](input-standard.md)、[实现方案](five-way-navigation.md) |
+| 生命周期、存档、暂停 | [AtomApp 协议](app-contract.md) |
+| 布局、主题、控件与图标 | [设计规范](design-system.md)、[系统外观](system-appearance.md) |
+| 发布截图封面 | [封面规范](market-covers.md) |
+| 生成与模型配置 | [工作坊与主题](workshop-and-themes.md)、[工作坊 API](workshop-api.md)、[生成校验](generation-validation.md) |
+| 本地设备接口 | [API](api.md) |
 
-- [产品官网与可搜索指南](https://ldcx.tech/atom/) · [网站源码与发布](../site/README.md)
-- [四个 AI 原生体验的源码、边界与验证](../experiences/README.md)
+## 三端部署与维护
+
+| 内容 | 文档 |
+| --- | --- |
+| Debian 启动、日志与恢复 | [样机部署](deployment.md) |
+| 升级、数据恢复、Mac 发行 | [系统维护](system-maintenance.md) |
+| 连接电脑、配对和 Agent | [Connect 指南](../connect/README.md)、[三端产品契约](../connect/PRODUCT-CONTRACT.md)、[通信协议](../connect/PROTOCOL.md) |
+| 云端、备份与成本限制 | [服务器运维](../connect/server/README.md) |
+| 完整源码库同步与验收 | [全量同步](full-library-sync-2026-10-23.md) |
+| 官网与应用目录 | [网站构建发布](../site/README.md) |
+| 应用市场与 Studio | [市场服务](../connect/marketplace/README.md)、[Studio 专项记录](studio-delivery.md) |
+
+## 硬件与专项资料
+
+- [硬件能力](hardware-capabilities.md)、[GPU 接入](gpu-enablement.md)、[音频诊断](audio-diagnostics.md)、[智谱语音](voice-zhipu.md)、[蓝牙配对](bluetooth-pairing.md)。
+- [灰色板迁移记录](gray-migration.md)：历史迁移与恢复线索，当前版本以研发基线为准。
+- [应用上游与许可](../ports/README.md)、[官方应用](../official/README.md)、[生活应用](life-apps-delivery-2026-10-23.md)、[探索应用](oracle-apps-2026-10-23.md)、[点阵](dot-waves.md)、[复杂移植](sandbox-extras.md)。
+- [设计研究](design-research.md)、[官方 UI 专项记录](official-ui-refresh.md)、[AI 原生体验](../experiences/README.md)。
+
+阶段记录保留其测量环境，不代表最新版本全部回归通过。更早文档通过 Git 历史查阅；不恢复失效操作说明作为当前规范。上游许可证、源码说明与真实测试证据继续保留。

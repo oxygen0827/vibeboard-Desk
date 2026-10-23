@@ -10,17 +10,17 @@ cd vibeboard-Desk
 python3 atom/server.py
 ```
 
-浏览器打开 `http://127.0.0.1:8770`。设备界面以 480×360 为基准。Python 3.7+，设备服务无 pip 依赖；Mac/Windows 可开发界面，但驱动、音频、风扇、GPU 的验收必须在 Linux 样机进行。本地空目录没有样机的个人数据和已安装应用，需要按下文构建并安装。
+浏览器打开 `http://127.0.0.1:8770`。设备界面以 480×360 为基准。Python 3.7+，基础桌面使用标准库；加密配对与验签需要 cryptography；Mac/Windows 可开发界面，但驱动、音频、风扇、GPU 的验收必须在 Linux 样机进行。本地空目录没有样机的个人数据和已安装应用，需要按下文构建并安装。
 
 ## 分工与代码地图
 
 | 负责内容 | 主要目录 | 注意事项 |
 | --- | --- | --- |
 | 设备后端与硬件 | `atom/server.py`、`atom/voice.py`、`atom/deploy/` | 同源、权限、凭据隔离；不要顺手重启图形服务 |
-| 桌面与系统工具 | `atom/static/` | 大图标分页、滚轮/拖动、Space/Home、全屏切换 |
+| 桌面与系统工具 | `atom/static/` | 大图标分页、滚轮/拖动、五向输入、Home、全屏切换 |
 | 官方视觉规范 | `atom/design/device-ui.css` | 统一设计源；修改后重新构建客户端，不只改生成副本 |
 | 日用/创作客户端 | `atom/notes-app/`、`market-app/`、`computer-app/`、`library-app/` | 业务源码、私有数据的受控桥、完整安装包 |
-| 五个原创官方作品 | `atom/official/` | 今日、伙伴、音乐、点阵及任务状态 |
+| 官方作品与同步应用 | `atom/official/` | 今日、相册、音乐、点阵、天气及生活探索应用 |
 | 个人电脑伴侣 | `atom/connect/computer/`、`desktop/` | Node 24+；原生 Mac 外壳；Agent 与 Studio |
 | 中继和市场平台 | `atom/connect/relay/`、`marketplace/` | Python/SQLite，账号与配对权限分离，持久化任务/版本 |
 | GitHub 移植应用 | `atom/ports/` | 完整资源、许可、上游来源；不要只复制 JSON 入口 |
@@ -68,9 +68,9 @@ python3 atom/tools/deploy_app.py update atom/examples/quick-notes.json
 python3 atom/tools/deploy_app.py update atom/official/sound-lab/bundle.json
 ```
 
-首次安装普通应用使用 `install`，已安装时使用 `update`。CLI 会自动让受保护的官方客户端走审核更新接口。完成更新后刷新桌面；校验图标、位置、退出返回页、存储、音频和后台暂停行为。禁止把开发 Mac 的整套空 `apps/`、`state/` 覆盖到样机。先备份，再修改设备服务或启动脚本。
+首次安装普通应用使用 `install`，已安装时使用 `update`。CLI 会自动让受保护的官方客户端走审核更新接口。完成更新后刷新桌面；校验图标、位置、退出返回页、存储、音频和后台暂停行为。禁止把开发 Mac 的整套空 `apps/`、`state/` 覆盖到样机。修改服务或启动脚本前核对可恢复备份；云端遵守本地/OSS 各三份上限，不为每次代码修改重复创建备份或快照。
 
-电脑伴侣、中继、市场和配对的启动命令见 [Connect 部署指南](../connect/README.md) 与 [市场说明](../connect/marketplace/README.md)。本机联调不代表公网服务已上线。云部署另需 HTTPS、备份、限流与账号运营。
+电脑伴侣、中继、市场和配对的启动命令见 [Connect 部署指南](../connect/README.md) 与 [市场说明](../connect/marketplace/README.md)。默认云端已上线；本地联调仍不能替代公网验收。自行托管参照服务器指南配置 HTTPS、备份、限流与账号运营。
 
 ## 必须遵守的产品规则
 
@@ -78,7 +78,7 @@ python3 atom/tools/deploy_app.py update atom/official/sound-lab/bundle.json
 - 统一主题令牌和字体层级；颜色、按钮主次、内容留白形成整体。音轨、场景、科学数据的颜色有实际意义，应保留。当前系统主题的强制控件样式要通过真机检查，单独浏览器预览不足以发现覆盖问题。
 - 每应用独立 `icon.svg`，64×64、透明、单色 `currentColor`，遵循 [AGENTS.md](../../AGENTS.md)。更新保留用户已有合法图标。
 - AtomApp v1 做持久化；只有保存确认后才报告成功。失败读取不覆盖旧数据，64 KiB 限额，退出释放音频/GPU/计时器。
-- 新应用追加，更新保留位置。退出回打开时的桌面页，已在桌面时 Space/Home 回第一页；鼠标正常显示，左右方向键翻页。已取消上下行键盘选择和自动隐藏鼠标。
+- 新应用追加，更新保留位置。退出回打开时的桌面页，Home 在桌面回第一页；方向移动焦点，短按 Space 确认、长按语音，松手结束录音。方向输入隐藏鼠标，鼠标移动/点击恢复。新建/更新/发布必须遵守 [五向规范](input-standard.md)。
 - 公共安装资源不携带模型密钥。配对状态、市场账号令牌、工作区和真实个人记录不提交。配置通过文档示例和各自的本地设置复现。
 
 ## Git 协作建议
@@ -86,3 +86,9 @@ python3 atom/tools/deploy_app.py update atom/official/sound-lab/bundle.json
 每人建立自己的 `codex/功能名` 或团队约定分支，通过 Pull Request 合并。改动说明包含「解决的问题、真机截图或录屏、实际跑过的测试、剩余限制」。三端接口变更先商定契约；不同人尽量分目录工作，共同修改 `server.py`、`static/app.js` 时先协调。
 
 提交前检查 `git diff --stat` 与 `git diff --cached`。不提交 `atom/apps/`、`atom/state/`、`.env`、本机安装包、数据库、备份或第三方构建缓存。第三方素材与代码保留原许可证；根项目说明不替代各上游授权。
+
+## 工作树与文档维护
+
+一个工作树是同一 Git 仓库的独立检出目录，使用自己的分支和工作文件；提交对象和远端共享，未提交修改不会自动同步。每人/每项任务使用独立分支，先提交再通过 PR 或明确的 cherry-pick 集成，避免两人同时改同一目录。不要复制私人 state 或强制推送覆盖伙伴提交。
+
+当前版本与待验收统一写入 [研发基线](current-status.md)，长期规则写入对应协议；不要再复制一份 README 或用旧阶段计划指导部署。文档修改先检查本地链接和 git diff --check，代码改动按实际影响运行测试。

@@ -1,6 +1,6 @@
 # ATOM App v1
 
-系统入口、图标、主题、480×360单屏、必要局部滚动和空格/Home返回仍遵循AGENTS.md。系统会在应用脚本之前注入`AtomApp`，开发者不要自行复制、覆盖SDK，也不要用localStorage假设沙箱同源。
+系统入口、图标、主题、480×360单屏、必要局部滚动及五向输入仍遵循 AGENTS.md 与 [输入规范](input-standard.md)；Space 短按确认、长按语音，Home 返回桌面。系统会在应用脚本之前注入`AtomApp`，开发者不要自行复制、覆盖SDK，也不要用localStorage假设沙箱同源。
 
 ## 初始化与启动
 

@@ -1,6 +1,6 @@
 # ATOM 应用开发与部署
 
-目前提供自包含 Web 应用安装、更新、卸载与设备预览。应用可由设备工作坊调用配置的模型生成，也可由自己的电脑和 agent 开发后部署；源码应用市场已有可部署实现，见 [Studio 交付说明](studio-delivery.md)。部署应用不需要修改内核、驱动或桌面。
+目前提供自包含 Web 应用安装、更新、卸载与设备预览。应用可由设备工作坊调用配置的模型生成，也可由自己的电脑和 agent 开发后部署；源码应用市场已有可部署实现，见 [市场服务说明](../connect/marketplace/README.md)。部署应用不需要修改内核、驱动或桌面。
 
 ## 连接
 
@@ -16,7 +16,7 @@ ssh -N -L 127.0.0.1:8770:127.0.0.1:8770 YOUR_ATOM_SSH_HOST
 
 ## 安装与管理
 
-ATOM 0.2 安装和更新前，先在设置中手动开启开发模式。CLI 不会自动开启；关闭时安装和更新会明确报错。查看列表和卸载不要求开发模式。开发期间可通过 SSH 在设备运行命令，或在电脑通过隧道运行：
+安装和更新前，先在设置中手动开启开发模式。CLI 不会自动开启；关闭时安装和更新会明确报错。查看列表和卸载不要求开发模式。开发期间可通过 SSH 在设备运行命令，或在电脑通过隧道运行：
 
 ```sh
 python3 atom/tools/deploy_app.py list
@@ -26,7 +26,7 @@ python3 atom/tools/deploy_app.py update atom/examples/breathe.json
 python3 atom/tools/deploy_app.py uninstall breathe
 ```
 
-首次使用 install；同一 ID 已存在时用 update。卸载会删除该应用。内置应用不能卸载。刷新主页应用列表后进入应用，使用主界面返回控件退出。
+首次使用 install；同一 ID 已存在时用 update。卸载会删除该应用。内置应用不能卸载。刷新主页应用列表后进入应用，使用左上角返回箭头或 Home 退出。
 
 设备本地也可直接调用 API：
 
@@ -45,13 +45,18 @@ curl -fsS -H 'Origin: http://127.0.0.1:8770' \
     "id": "my-app",
     "name": "我的应用",
     "description": "应用说明",
-    "entry": "index.html"
+    "entry": "index.html",
+    "icon": "icon.svg",
+    "input": {"version": 1, "profile": "five-way", "back": "root"}
   },
   "files": {
-    "index.html": "<!doctype html><html><h1>Hello ATOM</h1></html>"
+    "index.html": "<!doctype html><html lang=\"zh-CN\"><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>我的应用</title><style>html,body{margin:0;height:100%;overflow:hidden}main{padding:56px 24px 24px}button{min-height:48px}</style><main><button onclick=\"this.textContent='完成'\">开始</button></main></html>",
+    "icon.svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path d=\"m20 14 28 18-28 18Z\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\"/></svg>"
   }
 }
 ```
+
+这是最小按钮示例；实际图标须与应用功能匹配，不能把示例当所有应用的共享图标。新应用必须满足 [五向输入强制规范](input-standard.md)，嵌套页面注册返回回调，画布应用明确声明场景并提供语义控件。参考 [运行协议](app-contract.md) 使用 `AtomApp.load/save` 保存，不能假定 opaque iframe 的 localStorage 可用。
 
 ID 使用小写英文、数字和连字符，勿与内置应用重复。入口固定 index.html；文件内容为 UTF-8 字符串，路径不得绝对、穿越目录或覆盖 manifest.json。最多 100 个文件，请保持整个 JSON 包小于 1 MiB。
 
@@ -63,6 +68,15 @@ ID 使用小写英文、数字和连字符，勿与内置应用重复。入口�
 
 目前这不是任意 Linux 软件安装器，也没有为应用提供系统命令权限。服务器返回的校验错误应修正应用包；不要绕过同源校验或自动开启开发模式。
 
-### 临时实体 Home 键映射
+## 五向输入与发布检查
 
-主页鼠标滚轮向下/右翻下一页、向上/左翻上一页，应用内部滚动不受影响。空格短按返回桌面，持续650ms打开工作坊并启动录音；松开长按不会再次返回。输入框和可编辑内容中的空格保留输入功能。当前转写需配置STT，独立语音聊天尚未接入。安装应用和预览通过共享home-key.js中继，未来实体按键可替换输入来源，沿用atom:return-home / atom:voice-wake事件。
+方向移动焦点，Space 短按确认、长按约 650 ms 唤醒语音/非密码字段听写，松手结束录音。返回由左上角箭头逐层处理，Home 回原桌面页；桌面 Home 回第一页。应用不得全局抢占 Space/方向键，不实现与共享运行时竞争的选框。
+
+```sh
+python3 atom/tools/check_app.py path/to/bundle.json
+python3 atom/tools/prepare_icon_bundles.py
+```
+
+静态校验后必须实测方向移动、确认、返回、语音取消及后台释放。完整移植须携带图片、字体、模型、WASM 与许可证，不能仅部署入口 JSON。新安装追加末尾，更新保留图标、安装时间和位置。完整资源库发布见 [同步指南](full-library-sync-2026-10-23.md)。
+
+应用市场封面使用真实首页截图，在 **ATOM Connect → 我的创作 → 首页截图** 上传；当前发布对话框要求封面。公开发布是明确操作，不把私人草稿自动上传。

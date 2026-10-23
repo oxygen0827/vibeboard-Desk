@@ -1,247 +1,118 @@
-# VibeBoard Desk / ATOM · 独立桌面 AI 终端
+# ATOM · 个人 AI 终端
 
-ATOM 是运行在 RK3566 小电脑上的全屏应用系统原型。它保留 Debian 和板厂驱动，用本地 Python 服务、Chromium/EGL 和统一的应用规范，将这台设备变成可以独立使用、通过语音创建应用、运行互动图形作品的桌面终端。
+ATOM 是一台可以独立运行应用、用语音创造作品，并连接个人电脑 Agent 的小电脑。设备保留 Debian 与板厂驱动，以本地服务、全屏桌面和统一应用接口承载交互；复杂开发任务交给用户授权的电脑执行。
 
-**本阶段更新至 2026-10-22。** 当前实现包含独立设备体验与 ATOM Connect 电脑 Agent 桥接原型：独立应用不依赖个人电脑保持开机，电脑任务需要对应电脑在线。应用生成和语音服务调用云端 API；基础应用与已部署素材可以离线运行。这里没有部署大型本地语言模型。
+[产品官网](https://ldcx.tech/atom/) · [应用目录](https://ldcx.tech/atom/apps/) · [使用指南](https://ldcx.tech/atom/guide/) · [开发文档](atom/docs/README.md) · [协作开发](atom/docs/collaboration.md)
 
-![当前桌面](atom/artifacts/studio-delivery/desktop-status-spacing.png)
+![灰色样机桌面与五向焦点](atom/artifacts/joystick-20261022/gray-desktop-grid.png)
 
-> 仓库保留原有项目；ATOM 同时用于透明板与灰色板。早期计划和验收报告用于追溯，本 README 与[文档索引](atom/docs/README.md)描述当前交付。
+## 当前基线
 
-## 产品官网与使用指南
+截至 **2026-10-23**：设备核心 `2026.10.23.2`，Mac 内部测试版 **ATOM Connect 0.6.4**。完整源码库收录 **62 个独立应用**，均包含真实首页封面和完整资源 ZIP；官网、云端和 Mac 已接入同一资源库。源码库收录不等于全部安装，也不等于全部通过五向适配。灰色样机定向升级没有推进公共系统 latest 通道。
 
-[认识 ATOM](https://ldcx.tech/atom/) · [应用目录](https://ldcx.tech/atom/apps/) · [可搜索的使用指南](https://ldcx.tech/atom/guide/)
+[当前状态与待验收事项](atom/docs/current-status.md)集中记录交付范围；[完整资源同步](atom/docs/full-library-sync-2026-10-23.md)记录发布和校验证据。
 
-独立应用目录收录 39 个既有应用与工具，并读取云端市场的新公开作品；支持分类、搜索、界面与获取方式说明、公开源码包下载。大型移植的完整资源要求单独标明。
+## 能做什么
 
-应用市场使用首页截图作为卡片背景，官网、电脑端和小电脑端共享云端封面资料。电脑端「我的创作 → 首页截图」提供上传和预览，发布前提示补齐封面；当前云端 16 个公开作品均有截图封面。灰色板已完成新版部署；不同样机的历史进度详见 [封面规则与验收](atom/docs/market-covers.md)。
-
-官网已重做产品展示：加入 40 秒 ATOM v3 概念短片、章节跳转和语言炼金的可交互材质预览，作品区精选 12 个现有案例，每 3 秒自动轮播、600 ms 平滑切换，支持暂停与手动切换；重点呈现共生世界、AI 合奏、光影水池、天体观测台等，以及「创造应用 → 改造源码 → 分享新版本」的核心流程。明确区分当前样机与概念硬件。可搜索指南覆盖首次使用、配对、创建、市场、同步、账号恢复与排错。网站源码、媒体来源、设计资料与独立发布脚本位于 [atom/site](atom/site/README.md)，静态路由与现有中继/市场 API 共存。
-
-## 灰色板与四个交互作品 · 2026-10-22
-
-光子芯片、光子快跑、指尖烟花、迷你钢琴已按 ATOM 白天 / 暗黑主题重新适配，具备用途图标、全屏交互、空格返回与退出资源释放，完整源码和真实截图已同步到云端市场、Mac 市场与官网目录。[四个应用的构建与使用](atom/official/gray-ports/README.md)。
-
-灰色板已装入包含 36 个可安装应用的新版应用系统，旧应用服务和历史发布目录已备份清理，并以独立身份配对 Mac；真实 Codex 任务往返已成功。重新开机后实体显示、Mali-G52 加速及 11 个应用已复核。旧 BSP 的图形会话退出等待仍列为已知限制，日常更新避免反复热重启 LightDM。[迁移记录、已测内容与回退](atom/docs/gray-migration.md)。
-
-## 开箱与系统维护 · 2026-10-22
-
-**最新补齐：设备核心 `2026.10.22.9` / Mac `0.6.2`。** 蓝牙已支持在 ATOM 内输入 PIN、核对数字和取消配对；手机扫码页支持创建账号、保存恢复密钥并登录设备。灰色板与云端已部署，Mac 包已更新。实物蓝牙、换网等最终验收按用户安排暂缓；Apple Developer 与 SMTP 尚未具备，旧 BSP 显示问题仍需受控复现。[当前完成情况与待验收清单](atom/docs/system-completion-2026-10-22.md)。
-
-前一维护阶段 **设备核心 2026.10.22.8 / ATOM Connect 0.6.1**：补齐手机扫码登录与加密密钥转交、取消和重试；应用存档在设备确认写入后才提示成功；自动恢复和 7 天快照增加校验；蓝牙失败提示、电源确认、时区设置和模拟器更新保序已补齐。云端和 Mac 内部包已更新，灰色样机已通过签名 OTA 安装 `.8`，保留 36 个应用、安装顺序和原配对身份。修复发布包丢失桌面启动脚本执行权限的问题，真机全屏、原页返回与存档确认通过；蓝牙控制器和匹配版本音频模块可用，外设配对及实际声音仍需用户选定设备后验证。[本轮验收与剩余事项](atom/docs/continuation-2026-10-22.md)。
-
-新增首次使用引导、同账号发现电脑、登录后可用的官方 AI 通道，以及设备系统更新、数据备份/恢复和模拟设备镜像。自己的文字、转写和朗读密钥可分别覆盖官方通道；官方调用按账号计量，凭据仅保存在服务器私有配置。
-
-系统升级采用签名包、安装前备份和失败恢复，保留用户应用与身份。数据镜像需要主动授权，仅从真机单向传入 Mac 模拟设备。Mac 内部测试包可内置 Node/Python，正式 Developer ID 签名与公证仍待证书。使用方法、数据范围和验证边界见[系统维护说明](atom/docs/system-maintenance.md)与[交付记录](atom/docs/maintenance-delivery-2026-10-22.md)。
-
-## 外观、相册与桌边应用 · 2026-10-21
-
-- **白天 / 暗黑**：设备与 ATOM Connect 的设置中一键切换并保存；暗色桌面为蓝紫青绿静态色场，应用内容颜色保持原意。[外观设计与验证](atom/docs/system-appearance.md)。
-- **苹果照片导入**：支持 HEIC/HEIF、JPEG、PNG、WebP，单张最多 **20 MiB / 6400 万像素**；服务端生成轻量预览，导出保留原文件。云端、电脑端与灰色板已完成新版部署；实际拍摄格式和样机验证见相册文档。
-- **天气之窗**：满屏实拍天气背景，七种天气摄影、手选城市与实时天气数据。[来源与运行边界](atom/official/weather-window/README.md)。
-- **掌心节拍**：三种音色、拍号与细分、点按定速，以及本地麦克风拍手定速。[使用说明](atom/official/clap-stage/README.md)。
-
-天气与节拍器已上架两端共用的云端源码市场，并已装在灰色板；实体会话启动和退出验证见[灰色板迁移](atom/docs/gray-migration.md)。拍手收音效果仍取决于麦克风与环境，早期进度保留在 [2026-10-21 记录](atom/docs/delivery-2026-10-21.md)。
-
-## AI 原生体验（研发版）
-
-新增共生世界、语言炼金、合奏伙伴和 Agent 小屋：用语言修改可交互小岛、生成鼠标可操控的 GPU 材质、弹出乐句让 AI 接奏，以及用真实电脑任务驱动的小工作室。[源码、运行边界和测试](atom/experiences/README.md)。四个应用已追加到样机桌面，并以完整源码上架电脑端与设备端共用的云端市场。
-
-## 团队协作入口
-
-新成员先阅读 **[协作开发手册](atom/docs/collaboration.md)**：本地启动、目录分工、应用构建、浏览器测试、样机更新和分支协作。实际密钥与登录状态通过各自的私有配置管理。
-
-## 本轮交付：ATOM Studio 与源码应用市场
-
-[完整交付与使用说明](atom/docs/studio-delivery.md) · [三端数据契约](atom/connect/PRODUCT-CONTRACT.md) · [市场服务部署](atom/connect/marketplace/README.md)
-
-电脑端负责编辑、AI 改造、版本比较和明确发布；小电脑负责独立运行、语音输入、预览安装与轻交互。市场保存完整源码、许可、不可变版本及二次创作关系。便签、日程和待办按账号同步，离线编辑保留在本地，冲突由用户选择。
-
-当前基础官方作品包括今日、声音实验室、像素实验室；任务伙伴的电脑筛选、关注偏好、任务优先级和回传时间已整合进 Agent 小屋。云朵伙伴、任务伙伴已从样机与市场入口移除。样机按用户选择保留 18 个旧应用，其余已卸载并作私有备份；移植源码继续保留在仓库，按需安装。
-
-新增同步应用 **相册**：电脑导入照片，小电脑分页浏览、收藏与全屏轮播；灵感暗房支持文字生图、参考照片风格改写、独立版本保存与原图对比。两端通过同一账号直接访问云端，电脑无需持续开机。照片为账号私有云端存储，服务器可读；便签、今日和电脑任务的端到端加密保持不变。实际生图需要管理员配置并开通火山方舟模型。[使用、限制与模型配置](atom/official/photo-album/README.md)。
-
-## ATOM Connect · 连接个人电脑上的 Agent
-
-通过设备「我的电脑」、电脑端 ATOM Connect 和自托管中继，调用电脑上的 Codex，选择授权项目，查看流式文本、审批、取消与最终结果。已提供 macOS 菜单栏 App 构建器，也可以运行 Node.js 源码。Claude 为可选官方 SDK/API Key 适配，目前未做真实付费推理验证。
-
-**完整安装、配对、macOS 构建、开发 SSH 隧道与 HTTPS 部署，请阅读 [ATOM Connect 操作部署指南](atom/connect/README.md)。** 当前中继与市场已部署到 `https://ldcx.tech/atom`；电脑任务、便签和日程使用已有端到端加密协议。市场公开源码按发布规则共享，不接管已有 Codex 桌面会话。
-
-## 功能与交互
-
-| 功能 | 当前实现 |
+| 能力 | 体验 |
 | --- | --- |
-| 桌面 | 480×360，3×2 大图标分页；鼠标拖动、滚轮、左右方向键；五点滑动分页栏、页码总览跳页；新安装应用追加末尾，更新保留位置 |
-| 全屏应用 | 进入应用后隐藏系统常驻顶部/底部；只在必要内容区域滚动；退出回到打开应用时的桌面页 |
-| Home / 空格 | 短按退出到原桌面页；已在桌面时短按回第一页。文本输入时保留普通空格 |
-| 按住说话 | 长按约 650 ms 启动录音，松手自动停止并转写；麦克风启动期间松手也会处理；最长 30 秒 |
-| 工作坊 | 文字或录音输入 → 模型生成 → 状态反馈 → 隔离预览 → 安装/更新；需求草稿保存、任务查询与网络重试 |
-| 应用数据 | AtomApp v1 SDK，应用独立 JSON 保存，64 KiB 限额；预览数据隔离；读取失败禁止默认值覆盖 |
-| 主题与图标 | 官方主题、本地主题包导入、主题图标覆盖；每个应用都有独立语义 SVG，颜色和图标底板跟随系统主题 |
-| 语音 | 云端 ASR 与 TTS；设备扬声器播放；实际录音/转写/生成/播报状态驱动表情；语音提示可关闭 |
-| 麦克风测试 | 原始 PCM 录音、实时 RMS/峰值/削波、最长 30 秒、扬声器回放 |
-| 风扇控制 | 测试应用可临时暂停风扇；语音需求录音自动暂停；停止、退出、失联或温度保护后恢复自动温控 |
-| 设备管理 | 系统状态、音量、背光、开发模式、应用安装更新卸载、图形会话与显示恢复机制 |
+| 独立桌面 | 480×360、三列两行大图标、平滑分页、首末页回弹；进入应用全屏，退出回到原桌面页 |
+| 五向交互 | 方向移动焦点，短按中心键确认，长按语音；共享焦点动画与鼠标输入模式切换 |
+| 语音工作坊 | 说出需求、转写编辑、生成、隔离预览、安装；任务反馈来自实际状态 |
+| 连接电脑 Agent | 选择授权项目，向电脑 Codex 发任务，查看流式进度、审批、取消和结果 |
+| 源码应用市场 | 浏览、获取完整源码、二次创作和明确发布；保留版本、许可及派生关系 |
+| 跨端日用应用 | 便签、日程、待办与相册；电脑输入和编辑，小电脑独立呈现 |
+| 创意作品 | 光影水池、月光海洋、粒子实验室、音乐与点阵、机器人表情，以及月亮来信、雨夜电台、玻璃生态瓶等 |
+| 外观与设备管理 | 明暗切换、主题图标、音量、背光、网络、蓝牙、签名核心更新、数据备份恢复 |
 
-样机当前保留官方入口与选定的 18 个旧应用（含麦克风测试），本轮新增内容见上方交付说明。所有已安装应用都在桌面上，常用入口排在前面；应用库已于 2026-10-21 移除。部分安装应用来自工作坊或早期示例，不全部对应一个 `ports/` 目录。联网源码应用市场已部署到现有云端中继；联网主题市场未交付。本地安装管理与主题导入已经可用。
+[移植应用来源与授权](atom/ports/README.md) · [AI 原生体验](atom/experiences/README.md) · [相册与生图边界](atom/official/photo-album/README.md)
 
-## 官方应用视觉与页面规范
+## 三端如何协作
 
-九个官方客户端已统一标题、字号、留白、列表分组和控件主次；「我的电脑」拆分发起任务/最近任务、服务连接/配对电脑。界面以 **480×360 固定画布** 设计，页面本身不滚动；便签、日程、应用目录、源码、任务输出等必要区域内部滚动，隐藏滚动条。音乐四轨保留各自的含义色，不能被主题一律覆盖。
+```text
+ATOM 小电脑 ── HTTPS ── 云端账号 / 中继 / 源码市场 ── HTTPS ── ATOM Connect
+   │                         │                              │
+独立运行应用              公开完整源码库                 授权项目 → 电脑 Agent
+语音与硬件交互            账号私有同步数据               编辑、改造、发布作品
+```
 
-统一源文件为 `atom/design/device-ui.css`，构建时随完整源码打包。详见 [视觉改版与验收](atom/docs/official-ui-refresh.md)。
+电脑任务通过带身份认证的 HTTP 轮询中继；Codex 在电脑侧通过 stdio app-server 运行。任务与便签等沿用端到端加密协议；相册是账号私有云端存储，服务器可读。公开源码库与私人数据分开管理。Connect 管理自己的 Agent 会话，不接管现有 Codex 桌面聊天。
 
-![今日](atom/artifacts/official-ui-refresh/today.png)
-![电脑连接](atom/artifacts/official-ui-refresh/my-computer.png)
-![声音实验室](atom/artifacts/official-ui-refresh/sound-lab.png)
+小电脑的独立应用不要求电脑开机。云端模型、天气和同步需要联网；电脑任务需要对应电脑开机并运行 Connect。设备没有部署大型本地语言模型。
 
-## 画面与应用
+## 本地启动
 
-`ports/` 包含适配的小屏幕应用和上游许可；`templates/` 与 `examples/` 提供可导入的 JSON 应用包。
-
-| 类别 | 项目 |
-| --- | --- |
-| GPU 图形 | fluid-atlas、fluid-paint、water-pool、volume-flow、moon-ocean、living-pattern |
-| 天体与模型 | planetarium、model-viewer、material-world |
-| 创作与科学 | pocket-studio、clay-studio、parametric-maker、fold-lab、circuit-lab、math-playground、physics-playground |
-| 音乐互动 | music-vision、rhythm-orbits |
-| 点阵 | dot-life、dot-image、dot-waves、dot-theater |
-| 可爱表情 | robo-face、kaia-face、pixel-companion、snappy-face |
-| 原生体验示例 | 七次练习、饮水计数模板、工具/信息/音乐/趣味模板、麦克风测试 |
-
-完整上游来源、固定提交、改动和授权见 [ports/README.md](atom/ports/README.md) 及各应用目录。真实计算场景保留有意义的颜色，工具控件跟随 ATOM 主题。并非所有应用都包含联网能力或专业工具的完整功能。
-
-![麦克风测试](atom/artifacts/mic-test-fan.png)
-
-## 硬件与运行环境
-
-样机为透明版泰山派：RK3566、Mali-G52、约 8 GB RAM、480×360 DSI 屏幕，Debian 10 / Linux 4.19.232 / Chromium 91。当前通过鼠标和键盘测试，没有摄像头，也没有实测触屏；触屏和实体 Home 键属于下一版硬件。
-
-- GPU：原生 EGL/GLES，已验证 WebGL 和 GPU 栅格化。GLX 的 llvmpipe 结果不能代表这条 EGL 路径。
-- VPU：已实播 H.264 硬解；原生 MPP 编解码、H.265 合成码流测试有记录，不等于浏览器全面支持 HEVC。
-- RGA：原生图像缩放测试通过。
-- NPU：RKNN MobileNet 真实执行通过；没有把 NPU 基准等同于 ASR、TTS 或 OCR 产品已实现。
-- 音频：RK809 codec、PulseAudio、`parec` 收音、`paplay` 回放。样机 Pulse socket 为 `/tmp/pulse-socket`。
-
-帧率、延迟等是具体样机的短测结果，不是所有硬件配置的性能承诺。详见[硬件能力基线](atom/docs/hardware-capabilities.md)、[GPU 接入](atom/docs/gpu-enablement.md)。
-
-## 本地开发
-
-```bash
+```sh
+git clone https://github.com/wangqioo/vibeboard-Desk.git
+cd vibeboard-Desk
 python3 atom/server.py
 ```
 
-从仓库根目录启动，打开 `http://127.0.0.1:8770`。Python 3.7+，基础桌面使用标准库；加密配对与系统验签需要 `cryptography`（Debian 可安装 `python3-cryptography`）。无需 Node 构建桌面。非 Linux 环境可开发界面和应用管理，真实音频、背光、温度和 GPU 需要目标设备。
+打开 `http://127.0.0.1:8770`。基础桌面使用 Python 3.7+ 标准库；加密配对和系统验签需要 `cryptography`。此入口不自动导入样机应用和私人数据。
 
-```bash
+如需带仓库应用的隔离模拟设备：
+
+```sh
+python3 atom/tools/simulator.py --offline
+```
+
+模拟器使用 `http://127.0.0.1:8790/simulator` 和独立 `~/.atom-simulator` 数据目录，不修改宿主机硬件。电脑端开发使用 Node 24+；[Connect 安装、配对与构建](atom/connect/README.md)另有完整说明。Mac App 控制台端口由启动器分配，不应硬编码本机端口。
+
+## 输入与应用开发
+
+- **方向键**模拟摇杆方向；**短按 Space**模拟中心键确认；**长按约 650 ms**唤醒语音，在非密码输入框中用于听写，松手结束录音。
+- 返回使用左上角可聚焦的箭头；逐层返回，应用顶层回到进入前的桌面页。**Home**直接返回桌面；已在桌面时回第一页。
+- 桌面焦点从应用开始，上下同列、跨页同行；方向输入隐藏鼠标，鼠标移动或点击恢复指针。
+- 所有新建、导入、更新和发布的应用必须满足[五向输入强制规范](atom/docs/input-standard.md)。画布必须有语义操作控件或声明只读场景，旧应用不得自动补声明冒充适配。
+- 每个应用提供独立透明单色 `icon.svg`；主题控制颜色和图标底板。全屏页面仅允许必要内容区滚动。
+- 使用 `AtomApp` 管理启动、64 KiB 独立存档和后台释放；保存成功必须等待设备确认。
+
+开始开发前阅读 [AGENTS.md](AGENTS.md)、[应用开发指南](atom/docs/developer-guide.md)、[运行协议](atom/docs/app-contract.md)和[视觉规范](atom/docs/design-system.md)。发布封面使用真实渲染：首页截图可在 **ATOM Connect → 我的创作 → 首页截图** 上传，当前发布流程要求封面。
+
+## 验证与部署
+
+按改动范围执行测试，不以模拟数据代替实机验收：
+
+```sh
 python3 -m unittest discover -s atom/tests -v
 node atom/tests/app-host.test.cjs
 node atom/tests/app-runtime.test.cjs
-python3 atom/tools/check_app.py atom/examples/mic-test.json
+node atom/tests/input-navigation.integration.cjs
+node atom/tests/joystick-shell.integration.cjs
 ```
 
-Node 用于协议测试；原生 WASM/上游移植构建另有工具要求，见各构建脚本和移植文档。
+浏览器依赖在 `atom/package.json`；先运行 `npm --prefix atom ci`，再按[协作手册](atom/docs/collaboration.md)安装浏览器并运行对应套件。市场/相册测试另外需要其 requirements 中的图像依赖。
 
-## 在 Debian 样机部署
+设备、Mac、云端分别发布，不能用一次核心升级代替全部三端部署：
 
-先备份目标设备的图形会话、systemd、音频与显示配置。当前部署脚本面向用户名 `linaro`、路径 `/home/linaro/atom` 的这台 BSP 样机，其他板卡需要按实际系统适配，不是通用刷机工具。
+- [Debian 样机部署与恢复](atom/docs/deployment.md)
+- [系统升级、数据恢复、Mac 发行](atom/docs/system-maintenance.md)
+- [服务器部署与备份](atom/connect/server/README.md)
+- [62 项完整源码库同步](atom/docs/full-library-sync-2026-10-23.md)
+- [官网构建与发布](atom/site/README.md)
 
-1. 将 `atom/` 复制到 `/home/linaro/atom`，安装 Python 3、Chromium、Openbox、LightDM、PulseAudio、ALSA 工具、curl 和 xset 等运行依赖。
-2. 设备执行 `sh /home/linaro/atom/deploy/install.sh`，安装后端与专用图形会话。
-3. 图形登录选择 ATOM；`start-atom.sh` 使用原生 `chromium-bin` 和 EGL。会话自动恢复浏览器，后端由 systemd 自动重启。
-4. 显示保护服务和 Xorg 配置需依照[部署指南](atom/docs/deployment.md)单独审核安装。
-5. 应用包安装前在设置启用开发模式；第三方大型移植必须复制完整资源目录。
+阿里云本地数据库备份和 OSS 对应归档各保留三份；遵守 [AGENTS.md](AGENTS.md) 的成本约束，不因文档整理或例行代码修改新增 ECS 快照或镜像。
 
-```bash
-systemctl status atom
-journalctl -u atom -n 50 --no-pager
-```
+## 代码地图
 
-服务只绑定本机回环地址。远程管理推荐 SSH 隧道：
+| 路径 | 内容 |
+| --- | --- |
+| `atom/server.py`、`atom/static/` | 设备 API、桌面、应用宿主与共享输入运行时 |
+| `atom/workshop.py`、`atom/voice.py` | 模型任务、录音和受控语音能力 |
+| `atom/connect/` | Mac 伴侣、电脑 Agent、中继、市场与服务器运维 |
+| `atom/official/`、`atom/ports/` | 官方应用、移植源码及完整资源、上游许可 |
+| `atom/legacy-seeds/` | 既有应用兼容快照，不代表五向认证 |
+| `atom/design/`、`atom/templates/` | 共享控件样式与应用模板 |
+| `atom/tools/`、`atom/tests/` | 构建、校验、部署工具及测试 |
+| `atom/site/` | 产品官网、指南与应用目录 |
+| `atom/docs/`、`atom/artifacts/` | 维护文档与实测证据 |
 
-```bash
-ssh -N -L 8770:127.0.0.1:8770 DEVICE_USER@DEVICE_HOST
-python3 atom/tools/deploy_app.py --target http://127.0.0.1:8770 list
-python3 atom/tools/deploy_app.py --target http://127.0.0.1:8770 install atom/examples/mic-test.json
-```
+根目录早期 Node/Web 平台与 ATOM 分开保留，运行方法见[旧网页平台说明](docs/vibeboard-web-legacy.md)。不要把设备部署目录覆盖到旧项目。
 
-具体私有设备地址、密码、SSH 私钥、模型密钥不随仓库发布。
+## 原型边界与许可
 
-## 模型与语音配置
+当前样机基于 RK3566、Mali-G52、Debian 10 / Linux 4.19 / Chromium 91。EGL/WebGL、H.264 硬解、RGA 和 NPU 示例各有实测记录，但不代表所有浏览器编码、语音/OCR 或持续负载已验证，详见[硬件能力](atom/docs/hardware-capabilities.md)。
 
-工作坊 → 模型配置，分别配置应用生成、录音转写与语音播报。主流协议入口和厂商预设可用，但不是所有厂商、所有模型都已逐一真机验证。
+真实摇杆、所有旧应用逐项五向迁移、蓝牙外设出声、换网与长期电源循环仍需验收。旧 BSP 显示卡住的根因未根治；避免反复热重启 LightDM/Xorg。Mac 当前是内部 ad-hoc 签名包，Developer ID、公证和 SMTP 尚未完成。完整未验收清单见[当前状态](atom/docs/current-status.md)。
 
-- 应用生成：样机默认 DeepSeek `deepseek-flash`；生成代码需预览和操作验证。
-- 录音转写：智谱 `glm-asr-2512`，上传 16 kHz、单声道原始 WAV。
-- 文字播报：智谱 `glm-tts`，默认彤彤 `tongtong`，支持 7 个音色，最多 1024 字。
-- ASR/TTS 独立于生成模型；需要网络和用户自己的有效账户/API Key。
-- 密钥存放在设备 `state/model.json`，权限 0600；配置 API 只返回是否设置，不返回明文。
-
-按住空格说应用需求，松手后转写到可编辑的需求框，然后由用户发起生成。语音当前不是完整的自由对话助手。[语音接口与验收](atom/docs/voice-zhipu.md)。
-
-## 麦克风与风扇诊断
-
-样机自接两线咪头安装在机壳内，用户提供原理图显示 MIC1p 接入、MIC1n 悬空；系统原设备树却启用差分模式。目前使用可恢复的单端运行时测试，未修改启动镜像，尚未证明底噪已经解决。
-
-麦克风测试显示数字电平 dBFS，不是声压计，也不是声波形。先保持安静，再以固定距离说同一句话，录音回放比较风扇开关、咪头位置和人声清晰度。测试保留原始声音，没有用降噪掩盖底噪。
-
-风扇控制依赖本机 GPIO3 A4 和已有 `taishan-fan` 服务。临时关闭最多 120 秒，60°C 恢复散热；页面失联 5 秒后恢复。按住说话期间由录音服务保持暂停，录音失败/停止/超时恢复温控。风扇未接通或温度不允许暂停时，语音仍可录制。
-
-安装、恢复和权限说明见[音频与风扇指南](atom/docs/audio-diagnostics.md)。不要将此板专用寄存器或 GPIO 设置直接用于其他硬件。
-
-## 应用开发规范
-
-- 应用全屏，避免网页式整页滚动；必要列表独立滚动。
-- 每个应用提供独立 `icon.svg`，64×64 viewBox、透明、单色 `currentColor`；主题负责图标底色、边框、圆角和墨色。
-- 普通应用跟随当前系统主题；固定主题是明确选择。
-- `AtomApp.deferReady()/ready()` 表达真实启动状态；`load/save` 提供独立数据保存；`onSuspend` 清理定时器、音频、GPU。
-- `iframe sandbox="allow-scripts"` 不授予同源权限。设备能力通过限定当前来源的 shell 桥接，不给任意应用开放写 API。
-- 更新保留图标、安装顺序；新应用追加到桌面末尾。
-
-阅读[应用协议](atom/docs/app-contract.md)、[设计规范](atom/docs/design-system.md)、[开发指南](atom/docs/developer-guide.md)和 [AGENTS.md](AGENTS.md)。
-
-## 仓库结构
-
-```text
-atom/
-  server.py                 本地 API、静态服务、安装器
-  workshop.py               模型适配、生成任务、配置管理
-  voice.py / stt.py / tts.py  真机录音、云转写、异步播报
-  static/                   桌面、工作坊、主题与应用 SDK
-  deploy/                   样机启动、显示保护、音频诊断工具
-  docs/                     当前指南、设计规范、历史验证
-  templates/ / examples/    JSON 应用包
-  ports/                    完整移植资源与上游许可证
-  mic-test/                 麦克风测试源文件
-  computer-app/             我的电脑应用
-  connect/                  中继、电脑连接程序、macOS 外壳与操作指南
-  relay_bridge.py           设备私有连接桥接
-  tools/                    构建、校验、部署和硬件测试工具
-  tests/                    后端与 JS 协议测试
-  artifacts/                不含密钥的截图及验收记录
-```
-
-`apps/`、`state/`、`vendor/`、缓存与设备私有配置不提交。`ports/` 保留可部署资源；部分入口 `bundle.json` 不含大型纹理/WASM/JS，不能只安装入口包就宣称完成离线部署。
-
-## 当前边界与后续工作
-
-- 电脑 Agent 桥接已提供自托管工程原型；尚无生产托管中继、云平台账户体系、联网应用/主题市场、通用 OCR 应用、摄像头/手势功能。
-- 后端生成任务保存在内存；页面重载和短暂断网可恢复查询，服务重启后任务失效，草稿仍保留。
-- JSON 安装有运行时回滚，不保证断电事务；还需要系统升级、签名分发、持续负载和断电测试。
-- Debian 10 / Chromium 91 是原型 BSP；启动器使用 `--no-sandbox`，iframe 隔离不能代替操作系统沙箱。正式产品必须升级受维护底座并完成安全验证。
-- 下一版触屏、物理 Home 键、音频硬件布局和风扇声学隔离仍需真实硬件验证。
-- 多个上游采用 MIT / Apache / GPL 等不同许可。保留每个项目的 LICENSE、版权和源码；不要将整个移植合集当作统一许可。部分图片素材的商业授权还需单独核对。
-
-仓库保留可运行样机、源代码、文档和测试证据；电脑连接能力的部署状态和验证边界见 ATOM Connect 指南。
-
-## 早期网页生成平台
-
-根目录原有的 Node/Web 平台代码保持保留，原运行方法见[早期网页平台说明](docs/vibeboard-web-legacy.md)。当前小电脑的桌面、工作坊与语音实现都在 atom/。
-
-### 五向摇杆输入开发分支
-
-`codex/five-way-navigation` 实现方向焦点导航、Space 短按确认/长按语音、文本框语音输入及应用返回接口。键盘可模拟五向输入；真实摇杆和全量第三方应用适配仍需验收。详见 [技术方案与接入规范](atom/docs/five-way-navigation.md)。
-
-应用开发必读：[五向输入强制规范 v1](atom/docs/input-standard.md)。新生成、安装/更新、发布的应用须声明 `manifest.input`；设备与市场复用 `atom/app_input.py` 校验，历史应用按兼容策略逐个迁移。
-
-五向输入规则随包分发于 [app-input-standard.json](atom/static/app-input-standard.json)，由小电脑工作坊及 Mac 新建/AI改造任务自动注入。外部 Agent 也可从设备开发指南读取；安装与发布校验是额外门禁。
+旧浏览器及 `--no-sandbox` 属于原型限制，正式发行需升级受维护底座并完成安全验证。模型凭据、账号、设备状态、个人记录和构建缓存不得提交。各移植项目授权不同，保留各目录 LICENSE、SOURCE 和素材来源；仓库总览不替代上游许可。

@@ -45,7 +45,7 @@ Python 3.7+，仅标准库。服务器默认仅监听回环地址。程序没有
 
 ### macOS 原生外壳
 
-需要 macOS 13+、Apple 命令行开发工具和 Node.js 22+。构建机与目标机架构需匹配；脚本把指定 Node 可执行文件复制进 App，不下载运行时，也不捆绑凭据。
+需要 macOS 13+、Apple 命令行开发工具和 Node.js 24+。构建机与目标机架构需匹配；脚本把指定 Node 可执行文件复制进 App，不下载运行时，也不捆绑凭据。
 
 ```sh
 python3 atom/connect/desktop/build-macos.py --node "$(command -v node)"
@@ -76,7 +76,7 @@ App 配置保存在 `~/Library/Application Support/ATOMConnect/state.json`。不
 
 ### 源码方式
 
-需要 Node.js 22+；主程序没有 npm 必装依赖。
+需要 Node.js 24+；主程序没有 npm 必装依赖。
 
 ```sh
 node atom/connect/computer/main.mjs --port 8788
@@ -148,7 +148,7 @@ node --test atom/connect/computer/test/*.test.mjs
 python3 -m unittest discover -s atom/tests -v
 ```
 
-参考 [共享协议](PROTOCOL.md)、[中继部署](relay/README.md)、[电脑端操作](computer/README.md) 和[总体连接方案](../docs/computer-agent-bridge-plan.md)。测试中的假进程仅用于协议与故障验证，不能代替真实模型推理、真实设备或生产网络验收。
+参考 [共享协议](PROTOCOL.md)、[中继部署](relay/README.md)、[电脑端操作](computer/README.md) 和[当前研发基线](../docs/current-status.md)。测试中的假进程仅用于协议与故障验证，不能代替真实模型推理、真实设备或生产网络验收。
 
 ## 本机开发服务恢复记录（2026-10-20）
 
