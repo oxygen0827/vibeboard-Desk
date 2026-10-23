@@ -252,12 +252,13 @@ class MarketplaceTests(unittest.TestCase):
         try:
             works=current.handle('GET','/market/v1/catalog')['works']
             self.assertEqual({w['category'] for w in works},{'life','sound','play','connect'})
-            self.assertEqual(len(works),14)
+            self.assertEqual(len({w['id'] for w in works}),len(works))
             album=next(w for w in works if w['id']=='official-photo-album')
             self.assertEqual(album['category'],'life')
             ids={w['id'] for w in works}
             self.assertNotIn('official-official-companion',ids)
             self.assertNotIn('official-task-pal',ids)
+            self.assertTrue({'official-'+aid for aid in ('oracle-tarot','zodiac-atlas','echo-book','moon-letter','rain-radio','personality-planet','natal-whispers','glass-ecosystem','element-sandbox')} <= ids)
             self.assertTrue({'official-symbiotic-world','official-language-alchemy','official-ai-duet','official-agent-studio','official-weather-window','official-clap-stage','official-photon-chip','official-photon-runner','official-finger-fireworks','official-mini-piano'} <= ids)
             self.assertTrue(all(current.version(w['latest_version_id'])['official'] for w in works))
         finally:current.close()

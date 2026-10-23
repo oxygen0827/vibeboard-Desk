@@ -14,6 +14,7 @@ EnvironmentFile=-/etc/atom/images.env
 # Optional ATOM official AI channel (Zhipu key and monthly quotas, root-only file).
 EnvironmentFile=-/etc/atom/ai.env
 Environment=PYTHONPATH=/opt/atom/python-deps
+Environment=ATOM_LIBRARY_CATALOG=/opt/atom/app-library/catalog.json
 ExecStart=/usr/bin/python3 /opt/atom/connect/relay/server.py --host 172.17.0.1 --port 9092 --db /var/lib/atom/relay.sqlite3 --trusted-proxy 172.17.0.0/16
 Restart=always
 RestartSec=3

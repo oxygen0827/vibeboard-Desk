@@ -83,11 +83,25 @@ for aid,folder,cat,desc,img,needs in [
  m=json.loads((ROOT/folder/'manifest.json').read_text());add(aid,m['name'],cat,desc,path=ROOT/folder,kind='system',image=img,needs=needs)
 for aid,name,cat,desc,img in [('workshop','工作坊','create','说出或输入想法，生成、预览，再确认安装一个属于自己的应用。',None),('clock','时钟','life','一眼看清现在的时间，让小电脑安静留在桌边。',None),('timer','计时器','life','设定一段时间，开始、暂停和重置，保持专注的节奏。',None)]:
  add(aid,name,cat,desc,source='static/app.js',kind='system',image=img,needs='工作坊生成需要有效模型服务'if aid=='workshop'else '本机运行')
+# Keep reviewed catalog entries and augment them with the complete source library.
+prior_path=SITE/'assets/apps/catalog.json'
+prior=json.loads(prior_path.read_text()).get('apps',[]) if prior_path.exists() else []
+known={r['id'] for r in rows}
+for item in prior:
+ if item['id'] not in known and item['id'] not in retired:
+  rows.append(item);known.add(item['id'])
+index=ROOT/'official/library-index.json'
+if index.exists():
+ for app in json.loads(index.read_text())['apps']:
+  if app['id'] in known or app['id'] in retired:continue
+  aid=app['id'];image=shot('full-library-covers/'+aid+'.png',aid)
+  rows.append(dict(id=aid,name=app['name'],description=app['description'],category=app['category'] if app['category'] in CATS else 'life',kind='port',market_id=None,source=app['archive'],icon='/atom/assets/apps/'+aid+'.svg',image=image,needs='完整源码兼容包；五向适配以源码说明为准',guide='/atom/guide/#market',archive=app['archive'],sha256=app['sha256']))
+  known.add(aid)
 priority=['language-alchemy','symbiotic-world','ai-duet','weather-window','clap-stage','photo-album','agent-studio','water-pool','moon-ocean','robo-face','pocket-studio','planetarium']
 rows.sort(key=lambda r:priority.index(r['id'])if r['id']in priority else len(priority))
 assert len({r['id'] for r in rows})==len(rows)
 assert not retired.intersection(r['id']for r in rows)
-payload={'updated':'2026-10-22','categories':CATS,'apps':rows}
+payload={'updated':'2026-10-23','categories':CATS,'apps':rows}
 (SITE/'assets/apps/catalog.json').write_text(json.dumps(payload,ensure_ascii=False,indent=2)+'\n')
 def card(r):
  e=html.escape

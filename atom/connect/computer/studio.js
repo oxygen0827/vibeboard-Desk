@@ -101,9 +101,15 @@ function coverUploader(draftId){
 function workCard(work,onclick){return h('button',{type:'button',class:'work',onclick},coverImage(work.cover_id),h('span',{class:'work-icon cat-'+(work.category||'life'),text:(work.title||'?').slice(0,1)}),h('strong',{},work.title,work.official?pill('官方','info plain'):null),h('p',{text:work.description||'暂无介绍'}),h('small',{text:authorOf(work)+' · '+(categories[work.category]||work.category||'')}),!work.cover_id?text('span','首页截图待上传','cover-missing'):null);}
 async function catalog(){const box=el('market-catalog');box.replaceChildren(text('p','正在打开市场…','muted'));
   try{studioState().catch(()=>{});const form=el('market-search'),q=new URLSearchParams({q:form.elements.q.value,category:form.elements.category.value}),r=await call('/catalog?'+q);
-    box.replaceChildren(...r.works.map(w=>workCard(w,()=>workDetail(w.id).catch(error))));
-    if(!r.works.length)box.append(h('div',{class:'card'},emptyState('没有匹配的作品','换个关键词或分类试试')));}
+    const published=new Set(r.works.map(w=>w.id.replace(/^official-/,''))),library=(r.library||[]).filter(a=>!published.has(a.id)&&!['official-companion','task-pal'].includes(a.id));
+    const sourceCard=a=>h('button',{type:'button',class:'work',onclick:()=>libraryDetail(a)},a.cover_id?coverImage(a.cover_id):null,h('span',{class:'work-icon cat-life',text:a.name.slice(0,1)}),h('strong',{text:a.name}),h('p',{text:a.description||'完整应用源码与资源'}),h('small',{text:'完整源码 · '+a.files+' 个文件 · '+(a.archive_bytes/1048576).toFixed(1)+' MiB'}));
+    box.replaceChildren(...r.works.map(w=>workCard(w,()=>workDetail(w.id).catch(error))),...library.map(sourceCard));
+    if(!r.works.length&&!library.length)box.append(h('div',{class:'card'},emptyState('没有匹配的作品','换个关键词或分类试试')));}
   catch(e){box.replaceChildren(h('div',{class:'card'},emptyState('无法打开市场',e.message)));}}
+function libraryDetail(a){const box=clearDialog(a.name),valid=/^\/atom\/assets\/library\/[a-z][a-z0-9_-]{0,47}-[a-f0-9]{16}\.zip$/.test(a.archive||'');
+  if(a.cover_id)box.append(coverImage(a.cover_id,'cover-upload-image'));
+  box.append(text('p',a.description||'完整源码资源包'),text('p',a.input_status==='legacy'?'既有应用兼容源码，尚未逐项完成五向适配。下载包含完整代码和资源，不代表新版本兼容认证。':'完整源码与资源包；上游许可随包保留。','muted'),text('p',a.files+' 个文件 · '+(a.archive_bytes/1048576).toFixed(1)+' MiB','muted'),h('pre',{class:'code',text:'SHA-256: '+a.sha256}),h('div',{class:'form-actions'},button('下载完整源码 ZIP',async()=>{if(!valid)throw Error('源码包地址无效');const state=await api('state'),base=state.relay_url||'https://ldcx.tech/atom',u=new URL(a.archive,base);if(u.protocol!=='https:')throw Error('源码下载需要 HTTPS');window.open(u.href,'_blank','noopener');},'btn primary'),button('在本机模拟器查看',()=>{dialog.close();showPage('simulator');simAsk('start');})));
+}
 el('market-search').onsubmit=e=>{e.preventDefault();catalog();};
 let searchTimer=null;el('market-search').elements.q.oninput=()=>{clearTimeout(searchTimer);searchTimer=setTimeout(catalog,300);};
 el('market-chips').onclick=e=>{const b=e.target.closest('button');if(!b)return;el('market-search').elements.category.value=b.dataset.category;el('market-chips').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));catalog();};

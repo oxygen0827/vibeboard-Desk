@@ -4,7 +4,7 @@ const data=JSON.parse(fs.readFileSync(path.join(__dirname,'assets/apps/catalog.j
 const works=data.apps.filter(a=>a.market_id).map(a=>({id:a.market_id,title:a.name,description:a.description,category:'play',author:'ATOM',license:'MIT',latest_version_id:'version-'+a.id}));
 works.push({id:'community-test',title:'星光留言 <img src=x onerror=alert(1)>',description:'来自市场的新公开作品',author:'作者 <script>window.injected=1</script>',category:'life',license:'MIT',latest_version_id:'version-community'}, {id:'official-task-pal',title:'Retired',latest_version_id:'retired'});
 (async()=>{const port=18945,origin='http://127.0.0.1:'+port,server=spawn('python3',[path.join(__dirname,'preview.py'),'--port',String(port)],{stdio:'ignore'});let browser;const errors=[];
-try{for(let i=0;i<40;i++){try{if((await fetch(origin+'/atom/apps/')).ok)break;}catch{}await new Promise(r=>setTimeout(r,100));}
+try{for(let i=0;i<40;i++){try{const ready=await fetch(origin+'/atom/apps/');await ready.arrayBuffer();if(ready.ok)break;}catch{}await new Promise(r=>setTimeout(r,100));}
 browser=await chromium.launch({headless:true,executablePath});
 for(const [width,height]of [[1440,1000],[768,1024],[390,844],[320,720]]){
  const p=await browser.newPage({viewport:{width,height},acceptDownloads:true});p.on('pageerror',e=>errors.push(e.message));
@@ -29,6 +29,6 @@ for(const [width,height]of [[1440,1000],[768,1024],[390,844],[320,720]]){
 }
 const failed=await browser.newPage();await failed.route('**/market/v1/catalog',r=>r.abort());await failed.goto(origin+'/atom/apps/');await failed.locator('#catalog-retry').waitFor({state:'visible'});assert.equal(await failed.locator('#catalog-count').textContent(),String(data.apps.length));assert.equal(await failed.locator('.app-card').count(),12);await failed.unroute('**/market/v1/catalog');await failed.route('**/market/v1/catalog',r=>r.fulfill({contentType:'application/json',body:JSON.stringify({works})}));await failed.locator('#catalog-retry').click();await failed.waitForFunction(n=>document.querySelector('#catalog-count').textContent===String(n),data.apps.length+1);await failed.close();
 const nojs=await browser.newPage({javaScriptEnabled:false});await nojs.goto(origin+'/atom/apps/');assert.equal(await nojs.locator('.app-card').count(),data.apps.length);await nojs.close();
-for(const app of data.apps){for(const url of [app.icon,app.image].filter(Boolean)){const r=await fetch(origin+url);assert(r.ok,url);}}
+for(const app of data.apps){for(const url of [app.icon,app.image].filter(Boolean)){const r=await fetch(origin+url);assert(r.ok,url);await r.arrayBuffer();}}
 assert.deepEqual(errors,[]);console.log(JSON.stringify({ok:true,baseApps:data.apps.length,liveMarketMerge:true,viewports:[1440,768,390,320],checks:['category and source filtering','search and empty reset','load more','detail dialog and Escape/focus return','source-package download matches bundle','complete-resource port instructions','URL deep links','untrusted metadata rendered as text','cloud failure and retry','all image and icon assets','static no-JS catalog','no horizontal overflow','read-only anonymous market requests']},null,2));
 }finally{await browser?.close();server.kill();}})().catch(e=>{console.error(e);process.exitCode=1});

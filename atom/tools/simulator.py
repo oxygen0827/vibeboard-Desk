@@ -24,7 +24,7 @@ import server  # noqa: E402  the real device backend
 PAGE = Path(__file__).with_name('simulator.html')
 CHROME = Path('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome')
 # Install order decides desktop order (the device sorts by install time).
-SOURCES = ['official/*/bundle.json', 'experiences/*/bundle.json', 'ports/*/bundle.json', 'examples/*.json', 'apps/*.json']
+SOURCES = ['official/*/bundle.json', 'experiences/*/bundle.json', 'ports/*/bundle.json', 'examples/*.json', 'legacy-seeds/*/bundle.json', 'apps/*.json']
 CLIENT_DIRS = ['computer-app', 'market-app', 'notes-app', 'robot-app']
 SKIP = {'bundle.json', '.DS_Store', '__pycache__'}
 
@@ -46,7 +46,16 @@ def changed(source, target):
     for item in source.rglob('*'):
         if item.is_file() and item.name not in SKIP:
             dest = target / item.relative_to(source)
-            if not dest.is_file() or not filecmp.cmp(item, dest, shallow=False):
+            if not dest.is_file():
+                return True
+            if item.name == 'manifest.json':
+                try:
+                    a=json.loads(item.read_text());b=json.loads(dest.read_text())
+                    a.pop('_installed_at_ns',None);b.pop('_installed_at_ns',None)
+                    if a != b:return True
+                    continue
+                except (ValueError,TypeError):return True
+            if not filecmp.cmp(item, dest, shallow=False):
                 return True
     return False
 
@@ -67,8 +76,15 @@ def seed(apps_root, seed_root):
         fresh = not (target / 'manifest.json').is_file()
         if fresh or changed(source, target):
             manifest_stat = None if fresh else (target / 'manifest.json').stat()
+            installed_at = None
+            if manifest_stat:
+                previous=json.loads((target/'manifest.json').read_text())
+                installed_at=previous.get('_installed_at_ns',manifest_stat.st_mtime_ns)
             shutil.copytree(source, target, dirs_exist_ok=True)
             if manifest_stat:
+                updated=json.loads((target/'manifest.json').read_text())
+                updated['_installed_at_ns']=installed_at
+                (target/'manifest.json').write_text(json.dumps(updated,ensure_ascii=False))
                 os.utime(target / 'manifest.json', ns=(manifest_stat.st_atime_ns, manifest_stat.st_mtime_ns))
             if fresh:  # keep the seed order on first install; updates keep their desktop position
                 os.utime(target / 'manifest.json')
@@ -172,6 +188,7 @@ def main():
     parser.add_argument('--no-open', action='store_true', help='do not open a window')
     parser.add_argument('--seed', help='install prebuilt apps from this folder instead of the repository')
     parser.add_argument('--build-seed', metavar='DIR', help='write prebuilt apps to DIR and exit')
+    parser.add_argument('--strict-seed', action='store_true', help='fail if any application could not be included')
     parser.add_argument('--relay', help='relay to register with (default: the one ATOM Connect uses)')
     parser.add_argument('--name', default='Mac 模拟器', help='device name shown when pairing')
     parser.add_argument('--offline', action='store_true', help='do not register with a relay')
@@ -185,6 +202,8 @@ def main():
         print('Built %d apps into %s' % (len(installed), target), flush=True)
         for path, error in failed:
             print('  skipped %s: %s' % (path, error), flush=True)
+        if failed and args.strict_seed:
+            raise SystemExit('Incomplete seed build; synchronization stopped')
         return
     home = Path(args.home).expanduser().absolute()
     apps_root = home / 'apps'

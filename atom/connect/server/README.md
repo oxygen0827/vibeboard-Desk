@@ -115,3 +115,5 @@ sudo -u atom python3 /opt/atom/connect/marketplace/ops.py --db /var/lib/atom/rel
 - OSS 桶开启或曾开启版本控制时，脚本拒绝新增备份及自动删除。普通删除可能只增加删除标记，历史版本仍计费，须先审查专用前缀的生命周期规则；不能用覆盖固定文件名规避。
 - 例行 Agent 开发不创建 ECS 快照、自动快照策略、自定义镜像，不启用 OSS 版本控制；只有用户明确要求对应云资源时才执行。数据库备份、应用发布包和 ECS 快照是不同资源。
 - 部署包仍只保留 3 个版本。对其他历史备份或云盘快照，先盘点归属与恢复用途，不做跨目录/跨服务清理。
+
+完整应用资源库：`ATOM_LIBRARY_CATALOG=/opt/atom/app-library/catalog.json`；使用 `atom/tools/sync_full_library.sh` 进行严格构建、全包摘要校验及原子发布。与作品版本、数据库备份分开，详见 [全量同步验收](../../docs/full-library-sync-2026-10-23.md)。

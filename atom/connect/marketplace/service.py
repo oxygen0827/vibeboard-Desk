@@ -137,6 +137,8 @@ class Marketplace:
         self.import_official()
         covers.official(self)
         self.photos = PhotoLibrary(self)
+        self.library_covers = {}
+        self.source_library("/market/v1/catalog")
 
     def _prepare_path(self, target):
         target.parent.mkdir(parents=True, mode=0o700, exist_ok=True)
@@ -328,12 +330,54 @@ class Marketplace:
                 raise MarketError(exc.status, exc.message, exc.code)
         if method == 'POST' and path in ('/register', '/login'):
             return self.sign_in(path, body, peer)
+        if method == 'GET' and path.startswith('/covers/') and path[8:] in self.library_covers:
+            return {'image':self.library_covers[path[8:]], 'width':360, 'height':270}
         if method == 'POST' and path == '/password/reset':
             return self.reset_password(body, peer)
         if method == 'POST' and path == '/password/change':
             return self.change_password(token, body)
         with self.lock, self.db:
-            return self._handle(method,target,token,body,peer)
+            result = self._handle(method,target,token,body,peer)
+        if method == 'GET' and path == '/catalog':
+            result['library'] = self.source_library(target)
+        return result
+
+    def source_library(self, target):
+        # Reviewed complete archives are separate from immutable market publications.
+        path = Path(os.environ.get('ATOM_LIBRARY_CATALOG', str(self.seed_root.parent / 'app-library' / 'catalog.json')))
+        if not path.is_file():
+            return []
+        if path.stat().st_size > 2 * 1024 * 1024:
+            raise MarketError(503, 'Source library metadata too large')
+        data = json.loads(path.read_text(encoding='utf-8'))
+        rows = data.get('apps', [])
+        require(isinstance(rows, list) and len(rows) <= 200, 'Invalid source library')
+        query = parse_qs(urlsplit(target).query)
+        term = query.get('q', [''])[0].lower()
+        category = query.get('category', [''])[0]
+        mapping = {'visual':'play','science':'play','create':'play'}
+        result = []
+        cover_cache = {}
+        for row in rows:
+            require(isinstance(row, dict) and APP_ID.fullmatch(row.get('id', '')), 'Invalid source archive ID')
+            if row['id'] in ('official-companion','task-pal'):
+                continue
+            archive = row.get('archive', '')
+            require(isinstance(archive, str) and re.fullmatch(r'/atom/assets/library/[a-z][a-z0-9_-]{0,47}-[a-f0-9]{16}\.zip', archive), 'Invalid source archive URL')
+            require(re.fullmatch(r'[a-f0-9]{64}', row.get('sha256','')), 'Invalid source digest')
+            row = dict(row)
+            image = row.pop('cover_image', None)
+            if isinstance(image,str) and re.fullmatch(r'data:image/jpeg;base64,[A-Za-z0-9+/=]+',image):
+                cid = hashlib.sha256(image.encode()).hexdigest()[:32]
+                row['cover_id'] = cid
+                cover_cache[cid] = image
+            if term and term not in (row.get('name','')+' '+row.get('description','')+' '+row['id']).lower():
+                continue
+            if category and mapping.get(row.get('category'),row.get('category')) != category:
+                continue
+            result.append(row)
+        self.library_covers = cover_cache
+        return result
 
     @staticmethod
     def hash_password(password, salt):
