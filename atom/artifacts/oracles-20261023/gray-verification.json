@@ -1,0 +1,13 @@
+{
+  "version": "2026.10.23.2",
+  "real_device": true,
+  "boundary_first_and_last": true,
+  "apps_on_last_page": [
+    "oracle-tarot",
+    "zodiac-atlas",
+    "echo-book"
+  ],
+  "three_app_direction_space_flows": true,
+  "nested_back_and_source_page": true,
+  "errors": []
+}
