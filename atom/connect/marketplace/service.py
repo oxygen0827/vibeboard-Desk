@@ -85,7 +85,7 @@ def validate_bundle(bundle, official=False):
     require('layout' not in manifest or manifest['layout'] == 'fullscreen', 'Invalid layout')
     if 'capabilities' in manifest:
         caps=manifest['capabilities']
-        require(isinstance(caps,list) and len(caps)<=4 and all(isinstance(c,str) and c in ('notes','agenda','task-state','photos') for c in caps) and len(set(caps))==len(caps),'Invalid capability declaration')
+        require(isinstance(caps,list) and len(caps)<=5 and all(isinstance(c,str) and c in ('notes','agenda','task-state','photos','sensors') for c in caps) and len(set(caps))==len(caps),'Invalid capability declaration')
     require(not any(k in manifest for k in ('theme_mode', 'theme_id')), 'Apps must follow the active system theme')
     require(2 <= len(files) <= 100 and 'index.html' in files and 'icon.svg' in files, 'Complete app files required')
     for name, content in files.items():

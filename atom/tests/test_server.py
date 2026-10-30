@@ -58,6 +58,27 @@ class APITests(unittest.TestCase):
     def package(self):
         return {'manifest': {'id': 'demo', 'name': 'Demo', 'entry': 'index.html', 'input': {'version':1,'profile':'five-way','back':'root'}}, 'files': {'index.html': '<h1>Hello</h1>', 'nested/main.js': 'hello'}}
 
+    def test_sensor_endpoint_is_read_only_and_not_cross_origin(self):
+        snapshot = {'version': 1, 'source': 'unavailable',
+                    'available': {'presence': False, 'motion': False},
+                    'presence': None, 'motion': None, 'updated_at': 0}
+        self.http.sensors = mock.Mock()
+        self.http.sensors.snapshot.return_value = snapshot
+        with urllib.request.urlopen(self.url + '/api/sensors') as response:
+            self.assertEqual(json.load(response), snapshot)
+            self.assertIsNone(response.headers.get('Access-Control-Allow-Origin'))
+        self.assertNotEqual(self.request('/api/sensors', {'presence': True})[0], 200)
+
+
+    def test_sensor_capability_survives_install_and_update(self):
+        package = self.package()
+        package['manifest']['capabilities'] = ['sensors']
+        self.assertEqual(self.request('/api/apps/install', package)[0], 201)
+        self.assertEqual(self.request('/api/apps/update', package)[0], 201)
+        manifest = json.loads((self.root / 'demo' / 'manifest.json').read_text())
+        self.assertEqual(manifest['capabilities'], ['sensors'])
+
+
     def test_system_shell_is_not_cached(self):
         for path in ('/', '/app.js', '/home-key.js', '/style.css', '/app-runtime.js', '/app-input-standard.json', '/input-navigation.js', '/app-host.js', '/companion.js'):
             with urllib.request.urlopen(self.url + path) as response:

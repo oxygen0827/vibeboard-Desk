@@ -48,3 +48,7 @@ async function increment() {
 完整接入说明与阶段边界见 [五向摇杆导航](five-way-navigation.md)。
 
 新生成、安装/更新、发布应用必须遵守 [五向输入强制规范 v1](input-standard.md)，声明 `manifest.input` 并通过共享准入校验。声明不等同于实际操作验收。
+
+## 可选感知输入
+
+应用声明 `capabilities: ["sensors"]` 后可使用 `AtomApp.sensors.subscribe(callback)`。系统仅向已授权的前台安装应用提供只读快照；预览不授予硬件访问。未连接、采样过期均为未知，不能当作无人。退出取消订阅，保留鼠标与五向完整玩法。字段、单位、适配器和测试要求见 [传感器契约](sensors.md)。传感器型号尚未选定，模拟通过不代表真机接入完成。

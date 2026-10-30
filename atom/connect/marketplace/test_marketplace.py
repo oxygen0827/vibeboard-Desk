@@ -235,11 +235,11 @@ class MarketplaceTests(unittest.TestCase):
             server.shutdown();server.server_close();thread.join();relay.close()
 
     def test_capabilities_are_narrow_unique_and_survive_fork(self):
-        source=bundle();source['manifest']['capabilities']=['notes','agenda','task-state']
+        source=bundle();source['manifest']['capabilities']=['notes','agenda','task-state','photos','sensors']
         draft=self.draft(source=source)
         published=self.publish(draft)
         fork=self.call('/forks',dict(version_id=published['version']['id']),self.b)['draft']
-        self.assertEqual(self.call('/drafts/'+fork['id'],who=self.b)['bundle']['manifest']['capabilities'],['notes','agenda','task-state'])
+        self.assertEqual(self.call('/drafts/'+fork['id'],who=self.b)['bundle']['manifest']['capabilities'],['notes','agenda','task-state','photos','sensors'])
         for caps in (['market-login'],['connect'],['admin'],['notes','notes'],['notes','agenda','task-state','notes'],'notes',[{}],[['notes']]):
             source=bundle();source['manifest']['capabilities']=caps
             self.denied(400,lambda:self.draft(source=source))
@@ -259,7 +259,7 @@ class MarketplaceTests(unittest.TestCase):
         current=m.Marketplace(str(Path(self.tmp.name)/'official-live.db'),seeds=source_root)
         try:
             works=current.handle('GET','/market/v1/catalog')['works']
-            self.assertEqual({w['category'] for w in works},{'life','sound','play','connect'})
+            self.assertEqual({w['category'] for w in works},{'life','sound','play','connect','companion'})
             self.assertEqual(len({w['id'] for w in works}),len(works))
             album=next(w for w in works if w['id']=='official-photo-album')
             self.assertEqual(album['category'],'life')

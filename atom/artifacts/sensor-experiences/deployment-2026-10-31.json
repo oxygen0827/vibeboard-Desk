@@ -1,0 +1,54 @@
+{
+  "agent-studio": {
+    "source_files_match": true,
+    "checked_files": 3
+  },
+  "photo-album": {
+    "source_files_match": true,
+    "checked_files": 3
+  },
+  "focus-garden": {
+    "source_files_match": true,
+    "checked_files": 5
+  },
+  "motion-music": {
+    "source_files_match": true,
+    "checked_files": 6
+  },
+  "runtime": {
+    "merged_shell_hash_match": true,
+    "shared_sdk_hash_match": true
+  },
+  "sensors": {
+    "version": 1,
+    "source": "unavailable",
+    "available": {
+      "presence": false,
+      "motion": false
+    },
+    "presence": null,
+    "motion": null,
+    "updated_at": 1793387614370
+  },
+  "deployed_files_sha256": {
+    "server.py": "b18ff8fbc8efb9c6f48b5ae9385b4b6d1ebb3de4bfa4782e9c68aff154762f09",
+    "sensors.py": "748b7de9aaea55445915f0e38a4eb8785ca3a1aecce363358473b683e28586fe",
+    "static/app.js": "bea376ba03d1115709d315dd6976475212ec365df3b7ea3609f8e393cfdde477",
+    "static/app-host.js": "0a412213c17bcf4332f73b945fa13b4b7834ddee783700a996b824c6bc33a907",
+    "static/app-runtime.js": "8ae98162ed9ad962f981586f3e1d7122c270daaad472e92932a08c3eb717254d"
+  },
+  "community_routes_preserved": [
+    "community-install",
+    "workshop-save"
+  ],
+  "backup": "/home/linaro/atom-sensor-backup-20261031-final",
+  "scope": "gray-device; cloud publishing and Mac package excluded",
+  "agent_studio_root_return": "explicit AtomApp.home; corrected and installed",
+  "browser_flows": {
+    "focus-garden": "passed: live device resources, SDK permission, fullscreen, integrated return to source desktop page",
+    "motion-music": "passed: live device resources, SDK permission, fullscreen, integrated return to source desktop page",
+    "agent-studio": "passed: live device resources, SDK permission, fullscreen, integrated return to source desktop page",
+    "photo-album": "passed: live device resources, SDK permission, fullscreen, integrated return to source desktop page"
+  },
+  "physical_screen": "focus-garden icon and rendered manual UI verified; no sensor hardware or long-run performance claim"
+}

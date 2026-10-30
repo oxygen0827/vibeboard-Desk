@@ -1,0 +1,46 @@
+// Injected sensor fixtures exercise UI contracts; no physical sensors are claimed by these tests.
+const assert=require('node:assert/strict'),http=require('node:http'),fs=require('node:fs'),path=require('node:path');
+const {chromium,executablePath}=require('../../tools/browser-test-runtime.cjs');
+const demo='data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="960" height="700"><defs><linearGradient id="g" x2="0" y2="1"><stop stop-color="#1c416b"/><stop offset="1" stop-color="#bca4a0"/></linearGradient></defs><path fill="url(#g)" d="M0 0h960v700H0z"/><circle fill="#ece0bc" cx="680" cy="170" r="48"/><path fill="#223f45" d="M0 430 180 290 420 480 660 320 960 490V700H0"/><path fill="#142e37" d="M0 540 230 470 550 610 960 470V700H0"/></svg>');
+const host=`<meta charset="utf-8"><style>body{margin:0}iframe{border:0;width:100vw;height:100vh}</style><iframe src="/index.html" sandbox="allow-scripts"></iframe><script>addEventListener('message',e=>{const d=e.data;if(d?.type!=='atom:photos')return;const photo={id:'demo',revision:1,name:'演示照片 · 月色山谷',thumbnail:${JSON.stringify(demo)}};const result=d.action==='state'?{user:{id:'demo',username:'演示账号'},styles:[{id:'clay'}]}:d.action==='list'?{items:[photo],total:1,pages:1}:d.action==='get'?{photo,data_url:photo.thumbnail}:{};e.source.postMessage({type:'atom:photos-result',id:d.id,result},'*')})</script>`;
+(async()=>{
+ const server=http.createServer((req,res)=>{const name=new URL(req.url,'http://localhost').pathname.slice(1);if(name&&!['index.html','app.js','style.css','icon.svg'].includes(name)){res.statusCode=404;return res.end()}res.setHeader('Content-Type',name.endsWith('.js')?'text/javascript':name.endsWith('.css')?'text/css':'text/html');res.end(name?fs.readFileSync(path.join(__dirname,name)):host)});
+ await new Promise(r=>server.listen(0,'127.0.0.1',r));const browser=await chromium.launch({executablePath,headless:true});
+ try{
+ for(const size of [{width:480,height:360},{width:960,height:700}]){
+ const p=await browser.newPage({viewport:size});const errors=[];p.on('pageerror',e=>errors.push(e.message));
+ await p.addInitScript(()=>{
+  const now=Date.now.bind(Date);window.clockOffset=0;Date.now=()=>now()+window.clockOffset;window.saves=[];window.unsubscribed=0;window.subscriptions=0;
+  window.AtomApp={deferReady(){},ready(){},load:async()=>{if(window.loadFailure)throw Error('read failed');return {style:'clay',otherPreference:'preserved'}},save:async s=>{window.saves.push(s);if(window.saveFailure)throw Error('disk failed');if(window.saveDelay)await new Promise(r=>window.resolveSave=r);return {mode:'device'}},navigation:{setBackHandler:f=>window.backFixture=f},home(){window.homeFixture=true},onSuspend:f=>window.suspendFixture=f,sensors:{subscribe(f){window.subscriptions++;window.sensorFixture=f;return()=>{window.unsubscribed++;window.sensorFixture=null}}}};
+  window.emit=(present,motion)=>sensorFixture({version:1,source:'device',available:{presence:true,motion:!!motion},presence:{present},motion:motion||null,updated_at:Date.now()});
+ });
+ await p.goto('http://127.0.0.1:'+server.address().port);const app=p.frames()[1],f=p.frameLocator('iframe');await f.locator('.photo').waitFor();await f.locator('[data-action="frame-settings"]').click();
+ assert.equal(await f.getByRole('switch').getAttribute('aria-checked'),'false');await f.getByText('感知未启用 · 开启后连接').waitFor();assert.equal(await app.evaluate(()=>subscriptions),0,'opening album must not request sensor permission');
+ await app.addScriptTag({path:path.join(__dirname,'../../static/input-navigation.js')});await app.evaluate(()=>AtomInput.setBackHandler(window.backFixture));
+ await app.evaluate(()=>{window.saveDelay=true;AtomInput.focus(document.querySelector('[role=switch]'))});await p.keyboard.press('Space');await f.getByText('保存中…').waitFor();assert.equal(await f.getByRole('switch').getAttribute('aria-checked'),'false');
+ await app.evaluate(()=>{window.resolveSave();window.saveDelay=false});await f.getByText('相框偏好已保存',{exact:true}).waitFor();assert.equal(await f.getByRole('switch').getAttribute('aria-checked'),'true');assert.equal(await app.evaluate(()=>saves[0].otherPreference),'preserved');assert.equal(await app.evaluate(()=>subscriptions),1);
+ await app.evaluate(()=>{window.saveFailure=true});await f.getByRole('switch').click();await f.getByText('相框设置未保存，请重试').waitFor();assert.equal(await f.getByRole('switch').getAttribute('aria-checked'),'true');await app.evaluate(()=>window.saveFailure=false);
+ await app.evaluate(()=>window.emit(true,{roll:0,pitch:0,moving:false}));await f.getByText('存在感知已连接 · 动作感知已连接').waitFor();
+ assert.equal(await f.locator('body').evaluate(e=>e.scrollHeight<=e.clientHeight),true);
+ await f.getByRole('switch').click();assert.equal(await app.evaluate(()=>unsubscribed),1);await f.getByText('感知未启用 · 开启后连接').waitFor();await f.getByRole('switch').click();assert.equal(await app.evaluate(()=>subscriptions),2);await p.screenshot({path:'/tmp/atom-frame-settings-'+size.width+'.png'});
+ await app.evaluate(()=>AtomInput.back());await f.locator('.photo').click();await f.locator('.photo-loading').waitFor({state:'detached'});await f.locator('[data-action="slideshow"]').click();
+ await app.evaluate(()=>{clockOffset+=11000;emit(false,{roll:0,pitch:0,moving:false})});await app.evaluate(()=>{clockOffset+=9000;emit(false,{roll:0,pitch:0,moving:false})});assert.equal(await f.locator('.viewer.frame-dimmed').count(),1);assert.equal(await f.locator('.viewer.clean').count(),1);
+ await app.evaluate(()=>emit(true,{roll:0,pitch:0,moving:false}));assert.equal(await f.locator('.viewer.frame-dimmed').count(),0);assert.equal(await f.locator('.viewer.clean').count(),1,'presence alone must not flash toolbar');
+ await app.evaluate(()=>emit(true,{roll:15,pitch:0,moving:true}));assert.equal(await f.locator('.viewer:not(.clean)').count(),1);
+ await app.evaluate(()=>{document.documentElement.dataset.atomInput='pointer';document.activeElement.blur()});await p.waitForTimeout(3700);assert.equal(await f.locator('.viewer.clean').count(),1);
+ await app.evaluate(()=>{clockOffset+=9000;emit(true,{roll:15.4,pitch:.3,moving:true})});assert.equal(await f.locator('.viewer.clean').count(),1,'stationary noise and sustained moving must not wake');
+ await app.evaluate(()=>emit(false,{roll:15.4,pitch:.3,moving:true}));await app.evaluate(()=>{clockOffset+=11000;emit(false,{roll:15.4,pitch:.3,moving:true})});assert.equal(await f.locator('.viewer.frame-dimmed').count(),1);
+ await app.evaluate(()=>clockOffset+=11000);await p.waitForTimeout(1100);assert.equal(await f.locator('.viewer.frame-dimmed').count(),0,'stale sensor restores photo');
+ await app.evaluate(()=>sensorFixture({version:1,source:'unavailable',available:{presence:false,motion:false},presence:null,motion:null,updated_at:Date.now()}));
+ await p.mouse.move(size.width/2,size.height/2);await f.locator('.viewer:not(.clean)').waitFor();await p.waitForTimeout(350);await p.screenshot({path:'/tmp/atom-frame-viewer-'+size.width+'.png'});
+ await f.locator('[data-action="frame-settings"]').click();await f.getByText('存在感知未连接 · 动作感知未连接').waitFor();await app.evaluate(()=>AtomInput.back());await f.locator('.viewer').waitFor();await app.evaluate(()=>AtomInput.back());await f.locator('.photo').waitFor();
+ await app.evaluate(()=>window.suspendFixture());assert.equal(await app.evaluate(()=>window.unsubscribed),2);assert.equal(await f.locator('#root').innerText(),'');assert.deepEqual(errors,[]);await p.close();
+ }
+ const failed=await browser.newPage({viewport:{width:480,height:360}});
+ await failed.addInitScript(()=>{window.loadFails=true;window.saveCalls=0;window.AtomApp={deferReady(){},ready(){},load:async()=>{if(loadFails)throw Error('read failure');return {style:'clay',frameSensing:true}},save:async()=>{saveCalls++;return {mode:'device'}},navigation:{setBackHandler(){}},onSuspend(){}}});
+ await failed.goto('http://127.0.0.1:'+server.address().port);const ff=failed.frameLocator('iframe');await ff.locator('.photo').waitFor();await ff.locator('[data-action="frame-settings"]').click();assert.equal(await ff.getByRole('switch').isDisabled(),true);assert.equal(await failed.frames()[1].evaluate(()=>saveCalls),0);await failed.frames()[1].evaluate(()=>loadFails=false);await ff.getByRole('button',{name:'重试读取'}).click();await ff.getByRole('switch',{name:'已开启'}).waitFor();await failed.emulateMedia({reducedMotion:'reduce'});await failed.close();
+ // No SDK / Mac fallback never invents connected hardware or durable saves.
+ const mac=await browser.newPage({viewport:{width:960,height:700}});await mac.goto('http://127.0.0.1:'+server.address().port);const mf=mac.frameLocator('iframe');await mf.locator('.photo').waitFor();await mf.locator('[data-action="frame-settings"]').click();await mf.getByRole('switch').click();await mf.getByText('仅在本次预览生效').waitFor();await mf.getByText('存在感知未连接 · 动作感知未连接').waitFor();await mac.close();
+ console.log('PASS sensing frame: defaults/unavailable, save ACK/failure, presence/restoration/stale, motion/noise, five-way return, suspend; 480x360 and 960x700. Screenshots in /tmp/atom-frame-*.png');
+ }finally{await browser.close();await new Promise(r=>server.close(r))}
+})().catch(e=>{console.error(e);process.exitCode=1});

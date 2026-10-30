@@ -23,7 +23,9 @@
     "personality-planet": "life",
     "natal-whispers": "life",
     "glass-ecosystem": "play",
-    "element-sandbox": "play"
+    "element-sandbox": "play",
+    "focus-garden": "companion",
+    "motion-music": "sound"
   },
   "extra_sources": [
     "../experiences/world/bundle.json",

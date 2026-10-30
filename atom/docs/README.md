@@ -21,6 +21,7 @@
 | 布局、主题、控件与图标 | [设计规范](design-system.md)、[系统外观](system-appearance.md) |
 | 发布截图封面 | [封面规范](market-covers.md) |
 | 生成与模型配置 | [工作坊与主题](workshop-and-themes.md)、[工作坊 API](workshop-api.md)、[生成校验](generation-validation.md) |
+| 感知应用与可选硬件 | [开发计划](sensor-experiences-plan.md)、[共享传感器接口](sensors.md) |
 | 本地设备接口 | [API](api.md) |
 
 ## 三端部署与维护

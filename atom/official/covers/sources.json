@@ -24,8 +24,8 @@
     "capture": "Reviewed application UI; empty/demo state for private-data applications"
   },
   "agent-studio": {
-    "source": "site/assets/agent-studio.png",
-    "capture": "Reviewed application UI; empty/demo state for private-data applications"
+    "source": "artifacts/sensor-experiences/agent-studio.png",
+    "capture": "Reviewed actual rendered UI; no private content. Empty state for focus-garden; manual, disconnected scene for agent-studio. Captured 2026-10-31; not evidence of connected sensors."
   },
   "mini-piano": {
     "source": "site/assets/apps/mini-piano.png",
@@ -90,5 +90,13 @@
   "element-sandbox": {
     "source": "artifacts/life-apps-20261023/element-sandbox.png",
     "capture": "Actual rendered homepage; empty/demo data; no private user content"
+  },
+  "focus-garden": {
+    "source": "artifacts/sensor-experiences/focus-garden.png",
+    "capture": "Reviewed actual rendered UI; no private content. Empty state for focus-garden; manual, disconnected scene for agent-studio. Captured 2026-10-31; not evidence of connected sensors."
+  },
+  "motion-music": {
+    "source": "artifacts/sensor-experiences/motion-music.png",
+    "capture": "Reviewed actual rendered UI; no private content. Empty state for focus-garden; manual, disconnected scene for agent-studio. Captured 2026-10-31; not evidence of connected sensors."
   }
 }

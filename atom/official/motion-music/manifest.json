@@ -1,0 +1,15 @@
+{
+  "id": "motion-music",
+  "name": "音乐物理沙盒",
+  "description": "把一枚小球、一片海和一束光装进口袋。拖动、倾斜、碰撞成曲，录下自己的五声音阶。",
+  "version": "1.0.0",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "layout": "fullscreen",
+  "theme_ui": "controls",
+  "category": "music",
+  "author": "ATOM",
+  "license": "MIT",
+  "capabilities": ["sensors"],
+  "input": {"version": 1, "profile": "five-way", "back": "root", "scene": "controls"}
+}

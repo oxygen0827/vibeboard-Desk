@@ -1,0 +1,1 @@
+{"id":"focus-garden","name":"专注花园","description":"给一件小事留一段时间，完成后亲手种下一株植物。真实计时、确认成长、存在感知辅助提醒。","entry":"index.html","icon":"icon.svg","layout":"fullscreen","theme_ui":"controls","capabilities":["sensors"],"input":{"version":1,"profile":"five-way","back":"root","scene":"none"}}

@@ -207,7 +207,7 @@ def validate_manifest(value, trusted_connect=False):
     if input_declaration is not None: result['input'] = input_declaration
     if 'capabilities' in value:
         caps = value['capabilities']
-        if not isinstance(caps,list) or len(caps)>4 or any(not isinstance(c,str) or c not in ('notes','agenda','task-state','photos') for c in caps) or len(set(caps))!=len(caps): raise ValueError('invalid app capabilities')
+        if not isinstance(caps,list) or len(caps)>5 or any(not isinstance(c,str) or c not in ('notes','agenda','task-state','photos','sensors') for c in caps) or len(set(caps))!=len(caps): raise ValueError('invalid app capabilities')
         result['capabilities'] = caps
     if 'theme_ui' in value:
         if value['theme_ui'] != 'controls': raise ValueError('invalid theme_ui')
@@ -416,6 +416,13 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         path = urlsplit(self.path).path
+        if path == '/api/sensors':
+            with FEATURE_LOCK:
+                if not hasattr(self.server, 'sensors'):
+                    from sensors import Sensors
+                    self.server.sensors = Sensors()
+            self.json_response(200, self.server.sensors.snapshot())
+            return
         if path in ('/api/themes', '/api/model-config', '/api/voice/status', '/api/voice/speech-status', '/api/connect/state') or path.startswith('/api/workshop/jobs/'):
             service = features(self.server)
             try:
