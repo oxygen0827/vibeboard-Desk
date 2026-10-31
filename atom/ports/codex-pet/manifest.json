@@ -1,0 +1,11 @@
+{
+  "id": "codex-pet",
+  "name": "Codex 宠物",
+  "description": "离线九态宠物，呈现 Connect 任务和经 SSH 送达的 Codex 桌面 Hook 摘要。",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "layout": "fullscreen",
+  "theme_ui": "controls",
+  "capabilities": ["task-state"],
+  "input": {"version": 1, "profile": "five-way", "back": "custom", "scene": "controls"}
+}

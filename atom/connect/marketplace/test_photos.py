@@ -67,6 +67,27 @@ class PhotosTests(unittest.TestCase):
             time.sleep(.02)
         self.fail('job did not finish')
 
+    def test_pet_reference_requires_owned_photo_and_preserves_original(self):
+        self.denied(400, lambda: self.call('/generate', {'request_id':secrets.token_hex(16), 'style':'pet', 'prompt':'毛绒'}))
+        source = self.upload()
+        body = {'request_id':secrets.token_hex(16), 'source_id':source['id'], 'style':'pet', 'prompt':'毛绒'}
+        self.denied(404, lambda: self.call('/generate', body, self.b))
+        first = self.call('/generate', body)['job']
+        again = self.call('/generate', body)['job']
+        self.assertEqual(first['id'], again['id'])
+        result = self.finish(first['id'])
+        self.assertEqual('completed', result['status'])
+        self.assertEqual(1, len(self.fake.calls))
+        prompt, reference = self.fake.calls[0]
+        self.assertIn('纯黑', prompt)
+        self.assertIn('毛绒', prompt)
+        self.assertIn('保留原肤色', prompt)
+        self.assertTrue(reference.startswith('data:image/jpeg;base64,'))
+        generated = self.call('/'+result['photo_id'])['photo']
+        self.assertEqual(source['id'], generated['parent_id'])
+        self.assertEqual('pet', generated['style'])
+        self.assertEqual(source, self.call('/'+source['id'])['photo'])
+
     def test_original_thumbnail_account_isolation_and_atomic_backup(self):
         raw = picture()
         p = self.upload(raw=raw)

@@ -1,0 +1,96 @@
+{
+  "id": "robo-face",
+  "steps": [
+    "#menu",
+    "#laugh",
+    "#close"
+  ],
+  "before": {
+    "title": "机器人眼睛",
+    "text": "···\n移动鼠标，它会看向你 · 点击逗它笑",
+    "size": {
+      "width": 480,
+      "height": 360
+    },
+    "controls": [
+      {
+        "tag": "BUTTON",
+        "id": "menu",
+        "label": "打开控制",
+        "disabled": false,
+        "x": 426,
+        "y": 10,
+        "w": 44,
+        "h": 44,
+        "font": "22px"
+      },
+      {
+        "tag": "BUTTON",
+        "id": "atom-app-back",
+        "label": "返回上一级",
+        "disabled": false,
+        "x": 0,
+        "y": 0,
+        "w": 48,
+        "h": 48,
+        "font": "14px"
+      }
+    ],
+    "canvases": 1,
+    "frames": 131,
+    "media": []
+  },
+  "after": {
+    "title": "机器人眼睛",
+    "text": "···\n移动鼠标，它会看向你 · 点击逗它笑",
+    "size": {
+      "width": 480,
+      "height": 360
+    },
+    "controls": [
+      {
+        "tag": "BUTTON",
+        "id": "menu",
+        "label": "打开控制",
+        "disabled": false,
+        "x": 426,
+        "y": 10,
+        "w": 44,
+        "h": 44,
+        "font": "22px"
+      },
+      {
+        "tag": "BUTTON",
+        "id": "atom-app-back",
+        "label": "返回上一级",
+        "disabled": false,
+        "x": 0,
+        "y": 0,
+        "w": 48,
+        "h": 48,
+        "font": "14px"
+      }
+    ],
+    "canvases": 1,
+    "frames": 179,
+    "media": []
+  },
+  "fixture": {
+    "ready": true,
+    "value": null,
+    "saves": 0,
+    "returned": 0,
+    "unsupported": [
+      "atom:input-mode"
+    ],
+    "calls": []
+  },
+  "suspend": {
+    "frames": 180,
+    "intervals": 0,
+    "audio": [],
+    "growth": 0
+  },
+  "errors": [],
+  "status": "reviewed"
+}

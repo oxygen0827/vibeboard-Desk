@@ -1,0 +1,82 @@
+{
+  "description": "Send sanitized Codex activity metadata to the gray ATOM companion over SSH.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/usr/bin/python3 /Users/hsh/vibecoding/vibeboard-Desk/atom/tools/codex_pet_hook.py --ssh-host linaro@150.158.146.192 --ssh-port 6278 --identity-file /Users/hsh/.ssh/atom_gray_friend --remote-root /home/linaro/atom",
+            "timeout": 8
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/usr/bin/python3 /Users/hsh/vibecoding/vibeboard-Desk/atom/tools/codex_pet_hook.py --ssh-host linaro@150.158.146.192 --ssh-port 6278 --identity-file /Users/hsh/.ssh/atom_gray_friend --remote-root /home/linaro/atom",
+            "timeout": 8
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/usr/bin/python3 /Users/hsh/vibecoding/vibeboard-Desk/atom/tools/codex_pet_hook.py --ssh-host linaro@150.158.146.192 --ssh-port 6278 --identity-file /Users/hsh/.ssh/atom_gray_friend --remote-root /home/linaro/atom",
+            "timeout": 8
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/usr/bin/python3 /Users/hsh/vibecoding/vibeboard-Desk/atom/tools/codex_pet_hook.py --ssh-host linaro@150.158.146.192 --ssh-port 6278 --identity-file /Users/hsh/.ssh/atom_gray_friend --remote-root /home/linaro/atom",
+            "timeout": 8
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/usr/bin/python3 /Users/hsh/vibecoding/vibeboard-Desk/atom/tools/codex_pet_hook.py --ssh-host linaro@150.158.146.192 --ssh-port 6278 --identity-file /Users/hsh/.ssh/atom_gray_friend --remote-root /home/linaro/atom",
+            "timeout": 8
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/usr/bin/python3 /Users/hsh/vibecoding/vibeboard-Desk/atom/tools/codex_pet_hook.py --ssh-host linaro@150.158.146.192 --ssh-port 6278 --identity-file /Users/hsh/.ssh/atom_gray_friend --remote-root /home/linaro/atom",
+            "timeout": 8
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/usr/bin/python3 /Users/hsh/vibecoding/vibeboard-Desk/atom/tools/codex_pet_hook.py --ssh-host linaro@150.158.146.192 --ssh-port 6278 --identity-file /Users/hsh/.ssh/atom_gray_friend --remote-root /home/linaro/atom",
+            "timeout": 8
+          }
+        ]
+      }
+    ]
+  }
+}

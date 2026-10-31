@@ -1,6 +1,6 @@
 # ATOM Connect 电脑端
 
-本程序在电脑本地运行，通过出站 HTTPS 轮询中继服务器接收 ATOM 的任务，调用本机 Codex 官方 stdio app-server，回传文本、状态、审批与结果。它管理自己的会话，不接管已有 Codex 桌面窗口。
+本程序在电脑本地运行，通过出站 HTTPS 轮询中继服务器接收 ATOM 的任务，调用电脑上配置的执行器，回传文本、状态、审批与结果。它管理自己的会话，不接管已有 Codex 桌面窗口。
 
 ## 启动
 
@@ -171,3 +171,39 @@ AI 整理补充真实验收：最终重建的 Mac App 经真实 Codex 完成整�
 ## 同账号发现与模拟设备镜像
 
 两端登录同一 ATOM 账号后，Mac 的「设备与连接」会列出在线小电脑；仍需在设备明确确认并核对安全码。原配对码方式保留。模拟设备的单向数据镜像需要设备端先授权，再由 Mac 明确同步，详见[系统维护说明](../../docs/system-maintenance.md)。
+
+
+## 多执行器接入
+
+办公室和「我的电脑」从已配对电脑公布的列表选择执行器，不需要重写应用前端。每个目标目前使用一个选定执行器，工作包仍然串行；本次接入没有增加员工并行调度。
+
+| 执行器 | 接口与配置 | 接入限制 |
+|---|---|---|
+| Codex | 原有官方 stdio app-server；`codex login` | 保留原有审批、项目权限和续聊 |
+| Claude Agent | 原有官方 SDK 与 API key | 安装 Claude CLI 不代表 SDK 和 API 账号已配置 |
+| OpenCode | `opencode acp`；`opencode auth login` | ACP v1；会话创建成功不保证模型额度或网络可用 |
+| Kimi Code | `kimi acp`；`kimi login` | ACP v1；必须实际支持该协议，不能拿普通终端输出代替 |
+| Pi | `pi --mode rpc` | 只开启 read/grep/find/ls；关闭扩展、MCP、技能和提示模板；不支持续聊 |
+
+可用 `ATOM_CODEX_BINARY`、`ATOM_OPENCODE_BINARY`、`ATOM_KIMI_BINARY`、`ATOM_PI_BINARY` 指定可执行文件。探测兼容图形应用的短 PATH，查找常见用户安装目录；无效显式路径不会悄悄回退。所有诊断独立失败，不因一个执行器缺失阻断其它执行器。
+
+OpenCode 的进程级权限策略覆盖默认允许操作：普通项目工具请求审批，只读项目默认拒绝写入和命令；保留模型等已有内联配置。ACP 只回答当前正在运行会话的单次许可，不提供永久许可。执行器未提供 `loadSession` 时，继续旧任务明确失败，不能静默丢失上下文。
+
+Pi 必须有已选择且出现在可用列表中的模型才能标记为可用；这不是付费额度验证。它以 `agent_settled` 和最后一条 assistant 的结束原因确认结果，不把请求接收、扩展处理、`agent_end` 或错误后的残余文本当作成功。旧版 Pi 不支持所需协议／参数时不承诺兼容。
+
+这些工具限制不是操作系统级的文件系统隔离。尤其 ACP 的工具许可依赖执行器履行协议，Pi 的读取工具不限制在项目目录内。不得把“只读工具”描述为“无法读取其它文件”，也不能用提示词替代隔离成果方案。
+
+验证命令：
+
+```sh
+node --test atom/connect/computer/test/*.test.mjs
+# 以下命令会调用真实模型，在临时空目录中仅请求固定文本，拒绝所有工具审批：
+node atom/connect/computer/tools/check-executor.mjs codex
+node atom/connect/computer/tools/check-executor.mjs opencode
+```
+
+ACP 执行器提交任务后若 3 分钟内没有任何消息（等待用户审批时不计时），任务判定失败并向执行器发送 `session/cancel`，设备显示原因。原因：OpenCode 在 ACP 模式下遇到模型服务错误（实测为 DeepSeek 余额不足，终端运行 `opencode run` 会显示 `Insufficient Balance`）时不返回错误，任务会永远停在“执行中”。
+
+本轮本机验证：Codex 真实固定回复成功且目录未改动，并从灰色小电脑经 Connect 派发完成；OpenCode 握手和会话创建通过，真实回复因所配置的 DeepSeek 账户余额不足无法完成，已从灰色小电脑实测 3 分钟后以上述原因失败；Claude 缺少 SDK/API 配置，Kimi 与 Pi 未安装，后两者仅通过协议替身测试。不能把这些结果描述为五种模型均已真实联调成功。
+
+协议依据：[ACP v1](https://agentclientprotocol.com/protocol/v1/prompt-turn)、[OpenCode 权限](https://opencode.ai/docs/permissions/)、[Kimi ACP](https://moonshotai.github.io/kimi-cli/en/reference/kimi-acp.html)、[Pi RPC](https://github.com/badlogic/pi-mono/blob/main/packages/coding-agent/docs/rpc.md)、[Pi CLI 资源控制](https://github.com/badlogic/pi-mono/blob/main/packages/coding-agent/docs/cli.md)。

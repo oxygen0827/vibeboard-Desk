@@ -1,0 +1,16 @@
+{
+  "id": "agent-office",
+  "name": "像素办公室",
+  "description": "四名像素员工组成的综合助理小队：确认分工后在已配对电脑上真实执行任务，完成后走来汇报。",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "theme_ui": "controls",
+  "layout": "fullscreen",
+  "capabilities": ["office-control"],
+  "input": {
+    "version": 1,
+    "profile": "five-way",
+    "back": "custom",
+    "scene": "controls"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "app": "photo-pet",
+  "change": "crop-aware gardening events",
+  "duration_seconds": 96,
+  "bonus_per_fertilized_plot": 1,
+  "tests": {
+    "yard_flow": "pass",
+    "ambient_motion": "pass",
+    "gardener_events": "pass",
+    "max_gardener_wrist_step_px_at_30fps": 2.400000000000889,
+    "feet_stable": true,
+    "fixed_limb_lengths": true,
+    "no_render_time_state_writes": true,
+    "reduced_motion_route_disabled": true,
+    "legacy_30_and_60_second_jobs_preserved": true
+  },
+  "admission": {
+    "errors": 0,
+    "warnings": [
+      "Recurring updates: check device lifecycle and idle CPU"
+    ]
+  },
+  "bundle_sha256": "0cd3e10af89de30d5c695d0da46b59050e6131c0b37228edf131d4e884fbbb5e",
+  "bundle_bytes": 1626840,
+  "verified_at_utc": "2026-10-31T02:28:57.498509+00:00",
+  "device": {
+    "installed": true,
+    "verified_files": 13,
+    "installed_at_ns": 1793192014984748822,
+    "live_playthrough": "not completed: foreground switched to unrelated apps during verification; stopped UI control",
+    "cpu": "Discarded active sample: screenshot showed desktop, not the courtyard. Local suspend test passed; no new app CPU claim."
+  }
+}

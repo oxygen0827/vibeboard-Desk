@@ -17,10 +17,10 @@ const labels={queued:'等待开始',generating:'正在生成',saving:'正在保�
 let alive=true,seq=0,pending=new Map(),user=null,accountChecked=false,config=null,screen='library',filter='all',page=0,listing={items:[],pages:0,total:0},
     selected=null,reference=null,before=null,job=null,jobs=[],busy=false,loading=false,message='',error='',readFailed=false,
     prefs={style:'clay',frameSensing:false},frameSensing=false,frameSaving=false,frameReturn='library',prompt='',style='clay',slideshow=false,clean=false,hideTimer=null,slideTimer=null,pollTimer=null,syncTimer=null,
-    zoom=1,panX=0,panY=0,zoomPhoto=null,suppressClick=false,photoLoading=false,photoCache=new Map(),photoRequests=new Map(),generationRequest=null,creatingSignature='',deleteConfirm=false,voice='',viewEpoch=0,accountEpoch=0;
+    zoom=1,panX=0,panY=0,zoomPhoto=null,suppressClick=false,photoLoading=false,photoCache=new Map(),photoRequests=new Map(),choosingFile=false,generationRequest=null,creatingSignature='',deleteConfirm=false,voice='',viewEpoch=0,accountEpoch=0;
 const limit=()=>innerWidth<=600?6:12;
 function rpc(action,data={}){if(!alive)return Promise.reject(Error('相册已关闭'));return new Promise((resolve,reject)=>{
- const id='photo-'+(++seq),t=setTimeout(()=>{pending.delete(id);reject(Error('连接超时，请刷新查看结果；生成任务不会自动重发'))},action==='download'?300000:action==='upload'?180000:60000);
+ const id='photo-'+(++seq),t=setTimeout(()=>{pending.delete(id);reject(Error('连接超时，请刷新查看结果；生成任务不会自动重发'))},['download','camera'].includes(action)?300000:action==='upload'?180000:60000);
  pending.set(id,{resolve,reject,t});parent.postMessage({type:'atom:photos',id,action,data:{...data,...(user&&action!=='state'?{expected_user_id:user.id}:{})}},'*');
 });}
 window.addEventListener('message',e=>{if(e.source!==parent)return;const d=e.data||{};
@@ -55,11 +55,11 @@ function render(){if(!alive)return;
    '<div class="frame-status" role="status"></div><p class="frame-note">只影响全屏照片，不改变屏幕亮度。感知未连接时，仍可手动浏览与轮播。</p>'+
    (readFailed?'<p>偏好读取失败，未覆盖原记录。</p>'+button('retry-read','重试读取'):'')+'</div>'+feedback();
  }else if(screen==='create'){
-  html=heading('灵感暗房',reference?'给这张照片一个新模样':'把想象留成一张照片','')+
+  html=heading(style==='pet'?'照片变宠物':'灵感暗房',reference?'给这张照片一个新模样':'把想象留成一张照片','')+
    '<div class="studio"><div class="reference">'+(reference?'<img src="'+esc(reference.data_url)+'" alt="参考照片"><span class="reference-label">参考照片</span>':empty('从想象开始','描述一个画面<br>挑选你喜欢的风格'))+'</div><div class="create-form">'+
-   '<div class="creation-presets"><label>创作模板<select id="photo-template" aria-label="创作模板，替换当前描述"><option value="">选择模板 · 可修改</option>'+((config&&config.templates)||[]).filter(t=>t.mode===(reference?'edit':'text')).map(t=>'<option value="'+esc(t.id)+'">'+esc(t.name)+'</option>').join('')+'</select></label><label>画面风格<select id="photo-style" aria-label="画面风格">'+(config&&config.styles||[]).map(s=>'<option value="'+esc(s.id)+'" '+(style===s.id?'selected':'')+'>'+esc(s.name)+'</option>').join('')+'</select></label></div>'+
-   '<textarea id="photo-prompt" aria-label="画面描述" maxlength="1500" placeholder="'+(reference?'比如：把背景变成雨后的京都小巷':'比如：一座漂浮在云海里的小房子')+'">'+esc(prompt)+'</textarea>'+
-   '<p class="privacy">'+(reference?'点击生成时，参考照片与描述会发送至火山方舟。':'描述会发送至火山方舟。')+'结果作为新照片保存。</p>'+button('generate',busy?'正在提交…':'生成新作品','primary',busy||!config||!config.generation_enabled)+'</div></div>'+
+   '<div class="creation-presets"><label>创作模板<select id="photo-template" aria-label="创作模板，替换当前描述"><option value="">选择模板 · 可修改</option>'+((config&&config.templates)||[]).filter(t=>t.mode===(reference?'edit':'text')).map(t=>'<option value="'+esc(t.id)+'">'+esc(t.name)+'</option>').join('')+'</select></label><label>画面风格<select id="photo-style" aria-label="画面风格">'+(config&&config.styles||[]).filter(s=>s.id!=='pet'||reference).map(s=>'<option value="'+esc(s.id)+'" '+(style===s.id?'selected':'')+'>'+esc(s.name)+'</option>').join('')+'</select></label></div>'+
+   '<textarea id="photo-prompt" aria-label="画面描述" maxlength="1500" placeholder="'+(style==='pet'?'可选：黏土、毛绒或像素风格':reference?'比如：把背景变成雨后的京都小巷':'比如：一座漂浮在云海里的小房子')+'">'+esc(prompt)+'</textarea>'+
+   '<p class="privacy">'+(reference?'点击生成时，参考照片与描述会发送至火山方舟。':'描述会发送至火山方舟。')+(style==='pet'?'本次生成静态角色图，作为新照片保存；不包含动作视频。':'结果作为新照片保存。')+'</p>'+button('generate',busy?'正在提交…':style==='pet'?'生成宠物形象':'生成新作品','primary',busy||!config||!config.generation_enabled)+'</div></div>'+
    (!config||!config.generation_enabled?'<p class="privacy">当前账号未启用生图服务，照片同步仍可使用。</p>':'')+feedback();
  }else if(screen==='job'){
   const running=job&&active(job.status);
@@ -70,7 +70,7 @@ function render(){if(!alive)return;
  }else if(screen==='jobs'){
   html=heading('创作记录','最近 12 次生成','')+'<div class="job-list">'+jobs.map(j=>'<div class="job-row"><div><strong>'+esc(j.prompt||'照片风格改写')+'</strong><p>'+esc(labels[j.status]||j.status)+(j.error?' · '+esc(j.error):'')+'</p></div>'+button('job:'+j.id,j.status==='completed'?'查看':'详情','quiet')+'</div>').join('')+'</div>'+(!jobs.length?empty('还没有创作','从一句话或一张照片开始'): '')+feedback();
  }else{
-  html=heading('相册',user?user.username+' · '+listing.total+' 张照片':accountChecked?'和 ATOM 分享你的生活':'正在连接你的相册',button('jobs','创作','quiet',!user)+(pc?button('import','导入','quiet',busy||!user):'')+button('create','＋ 灵感','primary',!user))+
+  html=heading('相册',user?user.username+' · '+listing.total+' 张照片':accountChecked?'和 ATOM 分享你的生活':'正在连接你的相册',button('jobs','创作','quiet',!user)+(pc?button('camera','拍照','quiet',busy||!user)+button('import','导入','quiet',busy||!user):'')+button('create','＋ 灵感','primary',!user))+
    (readFailed?'<div class="notice">偏好读取失败，未覆盖原记录。'+button('retry-read','重试')+'</div>':'')+
    (!accountChecked?'<div class="empty account-loading" role="status">'+(error?'<h2>暂时无法连接相册</h2><p>请检查网络后重试。</p>'+button('refresh','重试','primary'):'<span class="album-spinner" aria-hidden="true"></span><h2>正在加载相册</h2><p>正在确认账号并同步照片…</p>')+'</div>':!user?empty('把生活带到桌边','在电脑和 ATOM 登录同一个应用市场账号，<br>照片就能出现在这里。',button('login','登录账号','primary')+button('refresh','重试','quiet')):
     '<div class="tabs">'+[['all','全部'],['favorites','收藏'],['generated','AI 作品']].map(([v,t])=>button('filter:'+v,t,filter===v?'on':'')).join('')+button('frame-settings','相框','frame-settings-link')+'</div>'+
@@ -88,7 +88,7 @@ function renderViewer(){if(!selected){screen='library';render();return}
   (compare?'<img src="'+esc(before.data_url)+'" alt="原照片"><img class="after" src="'+esc(selected.data_url)+'" alt="AI 版本"><div class="labels"><span>原照片</span><span>新版本</span></div><input type="range" id="compare-range" min="0" max="100" value="50" aria-label="对比原图与生成版本">':'<img class="picture" src="'+esc(selected.data_url)+'" alt="'+esc(selected.photo.name)+'">')+
   '<div class="viewer-top">'+backControl()+'<span class="caption">'+esc(selected.photo.name)+'</span><div class="zoom-tools">'+button('zoom-out','−')+button('zoom-reset','100%')+button('zoom-in','＋')+'</div>'+button('favorite',selected.photo.favorite?'♥':'♡','',busy||photoLoading)+'</div>'+
   (compare?'':photoStep('prev','上一张照片')+photoStep('next','下一张照片'))+
-  '<div class="bottom">'+(compare?button('end-compare','结束对比'):button('slideshow',slideshow?'暂停':'轮播','',photoLoading)+button('edit-photo','改写','',photoLoading)+button('frame-settings','感知')+(selected.photo.parent_id?button('compare','对比','',photoLoading):'')+(pc?button('download','原图'):'')+button('delete','删除','',photoLoading))+'</div>'+
+  '<div class="bottom">'+(compare?button('end-compare','结束对比'):button('slideshow',slideshow?'暂停':'轮播','',photoLoading)+button('edit-photo','改写','',photoLoading)+(config?.styles.some(s=>s.id==='pet')?button('pet-photo','变宠物','',photoLoading):'')+button('frame-settings','感知')+(selected.photo.parent_id?button('compare','对比','',photoLoading):'')+(pc?button('download','原图'):'')+button('delete','删除','',photoLoading))+'</div>'+
   '<div class="pan-tools" aria-label="移动放大的照片" hidden>'+button('pan-left','←')+button('pan-up','↑')+button('pan-down','↓')+button('pan-right','→')+'</div>'+
   (photoLoading?'<span class="photo-loading" role="status">正在加载清晰照片…</span>':'')+
   (error?'<div class="view-error">'+esc(error)+'<br>'+button('retry-photo','重新加载')+button('dismiss-error','知道了')+'</div>':'')+
@@ -180,8 +180,9 @@ async function perform(action){error='';
  if(action==='refresh'){await refresh();return}
  if(action==='login'){await rpc('login');return}
  if(action==='retry-read'){await init();return}
- if(action==='import'){root.querySelector('#photo-files').click();return}
- if(action==='create'||action==='edit-photo'){reference=action==='edit-photo'?selected:null;prompt='';screen='create';generationRequest=null;stopSlide()}
+ if(action==='camera'){const captured=await rpc('camera');if(!captured||!alive)return;busy=true;render();try{const uploaded=await rpc('upload',{id:uid(),...captured});page=0;await refresh();await openPhoto(uploaded.photo.id)}finally{busy=false;render()}return}
+ if(action==='import'){choosingFile=true;root.querySelector('#photo-files').click();return}
+ if(action==='create'||action==='edit-photo'||action==='pet-photo'){reference=action==='create'?null:selected;if(action==='pet-photo')style='pet';else if(style==='pet')style='clay';prompt='';screen='create';generationRequest=null;stopSlide()}
  if(action==='generate'){await generate();return}
  if(action==='jobs'){await loadJobs();return}
  if(action==='previous'||action==='next'){page+=action==='previous'?-1:1;await refresh();return}
@@ -205,7 +206,8 @@ async function perform(action){error='';
 }
 root.addEventListener('click',async e=>{const target=e.target.closest('[data-action]');if(suppressClick){suppressClick=false;if(!target)return}if(target){if(busy)return;try{await perform(target.dataset.action)}catch(err){error=err.message;render()}}else if(screen==='view'){clean=!clean;root.querySelector('.viewer')?.classList.toggle('clean',clean);if(!clean)autoHide()}});
 root.addEventListener('input',e=>{if(e.target.id==='photo-prompt'){prompt=e.target.value;generationRequest=null}if(e.target.id==='compare-range')paintZoom()});
-root.addEventListener('change',e=>{if(e.target.id==='photo-style'){style=e.target.value;generationRequest=null}if(e.target.id==='photo-template'){const t=(config?.templates||[]).find(t=>t.id===e.target.value&&t.mode===(reference?'edit':'text'));if(t){prompt=t.prompt;style=t.style;generationRequest=null;message='已套用模板，可修改描述后再生成。';render()}return}if(e.target.id==='photo-files'&&e.target.files.length)upload(Array.from(e.target.files))});
+root.addEventListener('change',e=>{if(e.target.id==='photo-style'){style=e.target.value;generationRequest=null}if(e.target.id==='photo-template'){const t=(config?.templates||[]).find(t=>t.id===e.target.value&&t.mode===(reference?'edit':'text'));if(t){prompt=t.prompt;style=t.style;generationRequest=null;message='已套用模板，可修改描述后再生成。';render()}return}if(e.target.id==='photo-files'){choosingFile=false;if(e.target.files.length)upload(Array.from(e.target.files))}});
+root.addEventListener('cancel',e=>{if(e.target.id==='photo-files')choosingFile=false},true);
 let pointer=null;
 root.addEventListener('wheel',e=>{if(!['view','compare'].includes(screen)||deleteConfirm||e.target.closest('button,input,.confirm,.view-error'))return;e.preventDefault();const delta=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?innerHeight:1);setZoom(zoom*Math.exp(-Math.max(-300,Math.min(300,delta))*.002),e.clientX,e.clientY)},{passive:false});
 root.addEventListener('pointerdown',e=>{if(screen==='view'){frameWakeUntil=Date.now()+10000;paintFrame()}if(!['view','compare'].includes(screen)||deleteConfirm||e.button!==0||e.target.closest('button,input,.confirm,.view-error'))return;suppressClick=false;pointer={id:e.pointerId,x:e.clientX,y:e.clientY,panX,panY,moved:false};if(zoom>1){root.setPointerCapture(e.pointerId);stopSlide();showDetails()}});
@@ -271,5 +273,5 @@ window.addEventListener('pagehide',stop);
 async function init(){if(window.AtomApp){try{prefs=await AtomApp.load({style:'clay',frameSensing:false});if(!prefs||typeof prefs.style!=='string')throw Error('偏好无效');style=prefs.style;frameSensing=prefs.frameSensing===true;readFailed=false}catch(e){readFailed=true}}
  startFrame();render();await refresh();if(config&&!config.styles.some(s=>s.id===style))style='clay';
 }
-if(window.AtomApp){AtomApp.deferReady();AtomApp.navigation.setBackHandler(goBack);AtomApp.onSuspend(stop)}init();syncTimer=setInterval(()=>{if(alive&&user&&screen==='library'&&!busy)refresh()},20000);
+if(window.AtomApp){AtomApp.deferReady();AtomApp.navigation.setBackHandler(goBack);AtomApp.onSuspend(stop)}init();syncTimer=setInterval(()=>{if(alive&&user&&screen==='library'&&!busy&&!choosingFile)refresh()},20000);
 })();

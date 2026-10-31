@@ -195,7 +195,8 @@ final class ConnectApplication: NSObject, NSApplicationDelegate, WKNavigationDel
         return nil
     }
     func webView(_ webView: WKWebView, requestMediaCapturePermissionFor origin: WKSecurityOrigin, initiatedByFrame frame: WKFrameInfo, type: WKMediaCaptureType, decisionHandler: @escaping (WKPermissionDecision) -> Void) {
-        decisionHandler(origin.host == "127.0.0.1" && origin.port == simulator.port ? .prompt : .deny)
+        let computerCamera = frame.isMainFrame && type == .camera && origin.protocol == self.origin?.scheme && origin.host == self.origin?.host && origin.port == self.origin?.port
+        decisionHandler(computerCamera || (origin.host == "127.0.0.1" && origin.port == simulator.port) ? .prompt : .deny)
     }
 }
 /// Runs the real ATOM device backend (bundled Python sources and prebuilt apps) on a fixed local

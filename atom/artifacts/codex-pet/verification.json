@@ -1,0 +1,64 @@
+{
+  "date": "2026-10-28",
+  "environment": "macOS; Python 3.9.6; Node 24.19; headless Chrome; isolated apps/state",
+  "device_unit_tests": {
+    "run": 168,
+    "skipped": 12,
+    "result": "passed",
+    "date": "2026-10-27"
+  },
+  "application_ui": "passed: actual opaque iframe/shared runtime, API fixtures with explicit demo tasks",
+  "backend_smoke": "passed: real installer/backend/injected runtime/theme/icon; three offline pets; receiver->file->API->sandbox; five-way return",
+  "existing_joystick_shell": "passed",
+  "static_admission": {
+    "errors": 0,
+    "warnings": [
+      "attribution URLs in SOURCE.md",
+      "source URLs in embedded sprite metadata",
+      "timers: suspend/reduced-motion handled and browser-tested"
+    ]
+  },
+  "screenshots": "Actual final black-scene UI. home.png and pet choices are offline companions. waiting.png contains explicitly named receiver test data. work-preview.png is labeled manual preview, not a real task. desktop.png is the isolated simulator desktop.",
+  "real_hardware_installed": true,
+  "desktop_hooks_installed": false,
+  "public_market_published": false,
+  "scene_animation": "passed: autonomous walking, focus stability, tap reaction, nine states, black background, panel pause, system/reduced motion, suspension",
+  "hardware_verification": {
+    "date": "2026-10-28",
+    "host": "taishan-gray",
+    "screen": "480x360 real X11 display capture",
+    "checks": [
+      "full-screen black scene; Boba and Shinchan rendered",
+      "original native working animation by default; no laptop overlay",
+      "settings layout",
+      "direction and center keys open settings after iframe focus",
+      "dedicated cat icon; observed desktop placement now page 4/8",
+      "non-icon resource hashes match build; installer-normalized cat icon visually inspected",
+      "atom and lightdm active; health GET ok"
+    ],
+    "deployment": "minimal patch applied to device versions; existing code backed up; state not overwritten; atom backend restarted; browser reloaded; LightDM not restarted",
+    "code_backup": "/home/linaro/atom-pet-code-backups/20261028-133514",
+    "limits": [
+      "physical joystick hardware not directly exercised",
+      "desktop Codex hooks not configured; no claim of live computer task sync"
+    ]
+  },
+  "latest_device_update": {
+    "date": "2026-10-28",
+    "default": "native running sprite, local companionship, no added laptop",
+    "verified": "opened actual installed app; black fullscreen and default original work sprite; backend smoke passed",
+    "desktop_page_observed": "4/8; existing order retained by update installer",
+    "screenshot": "device-native-work.png"
+  },
+  "latency_update": {
+    "date": "2026-10-28",
+    "poll_interval_ms": 1000,
+    "selected_source": "desktop",
+    "test": "ui.test.cjs passed; device reopened and live working state observed; settings confirmed desktop-only",
+    "transport_sample_seconds": [
+      1.596,
+      1.242
+    ],
+    "note": "timestamp difference across hosts includes clock offset; no precise end-to-end latency claim"
+  }
+}

@@ -1,0 +1,297 @@
+[
+  {
+    "id": "ai-duet",
+    "round": 1,
+    "home": {
+      "title": "合奏伙伴",
+      "text": "你先弹，我来接\nDUET / A CONVERSATION IN NOTES\n保存合奏\n播放合奏\n重新弹奏\n速度 \n0 个音符\nC\nD\nE\nF\nG\nA\nB\nC\nAI 接奏\n轻触琴键 · 弹完后邀请 AI 接奏",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 19,
+          "y": 4,
+          "w": 48,
+          "h": 48,
+          "font": "16px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "save",
+          "label": "保存合奏",
+          "disabled": false,
+          "x": 393,
+          "y": 12,
+          "w": 68,
+          "h": 32,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "play",
+          "label": "播放合奏",
+          "disabled": false,
+          "x": 15,
+          "y": 164,
+          "w": 70,
+          "h": 32,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "clear",
+          "label": "重新弹奏",
+          "disabled": false,
+          "x": 92,
+          "y": 164,
+          "w": 70,
+          "h": 32,
+          "font": "12px"
+        },
+        {
+          "tag": "INPUT",
+          "id": "bpm",
+          "label": "",
+          "disabled": false,
+          "x": 194,
+          "y": 168,
+          "w": 55,
+          "h": 25,
+          "font": "11px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "音符 60",
+          "disabled": false,
+          "x": 15,
+          "y": 205,
+          "w": 54,
+          "h": 73,
+          "font": "11px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "音符 62",
+          "disabled": false,
+          "x": 72,
+          "y": 205,
+          "w": 54,
+          "h": 73,
+          "font": "11px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "音符 64",
+          "disabled": false,
+          "x": 128,
+          "y": 205,
+          "w": 54,
+          "h": 73,
+          "font": "11px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "音符 65",
+          "disabled": false,
+          "x": 185,
+          "y": 205,
+          "w": 54,
+          "h": 73,
+          "font": "11px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "音符 67",
+          "disabled": false,
+          "x": 242,
+          "y": 205,
+          "w": 54,
+          "h": 73,
+          "font": "11px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "音符 69",
+          "disabled": false,
+          "x": 298,
+          "y": 205,
+          "w": 54,
+          "h": 73,
+          "font": "11px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "音符 71",
+          "disabled": false,
+          "x": 355,
+          "y": 205,
+          "w": 54,
+          "h": 73,
+          "font": "11px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "音符 72",
+          "disabled": false,
+          "x": 411,
+          "y": 205,
+          "w": 54,
+          "h": 73,
+          "font": "11px"
+        },
+        {
+          "tag": "INPUT",
+          "id": "prompt",
+          "label": "合奏风格",
+          "disabled": false,
+          "x": 14,
+          "y": 288,
+          "w": 364,
+          "h": 40,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "generate",
+          "label": "AI 接奏",
+          "disabled": false,
+          "x": 385,
+          "y": 288,
+          "w": 81,
+          "h": 40,
+          "font": "16px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 2,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "atom-app-back",
+      "count": 15,
+      "visited": [
+        "save",
+        "C",
+        "B",
+        "save"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 2,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "language-alchemy",
+    "round": 1,
+    "home": {
+      "title": "语言炼金",
+      "text": "流动的月银\nLANGUAGE / MATTER\n保存作品\n移动光标，拨动这片物质\n炼成\n本地材质 · 输入一句话，让 AI 改造",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 19,
+          "y": 4,
+          "w": 48,
+          "h": 48,
+          "font": "16px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "save",
+          "label": "保存作品",
+          "disabled": false,
+          "x": 393,
+          "y": 12,
+          "w": 68,
+          "h": 32,
+          "font": "12px"
+        },
+        {
+          "tag": "INPUT",
+          "id": "prompt",
+          "label": "描述画面",
+          "disabled": false,
+          "x": 14,
+          "y": 288,
+          "w": 383,
+          "h": 40,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "generate",
+          "label": "炼成",
+          "disabled": false,
+          "x": 404,
+          "y": 288,
+          "w": 62,
+          "h": 40,
+          "font": "16px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 140,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "atom-app-back",
+      "count": 4,
+      "visited": [
+        "save",
+        "generate",
+        "prompt",
+        "atom-app-back"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 144,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  }
+]

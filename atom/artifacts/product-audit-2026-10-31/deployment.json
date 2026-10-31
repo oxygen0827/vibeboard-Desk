@@ -1,0 +1,191 @@
+{
+  "updated": [
+    {
+      "id": "local-music",
+      "changed_files": 2,
+      "total_files": 3,
+      "installed_at_preserved": true,
+      "changed_sha256": {
+        "index.html": "293c817ebb6b6a46d6d7041fe8c876ec08910bb3036ff092bd667496d17cde56",
+        "manifest.json": "7fc4ed976c324a05a6980682a048541592a6b718dea997b927fca009ff045b67"
+      }
+    },
+    {
+      "id": "made-23c2b1193c452dd3adf9",
+      "changed_files": 1,
+      "total_files": 5,
+      "installed_at_preserved": true,
+      "changed_sha256": {
+        "index.html": "187b113b9fe94cacaa75bbc000f524b627eb71c0b0a05781ed7b05729e782d92"
+      }
+    },
+    {
+      "id": "model-viewer",
+      "changed_files": 5,
+      "total_files": 12,
+      "installed_at_preserved": true,
+      "changed_sha256": {
+        "index.html": "23842925344e9690cb724cbb1b472175c2e0e345c31dcbe576b777484f618b67",
+        "scene-controls.js": "db1eef2cb78e02d9096f98dd865e6926109ec14bdf8905f40e9d156728272942",
+        "main.js": "4c13ba139c5c2731c8e66c889539334f5716fb30bcf8ec554a65005aa2469825",
+        "manifest.json": "3b6a516f32b2caff3bb172ab792cc8d7bfdfd2e17a66b744109cc5f36b880363",
+        "scene-session.js": "6b30ec6fc39ec3437869db511027c708a3048f4b086079752408f548d0fe00c6"
+      }
+    },
+    {
+      "id": "moon-ocean",
+      "changed_files": 4,
+      "total_files": 88,
+      "installed_at_preserved": true,
+      "changed_sha256": {
+        "index.html": "d6f09942b76bbfd5db5601585f7c822614dd0b560dae554bf22ab5ce0132f8ae",
+        "scene-controls.js": "db1eef2cb78e02d9096f98dd865e6926109ec14bdf8905f40e9d156728272942",
+        "manifest.json": "0b0c52561e47d95a63a6b14ace5a491e96f3b114a6a2cb6c0dfde7365e0f2c56",
+        "scene-session.js": "6b30ec6fc39ec3437869db511027c708a3048f4b086079752408f548d0fe00c6"
+      }
+    },
+    {
+      "id": "music-vision",
+      "changed_files": 4,
+      "total_files": 16,
+      "installed_at_preserved": true,
+      "changed_sha256": {
+        "index.html": "bac47052757fc6de3bb6b6ba10c8c52c63f5107cd23b09230586c01173ada174",
+        "main.js": "1d3cffbaa157b084be98b03b72aec5d193f3f2734a3718194c1990caf646c6da",
+        "manifest.json": "079abcdc30c1ea51f3fcf4c7ef2daeddf7b08b7e1caa6bac7ce41ec6675fad96",
+        "scene-session.js": "6b30ec6fc39ec3437869db511027c708a3048f4b086079752408f548d0fe00c6"
+      }
+    },
+    {
+      "id": "parametric-maker",
+      "changed_files": 5,
+      "total_files": 1113,
+      "installed_at_preserved": true,
+      "changed_sha256": {
+        "index.html": "6fda784f9103a7e25e2f0a57e490712b808acb9ad9fe1e21b19a79617130ec3d",
+        "scene-controls.js": "db1eef2cb78e02d9096f98dd865e6926109ec14bdf8905f40e9d156728272942",
+        "main.js": "c27a057aa255c777c08df34273ed604cde6085862db0c6392007a802a5236755",
+        "manifest.json": "1bd6edb93ae723c35ee2b99315190f9e9c1151a73d2b7ebefe5873f082110277",
+        "scene-session.js": "6b30ec6fc39ec3437869db511027c708a3048f4b086079752408f548d0fe00c6"
+      }
+    },
+    {
+      "id": "particle-lab",
+      "changed_files": 4,
+      "total_files": 5,
+      "installed_at_preserved": true,
+      "changed_sha256": {
+        "index.html": "3a49a0b99485082d7ea4d3f89874e97bd4ff4e3a160011a8b3ce9158af10333c",
+        "scene-controls.js": "db1eef2cb78e02d9096f98dd865e6926109ec14bdf8905f40e9d156728272942",
+        "manifest.json": "6ae536bc023dab7b9e07e21834d87bd8e3d7e2b614dfdd211c17c28e745aa3b5",
+        "scene-session.js": "6b30ec6fc39ec3437869db511027c708a3048f4b086079752408f548d0fe00c6"
+      }
+    },
+    {
+      "id": "physics-playground",
+      "changed_files": 5,
+      "total_files": 9,
+      "installed_at_preserved": true,
+      "changed_sha256": {
+        "index.html": "2347e0774ddfa60304707bac8b30a7af24201b1b8cf925694dcd9136b6a1243a",
+        "scene-controls.js": "db1eef2cb78e02d9096f98dd865e6926109ec14bdf8905f40e9d156728272942",
+        "main.js": "ec82aa08a5ba95a64ad8ce77f8a8fde2f8f2c7ff42e59673ac657dde3dbecbbe",
+        "manifest.json": "1dea28a5513acc69a1fcda2f98a82f5d76b5227a004d1b07ab3dc70f553d7465",
+        "scene-session.js": "6b30ec6fc39ec3437869db511027c708a3048f4b086079752408f548d0fe00c6"
+      }
+    },
+    {
+      "id": "planetarium",
+      "changed_files": 5,
+      "total_files": 27,
+      "installed_at_preserved": true,
+      "changed_sha256": {
+        "index.html": "3e7beae328a3ea1743092e57e42082960026c408038a3d872a6b2c26ec2d9871",
+        "scene-controls.js": "db1eef2cb78e02d9096f98dd865e6926109ec14bdf8905f40e9d156728272942",
+        "main.js": "270a2b8705d14325fc60817ffb7a052c1d94c604635124f3751b60db6f94b613",
+        "manifest.json": "eae578874280e9cb71fe95a1280df2efec3a81331674251941ef406435bc6228",
+        "scene-session.js": "6b30ec6fc39ec3437869db511027c708a3048f4b086079752408f548d0fe00c6"
+      }
+    },
+    {
+      "id": "pocket-studio",
+      "changed_files": 4,
+      "total_files": 8,
+      "installed_at_preserved": true,
+      "changed_sha256": {
+        "index.html": "f56f50462895e334f59585065ce2efafd420df1831a3686007be86f906a55f4b",
+        "main.js": "f0f23d31cf761d6c834e913cad24303f432d09daf54fbf70bc56a16bcb2c85c8",
+        "manifest.json": "9e7277fc2ac25988605d37b585812e033425ab81e9df1b2cc78e8a76d51b8371",
+        "scene-session.js": "6b30ec6fc39ec3437869db511027c708a3048f4b086079752408f548d0fe00c6"
+      }
+    },
+    {
+      "id": "quick-notes",
+      "changed_files": 3,
+      "total_files": 8,
+      "installed_at_preserved": true,
+      "changed_sha256": {
+        "style.css": "ed5aba39936b6ecb6beb8231015d71965d79593f0ea6c0d8d9a150887a7630bb",
+        "manifest.json": "875b301d04ba88b29ef326c141967b48b9f681d48d9e6b69a80d69086bc738a4",
+        "app.js": "584df19c47ad57e01e7d27f1207332f22e09e51066e9d725015780dea88e2f20"
+      }
+    },
+    {
+      "id": "rhythm-orbits",
+      "changed_files": 5,
+      "total_files": 161,
+      "installed_at_preserved": true,
+      "changed_sha256": {
+        "index.html": "8338b8d7b4145ea309dc2549481ad27dcb68e93946667547c0710ad88f16b05a",
+        "scene-controls.js": "db1eef2cb78e02d9096f98dd865e6926109ec14bdf8905f40e9d156728272942",
+        "main.js": "a3b515173b36b4bd7926137f3040ebeb1cb8d86830ab8be3aa5ed58a43e2ccbe",
+        "manifest.json": "4560f2e949b73d51c1f70f1f83ac39c8a66193672e39581ed9484b36f9cdaf1f",
+        "scene-session.js": "6b30ec6fc39ec3437869db511027c708a3048f4b086079752408f548d0fe00c6"
+      }
+    },
+    {
+      "id": "robo-face",
+      "changed_files": 6,
+      "total_files": 29,
+      "installed_at_preserved": true,
+      "changed_sha256": {
+        "index.html": "a383a44a6687a5ff0e6411188a4814cad0e60bb9409921f1db1e82310b48974f",
+        "common.css": "8ca6c3357fc6d8c1fa4a92a02a3213376d0e768e66cfa7ccb3aa00d98a66b083",
+        "main.js": "9f3eb800b31f10ae685342f97c61acf52ae7a0aa1f377b84d22288e29db34935",
+        "manifest.json": "8261d2f6e0fdd0d27278b8ebd731c46e3c378de43ecd8ddd179aa99ee06216ee",
+        "common.js": "051d0437fc191569ee208b5a566186e3877cb2fa709e021921fba88a4bbe43d3",
+        "scene-session.js": "6b30ec6fc39ec3437869db511027c708a3048f4b086079752408f548d0fe00c6"
+      }
+    },
+    {
+      "id": "volume-flow",
+      "changed_files": 6,
+      "total_files": 14,
+      "installed_at_preserved": true,
+      "changed_sha256": {
+        "index.html": "933c8dec8d8d7ba93c0a787a4aeff5c37e7b59175d205537a890c25f118f82c1",
+        "flow.js": "abb2266972a0473421d92090e419f767cedebae17dd1f36a68cd413529c7bf7f",
+        "scene-controls.js": "db1eef2cb78e02d9096f98dd865e6926109ec14bdf8905f40e9d156728272942",
+        "main.js": "e4d05dc75554478ea6e41817195d87c812fb7f04c68bac144b860ee802acfbdd",
+        "manifest.json": "4aef555f61eaaffa2a8f9cf9f62c2a7b83088403cbdeb5da74747e3ae0d12cc2",
+        "scene-session.js": "6b30ec6fc39ec3437869db511027c708a3048f4b086079752408f548d0fe00c6"
+      }
+    },
+    {
+      "id": "water-pool",
+      "changed_files": 5,
+      "total_files": 20,
+      "installed_at_preserved": true,
+      "changed_sha256": {
+        "index.html": "f7589ecb18ca3f754f11d42aa9cec41ed928c6ae38f6ff530c73c42c17df254d",
+        "scene-controls.js": "db1eef2cb78e02d9096f98dd865e6926109ec14bdf8905f40e9d156728272942",
+        "main.js": "dae7a881e31c448612fe57e6da5a87095b5909847ca79c10e66ca9b56635d1cc",
+        "manifest.json": "08aa63752952be51f2c2407a75df29102226963e26ab2c367e2294fd18b8154d",
+        "scene-session.js": "6b30ec6fc39ec3437869db511027c708a3048f4b086079752408f548d0fe00c6"
+      }
+    }
+  ],
+  "source_verified": true,
+  "state_files_touched": false,
+  "backup": "/home/linaro/atom/app-reviews/product-audit-2026-10-31/original"
+}

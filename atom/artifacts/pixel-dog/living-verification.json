@@ -1,0 +1,48 @@
+{
+  "date": "2026-10-30",
+  "app": "photo-pet",
+  "scope": "Read-only idle courtyard life, interruptible walking, occupation choreography and visible unclaimed products",
+  "sha256": "1e6aafc4856cd505117ccea670ad6840422bb5625a88db6ad0fd632a6b13bce1",
+  "bundle_bytes": 1603119,
+  "validation": {
+    "browser_regression": "PASS: complete yard.test.cjs with actual device theme and shared five-way runtime",
+    "idle": "180 seconds of virtual clock: no state changes or additional saves; input exits autonomous mode",
+    "retarget": "Changing plot while walking cancels stale pending action",
+    "jobs": "All three assignments, visible completed products, transactional claims and failure preservation",
+    "visual_review": "Six actual renderer phases at 3, 10, 23, 34, 48 and 61 seconds",
+    "lifecycle": "Reduced motion and suspend cleanup passed",
+    "admission": "0 errors, 0 warnings; prepare_icon_bundles.py completed",
+    "device": {
+      "hostname": "taishan-gray",
+      "verified_files": 11,
+      "installed_at_ns": 1793192014984748822,
+      "desktop_position_preserved": true,
+      "observed": [
+        "Purpose-specific desktop icon",
+        "App reopened with new resources",
+        "Different pet idle poses and positions in consecutive captures",
+        "Inventory remains carrots=0, fish=2, bond=0",
+        "No opaque scene hit-target blocks",
+        "Resident panel opens and short Space returns to courtyard",
+        "System focus ring visible in scene and resident panel"
+      ],
+      "left_on": "Courtyard home screen, confirmed after closing resident panel"
+    }
+  },
+  "screenshots": [
+    "living-device-desktop.png",
+    "living-device-idle-1.png",
+    "living-device-idle-2.png",
+    "living-device-confirm.png",
+    "living-device-panel.png",
+    "living-idle.png",
+    "living-products.png",
+    "living-choreography.png",
+    "living-device-final.png"
+  ],
+  "limits": [
+    "Three-minute accelerated browser idle test and brief real device inspection, not multi-hour hardware soak",
+    "Finite sprite keyframes; no claim of all-frame anatomical verification"
+  ],
+  "market_cover": "Upload an actual home-screen capture in ATOM Connect → 我的创作 → 首页截图 before publication"
+}

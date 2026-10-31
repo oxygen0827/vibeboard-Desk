@@ -1,0 +1,17 @@
+{
+  "date": "2026-10-30",
+  "cause": "Device dark theme forcibly paints all buttons; transparent scene hit targets cover characters and beds",
+  "fix": "App-scoped transparent surface overrides including pressed state; compact visible labels retain theme colors",
+  "browser_compatibility": "JSON state clone does not depend on structuredClone (device Chromium 91)",
+  "validation": [
+    "full browser regression with actual injected device dark theme",
+    "all 10 deployed resources verified",
+    "real desktop custom pet icon visible",
+    "real device app reopened and screen captured: no opaque hit-target blocks"
+  ],
+  "sha256": "ea2aadf9b4c36d77bda21826fba9b92aa36ff4d3bcd70decb678d14d8d190951",
+  "screenshots": [
+    "device-theme-before.png",
+    "device-theme-fixed.png"
+  ]
+}

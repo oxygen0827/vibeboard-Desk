@@ -1,0 +1,62 @@
+{
+  "date": "2026-10-30",
+  "app": "photo-pet",
+  "fix": [
+    "Idle and ready jobs use continuous resident daily poses, without waiting for pet autoplay",
+    "Water, forge, smoke, leaves and butterflies animate in the lifecycle-owned canvas loop",
+    "Foot-anchored cached sprite frames; upper-body breathing; tool attachments follow current frame"
+  ],
+  "sha256": "2d32a1f2640d50e3cd6fe43937f3ed0f5d9ba30c38e2c7ac09983185472ce132",
+  "admission": "0 errors, 0 warnings",
+  "browser_regression": "yard.test.cjs PASS, including system motion preference and suspend",
+  "render_validation": "motion.test.cjs PASS, eight regions visibly change; reduced motion renders identical frames; idle/ready routines do not mutate state",
+  "device": {
+    "verified_files": 12,
+    "installed_at_ns": 1793192014984748822,
+    "icon_page_after_shell_reload": 2,
+    "capture": {
+      "samples": 18,
+      "capture_seconds": 32.303,
+      "timing": [
+        0.0,
+        1.89,
+        3.782,
+        5.661,
+        7.545,
+        9.44,
+        11.326,
+        13.214,
+        15.103,
+        17.024,
+        18.934,
+        20.819,
+        22.722,
+        24.642,
+        26.527,
+        28.45,
+        30.367,
+        32.303
+      ],
+      "changed_pixels": {
+        "smith": 2147,
+        "gardener": 2240,
+        "fisher": 1796,
+        "keeper": 810,
+        "water": 1246,
+        "fire": 107,
+        "smoke": 19,
+        "leaves": 208
+      }
+    },
+    "inventory_observed": "carrots=0, fish=2, bond=0 in first and last captured frames",
+    "resident_click": "PASS: smith panel displays original ready task; no reward was claimed",
+    "left_on": "Courtyard home screen after closing smith panel, confirmed by ambient-device-final.png"
+  },
+  "artifacts": {
+    "preview": "ambient-preview.mp4 (actual renderer, 12 fps)",
+    "device": "ambient-device-sampled.mp4 (real screen samples; approximately one frame per 1.9 seconds, not an FPS benchmark)"
+  },
+  "limits": [
+    "Real capture proves visible temporal changes, not native frame rate or multi-hour endurance"
+  ]
+}

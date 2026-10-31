@@ -1,0 +1,2517 @@
+[
+  {
+    "id": "model-viewer",
+    "round": 1,
+    "home": {
+      "title": "",
+      "text": "模型检视台\n\n参数化扭结 · Three.js\n\n4,096 三角面 · 2.49 × 2.59 × 1.22 模型单位\n打开模型\n雕塑\n齿轮\n结构件\n线框\n巡航\n归位",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "open",
+          "label": "打开模型",
+          "disabled": false,
+          "x": 12,
+          "y": 308,
+          "w": 89,
+          "h": 40,
+          "font": "13px"
+        },
+        {
+          "tag": "SELECT",
+          "id": "sample",
+          "label": "雕塑齿轮结构件",
+          "disabled": false,
+          "x": 107,
+          "y": 308,
+          "w": 75,
+          "h": 40,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "wire",
+          "label": "线框",
+          "disabled": false,
+          "x": 188,
+          "y": 308,
+          "w": 89,
+          "h": 40,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "rotate",
+          "label": "巡航",
+          "disabled": false,
+          "x": 284,
+          "y": 308,
+          "w": 89,
+          "h": 40,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "fit",
+          "label": "归位",
+          "disabled": false,
+          "x": 379,
+          "y": 308,
+          "w": 89,
+          "h": 40,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 0,
+          "y": 0,
+          "w": 48,
+          "h": 48,
+          "font": "13px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 142,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "open",
+      "count": 6,
+      "visited": [
+        "sample",
+        "sample",
+        "open",
+        "atom-app-back"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 146,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "moon-ocean",
+    "round": 1,
+    "home": {
+      "title": "A trip under the moonlight",
+      "text": "月光海洋 · 拖动环视 · 滚轮靠近\n月夜\n白昼\n日落\n风力",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "月夜",
+          "disabled": false,
+          "x": 12,
+          "y": 310,
+          "w": 110,
+          "h": 40,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "白昼",
+          "disabled": false,
+          "x": 128,
+          "y": 310,
+          "w": 110,
+          "h": 40,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "日落",
+          "disabled": false,
+          "x": 243,
+          "y": 310,
+          "w": 110,
+          "h": 40,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "风力",
+          "disabled": false,
+          "x": 359,
+          "y": 310,
+          "w": 110,
+          "h": 40,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 0,
+          "y": 0,
+          "w": 48,
+          "h": 48,
+          "font": "14px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 327,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "月夜",
+      "count": 5,
+      "visited": [
+        "白昼",
+        "白昼",
+        "月夜",
+        "atom-app-back"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 330,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "music-vision",
+    "round": 1,
+    "home": {
+      "title": "音乐幻境",
+      "text": "音乐幻境\n$$$ Royal - Mashup (197)\n点击播放节拍，或选择本地音乐\n播放节拍\n本地音乐\n换一幅\n自动：关",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "play",
+          "label": "播放节拍",
+          "disabled": false,
+          "x": 12,
+          "y": 304,
+          "w": 110,
+          "h": 44,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "choose",
+          "label": "本地音乐",
+          "disabled": false,
+          "x": 128,
+          "y": 304,
+          "w": 110,
+          "h": 44,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "next",
+          "label": "换一幅",
+          "disabled": false,
+          "x": 243,
+          "y": 304,
+          "w": 110,
+          "h": 44,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "auto",
+          "label": "自动：关",
+          "disabled": false,
+          "x": 359,
+          "y": 304,
+          "w": 110,
+          "h": 44,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 0,
+          "y": 0,
+          "w": 48,
+          "h": 48,
+          "font": "13px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 142,
+      "media": [
+        "suspended"
+      ]
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "play",
+      "count": 5,
+      "visited": [
+        "choose",
+        "choose",
+        "play",
+        "atom-app-back"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 146,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [
+        "closed"
+      ],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "parametric-maker",
+    "round": 1,
+    "home": {
+      "title": "",
+      "text": "参数造物\n\n拖动旋转 · JSCAD布尔建模 · 单位mm\n\n尺寸 40\n壁厚 3\n28 三角面 · 尺寸 40mm · 实体CSG\n开口盒\n直角支架\n圆孔底座\n生成\n线框\n归位",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "INPUT",
+          "id": "size",
+          "label": "",
+          "disabled": false,
+          "x": 22,
+          "y": 83,
+          "w": 124,
+          "h": 36,
+          "font": "13.3333px"
+        },
+        {
+          "tag": "INPUT",
+          "id": "wall",
+          "label": "",
+          "disabled": false,
+          "x": 22,
+          "y": 141,
+          "w": 124,
+          "h": 36,
+          "font": "13.3333px"
+        },
+        {
+          "tag": "SELECT",
+          "id": "preset",
+          "label": "开口盒直角支架圆孔底座",
+          "disabled": false,
+          "x": 8,
+          "y": 304,
+          "w": 112,
+          "h": 48,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "rebuild",
+          "label": "生成",
+          "disabled": false,
+          "x": 126,
+          "y": 304,
+          "w": 112,
+          "h": 48,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "wire",
+          "label": "线框",
+          "disabled": false,
+          "x": 243,
+          "y": 304,
+          "w": 112,
+          "h": 48,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "fit",
+          "label": "归位",
+          "disabled": false,
+          "x": 361,
+          "y": 304,
+          "w": 112,
+          "h": 48,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 0,
+          "y": 0,
+          "w": 48,
+          "h": 48,
+          "font": "14px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 143,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "size",
+      "count": 7,
+      "visited": [
+        "wire",
+        "wire",
+        "rebuild",
+        "wall"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 146,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "particle-lab",
+    "round": 1,
+    "home": {
+      "title": "粒子实验室",
+      "text": "粒子实验室\n60 FPS · 300 粒子\n引力轨道\n星雨\n波场\n暂停\n重置\n120\n300\n600\n1000\n\n移动鼠标改变引力中心 · 帧率是当前实测值",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "SELECT",
+          "id": "mode",
+          "label": "模拟模式",
+          "disabled": false,
+          "x": 14,
+          "y": 274,
+          "w": 80,
+          "h": 44,
+          "font": "16px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "pause",
+          "label": "暂停",
+          "disabled": false,
+          "x": 102,
+          "y": 274,
+          "w": 148,
+          "h": 44,
+          "font": "16px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "reset",
+          "label": "重置",
+          "disabled": false,
+          "x": 258,
+          "y": 274,
+          "w": 148,
+          "h": 44,
+          "font": "16px"
+        },
+        {
+          "tag": "SELECT",
+          "id": "count",
+          "label": "粒子数量",
+          "disabled": false,
+          "x": 413,
+          "y": 274,
+          "w": 53,
+          "h": 44,
+          "font": "16px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 0,
+          "y": 0,
+          "w": 48,
+          "h": 48,
+          "font": "16px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 141,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "mode",
+      "count": 5,
+      "visited": [
+        "pause",
+        "pause",
+        "mode",
+        "atom-app-back"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 143,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "physics-playground",
+    "round": 1,
+    "home": {
+      "title": "",
+      "text": "物理实验台\n40 物体 · 293 碰撞 · 60 FPS\n碰撞\n多米诺\n悬索桥\n弹弓\n拖动任意物体 · 添加形状观察碰撞\n添物体\n重力：开\n暂停\n重置",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "碰撞",
+          "disabled": false,
+          "x": 12,
+          "y": 39,
+          "w": 50,
+          "h": 36,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "多米诺",
+          "disabled": false,
+          "x": 68,
+          "y": 39,
+          "w": 63,
+          "h": 36,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "悬索桥",
+          "disabled": false,
+          "x": 137,
+          "y": 39,
+          "w": 63,
+          "h": 36,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "弹弓",
+          "disabled": false,
+          "x": 206,
+          "y": 39,
+          "w": 50,
+          "h": 36,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "spawn",
+          "label": "添物体",
+          "disabled": false,
+          "x": 12,
+          "y": 314,
+          "w": 110,
+          "h": 36,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "gravity",
+          "label": "重力：开",
+          "disabled": false,
+          "x": 128,
+          "y": 314,
+          "w": 110,
+          "h": 36,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "pause",
+          "label": "暂停",
+          "disabled": false,
+          "x": 243,
+          "y": 314,
+          "w": 110,
+          "h": 36,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "reset",
+          "label": "重置",
+          "disabled": false,
+          "x": 359,
+          "y": 314,
+          "w": 110,
+          "h": 36,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 0,
+          "y": 0,
+          "w": 48,
+          "h": 48,
+          "font": "13px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 141,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "碰撞",
+      "count": 9,
+      "visited": [
+        "多米诺",
+        "spawn",
+        "atom-app-back",
+        "atom-app-back"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 144,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "planetarium",
+    "round": 1,
+    "home": {
+      "title": "",
+      "text": "地球 · 蓝色家园\n\nSpacekit · 拖动环绕 · 滚轮缩放\n\n地球\n木星\n土星\n暂停巡航\n60 FPS",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "地球",
+          "disabled": false,
+          "x": 12,
+          "y": 304,
+          "w": 110,
+          "h": 44,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "木星",
+          "disabled": false,
+          "x": 128,
+          "y": 304,
+          "w": 110,
+          "h": 44,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "土星",
+          "disabled": false,
+          "x": 243,
+          "y": 304,
+          "w": 110,
+          "h": 44,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "spin",
+          "label": "暂停巡航",
+          "disabled": false,
+          "x": 359,
+          "y": 304,
+          "w": 110,
+          "h": 44,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 0,
+          "y": 0,
+          "w": 48,
+          "h": 48,
+          "font": "14px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 1311,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "地球",
+      "count": 5,
+      "visited": [
+        "木星",
+        "木星",
+        "地球",
+        "atom-app-back"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 1316,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "pocket-studio",
+    "round": 1,
+    "home": {
+      "title": "",
+      "text": "口袋音乐工作站\n16 步 · 7 轨 · 离线合成\n播放\n110\n夜航\n街机\n空白\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\nC5\nB♭4\nG4\nE♭4\n底鼓\n军鼓\n踩镲\n变奏\n清空\n保存\n恢复\n点击格子编曲，播放后可继续修改",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "play",
+          "label": "播放",
+          "disabled": false,
+          "x": 12,
+          "y": 60,
+          "w": 66,
+          "h": 34,
+          "font": "13px"
+        },
+        {
+          "tag": "INPUT",
+          "id": "tempo",
+          "label": "",
+          "disabled": false,
+          "x": 112,
+          "y": 69,
+          "w": 200,
+          "h": 16,
+          "font": "13.3333px"
+        },
+        {
+          "tag": "SELECT",
+          "id": "preset",
+          "label": "夜航街机空白",
+          "disabled": false,
+          "x": 321,
+          "y": 60,
+          "w": 60,
+          "h": 34,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "C5 第1步",
+          "disabled": false,
+          "x": 57,
+          "y": 125,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "C5 第2步",
+          "disabled": false,
+          "x": 83,
+          "y": 125,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "C5 第3步",
+          "disabled": false,
+          "x": 109,
+          "y": 125,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "C5 第4步",
+          "disabled": false,
+          "x": 135,
+          "y": 125,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "C5 第5步",
+          "disabled": false,
+          "x": 161,
+          "y": 125,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "C5 第6步",
+          "disabled": false,
+          "x": 186,
+          "y": 125,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "C5 第7步",
+          "disabled": false,
+          "x": 212,
+          "y": 125,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "C5 第8步",
+          "disabled": false,
+          "x": 238,
+          "y": 125,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "C5 第9步",
+          "disabled": false,
+          "x": 264,
+          "y": 125,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "C5 第10步",
+          "disabled": false,
+          "x": 290,
+          "y": 125,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "C5 第11步",
+          "disabled": false,
+          "x": 316,
+          "y": 125,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "C5 第12步",
+          "disabled": false,
+          "x": 342,
+          "y": 125,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "C5 第13步",
+          "disabled": false,
+          "x": 368,
+          "y": 125,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "C5 第14步",
+          "disabled": false,
+          "x": 393,
+          "y": 125,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "C5 第15步",
+          "disabled": false,
+          "x": 419,
+          "y": 125,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "C5 第16步",
+          "disabled": false,
+          "x": 445,
+          "y": 125,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "B♭4 第1步",
+          "disabled": false,
+          "x": 57,
+          "y": 146,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "B♭4 第2步",
+          "disabled": false,
+          "x": 83,
+          "y": 146,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "B♭4 第3步",
+          "disabled": false,
+          "x": 109,
+          "y": 146,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "B♭4 第4步",
+          "disabled": false,
+          "x": 135,
+          "y": 146,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "B♭4 第5步",
+          "disabled": false,
+          "x": 161,
+          "y": 146,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "B♭4 第6步",
+          "disabled": false,
+          "x": 186,
+          "y": 146,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "B♭4 第7步",
+          "disabled": false,
+          "x": 212,
+          "y": 146,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "B♭4 第8步",
+          "disabled": false,
+          "x": 238,
+          "y": 146,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "B♭4 第9步",
+          "disabled": false,
+          "x": 264,
+          "y": 146,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "B♭4 第10步",
+          "disabled": false,
+          "x": 290,
+          "y": 146,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "B♭4 第11步",
+          "disabled": false,
+          "x": 316,
+          "y": 146,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "B♭4 第12步",
+          "disabled": false,
+          "x": 342,
+          "y": 146,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "B♭4 第13步",
+          "disabled": false,
+          "x": 368,
+          "y": 146,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "B♭4 第14步",
+          "disabled": false,
+          "x": 393,
+          "y": 146,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "B♭4 第15步",
+          "disabled": false,
+          "x": 419,
+          "y": 146,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "B♭4 第16步",
+          "disabled": false,
+          "x": 445,
+          "y": 146,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "G4 第1步",
+          "disabled": false,
+          "x": 57,
+          "y": 167,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "G4 第2步",
+          "disabled": false,
+          "x": 83,
+          "y": 167,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "G4 第3步",
+          "disabled": false,
+          "x": 109,
+          "y": 167,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "G4 第4步",
+          "disabled": false,
+          "x": 135,
+          "y": 167,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "G4 第5步",
+          "disabled": false,
+          "x": 161,
+          "y": 167,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "G4 第6步",
+          "disabled": false,
+          "x": 186,
+          "y": 167,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "G4 第7步",
+          "disabled": false,
+          "x": 212,
+          "y": 167,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "G4 第8步",
+          "disabled": false,
+          "x": 238,
+          "y": 167,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "G4 第9步",
+          "disabled": false,
+          "x": 264,
+          "y": 167,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "G4 第10步",
+          "disabled": false,
+          "x": 290,
+          "y": 167,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "G4 第11步",
+          "disabled": false,
+          "x": 316,
+          "y": 167,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "G4 第12步",
+          "disabled": false,
+          "x": 342,
+          "y": 167,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "G4 第13步",
+          "disabled": false,
+          "x": 368,
+          "y": 167,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "G4 第14步",
+          "disabled": false,
+          "x": 393,
+          "y": 167,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "G4 第15步",
+          "disabled": false,
+          "x": 419,
+          "y": 167,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "G4 第16步",
+          "disabled": false,
+          "x": 445,
+          "y": 167,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "E♭4 第1步",
+          "disabled": false,
+          "x": 57,
+          "y": 188,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "E♭4 第2步",
+          "disabled": false,
+          "x": 83,
+          "y": 188,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "E♭4 第3步",
+          "disabled": false,
+          "x": 109,
+          "y": 188,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "E♭4 第4步",
+          "disabled": false,
+          "x": 135,
+          "y": 188,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "E♭4 第5步",
+          "disabled": false,
+          "x": 161,
+          "y": 188,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "E♭4 第6步",
+          "disabled": false,
+          "x": 186,
+          "y": 188,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "E♭4 第7步",
+          "disabled": false,
+          "x": 212,
+          "y": 188,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "E♭4 第8步",
+          "disabled": false,
+          "x": 238,
+          "y": 188,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "E♭4 第9步",
+          "disabled": false,
+          "x": 264,
+          "y": 188,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "E♭4 第10步",
+          "disabled": false,
+          "x": 290,
+          "y": 188,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "E♭4 第11步",
+          "disabled": false,
+          "x": 316,
+          "y": 188,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "E♭4 第12步",
+          "disabled": false,
+          "x": 342,
+          "y": 188,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "E♭4 第13步",
+          "disabled": false,
+          "x": 368,
+          "y": 188,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "E♭4 第14步",
+          "disabled": false,
+          "x": 393,
+          "y": 188,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "E♭4 第15步",
+          "disabled": false,
+          "x": 419,
+          "y": 188,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "E♭4 第16步",
+          "disabled": false,
+          "x": 445,
+          "y": 188,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第1步",
+          "disabled": false,
+          "x": 57,
+          "y": 208,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第2步",
+          "disabled": false,
+          "x": 83,
+          "y": 208,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第3步",
+          "disabled": false,
+          "x": 109,
+          "y": 208,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第4步",
+          "disabled": false,
+          "x": 135,
+          "y": 208,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第5步",
+          "disabled": false,
+          "x": 161,
+          "y": 208,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第6步",
+          "disabled": false,
+          "x": 186,
+          "y": 208,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第7步",
+          "disabled": false,
+          "x": 212,
+          "y": 208,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第8步",
+          "disabled": false,
+          "x": 238,
+          "y": 208,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第9步",
+          "disabled": false,
+          "x": 264,
+          "y": 208,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第10步",
+          "disabled": false,
+          "x": 290,
+          "y": 208,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第11步",
+          "disabled": false,
+          "x": 316,
+          "y": 208,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第12步",
+          "disabled": false,
+          "x": 342,
+          "y": 208,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第13步",
+          "disabled": false,
+          "x": 368,
+          "y": 208,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第14步",
+          "disabled": false,
+          "x": 393,
+          "y": 208,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第15步",
+          "disabled": false,
+          "x": 419,
+          "y": 208,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第16步",
+          "disabled": false,
+          "x": 445,
+          "y": 208,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第1步",
+          "disabled": false,
+          "x": 57,
+          "y": 229,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第2步",
+          "disabled": false,
+          "x": 83,
+          "y": 229,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第3步",
+          "disabled": false,
+          "x": 109,
+          "y": 229,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第4步",
+          "disabled": false,
+          "x": 135,
+          "y": 229,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第5步",
+          "disabled": false,
+          "x": 161,
+          "y": 229,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第6步",
+          "disabled": false,
+          "x": 186,
+          "y": 229,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第7步",
+          "disabled": false,
+          "x": 212,
+          "y": 229,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第8步",
+          "disabled": false,
+          "x": 238,
+          "y": 229,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第9步",
+          "disabled": false,
+          "x": 264,
+          "y": 229,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第10步",
+          "disabled": false,
+          "x": 290,
+          "y": 229,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第11步",
+          "disabled": false,
+          "x": 316,
+          "y": 229,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第12步",
+          "disabled": false,
+          "x": 342,
+          "y": 229,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第13步",
+          "disabled": false,
+          "x": 368,
+          "y": 229,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第14步",
+          "disabled": false,
+          "x": 393,
+          "y": 229,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第15步",
+          "disabled": false,
+          "x": 419,
+          "y": 229,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第16步",
+          "disabled": false,
+          "x": 445,
+          "y": 229,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第1步",
+          "disabled": false,
+          "x": 57,
+          "y": 250,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第2步",
+          "disabled": false,
+          "x": 83,
+          "y": 250,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第3步",
+          "disabled": false,
+          "x": 109,
+          "y": 250,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第4步",
+          "disabled": false,
+          "x": 135,
+          "y": 250,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第5步",
+          "disabled": false,
+          "x": 161,
+          "y": 250,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第6步",
+          "disabled": false,
+          "x": 186,
+          "y": 250,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第7步",
+          "disabled": false,
+          "x": 212,
+          "y": 250,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第8步",
+          "disabled": false,
+          "x": 238,
+          "y": 250,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第9步",
+          "disabled": false,
+          "x": 264,
+          "y": 250,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第10步",
+          "disabled": false,
+          "x": 290,
+          "y": 250,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第11步",
+          "disabled": false,
+          "x": 316,
+          "y": 250,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第12步",
+          "disabled": false,
+          "x": 342,
+          "y": 250,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第13步",
+          "disabled": false,
+          "x": 368,
+          "y": 250,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第14步",
+          "disabled": false,
+          "x": 393,
+          "y": 250,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第15步",
+          "disabled": false,
+          "x": 419,
+          "y": 250,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第16步",
+          "disabled": false,
+          "x": 445,
+          "y": 250,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "random",
+          "label": "变奏",
+          "disabled": false,
+          "x": 12,
+          "y": 278,
+          "w": 109,
+          "h": 34,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "clear",
+          "label": "清空",
+          "disabled": false,
+          "x": 128,
+          "y": 278,
+          "w": 109,
+          "h": 34,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "save",
+          "label": "保存",
+          "disabled": false,
+          "x": 244,
+          "y": 278,
+          "w": 109,
+          "h": 34,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "restore",
+          "label": "恢复",
+          "disabled": false,
+          "x": 359,
+          "y": 278,
+          "w": 109,
+          "h": 34,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 0,
+          "y": 0,
+          "w": 48,
+          "h": 48,
+          "font": "13px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 141,
+      "media": [
+        "suspended"
+      ]
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "play",
+      "count": 120,
+      "visited": [
+        "tempo",
+        "",
+        "",
+        "tempo"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 145,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [
+        "suspended"
+      ],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "rhythm-orbits",
+    "round": 1,
+    "home": {
+      "title": "节奏轨道",
+      "text": "节奏轨道\n低鼓 · 4/16 · 偏移 0\n开始演奏\n变换节奏\n静音轨道\nBPM\n步数\n击打\n旋转一格",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "play",
+          "label": "开始演奏",
+          "disabled": false,
+          "x": 12,
+          "y": 252,
+          "w": 119,
+          "h": 44,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "random",
+          "label": "变换节奏",
+          "disabled": false,
+          "x": 137,
+          "y": 252,
+          "w": 119,
+          "h": 44,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "mute",
+          "label": "静音轨道",
+          "disabled": false,
+          "x": 263,
+          "y": 252,
+          "w": 119,
+          "h": 44,
+          "font": "12px"
+        },
+        {
+          "tag": "INPUT",
+          "id": "bpm",
+          "label": "",
+          "disabled": false,
+          "x": 416,
+          "y": 252,
+          "w": 52,
+          "h": 44,
+          "font": "13.3333px"
+        },
+        {
+          "tag": "INPUT",
+          "id": "steps",
+          "label": "",
+          "disabled": false,
+          "x": 40,
+          "y": 304,
+          "w": 90,
+          "h": 44,
+          "font": "13.3333px"
+        },
+        {
+          "tag": "INPUT",
+          "id": "pulses",
+          "label": "",
+          "disabled": false,
+          "x": 166,
+          "y": 304,
+          "w": 90,
+          "h": 44,
+          "font": "13.3333px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "rotate",
+          "label": "旋转一格",
+          "disabled": false,
+          "x": 264,
+          "y": 304,
+          "w": 90,
+          "h": 44,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 0,
+          "y": 0,
+          "w": 48,
+          "h": 48,
+          "font": "12px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 142,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "play",
+      "count": 8,
+      "visited": [
+        "random",
+        "pulses",
+        "steps",
+        "play"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 145,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "robo-face",
+    "round": 1,
+    "home": {
+      "title": "机器人眼睛",
+      "text": "···\n移动鼠标，它会看向你 · 点击逗它笑",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "menu",
+          "label": "打开控制",
+          "disabled": false,
+          "x": 426,
+          "y": 10,
+          "w": 44,
+          "h": 44,
+          "font": "22px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 0,
+          "y": 0,
+          "w": 48,
+          "h": 48,
+          "font": "14px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 126,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "menu",
+      "count": 2,
+      "visited": [
+        "menu",
+        "menu",
+        "atom-app-back",
+        "atom-app-back"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 129,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "volume-flow",
+    "round": 1,
+    "home": {
+      "title": "",
+      "text": "体积流场 · 拖动旋转 · 滚轮缩放\n4千粒子\n换色\n变换流场\n暂停",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "quality",
+          "label": "4千粒子",
+          "disabled": false,
+          "x": 12,
+          "y": 310,
+          "w": 110,
+          "h": 40,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "color",
+          "label": "换色",
+          "disabled": false,
+          "x": 128,
+          "y": 310,
+          "w": 110,
+          "h": 40,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "curl",
+          "label": "变换流场",
+          "disabled": false,
+          "x": 243,
+          "y": 310,
+          "w": 110,
+          "h": 40,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "speed",
+          "label": "暂停",
+          "disabled": false,
+          "x": 359,
+          "y": 310,
+          "w": 110,
+          "h": 40,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 0,
+          "y": 0,
+          "w": 48,
+          "h": 48,
+          "font": "14px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 142,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "quality",
+      "count": 5,
+      "visited": [
+        "color",
+        "color",
+        "quality",
+        "atom-app-back"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 144,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "water-pool",
+    "round": 1,
+    "home": {
+      "title": "光影水池",
+      "text": "光影水池 · 拨动水面 / 拖动球体\n暂停\n重力：关\n雨滴",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "暂停",
+          "disabled": false,
+          "x": 12,
+          "y": 308,
+          "w": 56,
+          "h": 40,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "重力：关",
+          "disabled": false,
+          "x": 76,
+          "y": 308,
+          "w": 84,
+          "h": 40,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "雨滴",
+          "disabled": false,
+          "x": 168,
+          "y": 308,
+          "w": 56,
+          "h": 40,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 0,
+          "y": 0,
+          "w": 48,
+          "h": 48,
+          "font": "13px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 142,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "暂停",
+      "count": 4,
+      "visited": [
+        "重力：关",
+        "重力：关",
+        "暂停",
+        "atom-app-back"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 144,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  }
+]

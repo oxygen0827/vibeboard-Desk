@@ -1,0 +1,15 @@
+{
+  "id": "made-23c2b1193c452dd3adf9",
+  "name": "创作链路验收 · 呼吸灯",
+  "description": "",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "input": {
+    "version": 1,
+    "profile": "five-way",
+    "back": "root",
+    "scene": "none"
+  },
+  "theme_ui": "controls",
+  "layout": "fullscreen"
+}

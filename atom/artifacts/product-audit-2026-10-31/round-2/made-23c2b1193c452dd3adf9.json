@@ -1,0 +1,117 @@
+{
+  "id": "made-23c2b1193c452dd3adf9",
+  "steps": [
+    "#toggle-btn",
+    "#color-btn"
+  ],
+  "before": {
+    "title": "",
+    "text": "暂停\n切换颜色",
+    "size": {
+      "width": 480,
+      "height": 360
+    },
+    "controls": [
+      {
+        "tag": "BUTTON",
+        "id": "",
+        "label": "返回桌面",
+        "disabled": false,
+        "x": 16,
+        "y": 16,
+        "w": 48,
+        "h": 48,
+        "font": "16px"
+      },
+      {
+        "tag": "BUTTON",
+        "id": "toggle-btn",
+        "label": "暂停",
+        "disabled": false,
+        "x": 134,
+        "y": 250,
+        "w": 80,
+        "h": 50,
+        "font": "16px"
+      },
+      {
+        "tag": "BUTTON",
+        "id": "color-btn",
+        "label": "切换颜色",
+        "disabled": false,
+        "x": 234,
+        "y": 250,
+        "w": 112,
+        "h": 50,
+        "font": "16px"
+      }
+    ],
+    "canvases": 0,
+    "frames": 2,
+    "media": []
+  },
+  "after": {
+    "title": "",
+    "text": "继续\n切换为蓝色",
+    "size": {
+      "width": 480,
+      "height": 360
+    },
+    "controls": [
+      {
+        "tag": "BUTTON",
+        "id": "",
+        "label": "返回桌面",
+        "disabled": false,
+        "x": 16,
+        "y": 16,
+        "w": 48,
+        "h": 48,
+        "font": "16px"
+      },
+      {
+        "tag": "BUTTON",
+        "id": "toggle-btn",
+        "label": "继续",
+        "disabled": false,
+        "x": 126,
+        "y": 250,
+        "w": 80,
+        "h": 50,
+        "font": "16px"
+      },
+      {
+        "tag": "BUTTON",
+        "id": "color-btn",
+        "label": "切换为蓝色",
+        "disabled": false,
+        "x": 226,
+        "y": 250,
+        "w": 128,
+        "h": 50,
+        "font": "16px"
+      }
+    ],
+    "canvases": 0,
+    "frames": 25,
+    "media": []
+  },
+  "fixture": {
+    "ready": true,
+    "value": null,
+    "saves": 0,
+    "returned": 0,
+    "unsupported": [
+      "atom:input-mode"
+    ],
+    "calls": []
+  },
+  "suspend": {
+    "frames": 27,
+    "intervals": 0,
+    "audio": [],
+    "growth": 0
+  },
+  "errors": [],
+  "status": "reviewed"
+}

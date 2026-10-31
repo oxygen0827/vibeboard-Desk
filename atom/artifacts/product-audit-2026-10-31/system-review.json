@@ -1,0 +1,35 @@
+{
+  "source": "actual device static UI; isolated demo APIs, no hardware mutation",
+  "rounds": [
+    {
+      "round": 1,
+      "clock": "rendered",
+      "timer": "preset/start/pause/invalid input",
+      "status": "offline demo state",
+      "settings": "nested return",
+      "workshop": "empty creation",
+      "developer": "read-only",
+      "errors": []
+    },
+    {
+      "round": 2,
+      "clock": "rendered",
+      "timer": "preset/start/pause/invalid input",
+      "status": "offline demo state",
+      "settings": "nested return",
+      "workshop": "empty creation",
+      "developer": "read-only",
+      "errors": []
+    },
+    {
+      "round": 3,
+      "clock": "rendered",
+      "timer": "preset/start/pause/invalid input",
+      "status": "offline demo state",
+      "settings": "nested return",
+      "workshop": "empty creation",
+      "developer": "read-only",
+      "errors": []
+    }
+  ]
+}

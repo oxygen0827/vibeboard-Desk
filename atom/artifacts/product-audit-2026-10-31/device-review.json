@@ -1,0 +1,16 @@
+{
+  "device": "taishan-gray",
+  "resolution": [
+    480,
+    360
+  ],
+  "visible_desktop_pages_reviewed": 9,
+  "hidden_icons": "robo-face and mic-test validated statically; not unhidden on desktop",
+  "physical_flows": [
+    "water-pool: launch, directional selection, short-Space open, rotate, close panel, return to page 4",
+    "model-viewer: launch and directional focus",
+    "glass-ecosystem / pixel-lab: existing apps still receive directional focus after host update"
+  ],
+  "screenshots": "device/",
+  "private_state_written_by_deployment": false
+}

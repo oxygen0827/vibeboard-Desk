@@ -1,0 +1,26 @@
+{
+  "app": "photo-pet",
+  "release": "residents-v1",
+  "date": "2026-10-30",
+  "bundle_bytes": 1593792,
+  "sha256": "900c9a564abb72c52bbbacd6608f6de63d00af2540b8b4f2f72b58801b387ce2",
+  "static_admission": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "browser_integration": "passed: existing garden loop, all three jobs, transactional save/claim, restoration, follow reversal, reduced motion, suspend",
+  "domain_checks": "passed: v2 migration, offline completion, duplicate claim prevention, tool cap, malformed job protection",
+  "deployment": {
+    "device": "taishan-gray",
+    "verified_files": 10,
+    "installed_at_preserved": 1793192014984748822,
+    "svg": "semantic equality after installer normalization"
+  },
+  "device_headless_smoke": "inconclusive: first isolated run produced no completion marker; diagnostic reconnect was closed",
+  "not_verified": [
+    "physical joystick flow",
+    "physical desktop icon appearance",
+    "multi-hour soak",
+    "every animation frame visual contact"
+  ]
+}

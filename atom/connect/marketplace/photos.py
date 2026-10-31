@@ -32,6 +32,8 @@ USER_BYTES = 64 * 1024 * 1024
 TOTAL_BYTES = 128 * 1024 * 1024
 PHOTO_ID = re.compile(r'^[a-f0-9]{32}$')
 from photo_prompts import STYLES, TEMPLATES, PROMPT_VERSION, build_prompt
+from pet_reference import reference_prompt
+STYLES = {**STYLES, "pet": ("桌面宠物形象", "")}
 ACTIVE = ('queued', 'generating', 'saving')
 
 
@@ -317,6 +319,7 @@ class PhotoLibrary:
         prompt = prompt.strip()
         check(prompt or source, '请描述要生成的画面')
         check(isinstance(style, str) and style in STYLES, '请选择支持的风格')
+        check(style != 'pet' or source, '生成宠物形象需要先选择一张参考照片')
         digest = hashlib.sha256(json.dumps([prompt, style, source]).encode()).hexdigest()
         with self.m.lock, self.m.db:
             previous = self.m.row('SELECT * FROM photo_jobs WHERE user=? AND request_id=?', (uid, request_id))
@@ -333,7 +336,7 @@ class PhotoLibrary:
                   '今天的生图次数已用完，请明天再试', 429)
             job = dict(id=secrets.token_hex(16), user_id=uid, status='queued', created_at=self.m.clock(),
                        updated_at=self.m.clock(), prompt=prompt, style=style, source_id=source,
-                       photo_id=None, error=None, prompt_version=PROMPT_VERSION, render_prompt=build_prompt(prompt, style, bool(source)))
+                       photo_id=None, error=None, prompt_version=PROMPT_VERSION, render_prompt=reference_prompt(prompt) if style == "pet" else build_prompt(prompt, style, bool(source)))
             self.m.db.execute('INSERT INTO photo_jobs VALUES(?,?,?,?,?)', (job['id'], uid, request_id, digest, json.dumps(job, ensure_ascii=False)))
             self.pool.submit(self.run, dict(job))
             return {'job': job}
@@ -354,7 +357,7 @@ class PhotoLibrary:
                     row = self.m.row('SELECT display FROM photo_media WHERE id=?', (job['source_id'],))
                     reference = data_url(row['display'], 'image/jpeg')
             self.update_job(job, status='generating')
-            prompt = job.get('render_prompt') or build_prompt(job['prompt'], job['style'], bool(reference))
+            prompt = job.get('render_prompt') or (reference_prompt(job['prompt']) if job['style'] == 'pet' else build_prompt(job['prompt'], job['style'], bool(reference)))
             raw = self.provider.generate(prompt, reference)
             self.update_job(job, status='saving')
             item = self.save_photo(job['user_id'], raw, prepare(raw), STYLES[job['style']][0] + ' · ' + (job['prompt'] or '照片新版本')[:60],

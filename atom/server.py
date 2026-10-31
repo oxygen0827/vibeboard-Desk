@@ -209,7 +209,7 @@ def validate_manifest(value, trusted_connect=False):
     if input_declaration is not None: result['input'] = input_declaration
     if 'capabilities' in value:
         caps = value['capabilities']
-        if not isinstance(caps,list) or len(caps)>5 or any(not isinstance(c,str) or c not in ('notes','agenda','task-state','photos','sensors') for c in caps) or len(set(caps))!=len(caps): raise ValueError('invalid app capabilities')
+        if not isinstance(caps,list) or len(caps)>5 or any(not isinstance(c,str) or c not in ('notes','agenda','task-state','photos','sensors','office-control') for c in caps) or len(set(caps))!=len(caps): raise ValueError('invalid app capabilities')
         result['capabilities'] = caps
     if 'theme_ui' in value:
         if value['theme_ui'] != 'controls': raise ValueError('invalid theme_ui')
@@ -610,7 +610,10 @@ class Handler(SimpleHTTPRequestHandler):
             if not isinstance(data, dict):
                 raise ValueError('JSON object required')
             path = urlsplit(self.path).path
-            if path.startswith('/api/device-data/'):
+            if path == '/api/codex-pet/state':
+                import codex_pet
+                self.json_response(200, codex_pet.snapshot(self.server.settings_path.parent))
+            elif path.startswith('/api/device-data/'):
                 service = features(self.server)
                 store = service.device_data
                 action = path.rsplit('/', 1)[-1]

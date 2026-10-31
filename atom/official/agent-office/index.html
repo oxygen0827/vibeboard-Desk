@@ -1,0 +1,64 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>像素办公室</title><link rel="stylesheet" href="style.css"></head><body><main>
+<canvas id="scene" width="240" height="180" aria-label="像素办公室：四个工位、会议桌和资料柜"></canvas>
+<header><h1>像素办公室</h1><button id="btn-setup" class="chip">检查连接…</button></header>
+<p id="status" role="status" hidden></p>
+<div id="spots" aria-label="办公室"></div>
+<footer><button id="btn-assign">派任务</button><button id="btn-board">任务板</button><button id="btn-reports">汇报<span id="badge" hidden></span></button></footer>
+</main>
+
+<dialog id="dlg-staff" class="sheet" aria-labelledby="staff-title">
+  <div class="sheet-head"><canvas id="portrait" width="14" height="18" aria-hidden="true"></canvas><div><h2 id="staff-title"></h2><p id="staff-reason"></p></div></div>
+  <p id="staff-live" class="live" hidden></p>
+  <div id="staff-approval" class="approval" hidden><p id="staff-approval-text"></p><div class="row"><button id="staff-allow">允许</button><button id="staff-deny">拒绝</button></div></div>
+  <div class="row"><button id="staff-assign">交给TA</button><button id="staff-report" hidden>查看成果</button><button id="staff-close">返回办公室</button></div>
+</dialog>
+
+<dialog id="dlg-goal" class="page" aria-labelledby="goal-title">
+  <div class="page-head"><button class="back" data-close>办公室</button><h2 id="goal-title">派任务</h2></div>
+  <div class="page-body atom-scroll">
+    <p id="goal-who" class="muted"></p>
+    <textarea id="goal-text" rows="3" maxlength="2000" placeholder="输入目标，或长按空格口述"></textarea>
+    <p class="muted small">长按空格语音输入；转写后不会自动提交。</p>
+    <button id="goal-target" class="row-btn"></button>
+    <p id="goal-status" role="status"></p>
+  </div>
+  <div class="page-actions"><button id="goal-submit" class="primary">拟定分工</button><button id="goal-save">保存草稿</button></div>
+</dialog>
+
+<dialog id="dlg-plan" class="page" aria-labelledby="plan-title">
+  <div class="page-head"><button class="back" data-close>办公室</button><h2 id="plan-title">分工方案</h2></div>
+  <div class="page-body atom-scroll"><p id="plan-status" role="status"></p><ol id="plan-list"></ol></div>
+  <div class="page-actions"><button id="plan-confirm" class="primary" hidden>确认开工</button><button id="plan-retry" hidden>重新生成</button><button id="plan-edit">修改需求</button></div>
+</dialog>
+
+<dialog id="dlg-board" class="page" aria-labelledby="board-title">
+  <div class="page-head"><button class="back" data-close>办公室</button><h2 id="board-title">任务板</h2></div>
+  <div class="page-body atom-scroll"><p id="board-goal"></p><p id="board-status" role="status"></p><ol id="board-list"></ol></div>
+  <div class="page-actions"><button id="board-plan" hidden>查看分工</button><button id="board-retry" hidden>重试失败</button><button id="board-cancel" hidden>停止目标</button><button id="board-new" hidden>新目标</button></div>
+</dialog>
+
+<dialog id="dlg-reports" class="page" aria-labelledby="reports-title">
+  <div class="page-head"><button class="back" data-close>办公室</button><h2 id="reports-title">汇报</h2></div>
+  <div class="page-body atom-scroll"><ul id="reports-list"></ul><p id="reports-empty" class="muted">还没有汇报。完成的工作会在这里保留。</p></div>
+</dialog>
+
+<dialog id="dlg-report" class="page" aria-labelledby="report-title">
+  <div class="page-head"><button class="back" data-close>汇报</button><h2 id="report-title">汇报</h2></div>
+  <p id="report-meta" class="muted small"></p>
+  <div id="report-text" class="page-body atom-scroll report-text"></div>
+</dialog>
+
+<dialog id="dlg-setup" class="page" aria-labelledby="setup-title">
+  <div class="page-head"><button class="back" data-close>办公室</button><h2 id="setup-title">连接与员工</h2></div>
+  <div class="page-body atom-scroll">
+    <p id="setup-status" role="status"></p>
+    <h3>电脑</h3><div id="setup-computers" class="choices"></div>
+    <h3>授权项目</h3><div id="setup-projects" class="choices"></div>
+    <h3>执行器</h3><div id="setup-agents" class="choices"></div>
+    <h3>员工名称</h3><div id="setup-staff" class="staff-names"></div>
+    <h3>演示模式</h3><p class="muted small">使用模拟数据体验流程，不连接电脑，所有结果标注“演示”。</p><button id="setup-demo" class="row-btn" aria-pressed="false">演示模式 · 关</button>
+    <!-- In-flow and stacked: one column keeps five-way Down/Up a straight walk through the page. -->
+    <div class="page-actions stacked"><button id="setup-save" class="primary">保存</button><button id="setup-refresh">重新检查</button></div>
+  </div>
+</dialog>
+<script src="office-map.js"></script><script src="office-art.js"></script><script src="office-domain.js"></script><script src="office-client.js"></script><script src="office-runner.js"></script><script src="office-scene.js"></script><script src="office-render.js"></script><script src="office-ui.js"></script><script src="app.js"></script></body></html>
