@@ -6,4 +6,4 @@ for(const candidate of candidates){try{runtime=require(candidate);break}catch(er
 if(!runtime)throw Error('Install browser test dependencies: npm --prefix atom install && npx --prefix atom playwright install chromium');
 let executablePath=process.env.ATOM_CHROME_EXECUTABLE;
 if(!executablePath&&process.platform==='darwin'&&fs.existsSync('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'))executablePath='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
-module.exports={chromium:runtime.chromium,executablePath};
+module.exports={chromium:runtime.chromium,webkit:runtime.webkit,executablePath};

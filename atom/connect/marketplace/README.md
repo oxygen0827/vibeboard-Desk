@@ -41,7 +41,7 @@ python3 -m unittest discover -s atom/connect/marketplace -p 'test_*.py' -v
 
 ## 版本、分叉和发布
 
-源码包必须完整包含 manifest 和 files，最大 1 MiB、100 个文本文件。入口固定 index.html，路径禁止绝对路径、穿越、隐藏文件、URL 和 manifest.json。图标为静态 currentColor、64×64 viewBox SVG，禁止事件/脚本/外部资源。平台不会运行上传的代码、调用任意构建命令或读取客户端提供的服务器路径。
+源码包必须完整包含 manifest 和 files，最大 1984 KiB、100 个文本文件（完整 HTTP 请求上限 2 MiB，预留 64 KiB 元数据空间）。入口固定 index.html，路径禁止绝对路径、穿越、隐藏文件、URL 和 manifest.json。图标为静态 currentColor、64×64 viewBox SVG，禁止事件/脚本/外部资源。平台不会运行上传的代码、调用任意构建命令或读取客户端提供的服务器路径。
 
 发布需要显式 `confirm:true` 和准确 revision；生成不可变版本编号与 SHA-256（完整紧凑 UTF-8 JSON 快照）。保存私人草稿不会改变已发布版本；发布后的草稿 revision 会增加，再次发布旧 revision 返回冲突。bundle 同时作为源码和安装包保存，不只保留入口 HTML。
 
@@ -73,6 +73,14 @@ python3 -m unittest discover -s atom/connect/marketplace -p 'test_*.py' -v
 ## 运维命令：备份、健康与目录下架
 
 这些命令是**拥有服务器数据库文件权限的管理员本地操作**，不提供给设备 iframe 或普通用户。请传市场数据库路径，而非 Connect 任务中继数据库。
+
+日常先看只读总览，一次读取公开作品/私人草稿数量、创作任务、改进建议与磁盘空间。不会打印正文、账号、任务错误详情或凭据；不会自动清理磁盘、重启服务或重试生成：
+
+```sh
+python3 atom/connect/marketplace/ops.py --db /private/path/relay.marketplace.sqlite3 overview
+```
+
+需要脚本读取时加 `--json`。历史失败数量只代表保留记录；总览通过代表市场数据库检查通过，外网可达、模型调用和设备安装仍分别验证。旧数据库缺少创作表时显示「尚未启用」，不会假报零任务。磁盘不足 1 GiB 或可用比例低于 5% 时给出容量提示。
 
 ```sh
 python3 atom/connect/marketplace/ops.py --db /private/path/relay.marketplace.sqlite3 health

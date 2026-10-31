@@ -1,0 +1,15 @@
+{
+  "id": "music-vision",
+  "name": "音乐幻境",
+  "description": "Butterchurn / MilkDrop 原版 WebGL2 音乐视觉引擎，离线预设和本地音频",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "theme_ui": "controls",
+  "layout": "fullscreen",
+  "input": {
+    "version": 1,
+    "profile": "five-way",
+    "back": "root",
+    "scene": "controls"
+  }
+}

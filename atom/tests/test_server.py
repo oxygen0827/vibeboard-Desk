@@ -210,6 +210,24 @@ class APITests(unittest.TestCase):
         self.assertIn(b'data-atom-theme', html)
         self.assertEqual(self.request('/api/voice/transcribe', {'recording_id':'../../bad'})[0], 400)
 
+    def test_sampled_piano_market_preview_install_update_preserves_resources_and_order(self):
+        bundle = json.loads((Path(__file__).resolve().parents[1] / 'official/mini-piano/bundle.json').read_text())
+        source = dict(bundle=bundle, version={'id':'v1','work_id':'piano'}, license='MIT', author='test', official=True)
+        service = server.features(self.http)
+        self.request('/api/developer', {'enabled':False})
+        with mock.patch.object(service.market, 'execute', return_value=source):
+            status, body = self.request('/api/market/preview', {'version_id':'v1'})
+            self.assertEqual(status,200,body[:300])
+            self.assertEqual(json.loads(body)['bundle']['files']['samples.js'],bundle['files']['samples.js'])
+            status, body = self.request('/api/market/install', {'version_id':'v1','confirm':True})
+            self.assertEqual(status,200,body[:300])
+            installed = json.loads((self.root/'mini-piano/manifest.json').read_text())
+            status, body = self.request('/api/market/install', {'version_id':'v1','confirm':True,'update':True})
+            self.assertEqual(status,200,body[:300])
+            updated = json.loads((self.root/'mini-piano/manifest.json').read_text())
+            self.assertEqual(installed['_installed_at_ns'],updated['_installed_at_ns'])
+        self.assertEqual((self.root/'mini-piano/samples.js').read_text(),bundle['files']['samples.js'])
+
     def test_market_install_does_not_require_developer_mode(self):
         self.request('/api/developer', {'enabled': False})
         icon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M8 8H56V56H8Z" stroke="currentColor" fill="none"/></svg>'

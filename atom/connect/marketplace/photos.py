@@ -31,14 +31,7 @@ except ImportError:
 USER_BYTES = 64 * 1024 * 1024
 TOTAL_BYTES = 128 * 1024 * 1024
 PHOTO_ID = re.compile(r'^[a-f0-9]{32}$')
-STYLES = {
-    'natural': ('自然光', '自然摄影，柔和光线，真实材质，细腻色彩。'),
-    'clay': ('黏土世界', '精致手工黏土微缩场景，圆润造型，保留手工质感，柔和影棚灯光。'),
-    'watercolor': ('水彩手记', '清透水彩插画，纸张肌理，柔和晕染，简洁留白。'),
-    'pixel': ('像素旅途', '精致像素艺术，清晰像素边缘，克制配色，丰富场景细节。'),
-    'film': ('胶片时光', '温暖复古胶片摄影，细微颗粒，自然光影，柔和高光。'),
-    'miniature': ('微缩奇境', '精致的微缩模型摄影，移轴景深，丰富材质和温暖光线。'),
-}
+from photo_prompts import STYLES, TEMPLATES, PROMPT_VERSION, build_prompt
 ACTIVE = ('queued', 'generating', 'saving')
 
 
@@ -134,6 +127,10 @@ class NoRedirect(HTTPRedirectHandler):
 class ArkImages:
     def __init__(self):
         self.key = os.environ.get('ARK_API_KEY', '')
+        mode = os.environ.get('ATOM_IMAGE_API_MODE', 'standard')
+        if mode not in ('standard', 'agent-plan'):
+            raise ValueError('ATOM_IMAGE_API_MODE must be standard or agent-plan')
+        self.endpoint = 'https://ark.cn-beijing.volces.com/api/' + ('plan/' if mode == 'agent-plan' else '') + 'v3/images/generations'
         self.model = os.environ.get('ATOM_IMAGE_MODEL', 'doubao-seedream-5-0-flash-260915')
         self.allowed = set(filter(None, os.environ.get('ATOM_IMAGE_ALLOWED_USERS', '').split(',')))
         self.opener = build_opener(NoRedirect())
@@ -147,7 +144,7 @@ class ArkImages:
                        output_format='jpeg', response_format='b64_json', watermark=True)
         if reference:
             payload['image'] = reference
-        request = Request('https://ark.cn-beijing.volces.com/api/v3/images/generations',
+        request = Request(self.endpoint,
                           data=json.dumps(payload).encode(), headers={
                               'Authorization': 'Bearer ' + self.key, 'Content-Type': 'application/json'})
         try:
@@ -245,7 +242,7 @@ class PhotoLibrary:
                 return dict(user={'id': uid, 'username': user['username']}, generation_enabled=self.provider.enabled(uid),
                             provider='火山方舟', model=self.provider.model, used_bytes=used['size'], limit_bytes=USER_BYTES,
                             max_original_bytes=MAX_ORIGINAL, max_pixels=MAX_PIXELS,
-                            total=used['n'], styles=[{'id': k, 'name': v[0]} for k, v in STYLES.items()])
+                            total=used['n'], prompt_version=PROMPT_VERSION, templates=TEMPLATES, styles=[{'id': k, 'name': v[0]} for k, v in STYLES.items()])
         if suffix == '' and method == 'GET':
             q = parse_qs(parsed.query)
             try:
@@ -336,7 +333,7 @@ class PhotoLibrary:
                   '今天的生图次数已用完，请明天再试', 429)
             job = dict(id=secrets.token_hex(16), user_id=uid, status='queued', created_at=self.m.clock(),
                        updated_at=self.m.clock(), prompt=prompt, style=style, source_id=source,
-                       photo_id=None, error=None)
+                       photo_id=None, error=None, prompt_version=PROMPT_VERSION, render_prompt=build_prompt(prompt, style, bool(source)))
             self.m.db.execute('INSERT INTO photo_jobs VALUES(?,?,?,?,?)', (job['id'], uid, request_id, digest, json.dumps(job, ensure_ascii=False)))
             self.pool.submit(self.run, dict(job))
             return {'job': job}
@@ -357,7 +354,7 @@ class PhotoLibrary:
                     row = self.m.row('SELECT display FROM photo_media WHERE id=?', (job['source_id'],))
                     reference = data_url(row['display'], 'image/jpeg')
             self.update_job(job, status='generating')
-            prompt = ('以参考照片为基础，尽量保留主体身份和关键构图。' if reference else '') + STYLES[job['style']][1] + '\n' + job['prompt']
+            prompt = job.get('render_prompt') or build_prompt(job['prompt'], job['style'], bool(reference))
             raw = self.provider.generate(prompt, reference)
             self.update_job(job, status='saving')
             item = self.save_photo(job['user_id'], raw, prepare(raw), STYLES[job['style']][0] + ' · ' + (job['prompt'] or '照片新版本')[:60],

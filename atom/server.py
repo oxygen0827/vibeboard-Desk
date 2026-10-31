@@ -122,6 +122,8 @@ def features(http):
             http.experiences = Experiences()
             from release_store import ReleaseStore
             http.releases = ReleaseStore(state / 'app-releases')
+            from community_install import CommunityInstaller
+            http.community_installer = CommunityInstaller(http, validate_delivery_bundle, install_app)
     return http
 
 
@@ -230,6 +232,64 @@ def ensure_safe_root(root):
         raise ValueError('symlink parent')
 
 
+def _recover_app_update(root):
+    """Caller holds LOCK. An uncommitted swap always restores the previous app."""
+    journal = root / '.app-update.json'
+    if journal.is_symlink():
+        raise ValueError('unsafe app update journal')
+    if not journal.exists():
+        return
+    if journal.stat().st_size > 4096:
+        raise ValueError('invalid app update journal')
+    record = json.loads(journal.read_text(encoding='utf-8'))
+    aid, backup_name = record.get('id'), record.get('backup')
+    if not isinstance(aid, str) or not ID.fullmatch(aid) or (aid in RESERVED_IDS and aid not in TRUSTED_CLIENT_IDS):
+        raise ValueError('invalid recovery app id')
+    if not isinstance(backup_name, str) or not re.fullmatch(r'\.backup-' + re.escape(aid) + r'-[0-9]+', backup_name):
+        raise ValueError('invalid recovery backup')
+    stage_name = record.get('stage')
+    if not isinstance(stage_name, str) or not re.fullmatch(r'\.install-[A-Za-z0-9_-]+', stage_name):
+        raise ValueError('invalid recovery stage')
+    stage = root / stage_name
+    if stage.is_symlink():
+        raise ValueError('unsafe recovery stage')
+    target, backup = root / aid, root / backup_name
+    if target.is_symlink() or backup.is_symlink():
+        raise ValueError('unsafe recovery path')
+    if backup.exists():
+        manifest = backup / 'manifest.json'
+        if manifest.is_symlink() or manifest.stat().st_size > 4096:
+            raise ValueError('invalid recovery manifest')
+        if json.loads(manifest.read_text(encoding='utf-8')).get('id') != aid:
+            raise ValueError('recovery app mismatch')
+        if target.exists():
+            shutil.rmtree(str(target))
+        os.rename(str(backup), str(target))
+        system_update._sync_dir(root)
+    elif not target.is_dir():
+        raise ValueError('app recovery files missing; preserve journal for repair')
+    if stage.exists():
+        shutil.rmtree(str(stage))
+    journal.unlink()
+    system_update._sync_dir(root)
+
+
+def recover_app_update(root):
+    with LOCK:
+        ensure_safe_root(root)
+        _recover_app_update(root)
+
+
+def _sync_app_tree(stage):
+    for file in stage.rglob('*'):
+        if file.is_file():
+            with file.open('rb') as data:
+                os.fsync(data.fileno())
+    folders = sorted((p for p in stage.rglob('*') if p.is_dir()), key=lambda p: len(p.parts), reverse=True)
+    for folder in folders + [stage]:
+        system_update._sync_dir(folder)
+
+
 def install_app(root, data, update=False, trusted_connect=False, require_input=True):
     provided_icon = isinstance(data,dict) and isinstance(data.get('manifest'),dict) and 'icon' in data['manifest']
     data = ensure_icon(data)
@@ -248,6 +308,7 @@ def install_app(root, data, update=False, trusted_connect=False, require_input=T
         raise ValueError('application too large')
     with LOCK:
         ensure_safe_root(root)
+        _recover_app_update(root)
         target = root / manifest['id']
         if target.is_symlink():
             raise ValueError('symlink app')
@@ -273,17 +334,29 @@ def install_app(root, data, update=False, trusted_connect=False, require_input=T
                 dest.parent.mkdir(parents=True, exist_ok=True)
                 dest.write_text(content, encoding='utf-8')
             (stage / 'manifest.json').write_text(json.dumps(manifest, ensure_ascii=False), encoding='utf-8')
+            _sync_app_tree(stage)
             if update:
                 backup = root / ('.backup-' + manifest['id'] + '-' + str(time.time_ns()))
-                os.rename(str(target), str(backup))
+                journal = root / '.app-update.json'
+                system_update._write(journal, dict(id=manifest['id'], backup=backup.name, stage=stage.name))
                 try:
+                    os.rename(str(target), str(backup))
+                    system_update._sync_dir(root)
                     os.rename(str(stage), str(target))
+                    system_update._sync_dir(root)
+                    journal.unlink()
+                    system_update._sync_dir(root)
                 except Exception:
-                    os.rename(str(backup), str(target))
+                    _recover_app_update(root)
                     raise
-                shutil.rmtree(str(backup))
+                # The committed target is authoritative; leftover backup cleanup is best effort.
+                try:
+                    shutil.rmtree(str(backup))
+                except OSError:
+                    pass
             else:
                 os.rename(str(stage), str(target))
+                system_update._sync_dir(root)
         finally:
             if stage.exists():
                 shutil.rmtree(str(stage))
@@ -295,6 +368,7 @@ def uninstall_app(root, app_id):
         raise ValueError('invalid or protected app id')
     with LOCK:
         ensure_safe_root(root)
+        _recover_app_update(root)
         target = root / app_id
         if target.is_symlink() or not target.is_dir():
             raise ValueError('app not installed')
@@ -304,6 +378,8 @@ def uninstall_app(root, app_id):
 
 
 def apps(root):
+    if root.exists() and not root.is_symlink():
+        recover_app_update(root)
     result = [dict(a) for a in BUILTINS]
     installed = []
     if root.exists() and not root.is_symlink():
@@ -426,7 +502,9 @@ class Handler(SimpleHTTPRequestHandler):
         if path in ('/api/themes', '/api/model-config', '/api/voice/status', '/api/voice/speech-status', '/api/connect/state') or path.startswith('/api/workshop/jobs/'):
             service = features(self.server)
             try:
-                if path == '/api/connect/state': result = service.connect.state()
+                if path == '/api/connect/state':
+                    service.community_installer.poll()
+                    result = service.connect.state()
                 elif path == '/api/themes': result = service.theme_store.list_themes()
                 elif path == '/api/model-config': result = dict(service.workshop.public_config(), official=official_status(service))
                 elif path == '/api/voice/speech-status': result = service.speech.public_status()
@@ -579,7 +657,17 @@ class Handler(SimpleHTTPRequestHandler):
             elif path.startswith('/api/market/'):
                 action = path.rsplit('/', 1)[-1]
                 service = features(self.server)
-                if action == 'rollback':
+                if action == 'workshop-save':
+                    job = service.workshop.get_job(data.get('job_id'))
+                    if job.get('status') != 'ready': raise ValueError('请等待应用生成完成')
+                    with service.market.lock:
+                        bundle = json.loads(json.dumps(job['bundle']))
+                        bundle['manifest'].pop('theme_mode', None)
+                        bundle['manifest'].pop('theme_id', None)
+                        result = service.market.request('community/create', dict(request_id='workshop-'+job['job_id'], title=bundle['manifest']['name'], description=bundle['manifest'].get('description',''), category='play', bundle=bundle), True)
+                elif action == 'community-install':
+                    result = service.community_installer.local(data)
+                elif action == 'rollback':
                     if data.get('confirm') is not True: raise ValueError('请确认恢复应用资源')
                     app_id = data.get('app_id')
                     if app_id in TRUSTED_CLIENT_IDS and app_id not in ('today','task-pal'): raise ValueError('系统入口不能通过市场回滚')
@@ -593,7 +681,7 @@ class Handler(SimpleHTTPRequestHandler):
                     source = service.market.execute('source', data)
                     source_id = source.get('bundle', {}).get('manifest', {}).get('id')
                     trusted = source.get('official') is True and source_id in {'today','task-pal'}
-                    bundle = validate_delivery_bundle(source.get('bundle'), trusted_connect=trusted, maximum=1024*1024)
+                    bundle = validate_delivery_bundle(source.get('bundle'), trusted_connect=trusted, maximum=MAX_BODY)
                     if action == 'preview': result = dict(bundle=bundle)
                     elif action == 'install-state': result = dict(installed=(self.server.apps_root / bundle['manifest']['id']).is_dir(), app_id=bundle['manifest']['id'], history=service.releases.history(bundle['manifest']['id']))
                     else:
@@ -782,6 +870,7 @@ def main():
     server = ThreadingHTTPServer(('127.0.0.1', args.port), Handler)
     server.apps_root = Path(args.apps_dir).absolute()
     server.settings_path = BASE / 'state' / 'settings.json'
+    recover_app_update(server.apps_root)
     server.serve_forever()
 
 

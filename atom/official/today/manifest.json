@@ -8,5 +8,10 @@
   "layout": "fullscreen",
   "capabilities": [
     "agenda"
-  ]
+  ],
+  "input": {
+    "version": 1,
+    "profile": "five-way",
+    "back": "custom"
+  }
 }

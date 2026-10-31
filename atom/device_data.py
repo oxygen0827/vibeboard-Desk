@@ -14,7 +14,7 @@ from system_update import _write
 
 LIMIT = 1500 * 1024
 MIRROR_LIMIT = 64 * 1024
-KEYS = {'atom.desktop.v2', 'atom.widget', 'atom.timer', 'atom.notes', 'atom.speechFeedback',
+KEYS = {'atom.desktop.v2', 'atom.desktop.sort.v1', 'atom.desktop.usage.v1', 'atom.widget', 'atom.timer', 'atom.notes', 'atom.speechFeedback',
         'atom.experienceAnimations', 'atom.appearance', 'atom.appearance.v1'}
 AUTO_KEEP = 7  # daily automatic snapshots kept alongside up to 10 manual backups
 BACKUP_ID = re.compile(r'^(?:[0-9]{8}-[0-9]{6}-[a-f0-9]{6}|auto-[0-9]{8})$')

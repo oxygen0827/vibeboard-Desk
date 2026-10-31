@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-23",
+  "updated": "2026-10-31",
   "categories": {
     "create": "AI 与创作",
     "visual": "光影与陪伴",
@@ -16,11 +16,13 @@
       "description": "用一句话生成 GPU 材质，移动鼠标改变光纹，保存喜欢的作品。",
       "kind": "market",
       "market_id": "official-language-alchemy",
-      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/experiences/visual",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/main/atom/experiences/visual",
       "icon": "/atom/assets/apps/language-alchemy.svg",
       "image": "/atom/assets/language-alchemy.png",
       "needs": "需要联网与模型服务",
-      "guide": "/atom/guide/#market"
+      "guide": "/atom/guide/#market",
+      "archive": "/atom/assets/library/language-alchemy-bd6bbb24b554f0d0.zip",
+      "sha256": "bd6bbb24b554f0d052b5da3edc341ae06a681180fd8f7aee4ee9eeaacde53fcc"
     },
     {
       "id": "symbiotic-world",
@@ -29,11 +31,13 @@
       "description": "改变建筑、天气与小物件，亲手搭建一座可以交互的小岛。",
       "kind": "market",
       "market_id": "official-symbiotic-world",
-      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/experiences/world",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/main/atom/experiences/world",
       "icon": "/atom/assets/apps/symbiotic-world.svg",
       "image": "/atom/assets/symbiotic-world.png",
       "needs": "AI 创作需要联网与模型服务",
-      "guide": "/atom/guide/#market"
+      "guide": "/atom/guide/#market",
+      "archive": "/atom/assets/library/symbiotic-world-964771e272665339.zip",
+      "sha256": "964771e272665339ed61bb7d2e2574cee1c7e68492812974411ec7da5195eda2"
     },
     {
       "id": "ai-duet",
@@ -42,11 +46,13 @@
       "description": "先弹奏几个音符，再让 AI 接下一句，保存你们一起做的旋律。",
       "kind": "market",
       "market_id": "official-ai-duet",
-      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/experiences/duet",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/main/atom/experiences/duet",
       "icon": "/atom/assets/apps/ai-duet.svg",
       "image": "/atom/assets/ai-duet.png",
       "needs": "弹奏可在本机运行；AI 接奏需要模型",
-      "guide": "/atom/guide/#market"
+      "guide": "/atom/guide/#market",
+      "archive": "/atom/assets/library/ai-duet-ffff27896fba995d.zip",
+      "sha256": "ffff27896fba995da00b055bd15c750fbd14d274afcaddf75b11d0f33483b81e"
     },
     {
       "id": "weather-window",
@@ -55,11 +61,13 @@
       "description": "七种实拍天气风景，手选城市，温度与天气轻轻留在画面上。",
       "kind": "market",
       "market_id": "official-weather-window",
-      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/official/weather-window",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/main/atom/official/weather-window",
       "icon": "/atom/assets/apps/weather-window.svg",
       "image": "/atom/assets/apps/weather-window.png",
       "needs": "天气需要联网；界面截图中的天气为示例数据",
-      "guide": "/atom/guide/#market"
+      "guide": "/atom/guide/#market",
+      "archive": "/atom/assets/library/weather-window-cdc27def304f141a.zip",
+      "sha256": "cdc27def304f141a8965d20302e1565e2b3f44855a8590ce57ed84f26cfd41b7"
     },
     {
       "id": "clap-stage",
@@ -68,11 +76,13 @@
       "description": "点按或拍手找到速度，跟着木音、拍手与轻鼓练习自己的节奏。",
       "kind": "market",
       "market_id": "official-clap-stage",
-      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/official/clap-stage",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/main/atom/official/clap-stage",
       "icon": "/atom/assets/apps/clap-stage.svg",
       "image": "/atom/assets/apps/clap-stage.png",
       "needs": "本机运行；拍手定速需要麦克风与更新后的设备系统",
-      "guide": "/atom/guide/#market"
+      "guide": "/atom/guide/#market",
+      "archive": "/atom/assets/library/clap-stage-9f79108698a9194a.zip",
+      "sha256": "9f79108698a9194a870b0e832026186acd3511fba8be9678323fe5e5c3ef9c77"
     },
     {
       "id": "photo-album",
@@ -81,11 +91,13 @@
       "description": "电脑导入照片，桌边全屏欣赏；支持收藏、同步和照片风格改写。",
       "kind": "market",
       "market_id": "official-photo-album",
-      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/official/photo-album",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/main/atom/official/photo-album",
       "icon": "/atom/assets/apps/photo-album.svg",
       "image": "/atom/assets/apps/photo-album.png",
       "needs": "同步需要联网；生图需配置并开通模型",
-      "guide": "/atom/guide/#market"
+      "guide": "/atom/guide/#market",
+      "archive": "/atom/assets/library/photo-album-39c40a887d21c04c.zip",
+      "sha256": "39c40a887d21c04cfb7043638e4e4aaf00789265a12ab5aa8727f8b907f24e7d"
     },
     {
       "id": "agent-studio",
@@ -94,11 +106,13 @@
       "description": "用一间小工作室呈现真实电脑任务，关注进度、审批与作品。",
       "kind": "market",
       "market_id": "official-agent-studio",
-      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/experiences/agents",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/main/atom/experiences/agents",
       "icon": "/atom/assets/apps/agent-studio.svg",
       "image": "/atom/assets/agent-studio.png",
       "needs": "需要配对电脑在线；截图任务为演示数据",
-      "guide": "/atom/guide/#market"
+      "guide": "/atom/guide/#market",
+      "archive": "/atom/assets/library/agent-studio-99dcebaad2596895.zip",
+      "sha256": "99dcebaad25968957e9e70264bd962f4da346bc8df047f06b6f41f4b7c85cd51"
     },
     {
       "id": "water-pool",
@@ -107,11 +121,13 @@
       "description": "拨动水面、拖动球体，观察反射、折射与池底焦散。",
       "kind": "port",
       "market_id": null,
-      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/ports/water-pool",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/main/atom/ports/water-pool",
       "icon": "/atom/assets/apps/water-pool.svg",
       "image": "/atom/assets/showcase-water.png",
       "needs": "完整资源安装后本机运行；查看源码目录中的许可与边界",
-      "guide": "/atom/guide/#developer"
+      "guide": "/atom/guide/#developer",
+      "archive": "/atom/assets/library/water-pool-b877249ea6e5abb0.zip",
+      "sha256": "b877249ea6e5abb00e52450190630e13c72407049da4870b9359c02b143b2061"
     },
     {
       "id": "moon-ocean",
@@ -120,11 +136,13 @@
       "description": "FFT 波浪模拟，一键切换月夜、白昼、日落与风力。",
       "kind": "port",
       "market_id": null,
-      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/ports/moon-ocean",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/main/atom/ports/moon-ocean",
       "icon": "/atom/assets/apps/moon-ocean.svg",
       "image": "/atom/assets/showcase-ocean.png",
       "needs": "完整资源安装后本机运行；查看源码目录中的许可与边界",
-      "guide": "/atom/guide/#developer"
+      "guide": "/atom/guide/#developer",
+      "archive": "/atom/assets/library/moon-ocean-8376731f3a82d68c.zip",
+      "sha256": "8376731f3a82d68cd8ecaa7d8117ca5f72d8ce60619cf803e7ac0e41d30364e5"
     },
     {
       "id": "robo-face",
@@ -133,11 +151,13 @@
       "description": "会眨眼、会犯困的小眼睛，跟着鼠标转动视线。",
       "kind": "port",
       "market_id": null,
-      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/ports/robo-face",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/main/atom/ports/robo-face",
       "icon": "/atom/assets/apps/robo-face.svg",
       "image": "/atom/assets/showcase-eyes.png",
       "needs": "完整资源安装后本机运行；查看源码目录中的许可与边界",
-      "guide": "/atom/guide/#developer"
+      "guide": "/atom/guide/#developer",
+      "archive": "/atom/assets/library/robo-face-7b52b77e74cfb5f3.zip",
+      "sha256": "7b52b77e74cfb5f3ff75ecc60f5407d13468657b0dbb670fe48f853380af20cc"
     },
     {
       "id": "pocket-studio",
@@ -146,11 +166,13 @@
       "description": "七轨十六步音序，旋律与鼓点合成，边播放边编排。",
       "kind": "port",
       "market_id": null,
-      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/ports/pocket-studio",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/main/atom/ports/pocket-studio",
       "icon": "/atom/assets/apps/pocket-studio.svg",
       "image": "/atom/assets/showcase-studio.png",
       "needs": "完整资源安装后本机运行；查看源码目录中的许可与边界",
-      "guide": "/atom/guide/#developer"
+      "guide": "/atom/guide/#developer",
+      "archive": "/atom/assets/library/pocket-studio-411f1248d1cfa7a9.zip",
+      "sha256": "411f1248d1cfa7a94bebc3cd13ef3c76b9addf208339dfc84b51f0652821358c"
     },
     {
       "id": "planetarium",
@@ -159,24 +181,28 @@
       "description": "环绕地球、木星和土星，观察球面纹理、大气与行星环。",
       "kind": "port",
       "market_id": null,
-      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/ports/planetarium",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/main/atom/ports/planetarium",
       "icon": "/atom/assets/apps/planetarium.svg",
       "image": "/atom/assets/showcase-planets.png",
       "needs": "完整资源安装后本机运行；查看源码目录中的许可与边界",
-      "guide": "/atom/guide/#developer"
+      "guide": "/atom/guide/#developer",
+      "archive": "/atom/assets/library/planetarium-09706ea412c33077.zip",
+      "sha256": "09706ea412c33077c532c9383eb6becf9c041795d61416677c0bd48263ec1cbf"
     },
     {
       "id": "mini-piano",
       "name": "迷你钢琴",
       "category": "sound",
-      "description": "十个白键、七个黑键与双音色，随手弹奏或听一段小星星。",
+      "description": "五首完整经典作品，双力度钢琴采样、双手分奏，支持鼠标滑奏。",
       "kind": "market",
       "market_id": "official-mini-piano",
-      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/official/mini-piano",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/main/atom/official/mini-piano",
       "icon": "/atom/assets/apps/mini-piano.svg",
-      "image": "/atom/assets/apps/mini-piano.png",
-      "needs": "本机合成音色，无需联网",
-      "guide": "/atom/guide/#market"
+      "image": "/atom/assets/apps/mini-piano-7f5b557401ad.jpg",
+      "needs": "离线采样音源与完整曲谱，无需联网",
+      "guide": "/atom/guide/#market",
+      "archive": "/atom/assets/library/mini-piano-a44900a07532ccdf.zip",
+      "sha256": "a44900a07532ccdfd8f9acf992b96221be483ecc24ead03f3befd581347a5895"
     },
     {
       "id": "photon-chip",
@@ -185,11 +211,13 @@
       "description": "在六条光路中注入光点，观察相位、交叉路径与探测器响应。",
       "kind": "market",
       "market_id": "official-photon-chip",
-      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/official/photon-chip",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/main/atom/official/photon-chip",
       "icon": "/atom/assets/apps/photon-chip.svg",
       "image": "/atom/assets/apps/photon-chip.png",
       "needs": "本机交互示意，不是光学求解器或算力测试",
-      "guide": "/atom/guide/#market"
+      "guide": "/atom/guide/#market",
+      "archive": "/atom/assets/library/photon-chip-9bfca410b8be2647.zip",
+      "sha256": "9bfca410b8be264796cd6f74ac49974a41af0792cd0ba16fc118a550fa88d148"
     },
     {
       "id": "today",
@@ -198,11 +226,28 @@
       "description": "把日程和待办放在桌边，与电脑工作台同步，离线也保留修改。",
       "kind": "market",
       "market_id": "official-today",
-      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/official/today",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/main/atom/official/today",
       "icon": "/atom/assets/apps/today.svg",
       "image": "/atom/assets/apps/today.png",
       "needs": "跨设备同步需要同一账号和网络",
-      "guide": "/atom/guide/#market"
+      "guide": "/atom/guide/#market",
+      "archive": "/atom/assets/library/today-e01c70cbf97ea33f.zip",
+      "sha256": "e01c70cbf97ea33f6e4ee7d0446cd98856c6872fe8d8954430ddedb00d072640"
+    },
+    {
+      "id": "motion-music",
+      "name": "音乐物理沙盒",
+      "category": "sound",
+      "description": "拖动小球、碰撞成曲，录下自己的五声音阶；支持兼容设备的倾斜输入。",
+      "kind": "market",
+      "market_id": "official-motion-music",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/main/atom/official/motion-music",
+      "icon": "/atom/assets/apps/motion-music.svg",
+      "image": "/atom/assets/apps/motion-music-2670072c0c59.jpg",
+      "needs": "鼠标可直接体验；倾斜输入需要兼容传感器",
+      "guide": "/atom/guide/#market",
+      "archive": "/atom/assets/library/motion-music-b66e6d278763ae2b.zip",
+      "sha256": "b66e6d278763ae2b11b66e1b5fb4c82b2fef63b23d7e79360cdf15db1777fb81"
     },
     {
       "id": "finger-fireworks",
@@ -211,11 +256,28 @@
       "description": "点击夜空点燃烟花，齐放、连放，让一句短话变成光点。",
       "kind": "market",
       "market_id": "official-finger-fireworks",
-      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/official/finger-fireworks",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/main/atom/official/finger-fireworks",
       "icon": "/atom/assets/apps/finger-fireworks.svg",
       "image": "/atom/assets/apps/finger-fireworks.png",
       "needs": "本机运行",
-      "guide": "/atom/guide/#market"
+      "guide": "/atom/guide/#market",
+      "archive": "/atom/assets/library/finger-fireworks-b9700d8c07892fd8.zip",
+      "sha256": "b9700d8c07892fd8d31561150bca55352de6ead3054e3197446af4f1d4021579"
+    },
+    {
+      "id": "focus-garden",
+      "name": "专注花园",
+      "category": "life",
+      "description": "给一件小事留一段时间，完成后亲手种下一株植物。",
+      "kind": "market",
+      "market_id": "official-focus-garden",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/main/atom/official/focus-garden",
+      "icon": "/atom/assets/apps/focus-garden.svg",
+      "image": "/atom/assets/apps/focus-garden-f880d4b97bb1.jpg",
+      "needs": "本机计时；存在感知需要兼容传感器",
+      "guide": "/atom/guide/#market",
+      "archive": "/atom/assets/library/focus-garden-4c01182a6edcebed.zip",
+      "sha256": "4c01182a6edcebedc42986bd20be3274db3c72fdafdc054cdffee6017820c6fa"
     },
     {
       "id": "pixel-lab",
@@ -224,11 +286,13 @@
       "description": "绘制点阵生命、沙粒和涟漪，亲眼看看简单规则如何产生变化。",
       "kind": "market",
       "market_id": "official-pixel-lab",
-      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/official/pixel-lab",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/main/atom/official/pixel-lab",
       "icon": "/atom/assets/apps/pixel-lab.svg",
       "image": "/atom/assets/apps/pixel-lab.png",
       "needs": "本机运行",
-      "guide": "/atom/guide/#market"
+      "guide": "/atom/guide/#market",
+      "archive": "/atom/assets/library/pixel-lab-3c3d07dc4714fb83.zip",
+      "sha256": "3c3d07dc4714fb83ebb9efcac167ac50d971bb3043779100667401a628603b50"
     },
     {
       "id": "sound-lab",
@@ -237,11 +301,13 @@
       "description": "四轨十六步编排，调节速度与音量，保存自己的声音实验。",
       "kind": "market",
       "market_id": "official-sound-lab",
-      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/official/sound-lab",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/main/atom/official/sound-lab",
       "icon": "/atom/assets/apps/sound-lab.svg",
       "image": "/atom/assets/sound-lab.png",
       "needs": "本机声音合成",
-      "guide": "/atom/guide/#market"
+      "guide": "/atom/guide/#market",
+      "archive": "/atom/assets/library/sound-lab-168858a7aac5ed28.zip",
+      "sha256": "168858a7aac5ed28db1e0e4d68de5ab7e22bfcf4afd3b409878cc8c0bcf4286a"
     },
     {
       "id": "photon-runner",
@@ -250,11 +316,13 @@
       "description": "点按让光子跃起，穿过加速光门，挑战自己的本机最高纪录。",
       "kind": "market",
       "market_id": "official-photon-runner",
-      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/official/photon-runner",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/main/atom/official/photon-runner",
       "icon": "/atom/assets/apps/photon-runner.svg",
       "image": "/atom/assets/apps/photon-runner.png",
       "needs": "本机运行；截图为测试纪录",
-      "guide": "/atom/guide/#market"
+      "guide": "/atom/guide/#market",
+      "archive": "/atom/assets/library/photon-runner-96245e3ebaf1d17d.zip",
+      "sha256": "96245e3ebaf1d17d1fcb1bc51a411c41c943f0536f0871666d398c89644c5d0a"
     },
     {
       "id": "volume-flow",
@@ -263,11 +331,13 @@
       "description": "数千颗粒子勾出流场，旋转、换色，观察光与体积。",
       "kind": "port",
       "market_id": null,
-      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/ports/volume-flow",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/main/atom/ports/volume-flow",
       "icon": "/atom/assets/apps/volume-flow.svg",
       "image": "/atom/assets/showcase-flow.png",
       "needs": "完整资源安装后本机运行；查看源码目录中的许可与边界",
-      "guide": "/atom/guide/#developer"
+      "guide": "/atom/guide/#developer",
+      "archive": "/atom/assets/library/volume-flow-5dfe36fa856a766f.zip",
+      "sha256": "5dfe36fa856a766facfa6189f6543b5569d143a77c60733ddf3316bba6fe5994"
     },
     {
       "id": "music-vision",
@@ -276,11 +346,13 @@
       "description": "本地音频驱动 MilkDrop 视觉预设，让音乐有自己的画面。",
       "kind": "port",
       "market_id": null,
-      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/ports/music-vision",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/main/atom/ports/music-vision",
       "icon": "/atom/assets/apps/music-vision.svg",
       "image": "/atom/assets/apps/music-vision.png",
       "needs": "完整资源安装后本机运行；查看源码目录中的许可与边界",
-      "guide": "/atom/guide/#developer"
+      "guide": "/atom/guide/#developer",
+      "archive": "/atom/assets/library/music-vision-4be469bea617ae7f.zip",
+      "sha256": "4be469bea617ae7f10f068bd586afe0e38eeb7e91f74d62f8280911a2e145dc1"
     },
     {
       "id": "rhythm-orbits",
@@ -289,11 +361,13 @@
       "description": "三轨欧几里得节奏与本地合成器，把节拍排进轨道。",
       "kind": "port",
       "market_id": null,
-      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/ports/rhythm-orbits",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/main/atom/ports/rhythm-orbits",
       "icon": "/atom/assets/apps/rhythm-orbits.svg",
       "image": "/atom/assets/apps/rhythm-orbits.png",
       "needs": "完整资源安装后本机运行；查看源码目录中的许可与边界",
-      "guide": "/atom/guide/#developer"
+      "guide": "/atom/guide/#developer",
+      "archive": "/atom/assets/library/rhythm-orbits-9673e352b13c0fbe.zip",
+      "sha256": "9673e352b13c0fbe2fd65437f1ea0936de4171d73cc5e0b1360dded6d5d02eab"
     },
     {
       "id": "physics-playground",
@@ -302,11 +376,13 @@
       "description": "碰撞、多米诺、悬索桥和弹弓，拖动物体做小实验。",
       "kind": "port",
       "market_id": null,
-      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/ports/physics-playground",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/main/atom/ports/physics-playground",
       "icon": "/atom/assets/apps/physics-playground.svg",
       "image": "/atom/assets/showcase-physics.png",
       "needs": "完整资源安装后本机运行；查看源码目录中的许可与边界",
-      "guide": "/atom/guide/#developer"
+      "guide": "/atom/guide/#developer",
+      "archive": "/atom/assets/library/physics-playground-c5f226a99d3af422.zip",
+      "sha256": "c5f226a99d3af422d46af91684dcb69cfe8e418ecce8ed2d479acbcb747273b8"
     },
     {
       "id": "model-viewer",
@@ -315,11 +391,13 @@
       "description": "本地查看 STL / OBJ，旋转、缩放、线框与模型尺寸检查。",
       "kind": "port",
       "market_id": null,
-      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/ports/model-viewer",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/main/atom/ports/model-viewer",
       "icon": "/atom/assets/apps/model-viewer.svg",
       "image": "/atom/assets/apps/model-viewer.png",
       "needs": "完整资源安装后本机运行；查看源码目录中的许可与边界",
-      "guide": "/atom/guide/#developer"
+      "guide": "/atom/guide/#developer",
+      "archive": "/atom/assets/library/model-viewer-3417504a5a98853d.zip",
+      "sha256": "3417504a5a98853df317902e0a3337e7ad1b04a98ec48e54e1c016e55331cf71"
     },
     {
       "id": "math-playground",
@@ -328,11 +406,13 @@
       "description": "拖动参数点，探索复数分形、光线包络与三角几何。",
       "kind": "port",
       "market_id": null,
-      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/ports/math-playground",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/main/atom/ports/math-playground",
       "icon": "/atom/assets/apps/math-playground.svg",
       "image": "/atom/assets/showcase-math.png",
       "needs": "完整资源安装后本机运行；查看源码目录中的许可与边界",
-      "guide": "/atom/guide/#developer"
+      "guide": "/atom/guide/#developer",
+      "archive": "/atom/assets/library/math-playground-fe99c8ba2644a6c1.zip",
+      "sha256": "fe99c8ba2644a6c1867af0e7b8a82fe6ca7e674eb9739439c15a1231ae694c7b"
     },
     {
       "id": "clay-studio",
@@ -341,11 +421,13 @@
       "description": "在三维表面堆土或凹起，转动视角，体验真正的网格雕刻。",
       "kind": "port",
       "market_id": null,
-      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/ports/clay-studio",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/main/atom/ports/clay-studio",
       "icon": "/atom/assets/apps/clay-studio.svg",
       "image": "/atom/assets/apps/clay-studio.png",
       "needs": "完整资源安装后本机运行；查看源码目录中的许可与边界",
-      "guide": "/atom/guide/#developer"
+      "guide": "/atom/guide/#developer",
+      "archive": "/atom/assets/library/clay-studio-fb5deece0c379d57.zip",
+      "sha256": "fb5deece0c379d57df73b70d970ac0b1c58291f5283497717f6f9286da9fc852"
     },
     {
       "id": "parametric-maker",
@@ -354,11 +436,13 @@
       "description": "调整尺寸、壁厚与模型类型，用布尔运算生成小物件。",
       "kind": "port",
       "market_id": null,
-      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/ports/parametric-maker",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/main/atom/ports/parametric-maker",
       "icon": "/atom/assets/apps/parametric-maker.svg",
       "image": "/atom/assets/apps/parametric-maker.png",
       "needs": "完整资源安装后本机运行；查看源码目录中的许可与边界",
-      "guide": "/atom/guide/#developer"
+      "guide": "/atom/guide/#developer",
+      "archive": "/atom/assets/library/parametric-maker-4f04d7327c696df8.zip",
+      "sha256": "4f04d7327c696df87b21254799aec180ce5cbae835b156c98f0e223e2afc1aa6"
     },
     {
       "id": "circuit-lab",
@@ -367,11 +451,13 @@
       "description": "切换 RLC、整流与 555 电路，调整参数并观察波形。",
       "kind": "port",
       "market_id": null,
-      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/ports/circuit-lab",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/main/atom/ports/circuit-lab",
       "icon": "/atom/assets/apps/circuit-lab.svg",
       "image": "/atom/assets/showcase-circuit.png",
       "needs": "完整资源安装后本机运行；查看源码目录中的许可与边界",
-      "guide": "/atom/guide/#developer"
+      "guide": "/atom/guide/#developer",
+      "archive": "/atom/assets/library/circuit-lab-a6ddce1843bc2c4a.zip",
+      "sha256": "a6ddce1843bc2c4a6cc66a3461a2fa0ea25aa1a7c709ad5dd10dec1009c12829"
     },
     {
       "id": "material-world",
@@ -380,11 +466,13 @@
       "description": "用沙、水、火、木等材料画一场实验，看真实规则产生反应。",
       "kind": "port",
       "market_id": null,
-      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/ports/material-world",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/main/atom/ports/material-world",
       "icon": "/atom/assets/apps/material-world.svg",
       "image": "/atom/assets/apps/material-world.png",
       "needs": "完整资源安装后本机运行；查看源码目录中的许可与边界",
-      "guide": "/atom/guide/#developer"
+      "guide": "/atom/guide/#developer",
+      "archive": "/atom/assets/library/material-world-3c7e8a3eb792d9f8.zip",
+      "sha256": "3c7e8a3eb792d9f87959474298734e353ab4f4ddd43793192332e27485e83990"
     },
     {
       "id": "particle-lab",
@@ -393,11 +481,13 @@
       "description": "操控粒子组成的画面，探索鼠标与动态光点之间的互动。",
       "kind": "device",
       "market_id": null,
-      "source": "https://github.com/wangqioo/vibeboard-Desk/blob/deploy/ldcx-public/atom/apps/particle-lab.json",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/main/atom/legacy-seeds/particle-lab",
       "icon": "/atom/assets/apps/particle-lab.svg",
       "image": "/atom/assets/apps/particle-lab.png",
-      "needs": "完整 JSON 源码可导入设备；本机运行",
-      "guide": "/atom/guide/#desktop"
+      "needs": "完整源码可导入设备；本机运行",
+      "guide": "/atom/guide/#desktop",
+      "archive": "/atom/assets/library/particle-lab-9764ea3e9c00db07.zip",
+      "sha256": "9764ea3e9c00db07a53d25032703dbc9ee9c37b808329ee33c840f4974b14df9"
     },
     {
       "id": "local-music",
@@ -406,11 +496,13 @@
       "description": "在小电脑上播放本地音乐，让桌边有自己的背景声。",
       "kind": "device",
       "market_id": null,
-      "source": "https://github.com/wangqioo/vibeboard-Desk/blob/deploy/ldcx-public/atom/apps/local-music.json",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/main/atom/legacy-seeds/local-music",
       "icon": "/atom/assets/apps/local-music.svg",
       "image": "/atom/assets/apps/local-music.png",
-      "needs": "完整 JSON 源码可导入设备；音频文件留在本机",
-      "guide": "/atom/guide/#desktop"
+      "needs": "完整源码可导入设备；音频文件留在本机",
+      "guide": "/atom/guide/#desktop",
+      "archive": "/atom/assets/library/local-music-e885bf0bb6ba0856.zip",
+      "sha256": "e885bf0bb6ba08563ea47c44b48d442b0617b71a479da15b79a8d6032c91ecd6"
     },
     {
       "id": "mic-test",
@@ -419,11 +511,13 @@
       "description": "录音、回放，观察音量、峰值和削波，比较真实收音效果。",
       "kind": "system",
       "market_id": null,
-      "source": "https://github.com/wangqioo/vibeboard-Desk/blob/deploy/ldcx-public/atom/examples/mic-test.json",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/blob/main/atom/examples/mic-test.json",
       "icon": "/atom/assets/apps/mic-test.svg",
       "image": "/atom/assets/apps/mic-test.png",
       "needs": "需要设备麦克风；风扇控制受温度保护",
-      "guide": "/atom/guide/#desktop"
+      "guide": "/atom/guide/#desktop",
+      "archive": "/atom/assets/library/mic-test-40713f33b6886b4f.zip",
+      "sha256": "40713f33b6886b4ff26a7724a007d3ee2ac4a3d93d533b07a25d52d4046c0349"
     },
     {
       "id": "my-computer",
@@ -432,11 +526,13 @@
       "description": "连接电脑 Agent，选择授权项目，发起任务并查看进度与审批。",
       "kind": "system",
       "market_id": null,
-      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/computer-app",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/main/atom/computer-app",
       "icon": "/atom/assets/apps/my-computer.svg",
       "image": "/atom/assets/apps/my-computer.png",
       "needs": "电脑任务需要配对电脑在线",
-      "guide": "/atom/guide/#desktop"
+      "guide": "/atom/guide/#desktop",
+      "archive": "/atom/assets/library/my-computer-ea9ee39fd2ecd6a3.zip",
+      "sha256": "ea9ee39fd2ecd6a3a19e616339225bae2d24b51a9e987318623c9000eb4d3e08"
     },
     {
       "id": "quick-notes",
@@ -445,11 +541,13 @@
       "description": "随手记录想法，在电脑整理，在小电脑查看；离线修改保留。",
       "kind": "system",
       "market_id": null,
-      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/notes-app",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/main/atom/notes-app",
       "icon": "/atom/assets/apps/quick-notes.svg",
       "image": "/atom/assets/apps/quick-notes.png",
       "needs": "同步需要同一账号和网络",
-      "guide": "/atom/guide/#desktop"
+      "guide": "/atom/guide/#desktop",
+      "archive": "/atom/assets/library/quick-notes-4efd2f80f228a249.zip",
+      "sha256": "4efd2f80f228a249aab5b94ad6fff922beaba5bbd7788eebee23b42c32b372fe"
     },
     {
       "id": "market",
@@ -458,11 +556,13 @@
       "description": "发现带源码的作品，预览安装，基于原作改造并发布新版本。",
       "kind": "system",
       "market_id": null,
-      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/market-app",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/main/atom/market-app",
       "icon": "/atom/assets/apps/market.svg",
       "image": "/atom/assets/apps/market.png",
       "needs": "需要联网；安装与发布在客户端确认",
-      "guide": "/atom/guide/#desktop"
+      "guide": "/atom/guide/#desktop",
+      "archive": "/atom/assets/library/market-36eec4079f1e9ff6.zip",
+      "sha256": "36eec4079f1e9ff64988d2d63e95050bcbdc7b696e18b8f0fd7b3110cfa80b3c"
     },
     {
       "id": "robot",
@@ -471,11 +571,13 @@
       "description": "长按说话，用表情和声音回应你的桌面语音伙伴。",
       "kind": "system",
       "market_id": null,
-      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/deploy/ldcx-public/atom/robot-app",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/tree/main/atom/robot-app",
       "icon": "/atom/assets/apps/robot.svg",
       "image": "/atom/assets/apps/robot.png",
       "needs": "语音聊天需要麦克风、网络及已配置模型服务",
-      "guide": "/atom/guide/#desktop"
+      "guide": "/atom/guide/#desktop",
+      "archive": "/atom/assets/library/robot-87d591125b8767a4.zip",
+      "sha256": "87d591125b8767a4ea1567116bf3a9cf3faecad00d3bc84d2fab63c9df3d36ff"
     },
     {
       "id": "workshop",
@@ -484,7 +586,7 @@
       "description": "说出或输入想法，生成、预览，再确认安装一个属于自己的应用。",
       "kind": "system",
       "market_id": null,
-      "source": "https://github.com/wangqioo/vibeboard-Desk/blob/deploy/ldcx-public/atom/static/app.js",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/blob/main/atom/static/app.js",
       "icon": "/atom/assets/apps/workshop.svg",
       "image": "/atom/assets/apps/workshop.png",
       "needs": "工作坊生成需要有效模型服务",
@@ -497,7 +599,7 @@
       "description": "一眼看清现在的时间，让小电脑安静留在桌边。",
       "kind": "system",
       "market_id": null,
-      "source": "https://github.com/wangqioo/vibeboard-Desk/blob/deploy/ldcx-public/atom/static/app.js",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/blob/main/atom/static/app.js",
       "icon": "/atom/assets/apps/clock.svg",
       "image": "/atom/assets/apps/clock.png",
       "needs": "本机运行",
@@ -510,7 +612,7 @@
       "description": "设定一段时间，开始、暂停和重置，保持专注的节奏。",
       "kind": "system",
       "market_id": null,
-      "source": "https://github.com/wangqioo/vibeboard-Desk/blob/deploy/ldcx-public/atom/static/app.js",
+      "source": "https://github.com/wangqioo/vibeboard-Desk/blob/main/atom/static/app.js",
       "icon": "/atom/assets/apps/timer.svg",
       "image": "/atom/assets/apps/timer.png",
       "needs": "本机运行",
@@ -527,7 +629,9 @@
       "icon": "/atom/assets/apps/oracle-tarot.svg",
       "image": "/atom/assets/apps/oracle-tarot.png",
       "needs": "离线可用 · 支持五向摇杆",
-      "guide": "/atom/guide/#market"
+      "guide": "/atom/guide/#market",
+      "archive": "/atom/assets/library/oracle-tarot-902407321be6e12f.zip",
+      "sha256": "902407321be6e12f2e83ce75ac63cfeb3fe42e7bc6a5134275da03b155e29951"
     },
     {
       "id": "zodiac-atlas",
@@ -540,7 +644,9 @@
       "icon": "/atom/assets/apps/zodiac-atlas.svg",
       "image": "/atom/assets/apps/zodiac-atlas.png",
       "needs": "离线可用 · 支持五向摇杆",
-      "guide": "/atom/guide/#market"
+      "guide": "/atom/guide/#market",
+      "archive": "/atom/assets/library/zodiac-atlas-129cfe59b1e89126.zip",
+      "sha256": "129cfe59b1e8912684cf5428ecbb0441e4b4f0c61f00f60afaf416d404611144"
     },
     {
       "id": "echo-book",
@@ -553,7 +659,9 @@
       "icon": "/atom/assets/apps/echo-book.svg",
       "image": "/atom/assets/apps/echo-book.png",
       "needs": "离线可用 · 支持五向摇杆",
-      "guide": "/atom/guide/#market"
+      "guide": "/atom/guide/#market",
+      "archive": "/atom/assets/library/echo-book-963dcb20b211b57d.zip",
+      "sha256": "963dcb20b211b57d379417b8da3f9593fc6ece3613b7b340d9340353c5542140"
     },
     {
       "id": "moon-letter",
@@ -566,7 +674,9 @@
       "icon": "/atom/assets/apps/moon-letter.svg",
       "image": "/atom/assets/apps/moon-letter.png",
       "needs": "离线可用 · 支持五向摇杆",
-      "guide": "/atom/guide/#market"
+      "guide": "/atom/guide/#market",
+      "archive": "/atom/assets/library/moon-letter-c5045b22f3e4a6ed.zip",
+      "sha256": "c5045b22f3e4a6edafa4cd5afa6bfd953a2e8cb1e6d4f4a319f1998f3196a11d"
     },
     {
       "id": "rain-radio",
@@ -579,7 +689,9 @@
       "icon": "/atom/assets/apps/rain-radio.svg",
       "image": "/atom/assets/apps/rain-radio.png",
       "needs": "离线可用 · 支持五向摇杆",
-      "guide": "/atom/guide/#market"
+      "guide": "/atom/guide/#market",
+      "archive": "/atom/assets/library/rain-radio-d072a1cbd69c6ffe.zip",
+      "sha256": "d072a1cbd69c6ffe22c268e72657a323c4550bab9be1a4dea89daa2f8e89c17d"
     },
     {
       "id": "personality-planet",
@@ -592,7 +704,9 @@
       "icon": "/atom/assets/apps/personality-planet.svg",
       "image": "/atom/assets/apps/personality-planet.png",
       "needs": "离线可用 · 支持五向摇杆",
-      "guide": "/atom/guide/#market"
+      "guide": "/atom/guide/#market",
+      "archive": "/atom/assets/library/personality-planet-21a4928e837d8a4a.zip",
+      "sha256": "21a4928e837d8a4a72870e0048f60f05b10e2ec58f559679097c6436b7af85b2"
     },
     {
       "id": "natal-whispers",
@@ -605,7 +719,9 @@
       "icon": "/atom/assets/apps/natal-whispers.svg",
       "image": "/atom/assets/apps/natal-whispers.png",
       "needs": "离线可用 · 支持五向摇杆",
-      "guide": "/atom/guide/#market"
+      "guide": "/atom/guide/#market",
+      "archive": "/atom/assets/library/natal-whispers-6ce1c1fe97fa6c9b.zip",
+      "sha256": "6ce1c1fe97fa6c9bac5f9477d8096cf05f6610eeffc7ecf2d4ffabcf99164d3e"
     },
     {
       "id": "glass-ecosystem",
@@ -618,7 +734,9 @@
       "icon": "/atom/assets/apps/glass-ecosystem.svg",
       "image": "/atom/assets/apps/glass-ecosystem.png",
       "needs": "离线可用 · 支持五向摇杆",
-      "guide": "/atom/guide/#market"
+      "guide": "/atom/guide/#market",
+      "archive": "/atom/assets/library/glass-ecosystem-4049517a4d793615.zip",
+      "sha256": "4049517a4d793615676b64a1ecaf4b107ad16dbab77ed120fa3bedf87e2e4e44"
     },
     {
       "id": "element-sandbox",
@@ -631,7 +749,9 @@
       "icon": "/atom/assets/apps/element-sandbox.svg",
       "image": "/atom/assets/apps/element-sandbox.png",
       "needs": "离线可用 · 支持五向摇杆",
-      "guide": "/atom/guide/#market"
+      "guide": "/atom/guide/#market",
+      "archive": "/atom/assets/library/element-sandbox-20272e158bdf7ee8.zip",
+      "sha256": "20272e158bdf7ee8398ea6f35415fc8b008700e363b8c25f83fa4da849df149e"
     },
     {
       "id": "dot-image",

@@ -1,0 +1,15 @@
+{
+  "id": "physics-playground",
+  "name": "物理实验台",
+  "description": "ATOM 物理实验台 · 离线交互",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "theme_ui": "controls",
+  "layout": "fullscreen",
+  "input": {
+    "version": 1,
+    "profile": "five-way",
+    "back": "custom",
+    "scene": "controls"
+  }
+}

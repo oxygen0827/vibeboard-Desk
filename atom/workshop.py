@@ -158,7 +158,11 @@ class Workshop:
                     if self.jobs[old_id]['status'] in ('ready','failed'): del self.jobs[old_id]; break
             job_id = uuid.uuid4().hex
             self.jobs[job_id] = dict(job_id=job_id,status='queued',theme_id=theme,created_at=time.time())
-            threading.Thread(target=self._generate,args=(job_id,config,data['prompt'],css),daemon=True).start()
+            try:
+                threading.Thread(target=self._generate,args=(job_id,config,data['prompt'],css),daemon=True).start()
+            except RuntimeError:
+                self.jobs[job_id].update(status='failed',error='无法启动生成任务，请稍后重试')
+                raise ValueError('无法启动生成任务，请稍后重试')
             return dict(job_id=job_id)
 
     def get_job(self,job_id):

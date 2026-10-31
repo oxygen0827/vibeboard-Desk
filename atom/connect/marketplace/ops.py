@@ -4,6 +4,7 @@ import argparse
 import json
 import os
 import re
+import shutil
 import sqlite3
 import sys
 import time
@@ -43,6 +44,52 @@ def stats(path):
         return values
     finally:
         conn.close()
+
+
+def overview(path):
+    """Read-only operator summary; never include account names, source or errors."""
+    health(path)
+    counts = stats(path)
+    jobs = {name: 0 for name in ('queued', 'generating', 'completed', 'failed', 'interrupted', 'other')}
+    suggestions = {name: 0 for name in ('open', 'accepted', 'declined', 'other')}
+    conn = database(path)
+    try:
+        tables = {row[0] for row in conn.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+        for table, values in (('creation_jobs', jobs), ('suggestions', suggestions)):
+            if table not in tables:
+                continue
+            for row in conn.execute('SELECT data FROM ' + table):
+                try:
+                    value = json.loads(row[0])
+                    state = value.get('status') if isinstance(value, dict) else None
+                    state = state if isinstance(state, str) and state in values else 'other'
+                except (ValueError, TypeError):
+                    state = 'other'
+                values[state] += 1
+    finally:
+        conn.close()
+    disk = shutil.disk_usage(Path(path).expanduser().resolve().parent)
+    actions = []
+    if disk.free < 1024**3 or disk.free / max(1, disk.total) < .05:
+        actions.append('磁盘空间偏低：大资源发布前检查容量；请勿直接删除用户资料或数据库。')
+    if jobs['other'] or suggestions['other']:
+        actions.append('发现无法识别的任务状态：保留数据，检查服务版本和记录。')
+    available = dict(jobs='creation_jobs' in tables, suggestions='suggestions' in tables)
+    return dict(ok=True, scope='市场本地数据检查', counts=counts, jobs=jobs, suggestions=suggestions, available=available,
+                disk_free_bytes=disk.free, actions=actions)
+
+
+def format_overview(result):
+    counts, jobs, suggestions = result['counts'], result['jobs'], result['suggestions']
+    lines = [result['scope'] + '：通过',
+             '作品：公开目录 {} · 私人草稿 {}'.format(counts['listed_works'], counts['drafts']),
+             '创作任务：等待 {} · 生成中 {}'.format(jobs['queued'], jobs['generating']) if result['available']['jobs'] else '创作任务：此数据库尚未启用',
+             '保留的任务记录：完成 {} · 失败 {} · 中断 {}'.format(jobs['completed'], jobs['failed'], jobs['interrupted']) if result['available']['jobs'] else '任务历史：暂不可用',
+             '改进建议：待审阅 {} · 已采用 {} · 未采用 {}'.format(suggestions['open'], suggestions['accepted'], suggestions['declined']) if result['available']['suggestions'] else '改进建议：此数据库尚未启用',
+             '磁盘可用：{:.2f} GiB'.format(result['disk_free_bytes'] / 1024**3)]
+    lines.extend('下一步：' + action for action in result['actions'])
+    lines.append('此检查只读本地市场数据；外网、模型和设备安装需各自验证。')
+    return '\n'.join(lines)
 
 
 def backup(path, output):
@@ -156,6 +203,8 @@ def main():
     sub=parser.add_subparsers(dest='command',required=True)
     h=sub.add_parser('health');h.add_argument('--url')
     sub.add_parser('stats')
+    o=sub.add_parser('overview',help='只读检查市场数据、创作任务和磁盘空间')
+    o.add_argument('--json',action='store_true',help='保留机器可读输出')
     b=sub.add_parser('backup');b.add_argument('--output',required=True)
     for name in ('unlist','restore'):
         p=sub.add_parser(name);p.add_argument('--work-id',required=True);p.add_argument('--confirm',required=True)
@@ -163,11 +212,12 @@ def main():
     args=parser.parse_args()
     try:
         if args.command=='health':result=health(args.db,args.url)
+        elif args.command=='overview':result=overview(args.db)
         elif args.command=='stats':result=stats(args.db)
         elif args.command=='cover':result=set_cover(args.db,args.work_id,args.image,args.confirm)
         elif args.command=='backup':result=backup(args.db,args.output)
         else:result=visibility(args.db,args.work_id,args.command=='unlist',args.confirm)
-        print(json.dumps(result,ensure_ascii=False))
+        print(format_overview(result) if args.command=='overview' and not args.json else json.dumps(result,ensure_ascii=False))
         return 0
     except (OpsError,sqlite3.Error,OSError):
         # No tracebacks/SQLite rows/paths; detailed credential-bearing state is never printed.

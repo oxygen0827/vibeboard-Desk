@@ -14,10 +14,17 @@ with open(private/'.sync.lock','w') as lock:
   previous=json.loads(old_index.read_text()).get('apps',[])
   assert len(rows)>=len(previous), 'Library unexpectedly shrank; verify inventory before replacing it'
  current=set()
+ for p in incoming.iterdir():
+  if p.name=='catalog.json':continue
+  assert p.is_file() and not p.is_symlink()
+  assert re.fullmatch(r'[a-z][a-z0-9_-]{0,47}(?:-[a-f0-9]{16}\.zip|\.svg|\.png|\.jpg)',p.name)
  for app in rows:
   aid=app['id'];assert re.fullmatch(r'[a-z][a-z0-9_-]{0,47}',aid)
   name=app['archive'].rsplit('/',1)[-1];assert name==aid+'-'+app['sha256'][:16]+'.zip'
-  archive=incoming/name;assert archive.is_file() and not archive.is_symlink()
+  # A previous interrupted promotion may have moved validated archives already.
+  archive=incoming/name
+  if not archive.exists():archive=public/name
+  assert archive.is_file() and not archive.is_symlink()
   assert hashlib.sha256(archive.read_bytes()).hexdigest()==app['sha256']
   with zipfile.ZipFile(archive) as z:
    assert z.testzip() is None
@@ -31,7 +38,7 @@ with open(private/'.sync.lock','w') as lock:
  for p in incoming.iterdir():
   if p.name=='catalog.json':continue
   assert p.is_file() and not p.is_symlink()
-  assert re.fullmatch(r'[a-z][a-z0-9_-]{0,47}(?:-[a-f0-9]{16}\.zip|\.svg|\.png)',p.name)
+  assert re.fullmatch(r'[a-z][a-z0-9_-]{0,47}(?:-[a-f0-9]{16}\.zip|\.svg|\.png|\.jpg)',p.name)
   os.replace(str(p),str(public/p.name))
  shutil.copy2(str(incoming/'catalog.json'),str(private/'.catalog.next'))
  os.replace(str(private/'.catalog.next'),str(private/'catalog.json'))

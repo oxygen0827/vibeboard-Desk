@@ -10,8 +10,9 @@
     "test:ui": "node market-app/ui.test.cjs && node official/clients.test.cjs && node computer-app/ui.test.cjs",
     "test:runtime": "node tests/app-host.test.cjs && node tests/app-runtime.test.cjs",
     "test:computer": "node --test connect/computer/test/*.test.mjs",
+    "test:community": "node connect/computer/community-layout.test.cjs && node connect/computer/resource-preview-ui.test.cjs && node connect/computer/preview-appearance.test.cjs && node connect/computer/community-ui.test.cjs && node connect/computer/private-sync-ui.test.cjs",
     "test:experiences": "node experiences/world/test.cjs && node experiences/visual/ui.test.cjs && node experiences/agents/ui.test.cjs",
-    "test:site": "node site/test.cjs"
+    "test:site": "node site/test.cjs && node site/apps.test.cjs"
   },
   "devDependencies": {
     "playwright": "1.62.1"

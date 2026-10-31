@@ -48,3 +48,52 @@ python3 -m unittest discover -s atom/tests -p test_market_release.py
 - Mac：运行中的 ATOM Connect 本地 `/api/studio/catalog` 和 `/api/studio/versions/…` 已读取以上四项并核对源码摘要；本轮没有重新打包 Mac，内嵌相册的界面升级不在此项验证内。
 - 灰色板：实际 `/api/market/catalog` 与 Mac 指向同一版本。已核对四个开发包与公开源码一致（manifest 与 SVG 使用设备规范化规则），登记来源后调用正常 `/api/market/install` 完成四项更新；`_installed_at_ns` 未变。
 - 尚未声称完成：真实传感器联动、长期性能验收及所有客户端内嵌应用的动态版本切换。
+
+## 2026-10-31 全端整合与遗漏修复
+
+钢琴在灰色板已经是新采样版，但云端作品仍指向旧合成音源，Mac 发现因此显示旧版。另有今日、共生世界的正式版本滞后，Mac 种子中的相册、Agent 小屋等资源未随源码更新。仅更新一个安装目录不能证明多端一致。
+
+本次交付：
+
+- 云端三项新不可变版本：钢琴 `official-fca148e47d78e43b4c3d7c5d778794fa`、今日 `official-fa711bacfe8cc0f0d7da0e82513deca4`、共生世界 `official-20b44824c3103915b3c3bc32939a088d`。全部 25 个官方作品下载内容与审阅源码一致，封面可读。
+- 完整资源目录由 62 项补齐至 64 项，64 个 ZIP 在服务器逐包验证摘要、路径与文件数；所有应用都有真实首页封面。Mac/官网/设备使用同一目录，普通公开作品与兼容资源仍分别标识。
+- 官网静态目录更新为 67 个入口（64 个资源应用及 3 个系统入口），修正旧钢琴说明、截图、旧分支源码链接和旧 ZIP 地址；另从市场读取公开社区作品。目录浏览器回归及公网下载可达性通过。
+- 从灰色板收回 14 个既有应用的五向操作、逐级返回和场景暂停代码。保留上游资源、图标和许可，没有将设备账号、模型密钥、存档或私人应用带入仓库。
+- Mac 内置 64 项、运行中模拟器 64 项的运行资源与严格构建种子一致；内嵌相册同步更新。修改前确认模拟器资源匹配原种子，未覆盖私人修改；签名校验通过。客户端版本仍为 0.6.4 定向资源更新。
+- 灰色板已安装 47 项运行资源核对一致；17 项未安装，继续保持未安装。钢琴先逐文件核对已存在开发包与正式版本相同，再登记来源，随后与今日、共生世界一起走正常市场更新接口；三项版本回读一致且安装时间不变。市场系统客户端从已校验云端完整包更新。
+- 修复共享布局构建误改独立场景应用、ZIP 发布器不接受 JPEG 封面和中途重试的问题；QA 报告不再混入模拟器运行资源。没有创建云盘快照或新数据库备份，没有重启设备显示服务或推进核心 OTA。
+
+[脱敏分端校验结果](../artifacts/distribution-20261031/verification.json)只证明源码/运行资源一致，不能替代实体摇杆、扬声器、性能及全部功能验收。保留合法主题图标；非运行说明文件差异另列，不将它们误判为代码降级。
+
+### 后续必须执行的发布检查
+
+先构建并发布官方作品、完整资源目录，再更新客户端。使用新生成的种子作为唯一对照，不能复用旧安装包做“最新”基线：
+
+```sh
+python3 atom/tools/simulator.py --build-seed /absolute/build/seed --strict-seed
+python3 atom/tools/build_full_library.py --seed /absolute/build/seed --out /absolute/build/public \
+  --index atom/official/library-index.json
+python3 atom/site/build_apps.py
+# 按上文发布作品/资源。设备 inventory 使用同一工具 --inventory --seed <apps> 只读导出。
+python3 atom/tools/audit_app_distribution.py --require-all \
+  --seed /absolute/build/seed \
+  --library /absolute/build/public/catalog.json \
+  --mac-seed '/absolute/ATOM Connect.app/Contents/Resources/device/seed-apps' \
+  --installed '/absolute/ATOMConnect/simulator/apps' \
+  --device-inventory /absolute/build/device-inventory.json \
+  --output /absolute/build/distribution-check.json
+```
+
+`--require-all` 缺少任何端的证据就失败；源码与云端不同、资源目录摘要不同、内置包遗漏或已安装运行资源过期也失败。离线时必须保留为待验证，不能改成通过。设备清单须本次从真实设备读取；工具不会根据旧报告推断当前在线状态。
+
+此工具只读，不自动发布用户作品、不自动升级或覆盖分支。任何应用交付都要留上述结果，再分别检查 Mac 实际发现详情、设备安装回执及交互。CI 运行静态和隔离浏览器回归；真实部署验收在有访问条件的交付环境执行。
+
+完整库构建时同时更新仓库的 `library-index.json`，官网目录重新生成后发布，避免网站还提供已经被回收的旧 ZIP 链接。`sync_full_library.sh` 已包含本地索引和官网目录重建；它不会替用户提交代码或自动部署整站。
+
+### 本轮验证范围
+
+- 设备 Python：198 项，其中 187 通过、11 项因 macOS 缺少 Debian DBus/GLib 环境跳过；市场 60 项、relay 25 项、Mac/运行时 Node 73 项通过。
+- 随后补充分发索引的旧下载链接回归，分发检查 4 项通过；官网目录在 4 种视口完成筛选、详情、ZIP/源码下载与失败重试检查。
+- Chromium/WebKit：发现、创作、完整资源交互预览、主题、身份延迟及私有同步故障恢复通过。设备应用、五向输入、同步入口、场景返回与暂停回归通过。
+- 正在运行的 Mac 服务实际读取新钢琴；WebKit 验证 5 首曲谱与 32 个解码采样。另有五首自动演奏、鼠标滑奏和离线音频回归。
+- 本记录不把浏览器测试等同于实体扬声器听感、摇杆或连续运行性能验收；核心系统 OTA 版本未因应用资源更新而变更。

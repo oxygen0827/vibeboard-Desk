@@ -136,6 +136,32 @@ class PhotosTests(unittest.TestCase):
         self.assertEqual(self.call('/jobs/'+job['id'])['job']['status'],'interrupted')
         self.assertEqual(self.call('/'+p['id'])['photo']['name'],'test.png')
 
+    def test_prompt_pack_is_bounded_and_mode_specific(self):
+        from photo_prompts import TEMPLATES, STYLES, build_prompt
+        self.assertEqual(len(TEMPLATES), 24)
+        self.assertEqual(len({t['id'] for t in TEMPLATES}), 24)
+        for t in TEMPLATES:
+            self.assertIn(t['style'], STYLES)
+            self.assertIn(t['mode'], ('text', 'edit'))
+            self.assertLess(len(build_prompt(t['prompt'], t['style'], t['mode']=='edit')), 300)
+        prompt = build_prompt('只把背景改成蓝色', 'custom', True)
+        self.assertTrue(prompt.startswith('只把背景改成蓝色'))
+        self.assertIn('保留未要求修改', prompt)
+        self.assertNotIn('视觉风格', prompt)
+        state = self.call('/state')
+        self.assertEqual(state['prompt_version'], 2)
+        self.assertEqual(len(state['templates']), 24)
+
+    def test_provider_endpoint_matches_key_type(self):
+        from unittest.mock import patch
+        for mode, path in [('standard', '/api/v3/'), ('agent-plan', '/api/plan/v3/')]:
+            with patch.dict('os.environ', {'ATOM_IMAGE_API_MODE': mode}):
+                provider = ArkImages()
+                self.assertEqual(provider.endpoint, 'https://ark.cn-beijing.volces.com' + path + 'images/generations')
+        with patch.dict('os.environ', {'ATOM_IMAGE_API_MODE': 'https://untrusted.invalid'}):
+            with self.assertRaises(ValueError):
+                ArkImages()
+
     def test_provider_errors_do_not_echo_secret(self):
         from urllib.error import HTTPError
         provider=ArkImages();provider.key='private-test-credential'

@@ -26,7 +26,7 @@ LICENSES = {'MIT', 'Apache-2.0', 'BSD-2-Clause', 'BSD-3-Clause', 'CC0-1.0', 'MPL
 RESERVED = {'clock','timer','notes','status','settings','developer','manager','home','widgets','workshop','themes','my-computer','market','quick-notes','connect-preview','today','task-pal','app-library','robot'}
 APP_ID = re.compile(r'^[a-z][a-z0-9_-]{0,47}$')
 ID = re.compile(r'^[A-Za-z0-9_-]{1,100}$')
-MAX_BUNDLE = 1024 * 1024
+MAX_BUNDLE = 2 * 1024 * 1024 - 64 * 1024  # Leave room for HTTP metadata inside the 2 MiB envelope.
 EMAIL = re.compile(r'^[^@\s]{1,64}@[A-Za-z0-9.-]{1,189}\.[A-Za-z]{2,24}$')
 CODE_TTL, CODE_ATTEMPTS = 900, 5
 B64 = re.compile(r'^[A-Za-z0-9_-]+$')
@@ -72,7 +72,7 @@ def packed(value):
 
 def validate_bundle(bundle, official=False):
     require(isinstance(bundle, dict) and isinstance(bundle.get('manifest'), dict) and isinstance(bundle.get('files'), dict), 'Complete manifest and files required')
-    require(len(packed(bundle).encode('utf-8')) <= MAX_BUNDLE, 'Bundle exceeds 1 MiB')
+    require(len(packed(bundle).encode('utf-8')) <= MAX_BUNDLE, 'Bundle exceeds 1984 KiB (2 MiB request including metadata)')
     manifest, files = bundle['manifest'], bundle['files']
     try: validate_input_bundle(bundle, required=False)
     except ValueError as exc: raise MarketError(400, str(exc), 'input_contract_invalid')
@@ -117,7 +117,7 @@ def scan_publish(bundle):
     source = '\n'.join(bundle['files'].values()) + '\n' + packed(bundle['manifest'])
     # A conservative accidental-secret scanner, not a guarantee that source is safe.
     patterns = [r'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----',
-                r'\b(?:sk-[A-Za-z0-9_-]{16,}|gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,})',
+                r'\b(?:ark-[A-Za-z0-9-]{24,}|sk-[A-Za-z0-9_-]{16,}|gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,})',
                 r'(?i)(?:api[_-]?key|access[_-]?token|password|authorization)\s*["\']?\s*[:=]\s*["\'][A-Za-z0-9_./+\-=]{12,}["\']',
                 r'(?i)bearer\s+[A-Za-z0-9_.-]{20,}']
     require(not any(re.search(p, source) for p in patterns), 'Possible credential detected; remove secrets before publishing', 400, 'publish_secret_detected')
@@ -136,6 +136,8 @@ class Marketplace:
         self.seed_root = Path(seeds) if seeds else Path(__file__).resolve().parents[2] / 'official'
         self.import_official()
         covers.official(self)
+        from community import Community
+        self.community = Community(self, MarketError, validate_bundle, scan_publish)
         self.photos = PhotoLibrary(self)
         self.library_covers = {}
         self.source_library("/market/v1/catalog")
@@ -175,6 +177,7 @@ class Marketplace:
             self.db.commit()
 
     def close(self):
+        self.community.close()
         self.photos.close()
         self.db.close()
 
@@ -233,6 +236,7 @@ class Marketplace:
         return draft
 
     def publish(self, user, row, draft, changelog):
+        require(not draft.get('creation_pending'), '先完成创作，再公开分享')
         bundle = validate_bundle(json.loads(row['bundle']))
         self.check_parent_license(draft, bundle)
         scan_publish(bundle)
@@ -242,13 +246,15 @@ class Marketplace:
         work_id = draft.get('work_id') or secrets.token_hex(16)
         old = self.row('SELECT * FROM works WHERE id=?', (work_id,))
         require(not old or old['user'] == user['id'], 'Publication not permitted', 403)
+        if draft.get('expected_head') and old:
+            require(json.loads(old['data'])['latest_version_id'] == draft['expected_head'], '原作已更新，请重新审阅建议后发布', 409, 'revision_conflict')
         number = self.row('SELECT COUNT(*) n FROM versions WHERE work=?', (work_id,))['n']+1
         require(number <= 100, 'Work version quota reached', 409, 'quota_exceeded')
         version_id = secrets.token_hex(16)
         canonical = packed(bundle)
         digest = hashlib.sha256(canonical.encode('utf-8')).hexdigest()
         version = dict(id=version_id, work_id=work_id, number=number, created_at=self.clock(), changelog=changelog, sha256=digest, source_sha256=digest)
-        work = {k:draft.get(k) for k in ('title','description','category','license','parent_id','parent_version_id','attribution','cover_id')}
+        work = {k:draft.get(k) for k in ('title','description','category','license','parent_id','parent_version_id','attribution','cover_id','contributors')}
         if draft.get('cover_id'):
             require(self.row('SELECT 1 FROM covers WHERE id=? AND owner=?', (draft['cover_id'],user['id'])), '封面不存在，请重新上传')
             self.db.execute('UPDATE covers SET public=1 WHERE id=?', (draft['cover_id'],))
@@ -256,6 +262,7 @@ class Marketplace:
         work.update(id=work_id, author=user['username'], latest_version_id=version_id, updated_at=self.clock(), official=False)
         self.db.execute('INSERT OR REPLACE INTO works VALUES(?,?,?)', (work_id,user['id'],packed(work)))
         self.db.execute('INSERT INTO versions VALUES(?,?,?,?,?)', (version_id,work_id,number,packed(version),canonical))
+        draft['expected_head'] = version_id
         draft.update(work_id=work_id, revision=draft['revision']+1, updated_at=self.clock(), published_revision=draft['revision'])
         self.db.execute('UPDATE drafts SET data=? WHERE id=?', (packed(draft), draft['id']))
         return {'work':work, 'version':version}
@@ -500,7 +507,7 @@ class Marketplace:
         require(self.mailer.configured, '服务器暂未配置邮件发送', 503, 'mail_unavailable')
         self.mailer.send(to, subject, body)
 
-    def _handle(self, method, target, token, body, peer):
+    def _handle(self, method, target, token, body, peer, trusted_user=None):
         parsed = urlsplit(target)
         path = parsed.path.rstrip('/')[len('/market/v1'):]
         require(isinstance(body,dict), 'JSON object required')
@@ -513,6 +520,8 @@ class Marketplace:
             require(len(q)<=100 and (not category or category in CATEGORIES),'Invalid catalog filter')
             works=[json.loads(r['data']) for r in self.rows('SELECT w.data FROM works w LEFT JOIN visibility v ON v.work=w.id WHERE COALESCE(v.unlisted,0)=0 ORDER BY w.rowid DESC')]
             return {'works':[w for w in works if (not category or w['category']==category) and (not q or q in (w['title']+' '+w['description']+' '+w['author']).lower())][:200]}
+        if path.startswith('/community/') and method == 'POST':
+            return self.community.handle(path.rsplit('/', 1)[-1], self.auth(token), body)
         parts=path.strip('/').split('/')
         if method=='GET' and len(parts)==2 and parts[0]=='works':
             row=self.row('SELECT data FROM works WHERE id=?',(parts[1],))
@@ -526,7 +535,7 @@ class Marketplace:
             media=self.row('SELECT * FROM covers WHERE id=?', (parts[1],))
             require(media, '封面不存在', 404)
             if not media['public']:
-                user=self.auth(token)
+                user=trusted_user or self.auth(token)
                 require(media['owner']==user['id'], '封面不存在', 404)
             import base64
             return {'id':media['id'], 'image':'data:image/jpeg;base64,'+base64.b64encode(media['image']).decode(), 'width':media['width'], 'height':media['height']}
@@ -543,7 +552,7 @@ class Marketplace:
                 code=self.issue_code(user,'reset',user['email'])
                 self.mail(user['email'],'ATOM 密码重置验证码',user['username']+'，你好：\n\n你的 ATOM 密码重置验证码是 '+code+'，15 分钟内有效。\n如果不是你本人操作，请忽略这封邮件，你的密码不会改变。\n')
             return {'ok':True}
-        user=self.auth(token)
+        user=trusted_user or self.auth(token)
         if path=='/me' and method=='GET':
             return {'user':{'id':user['id'],'username':user['username'],'email':user['email'] or '','email_verified':bool(user['email_verified'])}}
         if path=='/keys' and method=='GET':
@@ -589,6 +598,8 @@ class Marketplace:
         if len(parts)>=2 and parts[0]=='drafts':
             row,draft=self.own_draft(parts[1],user)
             if len(parts)==2 and method=='GET':
+                parent = self.row('SELECT user FROM works WHERE id=?', (draft.get('parent_id'),))
+                draft['can_suggest'] = bool(parent and parent['user'] not in (user['id'], 'official'))
                 return {'draft':draft,'bundle':json.loads(row['bundle'])}
             if len(parts)==3 and method=='POST' and parts[2]=='cover':
                 if type(body.get('revision')) is not int or body['revision']!=draft['revision']:
@@ -618,6 +629,8 @@ class Marketplace:
                 bundle=validate_bundle(body.get('bundle'))
                 self.check_parent_license(draft,bundle)
                 old_bundle=json.loads(row['bundle'])
+                if bundle != old_bundle:
+                    draft['creation_pending'] = False
                 require(bundle['manifest']['id']==old_bundle['manifest']['id'],'Application ID cannot change on save')
                 for key,maximum in (('title',80),('description',500)):
                     if key in body: draft[key]=text(body,key,maximum,key=='description')

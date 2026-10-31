@@ -9,7 +9,7 @@ permissions:
 jobs:
   regression:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -21,7 +21,8 @@ jobs:
           cache: npm
           cache-dependency-path: atom/package-lock.json
       - run: npm --prefix atom ci
-      - run: cd atom && npx playwright install --with-deps chromium
+      - run: python3 -m pip install -r atom/connect/server/requirements.txt cryptography
+      - run: cd atom && npx playwright install --with-deps chromium webkit
       - name: Device service
         run: python3 -m unittest discover -s atom/tests
       - name: Relay and source marketplace
@@ -34,6 +35,8 @@ jobs:
           npm --prefix atom run test:runtime
       - name: Browser applications (fixture APIs)
         run: npm --prefix atom run test:ui
+      - name: Creation community and Mac preview (Chromium and WebKit)
+        run: npm --prefix atom run test:community
       - name: Creative experiences and product guide
         run: |
           npm --prefix atom run test:experiences

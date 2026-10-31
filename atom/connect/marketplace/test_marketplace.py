@@ -8,6 +8,7 @@ from pathlib import Path
 import tempfile
 import threading
 import unittest
+from unittest import mock
 
 spec=importlib.util.spec_from_file_location('market_under_test',Path(__file__).with_name('service.py'))
 m=importlib.util.module_from_spec(spec)
@@ -137,8 +138,19 @@ class MarketplaceTests(unittest.TestCase):
         self.denied(400,lambda:self.draft(source=bad))
         bad=bundle();bad['files']['icon.svg']=ICON.replace('currentColor','#ff0000')
         self.denied(400,lambda:self.draft(source=bad))
-        bad=bundle();bad['files']['big.txt']='x'*(1024*1024)
+        bad=bundle();bad['files']['big.txt']='x'*m.MAX_BUNDLE
         self.denied(400,lambda:self.draft(source=bad))
+
+    def test_sampled_piano_round_trips_market_and_device_install(self):
+        import server
+        piano=Path(__file__).resolve().parents[2]/'official/mini-piano/bundle.json'
+        source=json.loads(piano.read_text())
+        self.assertGreater(len(m.packed(source).encode()),1024*1024)
+        draft=self.draft(source=source)
+        restored=self.call('/drafts/'+draft['id'],who=self.a)['bundle']
+        self.assertEqual(restored['files']['samples.js'],source['files']['samples.js'])
+        server.install_app(Path(self.tmp.name).resolve()/'installed',restored)
+        self.assertEqual((Path(self.tmp.name)/'installed/mini-piano/samples.js').read_text(),source['files']['samples.js'])
 
     def test_notes_isolation_conflict_delete_restore(self):
         note=self.call('/notes',dict(id='offline-local-1',revision=0,text='First note',pinned=True),self.a)['note']
@@ -306,6 +318,34 @@ class MarketplaceTests(unittest.TestCase):
         self.assertEqual(latest['versions'][0]['number'],2)
         self.assertNotEqual(latest['work']['latest_version_id'],first['version']['id'])
         self.assertEqual(self.call('/versions/'+first['version']['id'])['bundle'],original)
+
+    def test_ops_overview_is_read_only_and_does_not_expose_private_job_data(self):
+        spec=importlib.util.spec_from_file_location('market_overview_test',Path(__file__).with_name('ops.py'))
+        ops=importlib.util.module_from_spec(spec);spec.loader.exec_module(ops)
+        with self.market.db:
+            self.market.db.execute('INSERT INTO creation_jobs VALUES(?,?,?)', ('one','alice',json.dumps(dict(status='failed',prompt='PRIVATE PROMPT',error='SECRET TOKEN'))))
+            self.market.db.execute('INSERT INTO creation_jobs VALUES(?,?,?)', ('two','alice',json.dumps(dict(status=['PRIVATE STATUS']))))
+            self.market.db.execute('INSERT INTO suggestions VALUES(?,?,?,?,?)', ('suggestion','alice','bobby',json.dumps(dict(status='open',summary='PRIVATE SUMMARY')),'{}'))
+        before=self.market.db.total_changes
+        with mock.patch.object(ops.shutil,'disk_usage',return_value=type('Disk',(),dict(total=40*1024**3,free=512*1024**2))()):
+            result=ops.overview(self.path)
+        self.assertTrue(result['ok'])
+        self.assertEqual(result['jobs']['failed'],1)
+        self.assertEqual(result['jobs']['other'],1)
+        self.assertEqual(result['suggestions']['open'],1)
+        self.assertEqual(len(result['actions']),2)
+        text=ops.format_overview(result)
+        self.assertIn('下一步',text)
+        self.assertNotIn('PRIVATE',text+json.dumps(result))
+        self.assertNotIn('SECRET',text+json.dumps(result))
+        self.assertEqual(before,self.market.db.total_changes)
+        self.assertEqual(self.market.db.execute('SELECT COUNT(*) FROM creation_jobs').fetchone()[0],2)
+        with self.market.db:
+            self.market.db.execute('DROP TABLE creation_jobs')
+            self.market.db.execute('DROP TABLE suggestions')
+        legacy=ops.overview(self.path)
+        self.assertFalse(legacy['available']['jobs'])
+        self.assertIn('此数据库尚未启用',ops.format_overview(legacy))
 
     def test_ops_backup_stats_health_unlist_restore(self):
         spec=importlib.util.spec_from_file_location('market_ops_test',Path(__file__).with_name('ops.py'))

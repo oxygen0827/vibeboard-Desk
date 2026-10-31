@@ -50,3 +50,7 @@ node atom/site/apps.test.cjs
 Python 图片测试和准备工具需要 Pillow。浏览器截图工具使用隔离的空白/演示状态，不应改成连接用户账号自动截图。`capture_market_screens.cjs` 可通过 `ATOM_IMAGE_PYTHON` 指定带 Pillow 的 Python。
 
 2026-10-21：云端 12 个公开作品均可匿名读取封面，官网 37 项卡片可展示截图；Mac 包已更新并验证实际市场页面。小电脑远程入口仍拒绝连接，因此 `market_client.py`、`static/app.js` 与完整 `examples/market.json` 尚未部署到真机。真机恢复后需保留应用位置、安装时间及有效图标，更新市场并检查 Home 返回行为。验收记录见 `../artifacts/market-covers/verification.json`。
+
+## 共享创作入口（2026-10-31）
+
+Mac 和设备的「我的 → 作品 → 分享作品」均支持真实首页截图上传，上传完成仅保存到私人草稿，点击公开发布后才进入公共目录。Mac 高级工作台「我的创作 → 首页截图」继续可用。详情见 [创作与社区计划](creation-community-plan.md)。

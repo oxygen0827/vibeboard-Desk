@@ -1,0 +1,15 @@
+{
+  "id": "parametric-maker",
+  "name": "参数造物",
+  "description": "JSCAD真实布尔建模 · 盒子支架底座",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "theme_ui": "controls",
+  "layout": "fullscreen",
+  "input": {
+    "version": 1,
+    "profile": "five-way",
+    "back": "custom",
+    "scene": "controls"
+  }
+}

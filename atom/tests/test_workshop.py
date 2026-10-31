@@ -79,6 +79,13 @@ class WorkshopTests(unittest.TestCase):
         for job_id in [None,[],42,'../x']:
             with self.assertRaises(ValueError): self.work.get_job(job_id)
 
+    def test_worker_launch_failure_is_not_left_queued(self):
+        self.configure()
+        with mock.patch.object(w.threading.Thread,'start',side_effect=RuntimeError('resource exhausted')):
+            for _ in range(3):
+                with self.assertRaisesRegex(ValueError,'启动'):self.work.start_generation({'prompt':'timer'})
+        self.assertTrue(all(j['status']=='failed' for j in self.work.jobs.values()))
+
     def test_invalid_bundle_paths(self):
         value=json.loads(json.dumps(BUNDLE)); value['files']['../escape']='x'
         with self.assertRaises(ValueError): w.validate_bundle(value)

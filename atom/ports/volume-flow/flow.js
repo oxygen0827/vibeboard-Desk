@@ -471,6 +471,7 @@ var Camera = function (element) {
         return viewDirection;
     };
 
+    this.orbit=function(x,y){azimuth+=x;elevation=Math.max(MIN_ELEVATION,Math.min(MAX_ELEVATION,elevation+y));recomputeViewMatrix();};
     var recomputeViewMatrix = function () {
         var xRotationMatrix = new Float32Array(16),
             yRotationMatrix = new Float32Array(16),
@@ -642,7 +643,7 @@ var Flow = function (canvas) {
     var particleTextureA = buildTexture(gl, 0, gl.RGBA, gl.FLOAT, 1, 1, null, gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE, gl.NEAREST, gl.NEAREST);
     var particleTextureB = buildTexture(gl, 0, gl.RGBA, gl.FLOAT, 1, 1, null, gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE, gl.NEAREST, gl.NEAREST);
 
-    var camera = new Camera(canvas);
+    var camera = new Camera(canvas);this.orbit=function(x,y){camera.orbit(x,y);};
 
     var projectionMatrix = makePerspectiveMatrix(new Float32Array(16), PROJECTION_FOV, ASPECT_RATIO, PROJECTION_NEAR, PROJECTION_FAR);
 
@@ -1118,7 +1119,7 @@ var Flow = function (canvas) {
 
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
-        requestAnimationFrame(render);
+        AtomSceneSession.frame(render);
     };
     render();
 };

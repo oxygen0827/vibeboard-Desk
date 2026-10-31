@@ -1,0 +1,15 @@
+{
+  "id": "pocket-studio",
+  "name": "口袋音乐工作站",
+  "description": "ATOM 口袋音乐工作站 · 离线交互",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "theme_ui": "controls",
+  "layout": "fullscreen",
+  "input": {
+    "version": 1,
+    "profile": "five-way",
+    "back": "root",
+    "scene": "controls"
+  }
+}

@@ -87,12 +87,9 @@ window.onload = function() {
   }
 
   document.getElementById('loading').innerHTML = '';
-  onresize();
+  onresize();setupAccessibleWaterControls(draw);
 
-  var requestAnimationFrame =
-    window.requestAnimationFrame ||
-    window.webkitRequestAnimationFrame ||
-    function(callback) { setTimeout(callback, 0); };
+  var scheduleFrame = AtomSceneSession.frame;
 
   var prevTime = new Date().getTime();
   function animate() {
@@ -102,9 +99,9 @@ window.onload = function() {
       draw();
     }
     prevTime = nextTime;
-    requestAnimationFrame(animate);
+    scheduleFrame(animate);
   }
-  requestAnimationFrame(animate);
+  scheduleFrame(animate);
 
   window.onresize = onresize;
 
@@ -279,3 +276,5 @@ window.onload = function() {
     gl.disable(gl.DEPTH_TEST);
   }
 };
+
+function setupAccessibleWaterControls(redraw){AtomSceneControls.attach([['向左环绕',()=>{angleY-=15;redraw()}],['向右环绕',()=>{angleY+=15;redraw()}],['俯视一点',()=>{angleX=Math.max(-80,angleX-10);redraw()}],['仰视一点',()=>{angleX=Math.min(-5,angleX+10);redraw()}],['球向左',()=>{center.x=Math.max(-.7,center.x-.2);redraw()}],['球向右',()=>{center.x=Math.min(.7,center.x+.2);redraw()}]],'移动球与视角');AtomSceneSession.onStop(function(){var ext=gl.getExtension('WEBGL_lose_context');if(ext)ext.loseContext()});}

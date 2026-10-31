@@ -2,3 +2,9 @@
 
 /* Piano key colours convey pitch layout; keep them distinct from control chrome. */
 .piano-key.white{background:linear-gradient(#fff,#e8edf5)!important;color:#526176!important;border:1px solid #c8d1dd!important}.piano-key.black{background:linear-gradient(#354052,#101721)!important;color:#dce9ff!important;border:1px solid #090e16!important}.piano-key.on{background:var(--accent,#007aff)!important;color:var(--accent-ink,#fff)!important}.piano-key{border-radius:0 0 10px 10px!important}
+
+.song-picker{position:absolute;top:66px;left:16px;right:16px;display:flex;align-items:center;gap:12px}.song-picker select{flex:1;min-width:0;height:40px;border:1px solid var(--line,#ddd);border-radius:12px;background:var(--card,#fff);color:var(--ink,#222);padding:0 12px;font:inherit;font-size:14px}.song-picker span{font-size:11px;color:var(--muted,#666)}.piano #keys,.piano-key{touch-action:none}.piano #notice{max-width:210px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.song-picker #speed{flex:0 0 120px}.piano #notice{max-width:145px;flex:1;min-width:0}.piano .controls{gap:2px}.piano .controls button{padding:0 8px;white-space:nowrap}
+
+.piano .scene-head{padding-left:0}.piano [data-atom-back]{min-width:64px;min-height:48px;padding:0 8px}.piano .scene-head>div{text-align:center;flex:1}.piano .scene-head [data-sound]{margin-right:4px}.piano #hands{font:inherit;font-size:12px;height:38px;border:0;border-radius:10px;background:var(--card,#fff);color:var(--ink,#222);padding:0 8px}.piano #progress{position:absolute;top:155px;left:16px;width:calc(100% - 32px);height:3px;border:0;accent-color:var(--accent,#007aff)}.piano #progress::-webkit-progress-bar{background:var(--line,#ddd);border-radius:3px}.piano #progress::-webkit-progress-value{background:var(--accent,#007aff);border-radius:3px}

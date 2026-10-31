@@ -21,3 +21,56 @@ test('in-flight old draft save never marks newer local edits synced',async()=>{c
 test('workspace source symlink cannot redirect checkout outside private state directory',async()=>{const f=fixture(),outside=fs.mkdtempSync(path.join(os.tmpdir(),'atom-studio-outside-'));try{await checkout(f);const source=f.studio.workspaceView('draft-one').source_path;fs.rmSync(source,{recursive:true});fs.symlinkSync(outside,source);assert.throws(()=>f.studio.localSave('draft-one',bundle()),/符号链接/);assert.deepEqual(fs.readdirSync(outside),[]);}finally{f.cleanup();fs.rmSync(outside,{recursive:true,force:true});}});
 test('local AI 409 retains complete artifact, no silent retry after restart',async()=>{class Fake extends EventEmitter{async open(){}async account(){return true;}async start(){this.emit('message',JSON.stringify(bundle()));this.emit('completed',{status:'completed'});}close(){}}const f=fixture(()=>new Fake());try{await checkout(f);f.setServerRevision(4);const r=await f.studio.aiModify({draft_id:'draft-one',prompt:'test'});for(let i=0;i<20&&f.studio.jobView(r.job.id).status!=='conflict';i++)await new Promise(r=>setTimeout(r,5));const job=f.studio.jobView(r.job.id);assert.equal(job.status,'conflict');assert(job.artifact.files.LICENSE);const restart=new Studio(f.companion);assert.equal(restart.jobView(job.id).status,'conflict');assert(restart.jobView(job.id).artifact.files['index.html']);}finally{f.cleanup();}});
 test('cover proxy keeps auth in host, updates only draft metadata and preserves local source',async()=>{const f=fixture();try{await checkout(f);const before=f.studio.workspaceView('draft-one').bundle;const original=f.studio.transport;f.studio.transport=async(url,opts)=>{const route=new URL(url).pathname;if(route.endsWith('/cover')){assert.equal(opts.headers.Authorization,'Bearer market-private-test-token');const input=JSON.parse(opts.body);assert.equal(input.revision,1);return Response.json({draft:{...f.studio.workspaceView('draft-one').draft,cover_id:'a'.repeat(32),revision:2}});}if(route.includes('/covers/'))return Response.json({id:'a'.repeat(32),image:'data:image/jpeg;base64,AA=='});return original(url,opts);};await f.studio.handle('POST','/drafts/draft-one/cover',{image:'data:image/png;base64,AA=='});assert.equal(f.studio.workspaceView('draft-one').draft.cover_id,'a'.repeat(32));assert.deepEqual(f.studio.workspaceView('draft-one').bundle,before);assert((await f.studio.handle('GET','/covers/'+'a'.repeat(32))).image);await assert.rejects(f.studio.remote('/covers/../../keys'),/不支持/);assert(!JSON.stringify(f.studio.state()).includes('market-private-test-token'));}finally{f.cleanup();}});
+
+test('source swap failure restores old source; interrupted swap recovers on next access',()=>{
+ const f=fixture();try{
+  f.studio.writeSource('durable',bundle());
+  const root=f.studio.workspace('durable'),target=path.join(root,'source'),old=fs.readFileSync(path.join(target,'assets/app.js'),'utf8');
+  const updated=bundle();updated.files['assets/app.js']='new code';
+  const rename=fs.renameSync;
+  fs.renameSync=(from,to)=>{if(to===target&&from!==path.join(root,'source-previous'))throw Error('swap failed');return rename(from,to)};
+  try{assert.throws(()=>f.studio.writeSource('durable',updated),/swap failed/);}finally{fs.renameSync=rename;}
+  assert.equal(fs.readFileSync(path.join(target,'assets/app.js'),'utf8'),old);
+  assert.deepEqual(fs.readdirSync(root),['source']);
+  fs.renameSync(target,path.join(root,'source-previous'));
+  assert.equal(f.studio.workspace('durable'),root);
+  assert.equal(fs.readFileSync(path.join(target,'assets/app.js'),'utf8'),old);
+  f.studio.writeSource('durable',updated);
+  assert.equal(fs.readFileSync(path.join(target,'assets/app.js'),'utf8'),'new code');
+ }finally{f.cleanup();}
+});
+
+
+test('source write failure leaves cached local and remote drafts unchanged',async()=>{
+ const f=fixture();try{
+  await checkout(f);
+  const before=f.studio.workspaceView('draft-one');
+  const updated=bundle();updated.files['assets/app.js']='unsaved code';
+  const writeSource=f.studio.writeSource;
+  f.studio.writeSource=()=>{throw Error('disk unavailable')};
+  try{
+   assert.throws(()=>f.studio.localSave('draft-one',updated),/disk unavailable/);
+   assert.deepEqual(f.studio.workspaceView('draft-one').bundle,before.bundle);
+   assert.equal(f.studio.workspaceView('draft-one').dirty,before.dirty);
+   assert.throws(()=>f.studio.cacheDraft({draft:{...before.draft,revision:99},bundle:updated}),/disk unavailable/);
+   assert.deepEqual(f.studio.workspaceView('draft-one').draft,before.draft);
+   assert.deepEqual(f.studio.workspaceView('draft-one').bundle,before.bundle);
+  }finally{f.studio.writeSource=writeSource;}
+  assert.equal(fs.readFileSync(path.join(before.source_path,'assets/app.js'),'utf8'),before.bundle.files['assets/app.js']);
+ }finally{f.cleanup();}
+});
+
+
+test('market piano checkout and local edits preserve full sampled source above agent artifact limit',()=>{
+ const f=fixture();try{
+  const piano=JSON.parse(fs.readFileSync(new URL('../../../official/mini-piano/bundle.json',import.meta.url),'utf8'));
+  assert(Buffer.byteLength(JSON.stringify(piano))>1024*1024);
+  const result=f.studio.cacheDraft({draft:{id:'piano',revision:1},bundle:piano});
+  assert.deepEqual(result.bundle.files,piano.files);
+  const updated=structuredClone(piano);updated.files['README-test.txt']='Local edit';
+  f.studio.localSave('piano',updated);
+  const saved=f.studio.workspaceView('piano');
+  assert.equal(saved.bundle.files['samples.js'],piano.files['samples.js']);
+  assert.equal(fs.readFileSync(path.join(saved.source_path,'samples.js'),'utf8'),piano.files['samples.js']);
+ }finally{f.cleanup();}
+});

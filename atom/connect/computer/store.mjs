@@ -1,6 +1,26 @@
 import fs from 'node:fs';
 import path from 'node:path';
-export function writePrivate(file,value){fs.mkdirSync(path.dirname(file),{recursive:true,mode:0o700});const tmp=file+'.'+crypto.randomUUID()+'.tmp';fs.writeFileSync(tmp,JSON.stringify(value,null,2),{mode:0o600,flag:'wx'});fs.chmodSync(tmp,0o600);fs.renameSync(tmp,file);}
+export function writePrivate(file,value){
+ const content=JSON.stringify(value,null,2); // Fail serialization before creating files.
+ const dir=path.dirname(file);
+ fs.mkdirSync(dir,{recursive:true,mode:0o700});
+ const tmp=file+'.'+crypto.randomUUID()+'.tmp';
+ let fd;
+ try{
+  fd=fs.openSync(tmp,'wx',0o600);
+  fs.writeFileSync(fd,content);fs.fsyncSync(fd);
+  fs.closeSync(fd);fd=undefined;
+  fs.renameSync(tmp,file);
+  // Rename is atomic, but its directory entry also needs to survive a power loss.
+  if(process.platform!=='win32'){
+   const parent=fs.openSync(dir,'r');
+   try{fs.fsyncSync(parent);}finally{fs.closeSync(parent);}
+  }
+ }finally{
+  if(fd!==undefined)fs.closeSync(fd);
+  fs.rmSync(tmp,{force:true});
+ }
+}
 export class Store {
  constructor(dir){this.file=path.join(dir,'state.json');try{this.data=JSON.parse(fs.readFileSync(this.file,'utf8'));}catch(e){if(e.code!=='ENOENT')throw e;this.data={projects:[],tasks:{},outbox:[],commands:[],sessions:{}};this.save();}}
  save(){writePrivate(this.file,this.data);}

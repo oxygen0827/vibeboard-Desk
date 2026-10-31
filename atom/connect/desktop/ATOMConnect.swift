@@ -139,9 +139,20 @@ final class ConnectApplication: NSObject, NSApplicationDelegate, WKNavigationDel
         }
     }
     func webView(_ webView: WKWebView, runOpenPanelWith parameters: WKOpenPanelParameters, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping ([URL]?) -> Void) {
-        guard let url = frame.request.url, let base = origin, url.host == base.host, url.port == base.port, url.path.hasPrefix("/photo-album/") else { completionHandler(nil); return }
+        guard let url = frame.request.url, let base = origin,
+              url.scheme == base.scheme, url.host == base.host, url.port == base.port else { completionHandler(nil); return }
+        let isPhotoAlbum = url.path.hasPrefix("/photo-album/")
+        let isDashboard = frame.isMainFrame && url.path == "/"
+        let isPreview = !frame.isMainFrame && url.path.range(of: #"^/api/studio/interactive/[a-f0-9-]{36}/[^?#]+\.html$"#, options: .regularExpression) != nil
+        guard isPhotoAlbum || isDashboard || isPreview else { completionHandler(nil); return }
         let panel = NSOpenPanel(); panel.canChooseFiles = true; panel.canChooseDirectories = false
-        panel.allowsMultipleSelection = parameters.allowsMultipleSelection; panel.allowedContentTypes = [.jpeg, .png, .webP] + ["public.heic", "public.heif"].compactMap { UTType($0) }
+        panel.allowsMultipleSelection = (isPhotoAlbum || isPreview) && parameters.allowsMultipleSelection
+        panel.allowedContentTypes = [.jpeg, .png, .webP]
+        if isPhotoAlbum { panel.allowedContentTypes += ["public.heic", "public.heif"].compactMap { UTType($0) } }
+        if isPreview {
+            panel.message = "所选文件仅用于当前应用预览，不会上传。"
+            panel.allowedContentTypes = [.image, .audio, .plainText] + ["json", "stl", "obj", "gltf", "glb", "mid", "midi"].compactMap { UTType(filenameExtension: $0) }
+        }
         panel.beginSheetModal(for: window) { response in completionHandler(response == .OK ? Array(panel.urls.prefix(20)) : nil) }
     }
     @objc func chooseFolder() {

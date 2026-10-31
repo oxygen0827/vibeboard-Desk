@@ -6,7 +6,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const source = fs.readFileSync(path.join(__dirname, '..', 'static', 'maintenance.js'), 'utf8');
-const SAVED = {'atom.desktop.v2': '{"order":["robot","clock"]}', 'atom.app.v1.robot': '{"history":[1]}'};
+const SAVED = {'atom.desktop.sort.v1': 'frequency', 'atom.desktop.usage.v1': '{"clock":{"count":7}}', 'atom.desktop.v2': '{"order":["robot","clock"]}', 'atom.app.v1.robot': '{"history":[1]}'};
 
 function shell(initial, backend) {
   const store = new Map(Object.entries(initial));
@@ -45,6 +45,8 @@ test('empty browser storage restores the saved copy before defaults are captured
   assert.ok(s.calls.includes('recover'));
   assert.ok(!s.calls.includes('capture'), 'defaults never replace the saved copy');
   assert.equal(s.store.get('atom.desktop.v2'), SAVED['atom.desktop.v2']);
+  assert.equal(s.store.get('atom.desktop.sort.v1'), SAVED['atom.desktop.sort.v1']);
+  assert.equal(s.store.get('atom.desktop.usage.v1'), SAVED['atom.desktop.usage.v1']);
   assert.equal(s.store.get('atom.app.v1.robot'), SAVED['atom.app.v1.robot']);
   assert.equal(s.reloaded(), 1);
   assert.deepEqual(s.backend.saved, SAVED);

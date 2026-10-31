@@ -1,4 +1,4 @@
-import test from'node:test';import assert from'node:assert/strict';import fs from'node:fs';import os from'node:os';import path from'node:path';import{EventEmitter}from'node:events';import{parseArtifact,validateArtifact,appPrompt,inputStandardPrompt}from'../artifact.mjs';import{Companion}from'../companion.mjs';
+import test from'node:test';import assert from'node:assert/strict';import fs from'node:fs';import os from'node:os';import path from'node:path';import{EventEmitter}from'node:events';import{parseArtifact,validateArtifact,validateSource,SOURCE_LIMIT,appPrompt,inputStandardPrompt}from'../artifact.mjs';import{Companion}from'../companion.mjs';
 const bundle=()=>({manifest:{id:'practice',name:'练习',description:'练习工具',icon:'icon.svg',entry:'index.html'},files:{'index.html':'<!doctype html><p>Hello</p>','icon.svg':'<svg viewBox="0 0 64 64"><path stroke="currentColor" d="M10 10L54 54"/></svg>'}});
 test('artifact retains complete >16KiB payload, limits UTF8 and validates icon/path',()=>{const b=bundle();b.files['index.html']='文'.repeat(10000);assert.equal(parseArtifact(JSON.stringify(b)).files['index.html'].length,10000);for(const mutate of [b=>b.files['../secret']='x',b=>b.files['icon.svg']='<svg viewBox="0 0 64 64" onload="x">currentColor</svg>',b=>b.files['icon.svg']='<svg viewBox="0 0 64 64"><image href="x"/>currentColor</svg>',b=>b.manifest.icon='placeholder.svg',b=>b.files['x']=3,b=>b.manifest.id='home',b=>b.manifest.id='1bad',b=>b.manifest.entry='other.html',b=>b.files['icon.svg']='<svg viewBox="0 0 64 64"><path stroke="red" fill="currentColor"/></svg>',b=>b.files['index.html']='文'.repeat(40000)]){const x=bundle();mutate(x);assert.throws(()=>validateArtifact(x));}assert.throws(()=>parseArtifact('```json\n{}\n```'));});
 test('app prompt includes lifecycle, icon, full screen and protocol instructions',()=>{const s=appPrompt('喝水记录');for(const p of ['AtomApp.load','AtomApp.save','AtomApp.onSuspend','currentColor','96 KiB','喝水记录'])assert(s.includes(p));});
@@ -8,3 +8,16 @@ test('missing entry normalized to index.html and device-compatible IDs accepted'
 
 test('new and remix task prompts include every shared input rule',()=>{const policy=JSON.parse(fs.readFileSync(new URL('../../../static/app-input-standard.json',import.meta.url),'utf8'));const expected='ATOM REQUIRED INPUT STANDARD v1:\n'+policy.rules.map(rule=>'- '+rule).join('\n');assert.equal(inputStandardPrompt(),expected);assert(appPrompt('Create an app').includes(expected));assert(appPrompt('Modify complete app source').includes(expected));});
 test('packaged desktop loader uses its bundled policy and refuses a missing policy',async()=>{const dir=fs.mkdtempSync(path.join(os.tmpdir(),'atom-policy-'));try{fs.copyFileSync(new URL('../artifact.mjs',import.meta.url),path.join(dir,'artifact.mjs'));fs.copyFileSync(new URL('../../../static/app-input-standard.json',import.meta.url),path.join(dir,'app-input-standard.json'));const {pathToFileURL}=await import('node:url');const module=await import(pathToFileURL(path.join(dir,'artifact.mjs')).href);assert.equal(module.inputStandardPrompt(),inputStandardPrompt());fs.unlinkSync(path.join(dir,'app-input-standard.json'));assert.throws(()=>module.appPrompt('create'));}finally{fs.rmSync(dir,{recursive:true,force:true});}});
+
+
+test('market source budget is separate from relay artifacts and still bounded',()=>{
+ const b=bundle();b.files['samples.js']='x'.repeat(1100*1024);
+ assert.throws(()=>validateArtifact(b),/96 KiB/);
+ assert.equal(validateSource(b).files['samples.js'],b.files['samples.js']);
+ assert(appPrompt('Remix',SOURCE_LIMIT).includes('1984 KiB'));
+ b.files['samples.js']='x'.repeat(SOURCE_LIMIT);
+ assert.throws(()=>validateSource(b),/1984 KiB/);
+ const conflict=bundle();conflict.files['manifest.json']='{}';
+ assert.throws(()=>validateSource(conflict),/路径/);
+ assert.throws(()=>validateArtifact(conflict),/路径/);
+});

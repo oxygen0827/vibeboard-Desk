@@ -15,7 +15,7 @@ AVAILABLE=$(df -Pk /opt | awk 'NR==2 {print $4}')
 [ "$AVAILABLE" -ge "$1" ] || { echo "Insufficient deployment headroom; free space or expand storage first" >&2; exit 1; }
 SPACE
 
-COPYFILE_DISABLE=1 tar --no-xattrs -C "$ATOM" --exclude '__pycache__' --exclude 'test_*.py' -czf - connect/relay connect/marketplace connect/server official experiences ports app_input.py \
+COPYFILE_DISABLE=1 tar --no-xattrs -C "$ATOM" --exclude '__pycache__' --exclude 'test_*.py' -czf - connect/relay connect/marketplace connect/server official experiences ports app_input.py static/app-input-standard.json \
   | $SSH "$HOST" "mkdir -p /opt/atom/releases/$RELEASE && tar -xzf - -C /opt/atom/releases/$RELEASE"
 
 $SSH "$HOST" sh -s "$RELEASE" <<'REMOTE'

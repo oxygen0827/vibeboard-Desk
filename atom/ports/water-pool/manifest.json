@@ -1,0 +1,15 @@
+{
+  "id": "water-pool",
+  "name": "光影水池",
+  "description": "WebGL实时交互 · 光影水池",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "theme_ui": "controls",
+  "layout": "fullscreen",
+  "input": {
+    "version": 1,
+    "profile": "five-way",
+    "back": "custom",
+    "scene": "controls"
+  }
+}

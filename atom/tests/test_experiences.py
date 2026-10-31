@@ -67,6 +67,8 @@ class JobTests(unittest.TestCase):
             with self.assertRaises(ValueError):s.cancel(a,'duet')
             self.assertEqual(s.cancel(a,'world')['job']['status'],'cancelled')
             self.assertFalse(s._set(a,status='completed',result=WORLD))
+            with self.assertRaises(ValueError):s.start(CONFIG,dict(kind='visual',prompt='星尘'))
+            s._run(a,CONFIG,'cancelled before request',{})
             c=s.start(CONFIG,dict(kind='visual',prompt='星尘'))['job']['id']
             self.assertNotEqual(b,c);self.assertEqual(thread.call_count,3)
         self.assertNotIn(CONFIG['api_key'],json.dumps(s.jobs))
@@ -84,6 +86,33 @@ class JobTests(unittest.TestCase):
             self.assertTrue(entered.wait(2));s.cancel(jid,'world');release.set();t.join(2)
         self.assertFalse(t.is_alive());self.assertEqual(s.status(jid,'world')['job']['status'],'cancelled')
         self.assertNotIn('result',s.status(jid,'world')['job'])
+
+    def test_thread_start_failure_releases_capacity(self):
+        s=experiences.Experiences()
+        with mock.patch.object(experiences.threading.Thread,'start',side_effect=RuntimeError('cannot start')):
+            with self.assertRaisesRegex(ValueError,'启动'):s.start(CONFIG,dict(kind='world',prompt='小岛'))
+        self.assertEqual(s.workers,set())
+        self.assertTrue(all(j['status']=='failed' for j in s.jobs.values()))
+
+    def test_cancelled_requests_keep_slots_until_real_workers_exit(self):
+        s=experiences.Experiences();entered=threading.Barrier(3);release=threading.Event()
+        def complete(*args,**kwargs):
+            entered.wait(timeout=3);release.wait(3)
+            return {'choices':[{'message':{'content':json.dumps(WORLD)}}]}
+        with mock.patch.object(experiences.official_ai,'complete',side_effect=complete):
+            try:
+                ids=[s.start(dict(CONFIG,official=True),dict(kind='world',prompt='小岛'))['job']['id'] for _ in range(2)]
+                entered.wait(timeout=3)
+                for jid in ids:s.cancel(jid,'world')
+                for _ in range(70):
+                    with self.assertRaises(ValueError):s.start(CONFIG,dict(kind='world',prompt='小岛'))
+                self.assertEqual(len(s.jobs),2)
+            finally:release.set()
+            import time
+            until=time.monotonic()+3
+            while s.workers and time.monotonic()<until:time.sleep(.01)
+        self.assertFalse(s.workers)
+        self.assertTrue(all(j['status']=='cancelled' and 'result' not in j for j in s.jobs.values()))
 
     def test_invalid_config_input_does_not_start_worker(self):
         s=experiences.Experiences()

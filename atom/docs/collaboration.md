@@ -38,11 +38,13 @@ python3 atom/official/build.py
 python3 atom/tools/prepare_icon_bundles.py
 ```
 
-上述构建会自动把统一 `device-ui.css` 复制进九个完整的离线源码目录。生成包位于 `atom/examples/` 和各官方作品的 `bundle.json`。不要只改 bundle JSON；它会在下次构建被源码覆盖。对特殊上游移植，按各目录的 README/build 脚本操作；`atom/vendor/` 为本地构建缓存，不进入仓库，安装资源在各移植目录中随包保留。
+上述构建只向明确采用共享布局的客户端复制 `device-ui.css`，不会向独立场景应用插入未打包的样式引用。生成包位于 `atom/examples/` 和各官方作品的 `bundle.json`。不要只改 bundle JSON；它会在下次构建被源码覆盖。对特殊上游移植，按各目录的 README/build 脚本操作；`atom/vendor/` 为本地构建缓存，不进入仓库，安装资源在各移植目录中随包保留。
 
 ## 本地回归
 
 ```sh
+# 在独立虚拟环境安装；相册测试需要真实 HEIF 编解码依赖
+python3 -m pip install -r atom/connect/server/requirements.txt cryptography
 python3 -m unittest discover -s atom/tests
 python3 -m unittest discover -s atom/connect/relay -p 'test_*.py'
 python3 -m unittest discover -s atom/connect/marketplace -p 'test_*.py'
@@ -51,8 +53,10 @@ node atom/tests/app-host.test.cjs
 node atom/tests/app-runtime.test.cjs
 npm --prefix atom ci
 cd atom
-npx playwright install chromium
+npx playwright install chromium webkit
 npm run test:ui
+npm run test:community
+node ports/navigation-ui.test.cjs
 ```
 
 浏览器测试优先使用仓库的 npm 依赖。在 Mac 上可使用已安装 Chrome，也可设置 `ATOM_CHROME_EXECUTABLE` 指向浏览器。`ATOM_PLAYWRIGHT_MODULE` 可指定已有 Playwright 模块。测试使用明确的父桥/服务 fixtures；不能把通过 fixtures 当成真实推理、录音质量或真机性能证明。

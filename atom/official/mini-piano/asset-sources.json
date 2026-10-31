@@ -1,0 +1,199 @@
+{
+  "scores": [
+    {
+      "id": "nocturne",
+      "url": "https://www.mutopiaproject.org/ftp/ChopinFF/O9/chopin_nocturne_op9_n2/chopin_nocturne_op9_n2.mid",
+      "sha256": "e202d3941ce5f26397f57f59f0e2e4e3ad9e19061fa3c4dc596c5ee6a6a2548e",
+      "license": "CC BY-SA 3.0",
+      "author": "Renato Biolcati Rinaldi",
+      "sourceTempo": [
+        [
+          0.0,
+          909090
+        ]
+      ]
+    },
+    {
+      "id": "clair",
+      "url": "https://www.mutopiaproject.org/ftp/DebussyC/L75/debussy_Ste_Bergamesq_Clair/debussy_Ste_Bergamesq_Clair.mid",
+      "sha256": "4eee9a1546ffde1ff74cb9824ba0e57cbc821185a15185bfea9faed97820bf8c",
+      "license": "Public Domain",
+      "author": "Keith OHara",
+      "sourceTempo": [
+        [
+          0.0,
+          1000000
+        ]
+      ]
+    },
+    {
+      "id": "maple",
+      "url": "https://www.mutopiaproject.org/ftp/JoplinS/maple/maple.mid",
+      "sha256": "3dd712a85fabd267f5a2cee5cb23af4683408c2f29b8814721844498f1ee4f66",
+      "license": "Public Domain",
+      "author": "Chris Sawer",
+      "sourceTempo": [
+        [
+          0.0,
+          500000
+        ]
+      ]
+    },
+    {
+      "id": "waltz",
+      "url": "https://www.mutopiaproject.org/ftp/ChopinFF/O64/chopin_valse_op64_no1/chopin_valse_op64_no1.mid",
+      "sha256": "62333ad9f9b22603d009734ab500330a12ac09aeca13d185ac0ba64a7fb9d206",
+      "license": "Public Domain",
+      "author": "Magnus Lewis-Smith",
+      "sourceTempo": [
+        [
+          0.0,
+          214285
+        ]
+      ]
+    },
+    {
+      "id": "moonlight",
+      "url": "https://www.mutopiaproject.org/ftp/BeethovenLv/O27/moonlight/moonlight-mids.zip",
+      "sha256": "8b5256217def67f68e0af830e0f7c9a4a71ab6f09e211999a1914c1f39cec082",
+      "license": "CC BY-SA 2.5",
+      "author": "Chris Sawer and Stewart Holmes",
+      "sourceTempo": [
+        [
+          0.0,
+          1000000
+        ]
+      ]
+    }
+  ],
+  "samples": [
+    {
+      "url": "https://raw.githubusercontent.com/tambien/Piano/master/audio/A0v5.mp3",
+      "sha256": "1310ef24d336459f6b27b0a030272f47495d890b831cd919162e05f5b46d3b24"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/tambien/Piano/master/audio/A0v12.mp3",
+      "sha256": "0a8bee1b5bc921e112027e73f1e485b327925a112f36406509b8bdaf0d9a7f8b"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/tambien/Piano/master/audio/C1v5.mp3",
+      "sha256": "6c938cf29e858262508db584f281f555443b9e6d9756981e45c4ec8384ea8b90"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/tambien/Piano/master/audio/C1v12.mp3",
+      "sha256": "aea6e15c42c86a35280929bfdc0cc41d5cfaafc207b1a69f23a94cb18eaa7e01"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/tambien/Piano/master/audio/Fs1v5.mp3",
+      "sha256": "621dbd7cc86b92158d68ae4fb243517ca68d89a9b73a5b63735a13fd48958036"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/tambien/Piano/master/audio/Fs1v12.mp3",
+      "sha256": "06c1b11299e92b33b59ed84e6928f247354b1ca562ec758f4aa2d21ebaa02dd6"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/tambien/Piano/master/audio/C2v5.mp3",
+      "sha256": "b1a1bde357ad51b08150eecc8278d27b83c24d42aaaed4c496e5398c16077171"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/tambien/Piano/master/audio/C2v12.mp3",
+      "sha256": "856dd9af0aece4a12af5e94e6ee8558369eee5092a3fccd4099382df31c428b6"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/tambien/Piano/master/audio/Fs2v5.mp3",
+      "sha256": "f947d85ecd86cc5a4a62a6c089d1fefbf702eac8658e10dc773bc13934823d68"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/tambien/Piano/master/audio/Fs2v12.mp3",
+      "sha256": "1f974f1461326de419d480d5b6528bfce0e75c9592491cf4816e7c8d1eb840fb"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/tambien/Piano/master/audio/C3v5.mp3",
+      "sha256": "97b6c5128bc1cfa7d90e1e829f5b0c83c4580b563ea7b256236485143f67a771"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/tambien/Piano/master/audio/C3v12.mp3",
+      "sha256": "076b5a1f826c8c5d8a420a60f2cc278d8922fbafe5efd3b20f201c079616e71b"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/tambien/Piano/master/audio/Fs3v5.mp3",
+      "sha256": "9082928c209872af1be825f15d3fe4697244bce4ab77cb3b37d70bfb4a40203c"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/tambien/Piano/master/audio/Fs3v12.mp3",
+      "sha256": "49b40c17ffce779ce070d8de76f7ef7420bb9857883be18ec2e2672ce3997f69"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/tambien/Piano/master/audio/C4v5.mp3",
+      "sha256": "140d7e6be024a7b5ca69b3a20fe5011bcb2b6d4b50c0e5d07db8f549e60495a0"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/tambien/Piano/master/audio/C4v12.mp3",
+      "sha256": "3f7729833927fe384bc0ab786f35bc1297fbe07e73a8fc46da8991cfb80d22a1"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/tambien/Piano/master/audio/Fs4v5.mp3",
+      "sha256": "47d81553643f9a697e1585056745232615d2913cbe4bb90903485312951d2a21"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/tambien/Piano/master/audio/Fs4v12.mp3",
+      "sha256": "cb4e86e772ef58a695f6145cf557f3e67da335cc8ff5f279fedce0a2f46c8669"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/tambien/Piano/master/audio/C5v5.mp3",
+      "sha256": "fb87f870b239e33d2bb4567f18356f530888e0ac24a3a742aeb211150ac33767"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/tambien/Piano/master/audio/C5v12.mp3",
+      "sha256": "57aeb3229caf6a9d920d6a0b84b1ea70fe2d2608bce18bd2c8d379a367381f6f"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/tambien/Piano/master/audio/Fs5v5.mp3",
+      "sha256": "ccf1a2183f8f623173a91bbcc8972fead95e89d54b96c28af956b040ab562dbc"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/tambien/Piano/master/audio/Fs5v12.mp3",
+      "sha256": "b9e2fbc22d5f9cf598e0493648282baf2a1dd4cfaf108ea4b30985eb4fb4de0f"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/tambien/Piano/master/audio/C6v5.mp3",
+      "sha256": "fc3ff7a8ba166f601b717dfe09fcfa96dbe503ef7490c35455f2d4aa93215274"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/tambien/Piano/master/audio/C6v12.mp3",
+      "sha256": "1068dbb07020cbe5f97b8bcd9a1380f3bb9b84bc6dcf98f54416316774d1b0ce"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/tambien/Piano/master/audio/Fs6v5.mp3",
+      "sha256": "19afbf1e771a6e3cca364c4bf4153198c0e77aa4176881a9abbc22a963ca1d0b"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/tambien/Piano/master/audio/Fs6v12.mp3",
+      "sha256": "3e1742a3bf71e532ea6054d926313230238317ae2602bf4d85e961ca915c7cc3"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/tambien/Piano/master/audio/C7v5.mp3",
+      "sha256": "646ba5395772e5feffe007b09fc25527ce3ab902f697a3110dd160015727f45f"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/tambien/Piano/master/audio/C7v12.mp3",
+      "sha256": "ecd11a62cb895936b2d2dfee6c63171f2fbd8de4d99225fdbe0e60b015985edc"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/tambien/Piano/master/audio/Fs7v5.mp3",
+      "sha256": "37c949cc2ad6548afa0ca6112e6da59a60dd1677e6799bd0996a2b684c1a979e"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/tambien/Piano/master/audio/Fs7v12.mp3",
+      "sha256": "dfbeee41219bc5cbe2be4d20104ce6f439f98b2ba42c4f93874e9d74a6bbf896"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/tambien/Piano/master/audio/C8v5.mp3",
+      "sha256": "137ae9aa2f4aee9a76ce125babf3ec5c53f51e801c5d003daa6c17997bdba4fc"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/tambien/Piano/master/audio/C8v12.mp3",
+      "sha256": "af0f8fb26bf2d771a94b6cde53236619ae08ff1a15594012a1efa0948f38e99a"
+    }
+  ]
+}

@@ -40,7 +40,7 @@ def verify(bundle, work_id, market=DEFAULT_MARKET, fetch=fetch_json):
     digest = hashlib.sha256(canonical(source['bundle'])).hexdigest()
     if digest != version['sha256']:
         raise ValueError('Downloaded source digest does not match the published version')
-    if canonical(source['bundle']) != canonical(bundle):
+    if source['bundle'] != bundle:
         raise ValueError('Published source differs from the reviewed local bundle; publish a new version first')
     cover_id = work.get('cover_id')
     if not cover_id:

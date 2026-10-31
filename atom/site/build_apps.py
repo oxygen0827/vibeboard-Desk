@@ -1,6 +1,7 @@
 """Build public, reviewed application metadata. Never copies runtime state or credentials."""
 from pathlib import Path
-import json,sys,shutil,html
+from datetime import date
+import json,sys,shutil,html,hashlib
 ROOT=Path(__file__).resolve().parents[1]; SITE=ROOT/'site'
 sys.path.insert(0,str(ROOT))
 from app_icons import validate_svg,theme_glyph,GLYPHS
@@ -12,7 +13,9 @@ metadata={
 'photon-chip':('science','在六条光路中注入光点，观察相位、交叉路径与探测器响应。','gray-migration/photon-chip.png','本机交互示意，不是光学求解器或算力测试'),
 'photon-runner':('visual','点按让光子跃起，穿过加速光门，挑战自己的本机最高纪录。','gray-migration/photon-runner.png','本机运行；截图为测试纪录'),
 'finger-fireworks':('visual','点击夜空点燃烟花，齐放、连放，让一句短话变成光点。','gray-migration/finger-fireworks.png','本机运行'),
-'mini-piano':('sound','十个白键、七个黑键与双音色，随手弹奏或听一段小星星。','gray-migration/mini-piano.png','本机合成音色，无需联网'),
+'mini-piano':('sound','五首完整经典作品，双力度钢琴采样、双手分奏，支持鼠标滑奏。',None,'离线采样音源与完整曲谱，无需联网'),
+'focus-garden':('life','给一件小事留一段时间，完成后亲手种下一株植物。',None,'本机计时；存在感知需要兼容传感器'),
+'motion-music':('sound','拖动小球、碰撞成曲，录下自己的五声音阶；支持兼容设备的倾斜输入。',None,'鼠标可直接体验；倾斜输入需要兼容传感器'),
 'language-alchemy':('create','用一句话生成 GPU 材质，移动鼠标改变光纹，保存喜欢的作品。','language-alchemy.png','需要联网与模型服务'),
 'symbiotic-world':('create','改变建筑、天气与小物件，亲手搭建一座可以交互的小岛。','symbiotic-world.png','AI 创作需要联网与模型服务'),
 'ai-duet':('sound','先弹奏几个音符，再让 AI 接下一句，保存你们一起做的旋律。','ai-duet.png','弹奏可在本机运行；AI 接奏需要模型'),
@@ -37,6 +40,11 @@ def icon_for(aid,path=None):
  dest=SITE/'assets/apps'/f'{aid}.svg';dest.write_text(s);return '/atom/assets/apps/'+dest.name
 
 def shot(name,aid):
+ if aid in ('mini-piano','focus-garden','motion-music'):
+  p=ROOT/'official/covers'/f'{aid}.jpg'
+  digest=hashlib.sha256(p.read_bytes()).hexdigest()[:12]
+  dst=SITE/'assets/apps'/f'{aid}-{digest}.jpg';shutil.copyfile(p,dst)
+  return '/atom/assets/apps/'+dst.name
  if not name and (ROOT/'artifacts/market-covers'/f'{aid}.png').exists():name='market-covers/'+aid+'.png'
  if not name:return None
  for base in [SITE/'assets',ROOT/'artifacts']:
@@ -47,7 +55,7 @@ def shot(name,aid):
  raise ValueError('Missing screenshot '+name)
 def add(aid,name,category,desc,source=None,kind='market',image=None,needs='本机运行',path=None):
  rel=str(path.relative_to(ROOT))if path else None
- rows.append(dict(id=aid,name=name,category=category,description=desc,kind=kind,market_id='official-'+aid if kind=='market' else None,source=('https://github.com/wangqioo/vibeboard-Desk/'+('blob'if Path(source or rel).suffix else 'tree')+'/deploy/ldcx-public/atom/'+(source or rel)) if source or rel else None,icon=icon_for(aid,path/'icon.svg'if path else None),image=shot(image,aid),needs=needs,guide='/atom/guide/#'+('market' if kind=='market' else 'developer'if kind=='port'else 'desktop')))
+ rows.append(dict(id=aid,name=name,category=category,description=desc,kind=kind,market_id='official-'+aid if kind=='market' else None,source=('https://github.com/wangqioo/vibeboard-Desk/'+('blob'if Path(source or rel).suffix else 'tree')+'/main/atom/'+(source or rel)) if source or rel else None,icon=icon_for(aid,path/'icon.svg'if path else None),image=shot(image,aid),needs=needs,guide='/atom/guide/#'+('market' if kind=='market' else 'developer'if kind=='port'else 'desktop')))
 for bundle in list((ROOT/'official').glob('*/bundle.json'))+[ROOT/p for p in ['experiences/visual/bundle.json','experiences/world/bundle.json','experiences/duet/bundle.json','experiences/agents/bundle.json']]:
  m=json.loads(bundle.read_text())['manifest'];aid=m['id']
  if aid in retired:continue
@@ -72,8 +80,8 @@ ports=[
 ]
 for aid,cat,desc,img in ports:
  path=ROOT/'ports'/aid;m=json.loads((path/'bundle.json').read_text())['manifest'];add(aid,m['name'],cat,desc,path=path,kind='port',image=img,needs='完整资源安装后本机运行；查看源码目录中的许可与边界')
-add('particle-lab','粒子实验室','visual','操控粒子组成的画面，探索鼠标与动态光点之间的互动。',source='apps/particle-lab.json',kind='device',image='particle-lab.png',needs='完整 JSON 源码可导入设备；本机运行')
-add('local-music','随身唱片','sound','在小电脑上播放本地音乐，让桌边有自己的背景声。',source='apps/local-music.json',kind='device',image='interiors/local-music.png',needs='完整 JSON 源码可导入设备；音频文件留在本机')
+add('particle-lab','粒子实验室','visual','操控粒子组成的画面，探索鼠标与动态光点之间的互动。',source='legacy-seeds/particle-lab',kind='device',image='particle-lab.png',needs='完整源码可导入设备；本机运行')
+add('local-music','随身唱片','sound','在小电脑上播放本地音乐，让桌边有自己的背景声。',source='legacy-seeds/local-music',kind='device',image='interiors/local-music.png',needs='完整源码可导入设备；音频文件留在本机')
 add('mic-test','麦克风测试','sound','录音、回放，观察音量、峰值和削波，比较真实收音效果。',path=ROOT/'mic-test',source='examples/mic-test.json',kind='system',image='interiors/mic-test.png',needs='需要设备麦克风；风扇控制受温度保护')
 for aid,folder,cat,desc,img,needs in [
 ('my-computer','computer-app','connect','连接电脑 Agent，选择授权项目，发起任务并查看进度与审批。',None,'电脑任务需要配对电脑在线'),
@@ -93,7 +101,12 @@ for item in prior:
 index=ROOT/'official/library-index.json'
 if index.exists():
  for app in json.loads(index.read_text())['apps']:
-  if app['id'] in known or app['id'] in retired:continue
+  if app['id'] in retired:continue
+  existing=next((r for r in rows if r['id']==app['id']),None)
+  if existing:
+   existing.update(archive=app['archive'],sha256=app['sha256'])
+   if (existing.get('source') or '').startswith('/atom/assets/library/'):existing['source']=app['archive']
+   continue
   aid=app['id'];image=shot('full-library-covers/'+aid+'.png',aid)
   rows.append(dict(id=aid,name=app['name'],description=app['description'],category=app['category'] if app['category'] in CATS else 'life',kind='port',market_id=None,source=app['archive'],icon='/atom/assets/apps/'+aid+'.svg',image=image,needs='完整源码兼容包；五向适配以源码说明为准',guide='/atom/guide/#market',archive=app['archive'],sha256=app['sha256']))
   known.add(aid)
@@ -101,7 +114,7 @@ priority=['language-alchemy','symbiotic-world','ai-duet','weather-window','clap-
 rows.sort(key=lambda r:priority.index(r['id'])if r['id']in priority else len(priority))
 assert len({r['id'] for r in rows})==len(rows)
 assert not retired.intersection(r['id']for r in rows)
-payload={'updated':'2026-10-23','categories':CATS,'apps':rows}
+payload={'updated':date.today().isoformat(),'categories':CATS,'apps':rows}
 (SITE/'assets/apps/catalog.json').write_text(json.dumps(payload,ensure_ascii=False,indent=2)+'\n')
 def card(r):
  e=html.escape

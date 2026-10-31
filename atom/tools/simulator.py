@@ -26,7 +26,7 @@ CHROME = Path('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome')
 # Install order decides desktop order (the device sorts by install time).
 SOURCES = ['official/*/bundle.json', 'experiences/*/bundle.json', 'ports/*/bundle.json', 'examples/*.json', 'legacy-seeds/*/bundle.json', 'apps/*.json']
 CLIENT_DIRS = ['computer-app', 'market-app', 'notes-app', 'robot-app']
-SKIP = {'bundle.json', '.DS_Store', '__pycache__'}
+SKIP = {'bundle.json', '.DS_Store', '__pycache__', 'verification.json', 'import-verification.json'}
 
 
 def copy_assets(source, target):

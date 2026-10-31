@@ -1,5 +1,5 @@
 """Private, fixed-route marketplace proxy. No account bearer reaches app iframes."""
-import base64, json, os, secrets, tempfile, threading
+import base64, json, os, re, secrets, tempfile, threading
 from pathlib import Path
 from urllib.request import Request, build_opener
 from urllib.error import HTTPError, URLError
@@ -230,6 +230,20 @@ class MarketClient:
                 self.save({})
             return {'ok':True,'local_cleared':True,'remote_revoked':revoked}
 
+        if action=='community':
+            route=data.get('route','')
+            method=data.get('method','GET')
+            public=bool(re.fullmatch(r'/(catalog(?:\?[^#]*)?|works/[A-Za-z0-9_-]+|versions/[A-Za-z0-9_-]+|covers/[a-f0-9]{32})',route))
+            private=bool(re.fullmatch(r'/drafts(?:/[A-Za-z0-9_-]+)?',route))
+            mutation=bool(re.fullmatch(r'/community/(suggestions|suggestion|suggest|review|generate|jobs|job|undo|copy|create|save|publish|cover)',route))
+            if not ((method=='GET' and (public or private)) or (method=='POST' and mutation)):
+                raise BridgeError('不支持的创作操作')
+            with self.lock:
+                expected=data.get('expected_user_id')
+                if expected is not None and expected!=self.current().get('user',{}).get('id'):
+                    raise BridgeError('账号已切换，请重新打开创作',409)
+                payload=data.get('body',{}) if method=='POST' else None
+                return self.request(route[1:],payload,not public or bool(self.current().get('token')))
         if action=='catalog':
             query={k:str(data[k])[:120] for k in ('q','category') if data.get(k)}
             return self.request('catalog'+('?' + urlencode(query) if query else ''))

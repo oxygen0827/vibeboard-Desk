@@ -1,0 +1,2213 @@
+{
+  "official": [
+    {
+      "app_id": "agent-studio",
+      "work_id": "official-agent-studio",
+      "version_id": "official-867faed2e3cb63364b175c4f497478fe",
+      "sha256": "867faed2e3cb63364b175c4f497478fee85bf2d5e524928b9bbdfd8f38181221",
+      "cover_id": "cc9652857104fefc549ca090d1cde344",
+      "cloud_verified": true
+    },
+    {
+      "app_id": "ai-duet",
+      "work_id": "official-ai-duet",
+      "version_id": "official-bc9a66fd9e22803eff6091d1b18f92b5",
+      "sha256": "bc9a66fd9e22803eff6091d1b18f92b5304266df3514200ec7156e353e9b47cc",
+      "cover_id": "67c484e01828e6512f79831ad80df787",
+      "cloud_verified": true
+    },
+    {
+      "app_id": "language-alchemy",
+      "work_id": "official-language-alchemy",
+      "version_id": "official-5972986ab5fcdb4151e50bd6620555aa",
+      "sha256": "5972986ab5fcdb4151e50bd6620555aa56bcb685e3ee0188365274a3b16b05c4",
+      "cover_id": "0e0a2ee29a7dcd688c2f3a5667611901",
+      "cloud_verified": true
+    },
+    {
+      "app_id": "symbiotic-world",
+      "work_id": "official-symbiotic-world",
+      "version_id": "official-20b44824c3103915b3c3bc32939a088d",
+      "sha256": "20b44824c3103915b3c3bc32939a088d880cd0f36becfcd760bf1164444296e2",
+      "cover_id": "604f908c5f2a0e23402986b116b71872",
+      "cloud_verified": true
+    },
+    {
+      "app_id": "clap-stage",
+      "work_id": "official-clap-stage",
+      "version_id": "official-1c408b40aad29d9cd48728ca3709c5fb",
+      "sha256": "1c408b40aad29d9cd48728ca3709c5fb43e42ff90d5ef2c4b2d72fb42abeb71f",
+      "cover_id": "4e856053c9d0453873074d7c0bf41af8",
+      "cloud_verified": true
+    },
+    {
+      "app_id": "finger-fireworks",
+      "work_id": "official-finger-fireworks",
+      "version_id": "official-c81d6e4b548099965e861c0f0d23c5cb",
+      "sha256": "c81d6e4b548099965e861c0f0d23c5cbf98936d6fbae80ec60e356d1764d9e00",
+      "cover_id": "0048f98988cd6833284e7f8c561a4b31",
+      "cloud_verified": true
+    },
+    {
+      "app_id": "focus-garden",
+      "work_id": "official-focus-garden",
+      "version_id": "official-7f6d24d04d9ccbc1ad21c979b45e6c35",
+      "sha256": "7f6d24d04d9ccbc1ad21c979b45e6c3555e5fd747b872fd2d26958b7c0f51adb",
+      "cover_id": "d4f09bc75b3713bdf583bf3956741936",
+      "cloud_verified": true
+    },
+    {
+      "app_id": "mini-piano",
+      "work_id": "official-mini-piano",
+      "version_id": "official-fca148e47d78e43b4c3d7c5d778794fa",
+      "sha256": "fca148e47d78e43b4c3d7c5d778794fa5793de65ea2f582f18d944cb542f6996",
+      "cover_id": "d6fbd70b12e0e1fd85d8e1f337413432",
+      "cloud_verified": true
+    },
+    {
+      "app_id": "motion-music",
+      "work_id": "official-motion-music",
+      "version_id": "official-c7bce2f96c432730ccec04a34da5e879",
+      "sha256": "c7bce2f96c432730ccec04a34da5e879bf2ef84e2e972bccfee2e73371390ed9",
+      "cover_id": "f1ee6f22fb09a19bbee656c42d0a24d6",
+      "cloud_verified": true
+    },
+    {
+      "app_id": "photo-album",
+      "work_id": "official-photo-album",
+      "version_id": "official-01511ac633599a99d930005cbaa3ac05",
+      "sha256": "01511ac633599a99d930005cbaa3ac050a41af77b73ff14d6f54d20554a99618",
+      "cover_id": "299438b303d38e26599ac27f36e473ed",
+      "cloud_verified": true
+    },
+    {
+      "app_id": "photon-chip",
+      "work_id": "official-photon-chip",
+      "version_id": "official-7b399287b97335ba7d9051e0303758f0",
+      "sha256": "7b399287b97335ba7d9051e0303758f0602efd0a71c79dcc0e1f4bb4f27f9389",
+      "cover_id": "6c3d42621c13fb7e202ac26a20f9c06d",
+      "cloud_verified": true
+    },
+    {
+      "app_id": "photon-runner",
+      "work_id": "official-photon-runner",
+      "version_id": "official-9b10c213eb3a4ff4cb080027477ab375",
+      "sha256": "9b10c213eb3a4ff4cb080027477ab37552eb98c10c6e63ad848cb87dab8fb20a",
+      "cover_id": "aeaeb02a7de77088803cd7f975982682",
+      "cloud_verified": true
+    },
+    {
+      "app_id": "pixel-lab",
+      "work_id": "official-pixel-lab",
+      "version_id": "official-caa71253c631796e18808a6d9fab4a0e",
+      "sha256": "caa71253c631796e18808a6d9fab4a0e4e40a7ab3aef3aa0c7836cf4b73425a3",
+      "cover_id": "53f5894b0e7bb5e62de305240585363b",
+      "cloud_verified": true
+    },
+    {
+      "app_id": "sound-lab",
+      "work_id": "official-sound-lab",
+      "version_id": "official-8bf8e186bb99bcf4d00f8f386d7f7cf6",
+      "sha256": "8bf8e186bb99bcf4d00f8f386d7f7cf6cc92991dc39ae1e7353607c0dc93673b",
+      "cover_id": "08b709b91999fc4d2b63d48f3c259a1a",
+      "cloud_verified": true
+    },
+    {
+      "app_id": "today",
+      "work_id": "official-today",
+      "version_id": "official-fa711bacfe8cc0f0d7da0e82513deca4",
+      "sha256": "fa711bacfe8cc0f0d7da0e82513deca4c6ad5ec8512262e1245e8a0f1e4ebbca",
+      "cover_id": "e8be461e459872be957acb8453349574",
+      "cloud_verified": true
+    },
+    {
+      "app_id": "weather-window",
+      "work_id": "official-weather-window",
+      "version_id": "official-ee33f8388402e3a0ec5c442fcd285453",
+      "sha256": "ee33f8388402e3a0ec5c442fcd2854533f0d47bcee44a920d57d6138bd46712d",
+      "cover_id": "a72064e31012b2f6f7fa566ca7c7ea59",
+      "cloud_verified": true
+    },
+    {
+      "app_id": "echo-book",
+      "work_id": "official-echo-book",
+      "version_id": "official-db3340e61a84984597279dc32dcbad9f",
+      "sha256": "db3340e61a84984597279dc32dcbad9ff5d924aae9c0d128a548ea689ec18c3e",
+      "cover_id": "0e8b1826132b7bba0552c46e7a7873b4",
+      "cloud_verified": true
+    },
+    {
+      "app_id": "element-sandbox",
+      "work_id": "official-element-sandbox",
+      "version_id": "official-ce15d8d9338d2b4121757991d3d840e7",
+      "sha256": "ce15d8d9338d2b4121757991d3d840e76129665ff3f9cfe474f4d090486b0895",
+      "cover_id": "349f35dc2d0c6a905fbebd86c0296451",
+      "cloud_verified": true
+    },
+    {
+      "app_id": "glass-ecosystem",
+      "work_id": "official-glass-ecosystem",
+      "version_id": "official-5a1324834cc676768cc4f5f200f7d8cc",
+      "sha256": "5a1324834cc676768cc4f5f200f7d8cced284cf7c1b0ff3460cf6cea0fcb134d",
+      "cover_id": "a9d80919f1e97c8116489809556b3a67",
+      "cloud_verified": true
+    },
+    {
+      "app_id": "moon-letter",
+      "work_id": "official-moon-letter",
+      "version_id": "official-f25d9831aa7f545a2be7e3623a15e0a6",
+      "sha256": "f25d9831aa7f545a2be7e3623a15e0a62d4ac2a396363975e458d60357b46fac",
+      "cover_id": "db7da8196f8bb7be5bfda1feb4878986",
+      "cloud_verified": true
+    },
+    {
+      "app_id": "natal-whispers",
+      "work_id": "official-natal-whispers",
+      "version_id": "official-c4c53daed5b7530fcbb737fd58ff941b",
+      "sha256": "c4c53daed5b7530fcbb737fd58ff941ba8c5faa9b36a3c202d7ede7218789323",
+      "cover_id": "3cf3c6ce6a191137adaa578f02a40a29",
+      "cloud_verified": true
+    },
+    {
+      "app_id": "oracle-tarot",
+      "work_id": "official-oracle-tarot",
+      "version_id": "official-a8ad0d7eb56a3e60d0782a3969641322",
+      "sha256": "a8ad0d7eb56a3e60d0782a39696413223a455deeaeaf5a4db38138c07c971f8c",
+      "cover_id": "7db72ccc06e08ab81ccba674924c471c",
+      "cloud_verified": true
+    },
+    {
+      "app_id": "personality-planet",
+      "work_id": "official-personality-planet",
+      "version_id": "official-4880949e3cda4281cd665ad919344850",
+      "sha256": "4880949e3cda4281cd665ad9193448504c78b768cd7ed2a381cd6b1f6bc669fc",
+      "cover_id": "78da51b8b706fe28cefc91a068e353db",
+      "cloud_verified": true
+    },
+    {
+      "app_id": "rain-radio",
+      "work_id": "official-rain-radio",
+      "version_id": "official-8eba04ae7fb0737d5876cb94caad59d9",
+      "sha256": "8eba04ae7fb0737d5876cb94caad59d9f104c798c949858fd5cc20b8d645e7a7",
+      "cover_id": "bc2e47e323b063c8bc7fe4a594a5571d",
+      "cloud_verified": true
+    },
+    {
+      "app_id": "zodiac-atlas",
+      "work_id": "official-zodiac-atlas",
+      "version_id": "official-8a932e34e6168189c6c4d2e7f38f9935",
+      "sha256": "8a932e34e6168189c6c4d2e7f38f99356877b72472b2040e1da313030411f54b",
+      "cover_id": "cabe2bfa298497d3b4dfcdb521d1a93f",
+      "cloud_verified": true
+    }
+  ],
+  "mac_seed": [
+    {
+      "id": "agent-studio",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "ai-duet",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "alien-creature",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "breathe",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "circuit-lab",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "clap-stage",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "clay-studio",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "cosmic-window",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "dot-image",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "dot-life",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "dot-theater",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "dot-waves",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "echo-book",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "element-sandbox",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "finger-fireworks",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "fluid-atlas",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "fluid-paint",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "focus-garden",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "focus-studio",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "fold-lab",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "glass-ecosystem",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "idea-card",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "kaia-face",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "language-alchemy",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "living-pattern",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "local-music",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "market",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "material-world",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "math-playground",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "mic-test",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "mini-piano",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "model-viewer",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "moon-letter",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "moon-ocean",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "motion-music",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "music-vision",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "my-computer",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "natal-whispers",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "oracle-tarot",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "parametric-maker",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "particle-lab",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "personality-planet",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "photo-album",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "photon-chip",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "photon-runner",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "physics-playground",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "pixel-companion",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "pixel-lab",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "planetarium",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "pocket-studio",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "practice-seven",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "quick-notes",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "rain-radio",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "rhythm-orbits",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "robo-face",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "robot",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "snappy-face",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "sound-lab",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "symbiotic-world",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "today",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "volume-flow",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "water-pool",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "weather-window",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "zodiac-atlas",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    }
+  ],
+  "simulator": [
+    {
+      "id": "agent-studio",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "ai-duet",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "alien-creature",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "breathe",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "circuit-lab",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "clap-stage",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "clay-studio",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "cosmic-window",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "dot-image",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "dot-life",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "dot-theater",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "dot-waves",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "echo-book",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "element-sandbox",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "finger-fireworks",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "fluid-atlas",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "fluid-paint",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "focus-garden",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "focus-studio",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "fold-lab",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "glass-ecosystem",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "idea-card",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "kaia-face",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "language-alchemy",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "living-pattern",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "local-music",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "market",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "material-world",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "math-playground",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "mic-test",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "mini-piano",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "model-viewer",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "moon-letter",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "moon-ocean",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "motion-music",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "music-vision",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "my-computer",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "natal-whispers",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "oracle-tarot",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "parametric-maker",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "particle-lab",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "personality-planet",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "photo-album",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "photon-chip",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "photon-runner",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "physics-playground",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "pixel-companion",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "pixel-lab",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "planetarium",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "pocket-studio",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "practice-seven",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "quick-notes",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "rain-radio",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "rhythm-orbits",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "robo-face",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "robot",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "snappy-face",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "sound-lab",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "symbiotic-world",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "today",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "volume-flow",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "water-pool",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "weather-window",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "zodiac-atlas",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    }
+  ],
+  "device": [
+    {
+      "id": "agent-studio",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": [
+        "icon.svg",
+        "README.md"
+      ]
+    },
+    {
+      "id": "ai-duet",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": [
+        "icon.svg"
+      ]
+    },
+    {
+      "id": "alien-creature",
+      "state": "not_installed"
+    },
+    {
+      "id": "breathe",
+      "state": "not_installed"
+    },
+    {
+      "id": "circuit-lab",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "clap-stage",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": [
+        "icon.svg"
+      ]
+    },
+    {
+      "id": "clay-studio",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "cosmic-window",
+      "state": "not_installed"
+    },
+    {
+      "id": "dot-image",
+      "state": "not_installed"
+    },
+    {
+      "id": "dot-life",
+      "state": "not_installed"
+    },
+    {
+      "id": "dot-theater",
+      "state": "not_installed"
+    },
+    {
+      "id": "dot-waves",
+      "state": "not_installed"
+    },
+    {
+      "id": "echo-book",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": [
+        "icon.svg"
+      ]
+    },
+    {
+      "id": "element-sandbox",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": [
+        "icon.svg"
+      ]
+    },
+    {
+      "id": "finger-fireworks",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": [
+        "icon.svg"
+      ]
+    },
+    {
+      "id": "fluid-atlas",
+      "state": "not_installed"
+    },
+    {
+      "id": "fluid-paint",
+      "state": "not_installed"
+    },
+    {
+      "id": "focus-garden",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": [
+        "icon.svg"
+      ]
+    },
+    {
+      "id": "focus-studio",
+      "state": "not_installed"
+    },
+    {
+      "id": "fold-lab",
+      "state": "not_installed"
+    },
+    {
+      "id": "glass-ecosystem",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": [
+        "icon.svg"
+      ]
+    },
+    {
+      "id": "idea-card",
+      "state": "not_installed"
+    },
+    {
+      "id": "kaia-face",
+      "state": "not_installed"
+    },
+    {
+      "id": "language-alchemy",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": [
+        "icon.svg"
+      ]
+    },
+    {
+      "id": "living-pattern",
+      "state": "not_installed"
+    },
+    {
+      "id": "local-music",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": [
+        "icon.svg"
+      ]
+    },
+    {
+      "id": "market",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": [
+        "icon.svg"
+      ]
+    },
+    {
+      "id": "material-world",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "math-playground",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "mic-test",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "mini-piano",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": [
+        "icon.svg"
+      ]
+    },
+    {
+      "id": "model-viewer",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "moon-letter",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": [
+        "icon.svg"
+      ]
+    },
+    {
+      "id": "moon-ocean",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "motion-music",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": [
+        "icon.svg"
+      ]
+    },
+    {
+      "id": "music-vision",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "my-computer",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "natal-whispers",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": [
+        "icon.svg"
+      ]
+    },
+    {
+      "id": "oracle-tarot",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": [
+        "icon.svg"
+      ]
+    },
+    {
+      "id": "parametric-maker",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "particle-lab",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": [
+        "icon.svg"
+      ]
+    },
+    {
+      "id": "personality-planet",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": [
+        "icon.svg"
+      ]
+    },
+    {
+      "id": "photo-album",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": [
+        "icon.svg",
+        "README.md"
+      ]
+    },
+    {
+      "id": "photon-chip",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": [
+        "icon.svg"
+      ]
+    },
+    {
+      "id": "photon-runner",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": [
+        "icon.svg"
+      ]
+    },
+    {
+      "id": "physics-playground",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "pixel-companion",
+      "state": "not_installed"
+    },
+    {
+      "id": "pixel-lab",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": [
+        "icon.svg"
+      ]
+    },
+    {
+      "id": "planetarium",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "pocket-studio",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "practice-seven",
+      "state": "not_installed"
+    },
+    {
+      "id": "quick-notes",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "rain-radio",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": [
+        "icon.svg"
+      ]
+    },
+    {
+      "id": "rhythm-orbits",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "robo-face",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "robot",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "snappy-face",
+      "state": "not_installed"
+    },
+    {
+      "id": "sound-lab",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": [
+        "icon.svg"
+      ]
+    },
+    {
+      "id": "symbiotic-world",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": [
+        "icon.svg"
+      ]
+    },
+    {
+      "id": "today",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": [
+        "icon.svg"
+      ]
+    },
+    {
+      "id": "volume-flow",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "water-pool",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": []
+    },
+    {
+      "id": "weather-window",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": [
+        "icon.svg"
+      ]
+    },
+    {
+      "id": "zodiac-atlas",
+      "state": "current",
+      "runtime_files": [],
+      "manifest_differs": false,
+      "other_files": [
+        "icon.svg"
+      ]
+    }
+  ],
+  "library": [
+    {
+      "id": "clap-stage",
+      "verified": true,
+      "sha256": "9f79108698a9194a870b0e832026186acd3511fba8be9678323fe5e5c3ef9c77"
+    },
+    {
+      "id": "finger-fireworks",
+      "verified": true,
+      "sha256": "b9700d8c07892fd8d31561150bca55352de6ead3054e3197446af4f1d4021579"
+    },
+    {
+      "id": "focus-garden",
+      "verified": true,
+      "sha256": "4c01182a6edcebedc42986bd20be3274db3c72fdafdc054cdffee6017820c6fa"
+    },
+    {
+      "id": "mini-piano",
+      "verified": true,
+      "sha256": "a44900a07532ccdfd8f9acf992b96221be483ecc24ead03f3befd581347a5895"
+    },
+    {
+      "id": "motion-music",
+      "verified": true,
+      "sha256": "b66e6d278763ae2b11b66e1b5fb4c82b2fef63b23d7e79360cdf15db1777fb81"
+    },
+    {
+      "id": "photo-album",
+      "verified": true,
+      "sha256": "39c40a887d21c04cfb7043638e4e4aaf00789265a12ab5aa8727f8b907f24e7d"
+    },
+    {
+      "id": "photon-chip",
+      "verified": true,
+      "sha256": "9bfca410b8be264796cd6f74ac49974a41af0792cd0ba16fc118a550fa88d148"
+    },
+    {
+      "id": "photon-runner",
+      "verified": true,
+      "sha256": "96245e3ebaf1d17d1fcb1bc51a411c41c943f0536f0871666d398c89644c5d0a"
+    },
+    {
+      "id": "pixel-lab",
+      "verified": true,
+      "sha256": "3c3d07dc4714fb83ebb9efcac167ac50d971bb3043779100667401a628603b50"
+    },
+    {
+      "id": "sound-lab",
+      "verified": true,
+      "sha256": "168858a7aac5ed28db1e0e4d68de5ab7e22bfcf4afd3b409878cc8c0bcf4286a"
+    },
+    {
+      "id": "today",
+      "verified": true,
+      "sha256": "e01c70cbf97ea33f6e4ee7d0446cd98856c6872fe8d8954430ddedb00d072640"
+    },
+    {
+      "id": "weather-window",
+      "verified": true,
+      "sha256": "cdc27def304f141a8965d20302e1565e2b3f44855a8590ce57ed84f26cfd41b7"
+    },
+    {
+      "id": "agent-studio",
+      "verified": true,
+      "sha256": "99dcebaad25968957e9e70264bd962f4da346bc8df047f06b6f41f4b7c85cd51"
+    },
+    {
+      "id": "ai-duet",
+      "verified": true,
+      "sha256": "ffff27896fba995da00b055bd15c750fbd14d274afcaddf75b11d0f33483b81e"
+    },
+    {
+      "id": "language-alchemy",
+      "verified": true,
+      "sha256": "bd6bbb24b554f0d052b5da3edc341ae06a681180fd8f7aee4ee9eeaacde53fcc"
+    },
+    {
+      "id": "symbiotic-world",
+      "verified": true,
+      "sha256": "964771e272665339ed61bb7d2e2574cee1c7e68492812974411ec7da5195eda2"
+    },
+    {
+      "id": "circuit-lab",
+      "verified": true,
+      "sha256": "a6ddce1843bc2c4a6cc66a3461a2fa0ea25aa1a7c709ad5dd10dec1009c12829"
+    },
+    {
+      "id": "clay-studio",
+      "verified": true,
+      "sha256": "fb5deece0c379d57df73b70d970ac0b1c58291f5283497717f6f9286da9fc852"
+    },
+    {
+      "id": "dot-image",
+      "verified": true,
+      "sha256": "e8bf7751b0111b127e2beedb9f6f5a3671c88360059efa71e047445581394905"
+    },
+    {
+      "id": "dot-life",
+      "verified": true,
+      "sha256": "b2721aa44a7d14f0f450319c53b991066f20380185afc2811fa6af23f1f3b122"
+    },
+    {
+      "id": "dot-theater",
+      "verified": true,
+      "sha256": "b8c91bdc55ec967425eb4d049aee21f0753ed8904375d4cb182a4eada2157dbf"
+    },
+    {
+      "id": "dot-waves",
+      "verified": true,
+      "sha256": "924672353e115e8249cee10b0ba64f1628a6aee15b6833fb1a845b851c906635"
+    },
+    {
+      "id": "echo-book",
+      "verified": true,
+      "sha256": "963dcb20b211b57d379417b8da3f9593fc6ece3613b7b340d9340353c5542140"
+    },
+    {
+      "id": "element-sandbox",
+      "verified": true,
+      "sha256": "20272e158bdf7ee8398ea6f35415fc8b008700e363b8c25f83fa4da849df149e"
+    },
+    {
+      "id": "fluid-atlas",
+      "verified": true,
+      "sha256": "dc888020030f249cfa6f22c8d962122f034d263a696063c823e106030e1074e4"
+    },
+    {
+      "id": "fluid-paint",
+      "verified": true,
+      "sha256": "15f046ba99b96843126e95e974f0cb8d53cefdf0861619d6ab6898a4eb41c6d7"
+    },
+    {
+      "id": "fold-lab",
+      "verified": true,
+      "sha256": "ae8abdcd91f66141cee1098707c758d98129c6c6b8101ffb3bece376b73f0515"
+    },
+    {
+      "id": "glass-ecosystem",
+      "verified": true,
+      "sha256": "4049517a4d793615676b64a1ecaf4b107ad16dbab77ed120fa3bedf87e2e4e44"
+    },
+    {
+      "id": "kaia-face",
+      "verified": true,
+      "sha256": "2f0dc61b93d13563f0315dac3ed5e02968904a3a11f110842aaa66f95e94657a"
+    },
+    {
+      "id": "living-pattern",
+      "verified": true,
+      "sha256": "8ac12f0e4a9fcd940cceb72087f6ba41ddf5510ed90f01e84f411dcee3ed9b48"
+    },
+    {
+      "id": "material-world",
+      "verified": true,
+      "sha256": "3c7e8a3eb792d9f87959474298734e353ab4f4ddd43793192332e27485e83990"
+    },
+    {
+      "id": "math-playground",
+      "verified": true,
+      "sha256": "fe99c8ba2644a6c1867af0e7b8a82fe6ca7e674eb9739439c15a1231ae694c7b"
+    },
+    {
+      "id": "model-viewer",
+      "verified": true,
+      "sha256": "3417504a5a98853df317902e0a3337e7ad1b04a98ec48e54e1c016e55331cf71"
+    },
+    {
+      "id": "moon-letter",
+      "verified": true,
+      "sha256": "c5045b22f3e4a6edafa4cd5afa6bfd953a2e8cb1e6d4f4a319f1998f3196a11d"
+    },
+    {
+      "id": "moon-ocean",
+      "verified": true,
+      "sha256": "8376731f3a82d68cd8ecaa7d8117ca5f72d8ce60619cf803e7ac0e41d30364e5"
+    },
+    {
+      "id": "music-vision",
+      "verified": true,
+      "sha256": "4be469bea617ae7f10f068bd586afe0e38eeb7e91f74d62f8280911a2e145dc1"
+    },
+    {
+      "id": "natal-whispers",
+      "verified": true,
+      "sha256": "6ce1c1fe97fa6c9bac5f9477d8096cf05f6610eeffc7ecf2d4ffabcf99164d3e"
+    },
+    {
+      "id": "oracle-tarot",
+      "verified": true,
+      "sha256": "902407321be6e12f2e83ce75ac63cfeb3fe42e7bc6a5134275da03b155e29951"
+    },
+    {
+      "id": "parametric-maker",
+      "verified": true,
+      "sha256": "4f04d7327c696df87b21254799aec180ce5cbae835b156c98f0e223e2afc1aa6"
+    },
+    {
+      "id": "personality-planet",
+      "verified": true,
+      "sha256": "21a4928e837d8a4a72870e0048f60f05b10e2ec58f559679097c6436b7af85b2"
+    },
+    {
+      "id": "physics-playground",
+      "verified": true,
+      "sha256": "c5f226a99d3af422d46af91684dcb69cfe8e418ecce8ed2d479acbcb747273b8"
+    },
+    {
+      "id": "pixel-companion",
+      "verified": true,
+      "sha256": "a2fe8519813dcb787bf6a635cbeded5ab818d707ba46fcfd78479f7059c9018a"
+    },
+    {
+      "id": "planetarium",
+      "verified": true,
+      "sha256": "09706ea412c33077c532c9383eb6becf9c041795d61416677c0bd48263ec1cbf"
+    },
+    {
+      "id": "pocket-studio",
+      "verified": true,
+      "sha256": "411f1248d1cfa7a94bebc3cd13ef3c76b9addf208339dfc84b51f0652821358c"
+    },
+    {
+      "id": "rain-radio",
+      "verified": true,
+      "sha256": "d072a1cbd69c6ffe22c268e72657a323c4550bab9be1a4dea89daa2f8e89c17d"
+    },
+    {
+      "id": "rhythm-orbits",
+      "verified": true,
+      "sha256": "9673e352b13c0fbe2fd65437f1ea0936de4171d73cc5e0b1360dded6d5d02eab"
+    },
+    {
+      "id": "robo-face",
+      "verified": true,
+      "sha256": "7b52b77e74cfb5f3ff75ecc60f5407d13468657b0dbb670fe48f853380af20cc"
+    },
+    {
+      "id": "snappy-face",
+      "verified": true,
+      "sha256": "7123d1c9afa3be651bb4656a3b48f5ebbeb50ceded57db7a6532855551886378"
+    },
+    {
+      "id": "volume-flow",
+      "verified": true,
+      "sha256": "5dfe36fa856a766facfa6189f6543b5569d143a77c60733ddf3316bba6fe5994"
+    },
+    {
+      "id": "water-pool",
+      "verified": true,
+      "sha256": "b877249ea6e5abb00e52450190630e13c72407049da4870b9359c02b143b2061"
+    },
+    {
+      "id": "zodiac-atlas",
+      "verified": true,
+      "sha256": "129cfe59b1e8912684cf5428ecbb0441e4b4f0c61f00f60afaf416d404611144"
+    },
+    {
+      "id": "breathe",
+      "verified": true,
+      "sha256": "8f23bcb55b338d30a939ea6b5f8ef3929b03883584fa9b10ba3de313f4eb70d0"
+    },
+    {
+      "id": "idea-card",
+      "verified": true,
+      "sha256": "94959684185a3187a920352bc878dcdecd3a75afdb9def24c1503a8820747f89"
+    },
+    {
+      "id": "market",
+      "verified": true,
+      "sha256": "36eec4079f1e9ff64988d2d63e95050bcbdc7b696e18b8f0fd7b3110cfa80b3c"
+    },
+    {
+      "id": "mic-test",
+      "verified": true,
+      "sha256": "40713f33b6886b4ff26a7724a007d3ee2ac4a3d93d533b07a25d52d4046c0349"
+    },
+    {
+      "id": "my-computer",
+      "verified": true,
+      "sha256": "ea9ee39fd2ecd6a3a19e616339225bae2d24b51a9e987318623c9000eb4d3e08"
+    },
+    {
+      "id": "practice-seven",
+      "verified": true,
+      "sha256": "8e5806f8d1826cd9da7f2e028d471d9198094ee97b206bceaa39d96a3bafa44f"
+    },
+    {
+      "id": "quick-notes",
+      "verified": true,
+      "sha256": "4efd2f80f228a249aab5b94ad6fff922beaba5bbd7788eebee23b42c32b372fe"
+    },
+    {
+      "id": "robot",
+      "verified": true,
+      "sha256": "87d591125b8767a4ea1567116bf3a9cf3faecad00d3bc84d2fab63c9df3d36ff"
+    },
+    {
+      "id": "alien-creature",
+      "verified": true,
+      "sha256": "a4a92c569f1a0cf8abbfbcf4a2dccdec65a9540d228e34a6fa190916f46c4192"
+    },
+    {
+      "id": "cosmic-window",
+      "verified": true,
+      "sha256": "9f097f9c536669e6e21addd1d9e87ce1d44156109b7ec664884e2d9e614c5ea8"
+    },
+    {
+      "id": "focus-studio",
+      "verified": true,
+      "sha256": "7db075ef8bb0061f1e1f55b3f2eed0f3553e6e2687373aba1bb5189cd74fde89"
+    },
+    {
+      "id": "local-music",
+      "verified": true,
+      "sha256": "e885bf0bb6ba08563ea47c44b48d442b0617b71a479da15b79a8d6032c91ecd6"
+    },
+    {
+      "id": "particle-lab",
+      "verified": true,
+      "sha256": "9764ea3e9c00db07a53d25032703dbc9ee9c37b808329ee33c840f4974b14df9"
+    }
+  ],
+  "repository_library": [
+    {
+      "id": "clap-stage",
+      "verified": true,
+      "sha256": "9f79108698a9194a870b0e832026186acd3511fba8be9678323fe5e5c3ef9c77"
+    },
+    {
+      "id": "finger-fireworks",
+      "verified": true,
+      "sha256": "b9700d8c07892fd8d31561150bca55352de6ead3054e3197446af4f1d4021579"
+    },
+    {
+      "id": "focus-garden",
+      "verified": true,
+      "sha256": "4c01182a6edcebedc42986bd20be3274db3c72fdafdc054cdffee6017820c6fa"
+    },
+    {
+      "id": "mini-piano",
+      "verified": true,
+      "sha256": "a44900a07532ccdfd8f9acf992b96221be483ecc24ead03f3befd581347a5895"
+    },
+    {
+      "id": "motion-music",
+      "verified": true,
+      "sha256": "b66e6d278763ae2b11b66e1b5fb4c82b2fef63b23d7e79360cdf15db1777fb81"
+    },
+    {
+      "id": "photo-album",
+      "verified": true,
+      "sha256": "39c40a887d21c04cfb7043638e4e4aaf00789265a12ab5aa8727f8b907f24e7d"
+    },
+    {
+      "id": "photon-chip",
+      "verified": true,
+      "sha256": "9bfca410b8be264796cd6f74ac49974a41af0792cd0ba16fc118a550fa88d148"
+    },
+    {
+      "id": "photon-runner",
+      "verified": true,
+      "sha256": "96245e3ebaf1d17d1fcb1bc51a411c41c943f0536f0871666d398c89644c5d0a"
+    },
+    {
+      "id": "pixel-lab",
+      "verified": true,
+      "sha256": "3c3d07dc4714fb83ebb9efcac167ac50d971bb3043779100667401a628603b50"
+    },
+    {
+      "id": "sound-lab",
+      "verified": true,
+      "sha256": "168858a7aac5ed28db1e0e4d68de5ab7e22bfcf4afd3b409878cc8c0bcf4286a"
+    },
+    {
+      "id": "today",
+      "verified": true,
+      "sha256": "e01c70cbf97ea33f6e4ee7d0446cd98856c6872fe8d8954430ddedb00d072640"
+    },
+    {
+      "id": "weather-window",
+      "verified": true,
+      "sha256": "cdc27def304f141a8965d20302e1565e2b3f44855a8590ce57ed84f26cfd41b7"
+    },
+    {
+      "id": "agent-studio",
+      "verified": true,
+      "sha256": "99dcebaad25968957e9e70264bd962f4da346bc8df047f06b6f41f4b7c85cd51"
+    },
+    {
+      "id": "ai-duet",
+      "verified": true,
+      "sha256": "ffff27896fba995da00b055bd15c750fbd14d274afcaddf75b11d0f33483b81e"
+    },
+    {
+      "id": "language-alchemy",
+      "verified": true,
+      "sha256": "bd6bbb24b554f0d052b5da3edc341ae06a681180fd8f7aee4ee9eeaacde53fcc"
+    },
+    {
+      "id": "symbiotic-world",
+      "verified": true,
+      "sha256": "964771e272665339ed61bb7d2e2574cee1c7e68492812974411ec7da5195eda2"
+    },
+    {
+      "id": "circuit-lab",
+      "verified": true,
+      "sha256": "a6ddce1843bc2c4a6cc66a3461a2fa0ea25aa1a7c709ad5dd10dec1009c12829"
+    },
+    {
+      "id": "clay-studio",
+      "verified": true,
+      "sha256": "fb5deece0c379d57df73b70d970ac0b1c58291f5283497717f6f9286da9fc852"
+    },
+    {
+      "id": "dot-image",
+      "verified": true,
+      "sha256": "e8bf7751b0111b127e2beedb9f6f5a3671c88360059efa71e047445581394905"
+    },
+    {
+      "id": "dot-life",
+      "verified": true,
+      "sha256": "b2721aa44a7d14f0f450319c53b991066f20380185afc2811fa6af23f1f3b122"
+    },
+    {
+      "id": "dot-theater",
+      "verified": true,
+      "sha256": "b8c91bdc55ec967425eb4d049aee21f0753ed8904375d4cb182a4eada2157dbf"
+    },
+    {
+      "id": "dot-waves",
+      "verified": true,
+      "sha256": "924672353e115e8249cee10b0ba64f1628a6aee15b6833fb1a845b851c906635"
+    },
+    {
+      "id": "echo-book",
+      "verified": true,
+      "sha256": "963dcb20b211b57d379417b8da3f9593fc6ece3613b7b340d9340353c5542140"
+    },
+    {
+      "id": "element-sandbox",
+      "verified": true,
+      "sha256": "20272e158bdf7ee8398ea6f35415fc8b008700e363b8c25f83fa4da849df149e"
+    },
+    {
+      "id": "fluid-atlas",
+      "verified": true,
+      "sha256": "dc888020030f249cfa6f22c8d962122f034d263a696063c823e106030e1074e4"
+    },
+    {
+      "id": "fluid-paint",
+      "verified": true,
+      "sha256": "15f046ba99b96843126e95e974f0cb8d53cefdf0861619d6ab6898a4eb41c6d7"
+    },
+    {
+      "id": "fold-lab",
+      "verified": true,
+      "sha256": "ae8abdcd91f66141cee1098707c758d98129c6c6b8101ffb3bece376b73f0515"
+    },
+    {
+      "id": "glass-ecosystem",
+      "verified": true,
+      "sha256": "4049517a4d793615676b64a1ecaf4b107ad16dbab77ed120fa3bedf87e2e4e44"
+    },
+    {
+      "id": "kaia-face",
+      "verified": true,
+      "sha256": "2f0dc61b93d13563f0315dac3ed5e02968904a3a11f110842aaa66f95e94657a"
+    },
+    {
+      "id": "living-pattern",
+      "verified": true,
+      "sha256": "8ac12f0e4a9fcd940cceb72087f6ba41ddf5510ed90f01e84f411dcee3ed9b48"
+    },
+    {
+      "id": "material-world",
+      "verified": true,
+      "sha256": "3c7e8a3eb792d9f87959474298734e353ab4f4ddd43793192332e27485e83990"
+    },
+    {
+      "id": "math-playground",
+      "verified": true,
+      "sha256": "fe99c8ba2644a6c1867af0e7b8a82fe6ca7e674eb9739439c15a1231ae694c7b"
+    },
+    {
+      "id": "model-viewer",
+      "verified": true,
+      "sha256": "3417504a5a98853df317902e0a3337e7ad1b04a98ec48e54e1c016e55331cf71"
+    },
+    {
+      "id": "moon-letter",
+      "verified": true,
+      "sha256": "c5045b22f3e4a6edafa4cd5afa6bfd953a2e8cb1e6d4f4a319f1998f3196a11d"
+    },
+    {
+      "id": "moon-ocean",
+      "verified": true,
+      "sha256": "8376731f3a82d68cd8ecaa7d8117ca5f72d8ce60619cf803e7ac0e41d30364e5"
+    },
+    {
+      "id": "music-vision",
+      "verified": true,
+      "sha256": "4be469bea617ae7f10f068bd586afe0e38eeb7e91f74d62f8280911a2e145dc1"
+    },
+    {
+      "id": "natal-whispers",
+      "verified": true,
+      "sha256": "6ce1c1fe97fa6c9bac5f9477d8096cf05f6610eeffc7ecf2d4ffabcf99164d3e"
+    },
+    {
+      "id": "oracle-tarot",
+      "verified": true,
+      "sha256": "902407321be6e12f2e83ce75ac63cfeb3fe42e7bc6a5134275da03b155e29951"
+    },
+    {
+      "id": "parametric-maker",
+      "verified": true,
+      "sha256": "4f04d7327c696df87b21254799aec180ce5cbae835b156c98f0e223e2afc1aa6"
+    },
+    {
+      "id": "personality-planet",
+      "verified": true,
+      "sha256": "21a4928e837d8a4a72870e0048f60f05b10e2ec58f559679097c6436b7af85b2"
+    },
+    {
+      "id": "physics-playground",
+      "verified": true,
+      "sha256": "c5f226a99d3af422d46af91684dcb69cfe8e418ecce8ed2d479acbcb747273b8"
+    },
+    {
+      "id": "pixel-companion",
+      "verified": true,
+      "sha256": "a2fe8519813dcb787bf6a635cbeded5ab818d707ba46fcfd78479f7059c9018a"
+    },
+    {
+      "id": "planetarium",
+      "verified": true,
+      "sha256": "09706ea412c33077c532c9383eb6becf9c041795d61416677c0bd48263ec1cbf"
+    },
+    {
+      "id": "pocket-studio",
+      "verified": true,
+      "sha256": "411f1248d1cfa7a94bebc3cd13ef3c76b9addf208339dfc84b51f0652821358c"
+    },
+    {
+      "id": "rain-radio",
+      "verified": true,
+      "sha256": "d072a1cbd69c6ffe22c268e72657a323c4550bab9be1a4dea89daa2f8e89c17d"
+    },
+    {
+      "id": "rhythm-orbits",
+      "verified": true,
+      "sha256": "9673e352b13c0fbe2fd65437f1ea0936de4171d73cc5e0b1360dded6d5d02eab"
+    },
+    {
+      "id": "robo-face",
+      "verified": true,
+      "sha256": "7b52b77e74cfb5f3ff75ecc60f5407d13468657b0dbb670fe48f853380af20cc"
+    },
+    {
+      "id": "snappy-face",
+      "verified": true,
+      "sha256": "7123d1c9afa3be651bb4656a3b48f5ebbeb50ceded57db7a6532855551886378"
+    },
+    {
+      "id": "volume-flow",
+      "verified": true,
+      "sha256": "5dfe36fa856a766facfa6189f6543b5569d143a77c60733ddf3316bba6fe5994"
+    },
+    {
+      "id": "water-pool",
+      "verified": true,
+      "sha256": "b877249ea6e5abb00e52450190630e13c72407049da4870b9359c02b143b2061"
+    },
+    {
+      "id": "zodiac-atlas",
+      "verified": true,
+      "sha256": "129cfe59b1e8912684cf5428ecbb0441e4b4f0c61f00f60afaf416d404611144"
+    },
+    {
+      "id": "breathe",
+      "verified": true,
+      "sha256": "8f23bcb55b338d30a939ea6b5f8ef3929b03883584fa9b10ba3de313f4eb70d0"
+    },
+    {
+      "id": "idea-card",
+      "verified": true,
+      "sha256": "94959684185a3187a920352bc878dcdecd3a75afdb9def24c1503a8820747f89"
+    },
+    {
+      "id": "market",
+      "verified": true,
+      "sha256": "36eec4079f1e9ff64988d2d63e95050bcbdc7b696e18b8f0fd7b3110cfa80b3c"
+    },
+    {
+      "id": "mic-test",
+      "verified": true,
+      "sha256": "40713f33b6886b4ff26a7724a007d3ee2ac4a3d93d533b07a25d52d4046c0349"
+    },
+    {
+      "id": "my-computer",
+      "verified": true,
+      "sha256": "ea9ee39fd2ecd6a3a19e616339225bae2d24b51a9e987318623c9000eb4d3e08"
+    },
+    {
+      "id": "practice-seven",
+      "verified": true,
+      "sha256": "8e5806f8d1826cd9da7f2e028d471d9198094ee97b206bceaa39d96a3bafa44f"
+    },
+    {
+      "id": "quick-notes",
+      "verified": true,
+      "sha256": "4efd2f80f228a249aab5b94ad6fff922beaba5bbd7788eebee23b42c32b372fe"
+    },
+    {
+      "id": "robot",
+      "verified": true,
+      "sha256": "87d591125b8767a4ea1567116bf3a9cf3faecad00d3bc84d2fab63c9df3d36ff"
+    },
+    {
+      "id": "alien-creature",
+      "verified": true,
+      "sha256": "a4a92c569f1a0cf8abbfbcf4a2dccdec65a9540d228e34a6fa190916f46c4192"
+    },
+    {
+      "id": "cosmic-window",
+      "verified": true,
+      "sha256": "9f097f9c536669e6e21addd1d9e87ce1d44156109b7ec664884e2d9e614c5ea8"
+    },
+    {
+      "id": "focus-studio",
+      "verified": true,
+      "sha256": "7db075ef8bb0061f1e1f55b3f2eed0f3553e6e2687373aba1bb5189cd74fde89"
+    },
+    {
+      "id": "local-music",
+      "verified": true,
+      "sha256": "e885bf0bb6ba08563ea47c44b48d442b0617b71a479da15b79a8d6032c91ecd6"
+    },
+    {
+      "id": "particle-lab",
+      "verified": true,
+      "sha256": "9764ea3e9c00db07a53d25032703dbc9ee9c37b808329ee33c840f4974b14df9"
+    }
+  ],
+  "ok": true,
+  "scope": "Only supplied channels; not_installed does not authorize installation. UI/hardware need separate acceptance.",
+  "verified_at": "2026-10-31",
+  "notes": [
+    "Read-only source digest evidence; not a complete hardware or performance certification.",
+    "Device apps marked not_installed were deliberately not installed.",
+    "Mac 0.6.4 received targeted resource updates; core device OTA unchanged."
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "id": "volume-flow",
+  "name": "体积流场",
+  "description": "体积流场 · 实时交互",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "theme_ui": "controls",
+  "layout": "fullscreen",
+  "input": {
+    "version": 1,
+    "profile": "five-way",
+    "back": "custom",
+    "scene": "controls"
+  }
+}

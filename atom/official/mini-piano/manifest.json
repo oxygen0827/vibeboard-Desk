@@ -1,9 +1,15 @@
 {
   "id": "mini-piano",
   "name": "迷你钢琴",
-  "description": "十个白键与七个黑键，双音色本机合成，支持鼠标、触屏、数字键和小星星自动演奏。",
+  "description": "五首完整经典钢琴作品，离线 Yamaha C5 双力度采样、双手分奏、表情演绎与鼠标滑奏。",
   "entry": "index.html",
   "icon": "icon.svg",
   "theme_ui": "controls",
-  "layout": "fullscreen"
+  "layout": "fullscreen",
+  "input": {
+    "version": 1,
+    "profile": "five-way",
+    "back": "root",
+    "scene": "controls"
+  }
 }

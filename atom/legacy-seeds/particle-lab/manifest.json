@@ -1,0 +1,15 @@
+{
+  "id": "particle-lab",
+  "name": "粒子实验室",
+  "description": "实时粒子模拟、指针引力、三种运动模式与实际帧率显示",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "layout": "fullscreen",
+  "input": {
+    "version": 1,
+    "profile": "five-way",
+    "back": "custom",
+    "scene": "controls"
+  },
+  "theme_ui": "controls"
+}

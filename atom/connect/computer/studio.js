@@ -106,9 +106,15 @@ async function catalog(){const box=el('market-catalog');box.replaceChildren(text
     box.replaceChildren(...r.works.map(w=>workCard(w,()=>workDetail(w.id).catch(error))),...library.map(sourceCard));
     if(!r.works.length&&!library.length)box.append(h('div',{class:'card'},emptyState('没有匹配的作品','换个关键词或分类试试')));}
   catch(e){box.replaceChildren(h('div',{class:'card'},emptyState('无法打开市场',e.message)));}}
-function libraryDetail(a){const box=clearDialog(a.name),valid=/^\/atom\/assets\/library\/[a-z][a-z0-9_-]{0,47}-[a-f0-9]{16}\.zip$/.test(a.archive||'');
+async function downloadLibrarySource(app){
+  if(!/^\/atom\/assets\/library\/[a-z][a-z0-9_-]{0,47}-[a-f0-9]{16}\.zip$/.test(app.archive||''))throw Error('源码包地址无效');
+  const state=await api('state'),url=new URL(app.archive,state.relay_url||'https://ldcx.tech/atom');
+  if(url.protocol!=='https:')throw Error('源码下载需要 HTTPS');
+  window.open(url.href,'_blank','noopener');
+}
+function libraryDetail(a){const box=clearDialog(a.name);
   if(a.cover_id)box.append(coverImage(a.cover_id,'cover-upload-image'));
-  box.append(text('p',a.description||'完整源码资源包'),text('p',a.input_status==='legacy'?'既有应用兼容源码，尚未逐项完成五向适配。下载包含完整代码和资源，不代表新版本兼容认证。':'完整源码与资源包；上游许可随包保留。','muted'),text('p',a.files+' 个文件 · '+(a.archive_bytes/1048576).toFixed(1)+' MiB','muted'),h('pre',{class:'code',text:'SHA-256: '+a.sha256}),h('div',{class:'form-actions'},button('下载完整源码 ZIP',async()=>{if(!valid)throw Error('源码包地址无效');const state=await api('state'),base=state.relay_url||'https://ldcx.tech/atom',u=new URL(a.archive,base);if(u.protocol!=='https:')throw Error('源码下载需要 HTTPS');window.open(u.href,'_blank','noopener');},'btn primary'),button('在本机模拟器查看',()=>{dialog.close();showPage('simulator');simAsk('start');})));
+  box.append(text('p',a.description||'完整源码资源包'),text('p',a.input_status==='legacy'?'既有应用兼容源码，尚未逐项完成五向适配。下载包含完整代码和资源，不代表新版本兼容认证。':'完整源码与资源包；上游许可随包保留。','muted'),text('p',a.files+' 个文件 · '+(a.archive_bytes/1048576).toFixed(1)+' MiB','muted'),h('pre',{class:'code',text:'SHA-256: '+a.sha256}),h('div',{class:'form-actions'},button('下载完整源码 ZIP',()=>downloadLibrarySource(a),'btn primary'),button('在本机模拟器查看',()=>{dialog.close();showPage('simulator');simAsk('start');})));
 }
 el('market-search').onsubmit=e=>{e.preventDefault();catalog();};
 let searchTimer=null;el('market-search').elements.q.oninput=()=>{clearTimeout(searchTimer);searchTimer=setTimeout(catalog,300);};
@@ -189,6 +195,13 @@ async function watchJob(jobId){if(poll)clearTimeout(poll);const r=await call('/a
   if(busy)poll=setTimeout(()=>watchJob(jobId).catch(error),1000);}
 el('ai-cancel').onclick=async()=>{try{await call('/ai-jobs/'+job.id+'/cancel',{});note('正在停止 AI 修改');}catch(e){error(e);}};
 
+function privateReadFailure(target,error,retry){
+  if(error.details?.code!=='decryption_failed'){lockedState(target);return;}
+  target.replaceChildren(h('div',{class:'card'},emptyState('暂时无法解密', '原始内容已保留，修改和同步已暂停。请重试读取，或重新解锁账号。'),
+    h('div',{class:'form-actions'},button('重试读取',retry,'btn primary'),button('重新解锁',()=>accountDialog(),'btn ghost'))));
+}
+function editorEnabled(id,enabled){el(id).querySelectorAll('input,textarea,button').forEach(control=>control.disabled=!enabled);}
+
 // Notes
 function noteFlag(n){return n.conflict?['同步冲突','flag bad']:n.pending?['待同步','flag']:n.deleted?['已删除','']:[ago(n.updated_at),''];}
 function setNote(n){selectedNote=n;const form=el('note-editor');form.elements.id.value=n?.id||'';form.elements.text.value=n?.text||'';form.elements.pinned.checked=!!n?.pinned;
@@ -203,16 +216,16 @@ function drawNotes(){const q=el('notes-filter').value.trim().toLowerCase(),list=
   el('notes-list').replaceChildren(...list.map(n=>{const [flag,cls]=noteFlag(n);const b=h('button',{type:'button',class:'note-item'+(n.deleted?' deleted':'')+(selectedNote?.id===n.id?' selected':''),onclick:()=>setNote(n)},h('p',{text:n.text}),h('small',{},n.pinned?icon('pin'):null,h('span',{class:cls,text:flag})));b.dataset.id=n.id;return b;}));
   if(!list.length)el('notes-list').append(emptyState(q?'没有匹配的便签':'还没有便签',q?'':'在右侧写下第一条想法'));
   el('nav-notes').textContent=notes.filter(n=>!n.deleted).length||'';}
-async function loadNotes(){if(!await needAccount())return;let r;try{r=await call('/notes');}catch(e){if(e.details?.code==='notes_locked'||e.status===423){lockedState(el('notes-list'));return;}throw e;}notes=r.notes||[];drawNotes();
+async function loadNotes(){if(!await needAccount())return;let r;try{r=await call('/notes');}catch(e){if(e.details?.code==='notes_locked'||e.status===423){notes=[];setNote(null);editorEnabled('note-editor',false);privateReadFailure(el('notes-list'),e,()=>loadNotes());return false;}throw e;}notes=r.notes||[];editorEnabled('note-editor',true);drawNotes();
   if(selectedNote){const updated=notes.find(n=>n.id===selectedNote.id);setNote(updated||null);}else setNote(null);
   el('notes-sub').textContent=r.offline?'当前离线，修改先保存在这台电脑':r.pending?r.pending+' 条等待同步':'与 ATOM 同步 · 共 '+notes.filter(n=>!n.deleted).length+' 条';
-  updateSyncTile();}
+  updateSyncTile();return !r.offline&&!r.pending;}
 el('notes-filter').oninput=drawNotes;
 el('note-editor').onsubmit=async e=>{e.preventDefault();try{const form=e.target,r=await call('/notes',{id:form.elements.id.value||undefined,revision:selectedNote?.revision,text:form.elements.text.value,pinned:form.elements.pinned.checked,deleted:selectedNote?.deleted||false});selectedNote=r.note;await loadNotes();note(r.note.pending?'已保存在本机，联网后同步':'便签已同步');}catch(err){error(err);}};
 el('note-editor').elements.text.onkeydown=e=>{if((e.metaKey||e.ctrlKey)&&e.key==='s'){e.preventDefault();el('note-editor').requestSubmit();}};
 el('note-new').onclick=()=>{if(currentPage!=='notes')showPage('notes');setNote(null);el('note-editor').elements.text.focus();};
 el('note-delete').onclick=async()=>{if(!selectedNote)return;try{await call('/notes',{...selectedNote,deleted:!selectedNote.deleted});await loadNotes();}catch(e){error(e);}};
-el('notes-sync').onclick=()=>loadNotes().then(()=>note('随手记已同步')).catch(error);
+el('notes-sync').onclick=()=>loadNotes().then(ok=>{if(ok)note('随手记已同步');}).catch(error);
 
 // Agenda
 function agendaRow(a){const r=h('div',{class:'agenda-row'+(a.done?' done':'')+(a.deleted?' deleted':'')});
@@ -221,16 +234,16 @@ function agendaRow(a){const r=h('div',{class:'agenda-row'+(a.done?' done':'')+(a
   if(a.conflict)r.append(pill('同步冲突','warn'),button('保留服务器',async()=>{await call('/agenda/resolve',{id:a.id,decision:'server'});await loadAgenda();},'btn small'),button('另存副本',async()=>{await call('/agenda/resolve',{id:a.id,decision:'copy'});await loadAgenda();},'btn small'));
   else r.append(h('div',{class:'row-actions'},button(a.deleted?'恢复':'删除',async()=>{await call('/agenda',{...a,deleted:!a.deleted});await loadAgenda();},'btn ghost small')));
   return r;}
-async function loadAgenda(){if(!await needAccount())return;let r;try{r=await call('/agenda');}catch(e){if(e.details?.code==='notes_locked'||e.status===423){lockedState(el('agenda-list'));return;}throw e;}agenda=r.items||[];
+async function loadAgenda(){if(!await needAccount())return;let r;try{r=await call('/agenda');}catch(e){if(e.details?.code==='notes_locked'||e.status===423){agenda=[];editorEnabled('agenda-add',false);privateReadFailure(el('agenda-list'),e,()=>loadAgenda());return false;}throw e;}agenda=r.items||[];editorEnabled('agenda-add',true);
   const live=agenda.filter(a=>!a.deleted),byTime=(a,b)=>(a.starts_at||'z').localeCompare(b.starts_at||'z');
   const groups=[['待办',live.filter(a=>a.kind==='todo'&&!a.done)],['日程',live.filter(a=>a.kind==='event'&&!a.done).sort(byTime)],['已完成',live.filter(a=>a.done)],['已删除',agenda.filter(a=>a.deleted)]];
   el('agenda-list').replaceChildren(...groups.filter(([,items])=>items.length).map(([title,items])=>h('div',{class:'agenda-group'},h('h2',{text:title+' · '+items.length}),h('div',{class:'card list'},...items.sort((a,b)=>title==='日程'?0:byTime(a,b)).map(agendaRow)))));
   if(!agenda.length)el('agenda-list').append(h('div',{class:'card agenda-group'},emptyState('今天还没有安排','在上面添加一件要做的事，它会同步到 ATOM 的「今日」')));
   const open=live.filter(a=>a.kind==='todo'&&!a.done).length;el('nav-agenda').textContent=open||'';
-  el('agenda-sub').textContent=r.offline?'当前离线，修改先保存在这台电脑':open+' 项待办未完成 · 与 ATOM 同步';updateSyncTile();}
+  el('agenda-sub').textContent=r.offline?'当前离线，修改先保存在这台电脑':open+' 项待办未完成 · 与 ATOM 同步';updateSyncTile();return !r.offline&&!r.pending;}
 el('agenda-kind').onclick=e=>{const b=e.target.closest('button');if(!b)return;el('agenda-add').elements.kind.value=b.dataset.kind;el('agenda-kind').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));el('agenda-add').elements.title.placeholder=b.dataset.kind==='todo'?'添加一件要做的事':'添加一个日程';};
 el('agenda-add').onsubmit=async e=>{e.preventDefault();try{const values=Object.fromEntries(new FormData(e.target));await call('/agenda',{...values,starts_at:values.starts_at?new Date(values.starts_at).toISOString():''});e.target.elements.title.value='';e.target.elements.starts_at.value='';await loadAgenda();}catch(err){error(err);}};
-el('agenda-sync').onclick=()=>loadAgenda().then(()=>note('今日已同步')).catch(error);
+el('agenda-sync').onclick=()=>loadAgenda().then(ok=>{if(ok)note('今日已同步');}).catch(error);
 
 // Overview tiles for synced apps and market
 function updateSyncTile(){if(!account){el('tile-sync').textContent='未登录';el('tile-sync-sub').textContent='登录市场账号后同步随手记和今日';return;}
@@ -266,8 +279,35 @@ async function showOrganization(jobId){if(organizePoll)clearTimeout(organizePoll
   box.append(h('label',{class:'check'},confirmed,h('span',{text:'我确认把选中的建议加入「今日」；原便签保持不变。'})),h('div',{class:'form-actions'},button('整理其他便签',()=>noteSelection(),'btn ghost'),button('加入选中事项',async()=>{if(!confirmed.checked)throw Error('请先确认要加入选中事项');const selected=kind=>checks[kind].filter(c=>c.checked).map(c=>Number(c.value));const result=await call('/notes/organize/'+j.id+'/apply',{confirm:true,todo_indices:selected('todos'),event_indices:selected('events')});note(result.pending?'已保存到本机今日，等待联网同步':'已加入今日');await showOrganization(j.id);},'btn primary')));}
 el('notes-organize').onclick=async()=>{try{if(!await needAccount())return;await loadNotes();const s=await studioState(),latest=s.jobs.filter(j=>j.kind==='notes-organize').slice(-1)[0];if(latest&&ACTIVE.includes(latest.status))await showOrganization(latest.id);else noteSelection(latest);}catch(e){error(e);}};
 
+// Share creation actions with the device; the Mac sidebar owns desktop navigation.
+const communityRoot=document.createElement('div');communityRoot.id='community-studio';
+let community=null,advancedStudio=false,communityNavigation=false;
+function mountCommunity(tab){
+ const page=tab==='discover'?'market':'creations',panel=document.querySelector('[data-panel="'+page+'"]');
+ panel.querySelectorAll(':scope > *').forEach(n=>{if(n!==communityRoot)n.hidden=true;});
+ panel.append(communityRoot);communityRoot.hidden=false;panel.classList.add('community-panel');
+ if(panel.hidden){communityNavigation=true;try{showPage(page);}finally{communityNavigation=false;}}
+}
+function communityPage(tab){
+ if(!community)community=new AtomCommunity(communityRoot,{
+  layout:'desktop',onView:mountCommunity,downloadSource:downloadLibrarySource,
+  state:()=>call('/state'),call:(route,body)=>call(route,body),
+  login:async()=>{await studioState();accountDialog();},home:()=>showPage('overview'),
+  preview:async bundle=>(await call('/preview',{bundle})).url,
+  previewResource:async app=>(await call('/library-preview',{id:app.id})).url,
+  releasePreview:url=>call('/preview/release',{url}).catch(()=>{}),
+  targets:async()=>(await call('/community/targets')).targets,
+  deliveries:async()=>(await call('/community/deliveries')).deliveries,
+  install:(ref,device_id,request_id)=>call('/community/install',{...ref,device_id,confirm:true,request_id}),
+  library:async()=>{communityRoot.hidden=true;const panel=document.querySelector('[data-panel=market]');panel.classList.remove('community-panel');panel.querySelectorAll(':scope > *').forEach(n=>{if(n!==communityRoot)n.hidden=false;});if(!el('community-return')){const b=button('回到发现',()=>communityPage('discover'));b.id='community-return';el('market-search').before(b);}await catalog();},
+  advanced:async id=>{advancedStudio=true;communityRoot.hidden=true;document.querySelector('[data-panel=creations]').classList.remove('community-panel');showPage('creations');await openEditor(id);},
+ });
+ return community.show(tab);
+}
+el('editor-back').onclick=async()=>{if(dirtyState()==='unsaved'&&!confirm('源码尚未保存，确定离开？'))return;advancedStudio=false;await communityPage('mine');};
+window.addEventListener('atom:page',e=>{if(communityNavigation)return;if(!['market','creations'].includes(e.detail)&&community){community.dispose();community=null;communityRoot.hidden=true;}if(e.detail==='market'){advancedStudio=false;communityPage('discover').catch(error);}if(e.detail==='creations'&&!advancedStudio)communityPage('mine').catch(error);});
 window.addEventListener('atom:page',e=>{if(e.detail!=='creations'&&poll){clearTimeout(poll);poll=null;}
-  const tasks={overview,market:catalog,creations:()=>editing&&!el('studio-editor').hidden?Promise.resolve():loadCreations(),notes:loadNotes,agenda:loadAgenda};
+  const tasks={overview,market:()=>Promise.resolve(),creations:()=>Promise.resolve(),notes:loadNotes,agenda:loadAgenda};
   if(tasks[e.detail])tasks[e.detail]().catch(error);});
 overview().catch(()=>{});
 })();

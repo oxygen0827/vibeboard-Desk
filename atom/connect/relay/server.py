@@ -85,6 +85,7 @@ class Relay:
         self.releases = Releases(Path(path).parent / 'system' if path != ':memory:' else Path('/nonexistent'))
         self.qrlogin = QRLogin(self.marketplace, clock=clock)
         self.ai = OfficialAI(str(Path(path).with_name(Path(path).stem + '.ai.sqlite3')) if path != ':memory:' else ':memory:', self.marketplace, clock=clock)
+        self.marketplace.community.ai = self.ai
         self.lock = threading.RLock()
         if path != ':memory:':
             os.makedirs(os.path.dirname(os.path.abspath(path)), mode=0o700, exist_ok=True)
@@ -106,6 +107,7 @@ class Relay:
         CREATE TABLE IF NOT EXISTS bindings(device TEXT, computer TEXT, PRIMARY KEY(device,computer));
         CREATE TABLE IF NOT EXISTS tasks(id TEXT PRIMARY KEY, device TEXT, computer TEXT, request TEXT, data TEXT, UNIQUE(device,request));
         CREATE TABLE IF NOT EXISTS events(task TEXT, event_id TEXT, seq INTEGER, data TEXT, PRIMARY KEY(task,event_id), UNIQUE(task,seq));
+        CREATE TABLE IF NOT EXISTS app_deliveries(id TEXT PRIMARY KEY,user TEXT,computer TEXT,device TEXT,status TEXT,data TEXT,bundle TEXT);
         CREATE TABLE IF NOT EXISTS commands(id TEXT PRIMARY KEY, computer TEXT, task TEXT, data TEXT, acked INTEGER DEFAULT 0);
         CREATE TABLE IF NOT EXISTS approvals(task TEXT, request TEXT, data TEXT, answered INTEGER DEFAULT 0, PRIMARY KEY(task,request));
         CREATE TABLE IF NOT EXISTS snapshots(device TEXT, computer TEXT, version TEXT, envelope TEXT, updated REAL, PRIMARY KEY(device,computer));
@@ -118,8 +120,8 @@ class Relay:
             os.chmod(path, 0o600)
 
     def close(self):
-        self.ai.close()
         self.marketplace.close()
+        self.ai.close()
         self.db.close()
 
     def one(self, sql, args=()):
@@ -183,6 +185,11 @@ class Relay:
             self.db.execute('UPDATE clients SET heartbeat=? WHERE id=?', (now, cid))
         def only(expected):
             require(role == expected, 'Role not permitted', 403)
+        if path.startswith('/v1/apps/'):
+            from relay.app_delivery import handle as app_delivery
+            expected=urllib.parse.parse_qs(parsed.query).get('account',[body.get('expected_account_id')])[0]
+            require(not expected or expected == client['account'], '账号已改变，请重新打开创作', 409)
+            return app_delivery(self, client, method, path, body, require)
         if method == 'GET' and path == '/v1/state':
             other = 'computer' if role == 'device' else 'device'
             bound = self.rows('SELECT c.*, b.device_key, b.computer_key FROM clients c JOIN bindings b ON c.id=b.' + other + ' WHERE b.' + role + '=?', (cid,))

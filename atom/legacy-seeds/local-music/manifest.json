@@ -1,0 +1,15 @@
+{
+  "id": "local-music",
+  "name": "随身唱片",
+  "description": "本地音频播放、歌单、进度和音量控制",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "layout": "fullscreen",
+  "input": {
+    "version": 1,
+    "profile": "five-way",
+    "back": "custom",
+    "scene": "none"
+  },
+  "theme_ui": "controls"
+}

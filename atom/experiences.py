@@ -88,6 +88,7 @@ SCHEMAS={
 class Experiences:
     def __init__(self):
         self.jobs={}
+        self.workers=set()
         self.lock=threading.Lock()
 
     def status(self, job_id, kind):
@@ -109,16 +110,22 @@ class Experiences:
         if len(json.dumps(state,ensure_ascii=False).encode())>65536: raise ValueError('当前作品过大')
         if not config.get('api_key'): raise ValueError('登录 ATOM 账号即可使用官方额度，或在工作坊填写自己的模型 Key')
         with self.lock:
-            if sum(j['status'] in ('queued','generating','validating') for j in self.jobs.values())>=2: raise ValueError('已有两个创作任务，请完成或取消后重试')
+            if len(self.workers)>=2: raise ValueError('两个模型请求仍在处理中，请稍后重试；取消的请求需等待后台结束')
             # Retain a bounded task history without storing user credentials.
             if len(self.jobs)>=64:
                 for key in list(self.jobs):
-                    if self.jobs[key]['status'] not in ('queued','generating','validating'):
+                    if key not in self.workers and self.jobs[key]['status'] not in ('queued','generating','validating'):
                         del self.jobs[key]
                         if len(self.jobs)<48: break
             job_id=uuid.uuid4().hex
             self.jobs[job_id]=dict(id=job_id,kind=kind,status='queued',phase='等待模型',created_at=time.time())
-        threading.Thread(target=self._run,args=(job_id,dict(config),prompt,state),daemon=True).start()
+            self.workers.add(job_id)
+        try:
+            threading.Thread(target=self._run,args=(job_id,dict(config),prompt,state),daemon=True).start()
+        except RuntimeError:
+            self._set(job_id,status='failed',phase='启动失败',error='无法启动创作任务，请稍后重试')
+            with self.lock: self.workers.discard(job_id)
+            raise ValueError('无法启动创作任务，请稍后重试')
         return self.status(job_id,kind)
 
     def _set(self,jid,**fields):
@@ -128,8 +135,8 @@ class Experiences:
             return True
 
     def _run(self,jid,config,prompt,state):
-        kind=self.jobs[jid]['kind']
         try:
+            with self.lock: kind=self.jobs[jid]['kind']
             if not self._set(jid,status='generating',phase='模型正在创作'): return
             url=urlsplit(config['base_url'])
             if not config.get('official') and (url.scheme!='https' or not url.hostname or url.username or url.password or url.query or url.fragment): raise ValueError('模型地址必须为 HTTPS')
@@ -162,3 +169,7 @@ class Experiences:
             # Upstream bodies/URLs can contain sensitive material. Only validated local errors are public.
             message=str(error) if isinstance(error,official_ai.OfficialError) else '模型生成失败，请稍后重试或检查工作坊模型设置'
             self._set(jid,status='failed',phase='生成失败',error=message)
+
+        finally:
+            # Cancellation discards results; a live network call still owns its worker slot.
+            with self.lock: self.workers.discard(jid)

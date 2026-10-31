@@ -36,6 +36,10 @@ class ReleaseTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'differs'):
             self.verify()
 
+    def test_json_key_order_is_not_a_source_change(self):
+        self.bundle = dict(reversed(list(self.bundle.items())))
+        self.assertTrue(self.verify()['cloud_verified'])
+
     def test_corrupt_download(self):
         self.source['bundle']['files']['index.html'] = 'corrupt'
         with self.assertRaisesRegex(ValueError, 'digest'):

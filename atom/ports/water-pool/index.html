@@ -7,8 +7,8 @@ Released under the MIT license
 -->
 
 <!DOCTYPE html>
-<html><head><script src="webgl2-compat.js"></script>
-  <title>WebGL Water</title>
+<html><head><meta charset="utf-8"><script src="scene-session.js"></script><script src="scene-controls.js"></script><script src="webgl2-compat.js"></script>
+  <title>光影水池</title>
   <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
   <script crossorigin="anonymous" src="OES_texture_float_linear-polyfill.js"></script>
   <script crossorigin="anonymous" src="lightgl.js"></script>
@@ -32,7 +32,7 @@ Released under the MIT license
       #help { width: 100px; font-size: 10px; line-height: 12px; }
     }
   </style>
-</head><body>
+<style data-product-review>.atomtitle,.head,.top{left:56px!important;right:12px!important;max-width:calc(100% - 68px)}.atomtitle strong,.head h1,.top strong{font-size:16px!important}.atomtitle{min-height:40px}</style></head><body>
   <div id="loading">Loading...</div>
   <div id="help">
     <h1>WebGL Water</h1>
@@ -64,4 +64,4 @@ Released under the MIT license
   <img crossorigin="anonymous" id="ypos" src="ypos.jpg">
   <img crossorigin="anonymous" id="zneg" src="zneg.jpg">
   <img crossorigin="anonymous" id="zpos" src="zpos.jpg">
-<style>html,body{margin:0;height:100%;overflow:hidden}#help{display:none}#loading{right:0}canvas{display:block}.tools{position:fixed;bottom:12px;left:12px;display:flex;gap:8px;z-index:3}button{height:40px;background:#183545dc;color:white;border:1px solid #ffffff55;border-radius:8px;padding:0 14px;font:14px sans-serif}.label{position:fixed;left:14px;top:12px;z-index:3;color:white;font:13px sans-serif;text-shadow:0 1px 4px black;pointer-events:none}</style><div class="label">光影水池 · 拨动水面 / 拖动球体</div><div class="tools"><button onclick="paused=!paused;this.textContent=paused?'继续':'暂停'">暂停</button><button onclick="useSpherePhysics=!useSpherePhysics;this.textContent=useSpherePhysics?'重力：开':'重力：关'">重力：关</button><button onclick="for(var i=0;i<8;i++)water.addDrop(Math.random()*2-1,Math.random()*2-1,.04,.04)">雨滴</button></div></body></html>
+<style>html,body{margin:0;height:100%;overflow:hidden}#help{display:none}#loading{right:0}canvas{display:block}.tools{position:fixed;bottom:12px;left:12px;display:flex;gap:8px;z-index:3}button{height:40px;background:#183545dc;color:white;border:1px solid #ffffff55;border-radius:8px;padding:0 14px;font:14px sans-serif}.label{position:fixed;left:56px;top:12px;z-index:3;color:white;font:13px sans-serif;text-shadow:0 1px 4px black;pointer-events:none}</style><div class="label">光影水池 · 拨动水面 / 拖动球体</div><div class="tools"><button onclick="paused=!paused;this.textContent=paused?'继续':'暂停'">暂停</button><button onclick="useSpherePhysics=!useSpherePhysics;this.textContent=useSpherePhysics?'重力：开':'重力：关'">重力：关</button><button onclick="for(var i=0;i<8;i++)water.addDrop(Math.random()*2-1,Math.random()*2-1,.04,.04)">雨滴</button></div></body></html>

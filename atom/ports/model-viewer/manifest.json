@@ -1,0 +1,15 @@
+{
+  "id": "model-viewer",
+  "name": "模型检视台",
+  "description": "离线STL/OBJ模型检查 · Three.js",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "theme_ui": "controls",
+  "layout": "fullscreen",
+  "input": {
+    "version": 1,
+    "profile": "five-way",
+    "back": "custom",
+    "scene": "controls"
+  }
+}

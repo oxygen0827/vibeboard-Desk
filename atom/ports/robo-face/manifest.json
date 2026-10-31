@@ -1,0 +1,15 @@
+{
+  "id": "robo-face",
+  "name": "机器人眼睛",
+  "description": "原版 RoboEyes · 好奇、眨眼与情绪",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "theme_ui": "controls",
+  "layout": "fullscreen",
+  "input": {
+    "version": 1,
+    "profile": "five-way",
+    "back": "custom",
+    "scene": "controls"
+  }
+}

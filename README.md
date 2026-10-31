@@ -12,6 +12,10 @@ ATOM 是一台可以独立运行应用、用语音创造作品，并连接个人
 
 [当前状态与待验收事项](atom/docs/current-status.md)集中记录交付范围；[完整资源同步](atom/docs/full-library-sync-2026-10-23.md)记录发布和校验证据。
 
+**2026-10-31 整合更新**：创作社区支持体验、AI 改造、私人草稿同步、同账号安装回执、上传真实截图后发布，以及作者审阅改进建议。Mac 使用独立的桌面布局，发现详情直接运行应用，可放大操作；完整资源库增至 **64 项**，与公开作品去重后本轮目录共 **66 项**，数量由服务端数据决定。操作与验收见[创作社区记录](atom/docs/creation-community-plan.md)。
+
+本轮还包含五首完整曲谱和离线采样钢琴、相册与同步应用体验修复、私有数据同步保护、保存/更新失败恢复，以及从灰色板收回的 14 个应用导航改动。各端实际交付与版本校验见[应用分发记录](atom/docs/app-distribution.md)；GitHub 提交不代替市场发布，公共核心 OTA 未推进。
+
 ## 能做什么
 
 | 能力 | 体验 |
@@ -21,6 +25,7 @@ ATOM 是一台可以独立运行应用、用语音创造作品，并连接个人
 | 语音工作坊 | 说出需求、转写编辑、生成、隔离预览、安装；任务反馈来自实际状态 |
 | 连接电脑 Agent | 选择授权项目，向电脑 Codex 发任务，查看流式进度、审批、取消和结果 |
 | 源码应用市场 | 浏览、获取完整源码、二次创作和明确发布；保留版本、许可及派生关系 |
+| Mac 直接体验 | 发现详情直接操作 480×360 应用，支持完整图片/音频/WASM 资源；预览隔离账号，退出释放资源 |
 | 跨端日用应用 | 便签、日程、待办与相册；电脑输入和编辑，小电脑独立呈现 |
 | 创意作品 | 光影水池、月光海洋、粒子实验室、音乐与点阵、机器人表情，以及月亮来信、雨夜电台、玻璃生态瓶等 |
 | 外观与设备管理 | 明暗切换、主题图标、音量、背光、网络、蓝牙、签名核心更新、数据备份恢复 |
@@ -81,7 +86,7 @@ node atom/tests/input-navigation.integration.cjs
 node atom/tests/joystick-shell.integration.cjs
 ```
 
-浏览器依赖在 `atom/package.json`；先运行 `npm --prefix atom ci`，再按[协作手册](atom/docs/collaboration.md)安装浏览器并运行对应套件。市场/相册测试另外需要其 requirements 中的图像依赖。
+浏览器依赖在 `atom/package.json`；先运行 `npm --prefix atom ci`，再按[协作手册](atom/docs/collaboration.md)安装 Chromium 与 WebKit。`npm --prefix atom run test:community` 覆盖 Mac 内部页面、交互预览、双端创作和同步异常。市场/相册测试另外需要其 requirements 中的图像依赖。
 
 设备、Mac、云端分别发布，不能用一次核心升级代替全部三端部署：
 
@@ -89,6 +94,7 @@ node atom/tests/joystick-shell.integration.cjs
 - [系统升级、数据恢复、Mac 发行](atom/docs/system-maintenance.md)
 - [服务器部署与备份](atom/connect/server/README.md)
 - [62 项完整源码库同步](atom/docs/full-library-sync-2026-10-23.md)
+- [当前应用多端发布与强制校验](atom/docs/app-distribution.md)
 - [官网构建与发布](atom/site/README.md)
 
 阿里云本地数据库备份和 OSS 对应归档各保留三份；遵守 [AGENTS.md](AGENTS.md) 的成本约束，不因文档整理或例行代码修改新增 ECS 快照或镜像。

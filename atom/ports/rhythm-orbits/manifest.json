@@ -1,0 +1,15 @@
+{
+  "id": "rhythm-orbits",
+  "name": "节奏轨道",
+  "description": "Music Pattern Generator 原版欧几里得节奏处理器，三轨 MIDI 事件驱动本地合成器",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "theme_ui": "controls",
+  "layout": "fullscreen",
+  "input": {
+    "version": 1,
+    "profile": "five-way",
+    "back": "custom",
+    "scene": "controls"
+  }
+}

@@ -6,7 +6,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'connect/marketplace')
 from service import scan_publish
 ROOT=Path(__file__).resolve().parents[1]
 RETIRED={'official-companion','task-pal'}
-p=argparse.ArgumentParser();p.add_argument('--seed',required=True);p.add_argument('--out',required=True);a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--seed',required=True);p.add_argument('--out',required=True);p.add_argument('--index',type=Path,help='Also refresh the repository public index without embedded cover data');a=p.parse_args()
 seed=Path(a.seed);out=Path(a.out);out.mkdir(parents=True,exist_ok=True)
 site=json.loads((ROOT/'site/assets/apps/catalog.json').read_text());known={x['id']:x for x in site['apps']};apps=[]
 for aid in json.loads((seed/'order.json').read_text()):
@@ -38,12 +38,15 @@ for aid in json.loads((seed/'order.json').read_text()):
  icon=folder/manifest.get('icon','icon.svg');(out/(aid+'.svg')).write_bytes(icon.read_bytes())
  old=known.get(aid,{})
  image=old.get('image');capture='existing reviewed homepage'
+ reviewed=ROOT/'official/covers'/(aid+'.jpg')
+ if reviewed.is_file():
+  image='/atom/assets/library/'+aid+'.jpg';(out/(aid+'.jpg')).write_bytes(reviewed.read_bytes())
  if not image:
   local=ROOT/'artifacts/full-library-covers'/(aid+'.png')
   if local.is_file():image='/atom/assets/library/'+aid+'.png';(out/(aid+'.png')).write_bytes(local.read_bytes());capture='actual rendered UI; isolated empty/demo state'
  cover=None
  if image:
-  path=out/(aid+'.png') if image.startswith('/atom/assets/library/') else ROOT/'site'/image.removeprefix('/atom/')
+  path=out/Path(image).name if image.startswith('/atom/assets/library/') else ROOT/'site'/image.removeprefix('/atom/')
   if path.is_file():
    from PIL import Image
    b=io.BytesIO()
@@ -51,4 +54,7 @@ for aid in json.loads((seed/'order.json').read_text()):
    cover='data:image/jpeg;base64,'+base64.b64encode(b.getvalue()).decode()
  apps.append(dict(id=aid,name=manifest['name'],description=manifest.get('description',''),category=old.get('category','life'),kind=old.get('kind','port'),icon='/atom/assets/library/'+aid+'.svg',image=image,cover_image=cover,archive='/atom/assets/library/'+name,sha256=sha,archive_bytes=len(data),files=len(content),expanded_bytes=size,input_status='declared' if manifest.get('input') else 'legacy',license_note='保留完整包中的上游与素材许可',capture=capture))
 (out/'catalog.json').write_text(json.dumps({'version':1,'apps':apps,'count':len(apps)},ensure_ascii=False,separators=(',',':'))+'\n')
+if a.index:
+ rows=[{k:v for k,v in app.items() if k!='cover_image'} for app in apps]
+ a.index.write_text(json.dumps({'version':1,'apps':rows,'count':len(rows)},ensure_ascii=False,indent=2)+'\n')
 print(json.dumps({'apps':len(apps),'archives_bytes':sum(x['archive_bytes'] for x in apps),'covers':sum(bool(x['cover_image']) for x in apps)}))

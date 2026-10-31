@@ -10,6 +10,11 @@ from app_input import validate_input_bundle, validate_input_manifest, generation
 class InputContractTests(unittest.TestCase):
     def test_generation_prompt_reads_the_bundled_policy_and_fails_closed(self):
         policy = json.loads((Path(__file__).resolve().parents[1] / 'static/app-input-standard.json').read_text())
+        self.assertTrue(any('data-atom-back' in rule for rule in policy['rules']))
+        self.assertTrue(any('data-atom-selectable' in rule for rule in policy['rules']))
+        self.assertTrue(any('maxlength' in rule or 'Over-limit' in rule for rule in policy['rules']))
+        self.assertTrue(any('listen to input events' in rule for rule in policy['rules']))
+        self.assertTrue(any('checking, signed-in, signed-out' in rule for rule in policy['rules']))
         expected = 'ATOM REQUIRED INPUT STANDARD v1:\n' + '\n'.join('- ' + rule for rule in policy['rules'])
         self.assertEqual(generation_input_standard(), expected)
         with mock.patch.object(Path, 'read_text', side_effect=OSError('missing')):

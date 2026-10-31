@@ -87,10 +87,13 @@ Claude 依据：[官方 SDK 概览](https://code.claude.com/docs/en/agent-sdk/ov
 
 完整创作流程：市场查看作品与许可证 → 查看各版本全部源码和上游来源 → 基于指定版本派生 → 在「我的创作」打开完整资源 → 编辑 / 本机预览 / AI 改造 → 比较快照 → 同步草稿 → 明确确认公开源码后发布。派生应用使用服务端分配的新应用 ID，不覆盖官方应用。上游作者、许可证、版本由服务端维护。
 
+- 保存恢复：私有 JSON 写入先 flush/fsync，再原子替换；源码先完整写入临时目录，再交换，保留一份 `source-previous/`。替换失败恢复旧源码；进程在交换中间退出时，下次访问工作区恢复旧目录。此保护不等于完成整机突然断电验收。
+- 私有同步：`private-sync.mjs` 共用便签/日程的队列确认与冲突逻辑；批次固定账号会话，切换账号、服务器或密钥后停止发送并保留原队列。`account_changed` 与服务器记录版本冲突分开处理。
+- 解密失败：返回 `423 / decryption_failed`，保留服务端密文与本机最后可读缓存，按账号、按集合暂停写入；该状态跨重启保留。界面提供重试读取与重新解锁，完整读取成功后才恢复编辑。不会把“无法解密”等提示作为正文保存。
 - 完整源码落盘：`<state-dir>/workspaces/<origin+user 哈希>/<draft-id>/source/`，含 manifest.json 和所有资源，拒绝路径穿越与符号链接。
 - 全量快照：相邻 `snapshots/` 目录，每个快照保存完整 bundle，最多保留 80 个；恢复先备份当前内容，不直接改变服务器。
 - 差异：包含所有新增、删除、修改文件的完整 before/after，并不是只比较入口 HTML。
-- 本机预览：480×360，sandbox opaque origin，禁网络、父页面与设备权限；相对 CSS/JS/图片资源内联；AtomApp 保存仅为当前预览暂存。复杂动态 import / fetch 资源可能需要应用适配，不能以本机预览替代真机验收。
+- 本机预览：480×360，sandbox opaque origin，禁网络、父页面与设备权限；发现/创作交互预览使用随机短期资源地址，支持相对模块、fetch、音频及 WASM；AtomApp 保存仅为当前预览暂存。旧高级编辑器保留资源内联预览；两者均不能代替真机验收。
 - 本机编辑与服务器同步分开：`dirty:true` 表示有未同步修改。`local_digest` 是当前 bundle 的本机 SHA-256；`synced_digest` 是最近确认发送/接收的 bundle 哈希，不等同于平台不可变版本的规范化 hash。旧同步响应不会把等待期间的新编辑标成已同步。
 - 409 冲突：本机内容、完整快照和 AI 产物都保留，可查看服务器完整源码，再明确选择服务器或本机版本；不会自动覆盖。
 - 发布需 `confirm:true`，只允许已同步的草稿。服务器再次扫描和检查许可。发布后刷新草稿 revision；源码公开与源代码中任何私人信息需用户确认。
@@ -106,7 +109,7 @@ Claude 依据：[官方 SDK 概览](https://code.claude.com/docs/en/agent-sdk/ov
 
 ### 可脚本调用的 Studio API
 
-下表前缀均为 `/api/studio`，使用相同本地 Cookie、Origin 和 CSRF。POST JSON 上限 2 MiB；应用 bundle 仍限制 96 KiB。所有令牌保存在私有文件，任何 state API 均不返回。
+下表前缀均为 `/api/studio`，使用相同本地 Cookie、Origin 和 CSRF。POST JSON 上限 2 MiB；Studio 完整源码/改造 bundle 上限 1984 KiB（为请求元数据预留 64 KiB），最多 100 个文件。普通 Connect Agent 任务的 result 产物仍为 96 KiB，不与源码库混用。所有令牌保存在私有文件，任何 state API 均不返回。
 
 | 方法与路径 | 请求 / 返回 |
 |---|---|

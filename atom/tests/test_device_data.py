@@ -17,6 +17,16 @@ class DataTests(unittest.TestCase):
         self.store.acknowledge(s['pending']['id']);self.assertIsNone(self.store.status()['pending'])
         b['backup']['data']['atom.timer']='1'
         with self.assertRaisesRegex(ValueError,'校验'):self.store.restore(b['backup'],True)
+    def test_sort_and_usage_survive_backup_restore(self):
+        data=dict(self.data,**{'atom.desktop.sort.v1':'"original"','atom.desktop.usage.v1':'{"clock":12}'})
+        backup=self.store.backup(data)['backup']
+        self.store.capture(self.data)
+        self.store.restore(backup,True)
+        self.store.acknowledge(self.store.status()['pending']['id'])
+        self.assertEqual(self.store.current()['data'],data)
+        script=(Path(__file__).resolve().parents[1]/'static/maintenance.js').read_text()
+        for key in ('atom.desktop.sort.v1','atom.desktop.usage.v1'):self.assertIn(key,script)
+
     def test_private_config_and_paths_are_rejected(self):
         for key in ['api_key','atom.capabilities.v1','atom.app.v1../model','atom.workshopDraft']:
             with self.assertRaises(ValueError):validate({key:'{}'})

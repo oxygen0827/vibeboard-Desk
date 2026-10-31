@@ -1,6 +1,6 @@
 /* Personal data stays in reviewed shell keys; cloud mirroring is opt-in and encrypted by the backend. */
 (function(){'use strict';
-var keys=['atom.desktop.v2','atom.widget','atom.timer','atom.notes','atom.speechFeedback','atom.experienceAnimations','atom.appearance','atom.appearance.v1'],state=null,busy=false,error='',message='',page='menu',applying=false,loading=false,attempted=false;
+var keys=['atom.desktop.v2', 'atom.desktop.sort.v1', 'atom.desktop.usage.v1','atom.widget','atom.timer','atom.notes','atom.speechFeedback','atom.experienceAnimations','atom.appearance','atom.appearance.v1'],state=null,busy=false,error='',message='',page='menu',applying=false,loading=false,attempted=false;
 function allowed(k){return keys.indexOf(k)>=0||/^atom\.app\.v1\.[a-z][a-z0-9_-]{0,47}$/.test(k);}
 function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function call(action,data){return window.AtomRequest('/api/device-data/'+action,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data||{})});}

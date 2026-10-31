@@ -12,6 +12,10 @@ APPS={
  'mini-piano':dict(name='迷你钢琴',old='piano',description='十个白键与七个黑键，双音色本机合成，支持鼠标、触屏、数字键和小星星自动演奏。',subtitle='数字键 1–0 · 本机合成',icon='<rect x="8" y="12" width="48" height="40" rx="6"/><path d="M20 12v40m12-40v40m12-40v40"/><path d="M16 12h8v23h-8zm24 0h8v23h-8z" fill="currentColor"/>',body='<div class="controls"><span id="notice" role="status">轻点琴键，弹一段旋律</span><button id="tone">音色 · 木琴</button><button id="demo">小星星</button></div><div id="keys" aria-label="琴键"></div>'),
 }
 for aid,data in APPS.items():
+ if aid=='mini-piano':
+  import runpy
+  runpy.run_path(str(ROOT/'official/mini-piano/build.py'),run_name='__main__')
+  continue
  p=ROOT/'official'/aid;p.mkdir(exist_ok=True)
  svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">'+data['icon']+'</svg>'
  validate_svg(svg)

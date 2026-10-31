@@ -1,0 +1,15 @@
+{
+  "id": "planetarium",
+  "name": "天体观测台",
+  "description": "移植Spacekit，高清行星纹理、光照、大气和土星环",
+  "entry": "index.html",
+  "icon": "icon.svg",
+  "theme_ui": "controls",
+  "layout": "fullscreen",
+  "input": {
+    "version": 1,
+    "profile": "five-way",
+    "back": "custom",
+    "scene": "controls"
+  }
+}
