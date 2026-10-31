@@ -6,7 +6,7 @@ const APP = __dirname, STATIC = path.join(__dirname, '../../static'), shots = pr
 const PARENT = `<meta charset="utf-8"><style>body{margin:0}iframe{width:480px;height:360px;border:0}</style><iframe sandbox="allow-scripts" src="/app/index.html"></iframe>
 <script>let saved=null;window.saves=0;onmessage=e=>{const d=e.data;if(d&&d.type==='atom:storage'){if(d.action==='set'){saved=d.data;saves++;}e.source.postMessage({type:'atom:storage-result',request_id:d.request_id,ok:true,data:saved,mode:'device'},'*');}
 // State requests in the first 10 s go unanswered, as when the user leaves the permission sheet open past the client deadline.
-const pc={client_id:'pc1',name:'测试电脑',online:true,e2e:'on',projects:[{id:'p1',name:'测试项目'}],agents:[{id:'codex',name:'Codex',available:true,authenticated:true}]};
+const pc={client_id:'pc1',name:'测试电脑',online:true,e2e:'on',projects:[{id:'p1',name:'测试项目'}],agents:['codex','claude','opencode','kimi','pi'].map(id=>({id,name:id,available:true,authenticated:true}))};
 if(d&&d.type==='atom:office'&&d.action==='state'&&Date.now()-window.t0>10000)e.source.postMessage({type:'atom:office-result',id:d.id,result:{configured:true,computers:[pc,Object.assign({},pc,{client_id:'pc2',name:'第二台电脑',projects:[]})]}},'*');};window.t0=Date.now();</script>`;
 
 (async () => {
@@ -36,6 +36,7 @@ if(d&&d.type==='atom:office'&&d.action==='state'&&Date.now()-window.t0>10000)e.s
       if (scheme === 'light') {
         // Setup choices must be reachable with arrows only; the runtime's spatial scoring favours aligned columns.
         await f.click('#btn-setup'); await page.waitForTimeout(200);
+        await f.click('[data-computer="pc1"]');
         const missing = await f.evaluate(() => {
           // Setup opens on its first choice; Down then walks every control in document order and Up from the top reaches back.
           const want = [...document.querySelectorAll('#dlg-setup .page-body button:not([hidden]), #dlg-setup .page-body input')], walked = [document.activeElement];
@@ -46,6 +47,13 @@ if(d&&d.type==='atom:office'&&d.action==='state'&&Date.now()-window.t0>10000)e.s
           return document.activeElement === document.querySelector('#dlg-setup .back') ? lost : lost.concat('back');
         });
         assert.deepEqual(missing, [], 'setup controls unreachable by five-way: ' + missing);
+        // Every advertised executor can be selected with the shared input runtime, without a hard-coded CLI list.
+        for (const id of ['codex','claude','opencode','kimi','pi']) {
+          await f.evaluate(id => AtomInput.focus(document.querySelector('[data-agent="'+id+'"]')), id);
+          await page.keyboard.press('Enter');
+          assert.equal(await f.getAttribute('[data-agent="'+id+'"]', 'aria-pressed'), 'true');
+        }
+
         // Real keys at device pace: open setup from the chip, Down, select. The page must stay open with the second
         // computer chosen (the five-way cursor follows the app's own focus moves; the choice buttons re-render).
         await f.click('#dlg-setup [data-close]'); await page.waitForTimeout(300);
