@@ -16,6 +16,7 @@ export function dashboard(companion,{port=8788,resourcePreviews=new ResourcePrev
   if(req.headers.host!==new URL(origin).host)return send(403,{error:'本地地址无效'});
   const url=new URL(req.url,origin);
   if(req.method==='GET'&&url.pathname==='/'){res.setHeader('Set-Cookie','atom_connect='+session+'; HttpOnly; SameSite=Strict; Path=/');res.writeHead(200,{'Content-Type':'text/html; charset=utf-8'});return res.end(fs.readFileSync(new URL('./dashboard.html',import.meta.url),'utf8'));}
+  if(req.method==='GET'&&url.pathname==='/camera.js'){res.writeHead(200,{'Content-Type':'text/javascript; charset=utf-8'});return res.end(fs.readFileSync(new URL('./camera.js',import.meta.url)));}
   if(req.method==='GET'&&url.pathname==='/photos.js'){res.writeHead(200,{'Content-Type':'text/javascript'});return res.end(fs.readFileSync(new URL('./photos.js',import.meta.url)));}
   if(req.method==='GET'&&/^\/community(?:-preview)?\.(js|css)$/.test(url.pathname)){res.writeHead(200,{'Content-Type':url.pathname.endsWith('.css')?'text/css':'text/javascript'});return res.end(fs.readFileSync(new URL('.'+url.pathname,import.meta.url)));}
   if(req.method==='GET'&&url.pathname==='/studio.js'){res.writeHead(200,{'Content-Type':'text/javascript'});return res.end(fs.readFileSync(new URL('./studio.js',import.meta.url)));}

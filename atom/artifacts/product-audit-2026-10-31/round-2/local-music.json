@@ -1,0 +1,229 @@
+{
+  "id": "local-music",
+  "steps": [
+    "#play",
+    "#back",
+    "#library",
+    "#back"
+  ],
+  "before": {
+    "title": "随身唱片",
+    "text": "随身唱片\n歌单\n♪\n\n添加你的音乐\n\n音频在本机播放，无需上传\n\n00:00\n00:00\n上一首\n添加音乐\n下一首\n音量\n顺序播放",
+    "size": {
+      "width": 480,
+      "height": 360
+    },
+    "controls": [
+      {
+        "tag": "BUTTON",
+        "id": "library",
+        "label": "歌单",
+        "disabled": false,
+        "x": 410,
+        "y": 14,
+        "w": 56,
+        "h": 44,
+        "font": "16px"
+      },
+      {
+        "tag": "INPUT",
+        "id": "seek",
+        "label": "播放进度",
+        "disabled": false,
+        "x": 60,
+        "y": 212,
+        "w": 360,
+        "h": 24,
+        "font": "13px"
+      },
+      {
+        "tag": "BUTTON",
+        "id": "prev",
+        "label": "上一首",
+        "disabled": false,
+        "x": 14,
+        "y": 248,
+        "w": 145,
+        "h": 44,
+        "font": "16px"
+      },
+      {
+        "tag": "BUTTON",
+        "id": "play",
+        "label": "添加音乐",
+        "disabled": false,
+        "x": 167,
+        "y": 248,
+        "w": 145,
+        "h": 44,
+        "font": "16px"
+      },
+      {
+        "tag": "BUTTON",
+        "id": "next",
+        "label": "下一首",
+        "disabled": false,
+        "x": 321,
+        "y": 248,
+        "w": 145,
+        "h": 44,
+        "font": "16px"
+      },
+      {
+        "tag": "INPUT",
+        "id": "volume",
+        "label": "音量",
+        "disabled": false,
+        "x": 50,
+        "y": 312,
+        "w": 330,
+        "h": 24,
+        "font": "13px"
+      },
+      {
+        "tag": "BUTTON",
+        "id": "mode",
+        "label": "顺序播放",
+        "disabled": false,
+        "x": 390,
+        "y": 302,
+        "w": 76,
+        "h": 44,
+        "font": "13px"
+      },
+      {
+        "tag": "BUTTON",
+        "id": "atom-app-back",
+        "label": "返回上一级",
+        "disabled": false,
+        "x": 0,
+        "y": 0,
+        "w": 48,
+        "h": 48,
+        "font": "16px"
+      }
+    ],
+    "canvases": 0,
+    "frames": 2,
+    "media": []
+  },
+  "after": {
+    "title": "随身唱片",
+    "text": "随身唱片\n歌单\n♪\n\n添加你的音乐\n\n音频在本机播放，无需上传\n\n00:00\n00:00\n上一首\n添加音乐\n下一首\n音量\n顺序播放",
+    "size": {
+      "width": 480,
+      "height": 360
+    },
+    "controls": [
+      {
+        "tag": "BUTTON",
+        "id": "library",
+        "label": "歌单",
+        "disabled": false,
+        "x": 410,
+        "y": 14,
+        "w": 56,
+        "h": 44,
+        "font": "16px"
+      },
+      {
+        "tag": "INPUT",
+        "id": "seek",
+        "label": "播放进度",
+        "disabled": false,
+        "x": 60,
+        "y": 212,
+        "w": 360,
+        "h": 24,
+        "font": "13px"
+      },
+      {
+        "tag": "BUTTON",
+        "id": "prev",
+        "label": "上一首",
+        "disabled": false,
+        "x": 14,
+        "y": 248,
+        "w": 145,
+        "h": 44,
+        "font": "16px"
+      },
+      {
+        "tag": "BUTTON",
+        "id": "play",
+        "label": "添加音乐",
+        "disabled": false,
+        "x": 167,
+        "y": 248,
+        "w": 145,
+        "h": 44,
+        "font": "16px"
+      },
+      {
+        "tag": "BUTTON",
+        "id": "next",
+        "label": "下一首",
+        "disabled": false,
+        "x": 321,
+        "y": 248,
+        "w": 145,
+        "h": 44,
+        "font": "16px"
+      },
+      {
+        "tag": "INPUT",
+        "id": "volume",
+        "label": "音量",
+        "disabled": false,
+        "x": 50,
+        "y": 312,
+        "w": 330,
+        "h": 24,
+        "font": "13px"
+      },
+      {
+        "tag": "BUTTON",
+        "id": "mode",
+        "label": "顺序播放",
+        "disabled": false,
+        "x": 390,
+        "y": 302,
+        "w": 76,
+        "h": 44,
+        "font": "13px"
+      },
+      {
+        "tag": "BUTTON",
+        "id": "atom-app-back",
+        "label": "返回上一级",
+        "disabled": false,
+        "x": 0,
+        "y": 0,
+        "w": 48,
+        "h": 48,
+        "font": "16px"
+      }
+    ],
+    "canvases": 0,
+    "frames": 3,
+    "media": []
+  },
+  "fixture": {
+    "ready": true,
+    "value": null,
+    "saves": 0,
+    "returned": 0,
+    "unsupported": [
+      "atom:input-mode"
+    ],
+    "calls": []
+  },
+  "suspend": {
+    "frames": 3,
+    "intervals": 0,
+    "audio": [],
+    "growth": 0
+  },
+  "errors": [],
+  "status": "reviewed"
+}

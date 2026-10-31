@@ -1,0 +1,50 @@
+/* Black belongs to the pet scene. The optional control pages follow the system theme. */
+:root{--bg:#f2f2f7;--ink:#1c1c1e;--card:#fff;--muted:#6c6c70;--line:#d9d9df;--accent:#007aff}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;font:16px/1.4 system-ui,sans-serif;background:#000;color:var(--ink)}
+[hidden]{display:none!important}
+button,select{font:inherit;min-height:44px;padding:8px 12px;border:0;border-radius:12px;background:var(--card);color:var(--ink)}
+button:disabled{opacity:.4}
+#home{position:absolute;inset:0;background:#000;overflow:hidden}
+#sprite{display:block;width:100%;height:100%;object-fit:contain;background:#000}
+#pet{position:absolute;top:0;left:0;width:45%;height:65%;cursor:pointer;background:transparent;border-radius:40%;-webkit-tap-highlight-color:transparent}
+#settings{position:absolute;right:4px;top:2px;width:44px;height:44px;padding:0;font-size:28px;line-height:1;--control-surface:transparent;--control-label:#89939a;box-shadow:none}
+body[data-panel=none] #atom-app-back{--control-surface:transparent;--control-label:#89939a;box-shadow:none}
+#scene-caption{position:absolute;bottom:11px;left:54px;right:54px;text-align:center;pointer-events:none;color:#d4dcdf}
+#scene-status{font-size:16px;font-weight:500;margin:0;line-height:22px}
+#scene-detail{font-size:14px;color:#7c898f;margin:3px 0 0;line-height:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#scene-detail:empty{display:none}
+#animation-note{position:absolute;top:16px;left:54px;right:54px;margin:0;color:#cab990;text-align:center;font-size:14px;pointer-events:none}
+#retry{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);white-space:nowrap;--control-surface:#181e22;--control-label:#e0e5e8}
+#panel{position:absolute;inset:0;background:var(--bg);color:var(--ink)}
+.panel-heading{height:54px;display:flex;align-items:center;justify-content:center;padding:6px 60px}
+h1{font-size:20px;margin:0}
+.tabs{height:44px;display:flex;gap:8px;padding:0 20px}
+.tabs button{min-height:36px;padding:6px 18px;font-size:15px}
+#preferences{height:210px;padding:6px 20px;display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;align-content:start}
+label{display:flex;flex-direction:column;gap:3px;font-size:14px;color:var(--muted)}
+select{width:100%;min-width:0;color:var(--ink)}
+.wide{grid-column:1/-1}
+p{margin:0}
+#pet-name,#save-feedback{font-size:14px;color:var(--muted);line-height:18px}
+#save-feedback:empty{display:none}
+#save-retry{min-height:32px;padding:3px 12px;font-size:14px;justify-self:start}
+#task-panel{height:210px;padding:5px 20px;position:relative}
+.task-heading{display:flex;justify-content:space-between;align-items:center;height:36px;gap:8px}
+#source,#position,#age,#feedback{font-size:14px;color:var(--muted)}
+.task-pager{display:flex;align-items:center;gap:5px;flex-shrink:0}
+.task-pager button{width:36px;min-height:32px;padding:0;font-size:24px}
+h2{font-size:20px;margin:6px 0 3px;line-height:26px}
+#detail{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:15px}
+#feedback{line-height:18px;margin-top:3px}
+#age{line-height:18px}
+.task-actions{display:flex;gap:8px;position:absolute;bottom:4px;left:20px;right:20px}
+.task-actions button{font-size:14px;min-height:38px;padding:6px 10px}
+#task{margin-left:auto}
+footer{position:absolute;bottom:8px;left:20px;right:20px;display:flex;justify-content:flex-end}
+#done{min-width:110px}
+#preferences{gap:6px 12px}
+#preferences label{gap:2px}
+#preferences select{min-height:40px;padding:6px 12px}
+#save-feedback{grid-column:1;align-self:center}
+#save-retry{grid-column:2;align-self:center;justify-self:end}

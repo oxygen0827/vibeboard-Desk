@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Codex 宠物</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-panel="none">
+<main id="home" aria-label="宠物陪伴场景">
+  <canvas id="sprite" width="480" height="360" aria-label="宠物动画"></canvas>
+  <div id="pet" role="button" tabindex="0" data-atom-default aria-label="和宠物打招呼"></div>
+  <button id="settings" aria-label="打开伙伴设置与任务" title="伙伴设置与任务">···</button>
+  <p id="animation-note" hidden></p>
+  <div id="scene-caption" aria-live="polite"><p id="scene-status">本地陪伴</p><p id="scene-detail"></p></div>
+  <button id="retry" hidden>重试读取</button>
+</main>
+<section id="panel" hidden aria-label="伙伴设置与任务">
+  <header class="panel-heading"><h1 id="title">我的伙伴</h1></header>
+  <nav class="tabs" aria-label="伙伴面板">
+    <button id="tab-companion" aria-pressed="true">伙伴</button>
+    <button id="tab-tasks" aria-pressed="false">工作状态</button>
+  </nav>
+  <section id="preferences">
+    <label class="wide">我的伙伴<select id="pet-select"></select></label>
+    <label>关注来源<select id="source-select"><option value="all">全部真实任务</option><option value="connect">ATOM Connect</option><option value="desktop">Codex 桌面 Hooks</option></select></label>
+    <label>看看它的动作<select id="action-select"><option value="auto">默认工作动作</option><option value="idle">待机</option><option value="runRight">向右走</option><option value="runLeft">向左走</option><option value="waving">开心挥手</option><option value="jumping">跳跃</option><option value="failed">有点受挫</option><option value="waiting">等待确认</option><option value="running">认真工作</option><option value="review">仔细审阅</option></select></label>
+    <p id="pet-name" class="wide"></p>
+    <p id="save-feedback" class="wide" role="status"></p>
+    <button id="save-retry" hidden>重试</button>
+  </section>
+  <section id="task-panel" hidden>
+    <div class="task-heading"><span id="source">尚未接入工作状态</span><div class="task-pager"><button id="previous" aria-label="上一个任务">‹</button><span id="position">0 / 0</span><button id="next" aria-label="下一个任务">›</button></div></div>
+    <h2 id="status">伙伴在这里</h2><p id="detail"></p><p id="age"></p><p id="feedback" role="status"></p>
+    <div class="task-actions"><button id="refresh">连接工作状态</button><button id="pause-sync" hidden>暂停同步</button><button id="task" disabled>任务详情</button></div>
+  </section>
+  <footer><button id="done">回到伙伴</button></footer>
+</section>
+<script src="pets.js"></script><script src="scene.js"></script><script src="app.js"></script>
+</body></html>

@@ -5,7 +5,7 @@ function state(value){if(active)options.onStatus(value,active.id);}
 function end(){if(options.onEnd)options.onEnd();clearTimeout(timer);if(active&&active.frame.contentWindow)active.frame.contentWindow.postMessage({type:'atom:app-lifecycle',state:'suspend'},'*');active=null;}
 function begin(frame,id,previewKey){end();active={frame:frame,id:id,previewKey:previewKey||null,ready:false,failed:false};state('loading');timer=setTimeout(function(){state('delayed');},8000);}
 function receive(e){if(!currentEvent(e)||!e.data)return;var d=e.data;
-if(d.type==='atom:app-ready'){if(active.ready||active.failed)return;active.ready=true;clearTimeout(timer);state('ready');return;}
+if(d.type==='atom:app-ready'){if(active.ready||active.failed)return;active.ready=true;clearTimeout(timer);state('ready');if(document.activeElement===document.body||document.activeElement===active.frame){try{active.frame.contentWindow.focus();}catch(_){}}return;}
 if(d.type==='atom:app-error'){active.failed=true;clearTimeout(timer);state('failed');return;}
 if(d.type!=='atom:storage'||typeof d.request_id!=='string'||!/^\d{1,12}$/.test(d.request_id)||['get','set'].indexOf(d.action)<0)return;
 var owner=active,key='atom.app.v1.'+active.id,mode=active.previewKey?'preview':'device',result={type:'atom:storage-result',request_id:d.request_id,ok:true,data:null,mode:mode};

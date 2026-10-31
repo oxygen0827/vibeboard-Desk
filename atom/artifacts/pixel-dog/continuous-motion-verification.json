@@ -1,0 +1,98 @@
+{
+  "date": "2026-10-30",
+  "app": "photo-pet",
+  "sha256": "a237fab8c554e0360073f94e9401b0184f1851e3d7879e6ffa47ecb0a10a8fc8",
+  "resources_verified": 13,
+  "installed_at_ns": 1793192014984748822,
+  "implementation": [
+    "Continuous two-bone arms with original character textures; tools follow wrists",
+    "Fixed standing feet and contact-band filtering of isolated atlas pixels",
+    "Display-aligned frame scheduling with a 30 fps target",
+    "Three bounded 96x96 character buffers, respecting the pixel grid",
+    "No crossfade between whole-body images"
+  ],
+  "checks": {
+    "admission": "0 errors; recurring-render warning addressed by device CPU/exit measurements and suspend tests",
+    "flow": "yard.test.cjs passed: five-way, state, jobs, retries, reduced motion, suspend",
+    "continuity": {
+      "test": "motion.test.cjs passed: 300 rendered frames at 30 fps",
+      "feet_unchanged": true,
+      "bone_lengths_fixed": true,
+      "max_wrist_step_pixels": {
+        "smith": 2.555817189388059,
+        "gardener": 0.1565117278594254,
+        "fisher": 0.14958790987330475
+      }
+    }
+  },
+  "device": {
+    "performance": {
+      "active": {
+        "seconds": 4.2472086640191264,
+        "chromium_cpu_percent_one_core": 188.12355671828652,
+        "logical_cpus": 4
+      },
+      "after_exit": {
+        "seconds": 4.16767717100447,
+        "chromium_cpu_percent_one_core": 11.517206835008121,
+        "logical_cpus": 4
+      },
+      "capture_seconds": 6.177,
+      "capture_frames": 120,
+      "capture_max_interval": 0.07989999999999986
+    },
+    "before_region_changes": {
+      "smith": {
+        "max_changed_pixels": 1622,
+        "median_changed_pixels": 0,
+        "unchanged_pairs": 114,
+        "pairs": 119
+      },
+      "gardener": {
+        "max_changed_pixels": 1945,
+        "median_changed_pixels": 0,
+        "unchanged_pairs": 71,
+        "pairs": 119
+      },
+      "fisher": {
+        "max_changed_pixels": 1494,
+        "median_changed_pixels": 0,
+        "unchanged_pairs": 115,
+        "pairs": 119
+      }
+    },
+    "after_region_changes": {
+      "smith": {
+        "max_changed_pixels": 375,
+        "median_changed_pixels": 158,
+        "unchanged_pairs": 5,
+        "pairs": 119
+      },
+      "gardener": {
+        "max_changed_pixels": 170,
+        "median_changed_pixels": 2,
+        "unchanged_pairs": 58,
+        "pairs": 119
+      },
+      "fisher": {
+        "max_changed_pixels": 268,
+        "median_changed_pixels": 142,
+        "unchanged_pairs": 28,
+        "pairs": 119
+      }
+    },
+    "desktop_return": "Original page 2 and dedicated icon verified",
+    "final_screen": "Courtyard home confirmed after ready; see continuous-motion-device-home.png"
+  },
+  "artifacts": [
+    "continuous-motion-preview.mp4",
+    "continuous-motion-device.mp4",
+    "continuous-motion-desktop.png",
+    "continuous-motion-device-home.png"
+  ],
+  "limits": [
+    "Regional captures are sampled evidence, not a native frame-rate benchmark",
+    "CPU figures are short whole-browser samples on a four-core device; the animation target is not a guarantee of sustained 30 fps",
+    "No multi-hour endurance claim"
+  ]
+}

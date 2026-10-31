@@ -1,0 +1,6687 @@
+[
+  {
+    "id": "agent-studio",
+    "round": 1,
+    "home": {
+      "title": "Agent 小屋",
+      "text": "‹ 桌面\nAgent 小屋\n正在同步电脑状态…\n任务\n一盏灯，等一个新想法。\n传感器未连接 · 手动陪伴\n体验离开\n轻轻摇一摇\n手动操作不会改变真实任务",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "back",
+          "label": "返回桌面",
+          "disabled": false,
+          "x": 10,
+          "y": 5,
+          "w": 70,
+          "h": 48,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "view",
+          "label": "任务",
+          "disabled": false,
+          "x": 426,
+          "y": 12,
+          "w": 44,
+          "h": 34,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "presence-demo",
+          "label": "体验离开",
+          "disabled": false,
+          "x": 150,
+          "y": 280,
+          "w": 78,
+          "h": 36,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "sway",
+          "label": "轻轻摇一摇",
+          "disabled": false,
+          "x": 240,
+          "y": 280,
+          "w": 90,
+          "h": 36,
+          "font": "12px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 2,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": [
+        "atom:task-state"
+      ]
+    },
+    "navigation": {
+      "start": "back",
+      "count": 4,
+      "visited": [
+        "view",
+        "sway",
+        "presence-demo",
+        "back"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 4,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "ai-duet",
+    "round": 1,
+    "home": {
+      "title": "合奏伙伴",
+      "text": "你先弹，我来接\nDUET / A CONVERSATION IN NOTES\n保存合奏\n播放合奏\n重新弹奏\n速度 \n0 个音符\nC\nD\nE\nF\nG\nA\nB\nC\nAI 接奏\n轻触琴键 · 弹完后邀请 AI 接奏",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 19,
+          "y": 4,
+          "w": 48,
+          "h": 48,
+          "font": "16px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "save",
+          "label": "保存合奏",
+          "disabled": false,
+          "x": 393,
+          "y": 12,
+          "w": 68,
+          "h": 32,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "play",
+          "label": "播放合奏",
+          "disabled": false,
+          "x": 15,
+          "y": 164,
+          "w": 70,
+          "h": 32,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "clear",
+          "label": "重新弹奏",
+          "disabled": false,
+          "x": 92,
+          "y": 164,
+          "w": 70,
+          "h": 32,
+          "font": "12px"
+        },
+        {
+          "tag": "INPUT",
+          "id": "bpm",
+          "label": "",
+          "disabled": false,
+          "x": 194,
+          "y": 168,
+          "w": 55,
+          "h": 25,
+          "font": "11px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "音符 60",
+          "disabled": false,
+          "x": 15,
+          "y": 205,
+          "w": 54,
+          "h": 73,
+          "font": "11px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "音符 62",
+          "disabled": false,
+          "x": 72,
+          "y": 205,
+          "w": 54,
+          "h": 73,
+          "font": "11px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "音符 64",
+          "disabled": false,
+          "x": 128,
+          "y": 205,
+          "w": 54,
+          "h": 73,
+          "font": "11px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "音符 65",
+          "disabled": false,
+          "x": 185,
+          "y": 205,
+          "w": 54,
+          "h": 73,
+          "font": "11px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "音符 67",
+          "disabled": false,
+          "x": 242,
+          "y": 205,
+          "w": 54,
+          "h": 73,
+          "font": "11px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "音符 69",
+          "disabled": false,
+          "x": 298,
+          "y": 205,
+          "w": 54,
+          "h": 73,
+          "font": "11px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "音符 71",
+          "disabled": false,
+          "x": 355,
+          "y": 205,
+          "w": 54,
+          "h": 73,
+          "font": "11px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "音符 72",
+          "disabled": false,
+          "x": 411,
+          "y": 205,
+          "w": 54,
+          "h": 73,
+          "font": "11px"
+        },
+        {
+          "tag": "INPUT",
+          "id": "prompt",
+          "label": "合奏风格",
+          "disabled": false,
+          "x": 14,
+          "y": 288,
+          "w": 364,
+          "h": 40,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "generate",
+          "label": "AI 接奏",
+          "disabled": false,
+          "x": 385,
+          "y": 288,
+          "w": 81,
+          "h": 40,
+          "font": "16px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 2,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "atom-app-back",
+      "count": 15,
+      "visited": [
+        "save",
+        "C",
+        "B",
+        "save"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 2,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "circuit-lab",
+    "round": 1,
+    "home": {
+      "title": "电路实验室",
+      "text": "电路实验室\n正在初始化求解器…\nRLC振荡\n半波整流\n555振荡器\n暂停\n参数×1\n重置",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "SELECT",
+          "id": "preset",
+          "label": "实验电路",
+          "disabled": false,
+          "x": 10,
+          "y": 312,
+          "w": 152,
+          "h": 40,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "pause",
+          "label": "暂停",
+          "disabled": false,
+          "x": 168,
+          "y": 312,
+          "w": 97,
+          "h": 40,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "change",
+          "label": "参数×1",
+          "disabled": false,
+          "x": 271,
+          "y": 312,
+          "w": 97,
+          "h": 40,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "reset",
+          "label": "重置",
+          "disabled": false,
+          "x": 373,
+          "y": 312,
+          "w": 97,
+          "h": 40,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 0,
+          "y": 0,
+          "w": 48,
+          "h": 48,
+          "font": "13px"
+        }
+      ],
+      "canvases": 0,
+      "frames": 2,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "preset",
+      "count": 5,
+      "visited": [
+        "pause",
+        "pause",
+        "preset",
+        "atom-app-back"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 3,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 1,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "clap-stage",
+    "round": 1,
+    "home": {
+      "title": "掌心节拍",
+      "text": "掌心节拍\n把节奏，留在桌上。\n木音\n96\nBPM · 点按定速\n4 拍\n整拍\n−\n＋\n开始\n拍手定速\n点四下，让它跟上你",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 20,
+          "y": 11,
+          "w": 60,
+          "h": 48,
+          "font": "16px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "sound",
+          "label": "切换节拍音色",
+          "disabled": false,
+          "x": 400,
+          "y": 15,
+          "w": 60,
+          "h": 40,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "tap",
+          "label": "连续点按定速",
+          "disabled": false,
+          "x": 160,
+          "y": 82,
+          "w": 160,
+          "h": 112,
+          "font": "16px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "meter",
+          "label": "切换每小节拍数",
+          "disabled": false,
+          "x": 33,
+          "y": 204,
+          "w": 37,
+          "h": 37,
+          "font": "10px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "division",
+          "label": "切换细分节奏",
+          "disabled": false,
+          "x": 409,
+          "y": 204,
+          "w": 38,
+          "h": 37,
+          "font": "10px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "slower",
+          "label": "减慢一分钟一拍",
+          "disabled": false,
+          "x": 20,
+          "y": 261,
+          "w": 37,
+          "h": 40,
+          "font": "18px"
+        },
+        {
+          "tag": "INPUT",
+          "id": "tempo",
+          "label": "每分钟拍数",
+          "disabled": false,
+          "x": 67,
+          "y": 261,
+          "w": 262,
+          "h": 40,
+          "font": "16px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "faster",
+          "label": "加快一分钟一拍",
+          "disabled": false,
+          "x": 339,
+          "y": 261,
+          "w": 37,
+          "h": 40,
+          "font": "18px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "play",
+          "label": "开始",
+          "disabled": false,
+          "x": 384,
+          "y": 261,
+          "w": 76,
+          "h": 40,
+          "font": "15px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "listen",
+          "label": "拍手定速",
+          "disabled": false,
+          "x": 20,
+          "y": 311,
+          "w": 44,
+          "h": 40,
+          "font": "11px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 2,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "atom-app-back",
+      "count": 10,
+      "visited": [
+        "sound",
+        "division",
+        "faster",
+        "division"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 2,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "clay-studio",
+    "round": 1,
+    "home": {
+      "title": "",
+      "text": "黏土工坊\n\n拖动雕刻 · 右键转动 · 滚轮缩放\n\n准备黏土\n堆土\n凸起\n撤销\n重置",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "tool",
+          "label": "堆土",
+          "disabled": false,
+          "x": 8,
+          "y": 304,
+          "w": 112,
+          "h": 48,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "negative",
+          "label": "凸起",
+          "disabled": false,
+          "x": 126,
+          "y": 304,
+          "w": 112,
+          "h": 48,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "undo",
+          "label": "撤销",
+          "disabled": false,
+          "x": 243,
+          "y": 304,
+          "w": 112,
+          "h": 48,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "reset",
+          "label": "重置",
+          "disabled": false,
+          "x": 361,
+          "y": 304,
+          "w": 112,
+          "h": 48,
+          "font": "14px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 0,
+      "media": []
+    },
+    "fixture": {
+      "ready": false,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "tool",
+      "count": 4,
+      "visited": [
+        "negative",
+        "negative",
+        "tool",
+        "tool"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 1,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "codex-pet",
+    "round": 1,
+    "home": {
+      "title": "Codex 宠物",
+      "text": "···\n\n本地陪伴",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "DIV",
+          "id": "pet",
+          "label": "和宠物打招呼",
+          "disabled": false,
+          "x": 0,
+          "y": 0,
+          "w": 216,
+          "h": 234,
+          "font": "16px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "settings",
+          "label": "打开伙伴设置与任务",
+          "disabled": false,
+          "x": 432,
+          "y": 2,
+          "w": 44,
+          "h": 44,
+          "font": "28px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 0,
+      "media": []
+    },
+    "fixture": {
+      "ready": false,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "pet",
+      "count": 2,
+      "visited": [
+        "settings",
+        "pet",
+        "pet",
+        "settings"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 2,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "echo-book",
+    "round": 1,
+    "home": {
+      "title": "回声之书",
+      "text": "回声之书\nATOM · LITTLE RITUALS\nTHE BOOK\nOF ECHOES\n✦\n回 声 之 书\nA MOMENT FOR YOURSELF\n心里放一个问题\n翻到属于此刻的一页\n\n不是预言，是换个角度看自己。\n\n翻开一页 我的书签\n随机文字灵感 · 不预测未来",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 54,
+          "y": 3,
+          "w": 48,
+          "h": 48,
+          "font": "16px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "open",
+          "label": "翻开一页",
+          "disabled": false,
+          "x": 187,
+          "y": 241,
+          "w": 88,
+          "h": 38,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "inBookmarks",
+          "label": "我的书签",
+          "disabled": false,
+          "x": 279,
+          "y": 241,
+          "w": 88,
+          "h": 38,
+          "font": "14px"
+        }
+      ],
+      "canvases": 0,
+      "frames": 2,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "atom-app-back",
+      "count": 3,
+      "visited": [
+        "inBookmarks",
+        "inBookmarks",
+        "open",
+        "atom-app-back"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 3,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "element-sandbox",
+    "round": 1,
+    "home": {
+      "title": "掌心造物沙盘",
+      "text": "掌心造物沙盘\n沙\n水\n火\n植物\n石墙\n‹\n投放 3\n›\n暂停\n清空\n水灭火，火烧植物，植物遇水生长 · 5 个投放口",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 52,
+          "y": 2,
+          "w": 48,
+          "h": 48,
+          "font": "16px"
+        },
+        {
+          "tag": "SELECT",
+          "id": "material",
+          "label": "投放材料",
+          "disabled": false,
+          "x": 97,
+          "y": 275,
+          "w": 77,
+          "h": 38,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "left",
+          "label": "‹",
+          "disabled": false,
+          "x": 179,
+          "y": 275,
+          "w": 23,
+          "h": 38,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "drop",
+          "label": "投放 3",
+          "disabled": false,
+          "x": 208,
+          "y": 275,
+          "w": 53,
+          "h": 38,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "right",
+          "label": "›",
+          "disabled": false,
+          "x": 265,
+          "y": 275,
+          "w": 23,
+          "h": 38,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "pause",
+          "label": "暂停",
+          "disabled": false,
+          "x": 294,
+          "y": 275,
+          "w": 42,
+          "h": 38,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "reset",
+          "label": "清空",
+          "disabled": false,
+          "x": 341,
+          "y": 275,
+          "w": 42,
+          "h": 38,
+          "font": "12px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 133,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "atom-app-back",
+      "count": 7,
+      "visited": [
+        "reset",
+        "reset",
+        "pause",
+        "atom-app-back"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 136,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "finger-fireworks",
+    "round": 1,
+    "home": {
+      "title": "指尖烟花",
+      "text": "指尖烟花\n点击夜空 · 数字键 1–9 定点燃放\n声音 关\n写一句话\n自动连放\n齐放",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 26,
+          "y": 10,
+          "w": 48,
+          "h": 48,
+          "font": "16px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "声音 关",
+          "disabled": false,
+          "x": 399,
+          "y": 13,
+          "w": 63,
+          "h": 42,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "words",
+          "label": "写一句话",
+          "disabled": false,
+          "x": 12,
+          "y": 306,
+          "w": 80,
+          "h": 42,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "auto",
+          "label": "自动连放",
+          "disabled": false,
+          "x": 100,
+          "y": 306,
+          "w": 80,
+          "h": 42,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "finale",
+          "label": "齐放",
+          "disabled": false,
+          "x": 188,
+          "y": 306,
+          "w": 52,
+          "h": 42,
+          "font": "14px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 139,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "atom-app-back",
+      "count": 5,
+      "visited": [
+        "声音 关",
+        "finale",
+        "auto",
+        "atom-app-back"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 141,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "focus-garden",
+    "round": 1,
+    "home": {
+      "title": "专注花园",
+      "text": "‹ 桌面\n专注花园\n0 株成长\n给一件小事，留一点时间\n25:00\n这次留出\n5 分钟\n25 分钟\n45 分钟\n开始专注\n传感器未连接 · 可手动计时\n成长只在计时结束并由你确认后记录",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "back",
+          "label": "‹ 桌面",
+          "disabled": false,
+          "x": 9,
+          "y": 3,
+          "w": 95,
+          "h": 48,
+          "font": "13px"
+        },
+        {
+          "tag": "SELECT",
+          "id": "duration",
+          "label": "专注时长",
+          "disabled": false,
+          "x": 233,
+          "y": 162,
+          "w": 67,
+          "h": 25,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "start",
+          "label": "开始专注",
+          "disabled": false,
+          "x": 175,
+          "y": 198,
+          "w": 130,
+          "h": 40,
+          "font": "13px"
+        }
+      ],
+      "canvases": 0,
+      "frames": 2,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "back",
+      "count": 3,
+      "visited": [
+        "duration",
+        "start",
+        "back",
+        "back"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 3,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "glass-ecosystem",
+    "round": 1,
+    "home": {
+      "title": "玻璃生态瓶",
+      "text": "玻璃生态瓶\n氧气 75% · 食物 25%\n种水草 6\n投喂\n光照 60%\n暂停\n保存\n简化生态模型 · 氧气随光照和生物数量变化",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 52,
+          "y": 2,
+          "w": 48,
+          "h": 48,
+          "font": "16px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "plant",
+          "label": "种水草 6",
+          "disabled": false,
+          "x": 92,
+          "y": 266,
+          "w": 67,
+          "h": 38,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "feed",
+          "label": "投喂",
+          "disabled": false,
+          "x": 165,
+          "y": 266,
+          "w": 44,
+          "h": 38,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "light",
+          "label": "光照 60%",
+          "disabled": false,
+          "x": 215,
+          "y": 266,
+          "w": 74,
+          "h": 38,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "pause",
+          "label": "暂停",
+          "disabled": false,
+          "x": 294,
+          "y": 266,
+          "w": 44,
+          "h": 38,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "save",
+          "label": "保存",
+          "disabled": false,
+          "x": 344,
+          "y": 266,
+          "w": 44,
+          "h": 38,
+          "font": "12px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 140,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "atom-app-back",
+      "count": 6,
+      "visited": [
+        "pause",
+        "pause",
+        "light",
+        "atom-app-back"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 146,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "language-alchemy",
+    "round": 1,
+    "home": {
+      "title": "语言炼金",
+      "text": "流动的月银\nLANGUAGE / MATTER\n保存作品\n移动光标，拨动这片物质\n炼成\n本地材质 · 输入一句话，让 AI 改造",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 19,
+          "y": 4,
+          "w": 48,
+          "h": 48,
+          "font": "16px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "save",
+          "label": "保存作品",
+          "disabled": false,
+          "x": 393,
+          "y": 12,
+          "w": 68,
+          "h": 32,
+          "font": "12px"
+        },
+        {
+          "tag": "INPUT",
+          "id": "prompt",
+          "label": "描述画面",
+          "disabled": false,
+          "x": 14,
+          "y": 288,
+          "w": 383,
+          "h": 40,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "generate",
+          "label": "炼成",
+          "disabled": false,
+          "x": 404,
+          "y": 288,
+          "w": 62,
+          "h": 40,
+          "font": "16px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 140,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "atom-app-back",
+      "count": 4,
+      "visited": [
+        "save",
+        "generate",
+        "prompt",
+        "atom-app-back"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 144,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "local-music",
+    "round": 1,
+    "home": {
+      "title": "随身唱片",
+      "text": "随身唱片\n歌单\n♪\n\n添加你的音乐\n\n音频在本机播放，无需上传\n\n00:00\n00:00\n上一首\n播放\n下一首\n音量\n顺序播放",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "library",
+          "label": "歌单",
+          "disabled": false,
+          "x": 410,
+          "y": 14,
+          "w": 56,
+          "h": 44,
+          "font": "16px"
+        },
+        {
+          "tag": "INPUT",
+          "id": "seek",
+          "label": "播放进度",
+          "disabled": false,
+          "x": 60,
+          "y": 212,
+          "w": 360,
+          "h": 24,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "prev",
+          "label": "上一首",
+          "disabled": false,
+          "x": 14,
+          "y": 248,
+          "w": 145,
+          "h": 44,
+          "font": "16px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "play",
+          "label": "播放",
+          "disabled": false,
+          "x": 167,
+          "y": 248,
+          "w": 145,
+          "h": 44,
+          "font": "16px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "next",
+          "label": "下一首",
+          "disabled": false,
+          "x": 321,
+          "y": 248,
+          "w": 145,
+          "h": 44,
+          "font": "16px"
+        },
+        {
+          "tag": "INPUT",
+          "id": "volume",
+          "label": "音量",
+          "disabled": false,
+          "x": 50,
+          "y": 312,
+          "w": 330,
+          "h": 24,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "mode",
+          "label": "顺序播放",
+          "disabled": false,
+          "x": 390,
+          "y": 302,
+          "w": 76,
+          "h": 44,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 0,
+          "y": 0,
+          "w": 48,
+          "h": 48,
+          "font": "16px"
+        }
+      ],
+      "canvases": 0,
+      "frames": 2,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "library",
+      "count": 8,
+      "visited": [
+        "library",
+        "mode",
+        "volume",
+        "play"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 3,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "made-23c2b1193c452dd3adf9",
+    "round": 1,
+    "home": {
+      "title": "",
+      "text": "暂停\n切换颜色",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "",
+          "disabled": false,
+          "x": 16,
+          "y": 16,
+          "w": 48,
+          "h": 48,
+          "font": "16px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "toggle-btn",
+          "label": "暂停",
+          "disabled": false,
+          "x": 134,
+          "y": 250,
+          "w": 80,
+          "h": 50,
+          "font": "16px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "color-btn",
+          "label": "切换颜色",
+          "disabled": false,
+          "x": 234,
+          "y": 250,
+          "w": 112,
+          "h": 50,
+          "font": "16px"
+        }
+      ],
+      "canvases": 0,
+      "frames": 2,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "",
+      "count": 3,
+      "visited": [
+        "color-btn",
+        "color-btn",
+        "toggle-btn",
+        ""
+      ]
+    },
+    "afterSuspend": {
+      "frames": 2,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "market",
+    "round": 1,
+    "home": {
+      "title": "应用市场",
+      "text": "‹ 返回\n应用市场\n我的创作\n登录\n离线审查：此操作未连接真实服务 重试\n搜索\n全部\n生活\n陪伴\n声音\n趣玩\n连接\n这里还没有作品\n\n试试其他分类，或在电脑工作台发布你的创作。\n\n请先在「我的电脑」配置中继服务。市场公开目录无需登录，衍生创作与笔记同步需要账号。",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "‹ 返回",
+          "disabled": false,
+          "x": 22,
+          "y": 14,
+          "w": 48,
+          "h": 48,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "我的创作",
+          "disabled": false,
+          "x": 355,
+          "y": 22,
+          "w": 48,
+          "h": 32,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "登录",
+          "disabled": false,
+          "x": 410,
+          "y": 22,
+          "w": 48,
+          "h": 32,
+          "font": "12px"
+        },
+        {
+          "tag": "INPUT",
+          "id": "search",
+          "label": "搜索应用",
+          "disabled": false,
+          "x": 22,
+          "y": 110,
+          "w": 378,
+          "h": 36,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "搜索",
+          "disabled": false,
+          "x": 406,
+          "y": 110,
+          "w": 52,
+          "h": 36,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "全部",
+          "disabled": false,
+          "x": 25,
+          "y": 159,
+          "w": 69,
+          "h": 28,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "生活",
+          "disabled": false,
+          "x": 97,
+          "y": 159,
+          "w": 69,
+          "h": 28,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "陪伴",
+          "disabled": false,
+          "x": 169,
+          "y": 159,
+          "w": 69,
+          "h": 28,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "声音",
+          "disabled": false,
+          "x": 241,
+          "y": 159,
+          "w": 69,
+          "h": 28,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "趣玩",
+          "disabled": false,
+          "x": 314,
+          "y": 159,
+          "w": 69,
+          "h": 28,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "连接",
+          "disabled": false,
+          "x": 386,
+          "y": 159,
+          "w": 69,
+          "h": 28,
+          "font": "12px"
+        }
+      ],
+      "canvases": 0,
+      "frames": 2,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "‹ 返回",
+      "count": 11,
+      "visited": [
+        "重试",
+        "search",
+        "生活",
+        "重试"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 3,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "material-world",
+    "round": 1,
+    "home": {
+      "title": "",
+      "text": "材料世界 · 沙水火木真实反应\n沙\n水\n火\n木\n油\n植物\n冰\n熔岩\n酸\n墙\n擦除\n笔刷：小\n暂停\n撤销\n清空",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "SELECT",
+          "id": "species",
+          "label": "材料",
+          "disabled": false,
+          "x": 8,
+          "y": 310,
+          "w": 64,
+          "h": 40,
+          "font": "15px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "brush",
+          "label": "笔刷：小",
+          "disabled": false,
+          "x": 78,
+          "y": 310,
+          "w": 78,
+          "h": 40,
+          "font": "15px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "pause",
+          "label": "暂停",
+          "disabled": false,
+          "x": 162,
+          "y": 310,
+          "w": 48,
+          "h": 40,
+          "font": "15px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "undo",
+          "label": "撤销",
+          "disabled": false,
+          "x": 216,
+          "y": 310,
+          "w": 48,
+          "h": 40,
+          "font": "15px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "clear",
+          "label": "清空",
+          "disabled": false,
+          "x": 270,
+          "y": 310,
+          "w": 48,
+          "h": 40,
+          "font": "15px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 0,
+      "media": []
+    },
+    "fixture": {
+      "ready": false,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "count": 0,
+      "visited": [
+        "材料世界 · 沙水火木真实反应沙水火木油植物冰熔岩酸墙擦除笔",
+        "材料世界 · 沙水火木真实反应沙水火木油植物冰熔岩酸墙擦除笔",
+        "材料世界 · 沙水火木真实反应沙水火木油植物冰熔岩酸墙擦除笔",
+        "材料世界 · 沙水火木真实反应沙水火木油植物冰熔岩酸墙擦除笔"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 0,
+      "raf": 0,
+      "intervals": 1,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "math-playground",
+    "round": 1,
+    "home": {
+      "title": "数学游乐场",
+      "text": "数学游乐场\n拖动橙色点，改变分形\n复数分形\n光线包络\n三角几何\n重置",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "复数分形",
+          "disabled": false,
+          "x": 10,
+          "y": 314,
+          "w": 111,
+          "h": 38,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "光线包络",
+          "disabled": false,
+          "x": 127,
+          "y": 314,
+          "w": 111,
+          "h": 38,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "三角几何",
+          "disabled": false,
+          "x": 243,
+          "y": 314,
+          "w": 111,
+          "h": 38,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "reset",
+          "label": "重置",
+          "disabled": false,
+          "x": 360,
+          "y": 314,
+          "w": 111,
+          "h": 38,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 0,
+          "y": 0,
+          "w": 48,
+          "h": 48,
+          "font": "13px"
+        }
+      ],
+      "canvases": 4,
+      "frames": 3,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "复数分形",
+      "count": 5,
+      "visited": [
+        "光线包络",
+        "光线包络",
+        "复数分形",
+        "atom-app-back"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 5,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "mic-test",
+    "round": 1,
+    "home": {
+      "title": "",
+      "text": "麦克风测试\n等待录音\n音量 RMS\n—\n峰值\n—\n削波比例\n—\n录音时长\n00.0 s\n\n先保持安静 2 秒，再用正常音量说话。录完可回放，听是否清楚、有杂音。\n\n离线审查：此操作未连接真实服务\n暂停风扇\n开始录音\n回放录音\n原始 PCM · 16 kHz · 最长 30 秒\n空格返回",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 22,
+          "y": 14,
+          "w": 48,
+          "h": 48,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "fan",
+          "label": "暂停风扇",
+          "disabled": true,
+          "x": 326,
+          "y": 228,
+          "w": 132,
+          "h": 44,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "record",
+          "label": "开始录音",
+          "disabled": false,
+          "x": 22,
+          "y": 279,
+          "w": 213,
+          "h": 44,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "play",
+          "label": "回放录音",
+          "disabled": true,
+          "x": 245,
+          "y": 279,
+          "w": 213,
+          "h": 44,
+          "font": "14px"
+        }
+      ],
+      "canvases": 0,
+      "frames": 2,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "atom-app-back",
+      "count": 2,
+      "visited": [
+        "record",
+        "record",
+        "atom-app-back",
+        "atom-app-back"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 4,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "mini-piano",
+    "round": 1,
+    "home": {
+      "title": "迷你钢琴",
+      "text": "‹ 桌面\n迷你钢琴\nYamaha C5 · 按住滑奏\n声音 关\n舒缓 0.8×\n原速 1×\n轻快 1.15×\n活泼 1.3×\n轻点琴键，弹一段旋律\n双手\n右手\n左手\n表情 开\n播放",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "返回桌面",
+          "disabled": false,
+          "x": 12,
+          "y": 10,
+          "w": 64,
+          "h": 48,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "声音 关",
+          "disabled": false,
+          "x": 395,
+          "y": 13,
+          "w": 63,
+          "h": 42,
+          "font": "12px"
+        },
+        {
+          "tag": "SELECT",
+          "id": "song",
+          "label": "选择完整钢琴作品",
+          "disabled": false,
+          "x": 16,
+          "y": 66,
+          "w": 316,
+          "h": 40,
+          "font": "14px"
+        },
+        {
+          "tag": "SELECT",
+          "id": "speed",
+          "label": "演奏速度",
+          "disabled": false,
+          "x": 344,
+          "y": 66,
+          "w": 120,
+          "h": 40,
+          "font": "14px"
+        },
+        {
+          "tag": "SELECT",
+          "id": "hands",
+          "label": "演奏声部",
+          "disabled": false,
+          "x": 309,
+          "y": 114,
+          "w": 56,
+          "h": 38,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "tone",
+          "label": "表情 开",
+          "disabled": false,
+          "x": 367,
+          "y": 112,
+          "w": 55,
+          "h": 42,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "demo",
+          "label": "播放",
+          "disabled": false,
+          "x": 424,
+          "y": 112,
+          "w": 40,
+          "h": 42,
+          "font": "12px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 0,
+      "media": []
+    },
+    "fixture": {
+      "ready": false,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "‹ 桌面",
+      "count": 7,
+      "visited": [
+        "song",
+        "hands",
+        "song",
+        "‹ 桌面"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 2,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "model-viewer",
+    "round": 1,
+    "home": {
+      "title": "",
+      "text": "模型检视台\n\n拖动旋转 · 滚轮缩放 · 本地文件不上传\n\n打开模型\n雕塑\n齿轮\n结构件\n线框\n巡航\n归位",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "open",
+          "label": "打开模型",
+          "disabled": false,
+          "x": 12,
+          "y": 308,
+          "w": 89,
+          "h": 40,
+          "font": "13px"
+        },
+        {
+          "tag": "SELECT",
+          "id": "sample",
+          "label": "雕塑齿轮结构件",
+          "disabled": false,
+          "x": 107,
+          "y": 308,
+          "w": 75,
+          "h": 40,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "wire",
+          "label": "线框",
+          "disabled": false,
+          "x": 188,
+          "y": 308,
+          "w": 89,
+          "h": 40,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "rotate",
+          "label": "巡航",
+          "disabled": false,
+          "x": 284,
+          "y": 308,
+          "w": 89,
+          "h": 40,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "fit",
+          "label": "归位",
+          "disabled": false,
+          "x": 379,
+          "y": 308,
+          "w": 89,
+          "h": 40,
+          "font": "13px"
+        }
+      ],
+      "canvases": 0,
+      "frames": 0,
+      "media": []
+    },
+    "fixture": {
+      "ready": false,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "open",
+      "count": 5,
+      "visited": [
+        "sample",
+        "sample",
+        "open",
+        "open"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 1,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "moon-letter",
+    "round": 1,
+    "home": {
+      "title": "月亮来信",
+      "text": "月亮来信\n2026-10-31\n下弦月\n\n照亮 69%\n距下次满月约 24 天\n\n今天，月亮也在这里。\n\n前一天\n写封来信\n后一天\n月相近似计算 · SunCalc",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 52,
+          "y": 2,
+          "w": 48,
+          "h": 48,
+          "font": "16px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "prev",
+          "label": "前一天",
+          "disabled": false,
+          "x": 126,
+          "y": 299,
+          "w": 66,
+          "h": 38,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "write",
+          "label": "写封来信",
+          "disabled": false,
+          "x": 200,
+          "y": 299,
+          "w": 80,
+          "h": 38,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "next",
+          "label": "后一天",
+          "disabled": false,
+          "x": 288,
+          "y": 299,
+          "w": 66,
+          "h": 38,
+          "font": "14px"
+        }
+      ],
+      "canvases": 0,
+      "frames": 2,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "atom-app-back",
+      "count": 4,
+      "visited": [
+        "next",
+        "next",
+        "write",
+        "atom-app-back"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 4,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "moon-ocean",
+    "round": 1,
+    "home": {
+      "title": "A trip under the moonlight",
+      "text": "月光海洋 · 拖动环视 · 滚轮靠近\n月夜\n白昼\n日落\n风力",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "月夜",
+          "disabled": false,
+          "x": 12,
+          "y": 310,
+          "w": 110,
+          "h": 40,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "白昼",
+          "disabled": false,
+          "x": 128,
+          "y": 310,
+          "w": 110,
+          "h": 40,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "日落",
+          "disabled": false,
+          "x": 243,
+          "y": 310,
+          "w": 110,
+          "h": 40,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "风力",
+          "disabled": false,
+          "x": 359,
+          "y": 310,
+          "w": 110,
+          "h": 40,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 0,
+          "y": 0,
+          "w": 48,
+          "h": 48,
+          "font": "14px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 11,
+      "media": []
+    },
+    "fixture": {
+      "ready": false,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "月夜",
+      "count": 5,
+      "visited": [
+        "白昼",
+        "白昼",
+        "月夜",
+        "atom-app-back"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 42,
+      "raf": 1,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 15
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "motion-music",
+    "round": 1,
+    "home": {
+      "title": "音乐物理沙盒",
+      "text": "‹ 桌面\n音乐物理沙盒\n开启声音\n01 / PENTATONIC\n让碰撞，成为旋律。\n\n拖动小球，松手听见回响\n\n手动把玩 · 未连接惯性传感器\n五声音阶\n音符沙盒\n瓶中海洋\n光之容器\n● 录一段\n▶ 回放\n保存\n←\n↑\n水平\n↓\n→\n拨动\n重置场景\n先拨动小球，再开启声音",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "back",
+          "label": "返回桌面",
+          "disabled": false,
+          "x": 0,
+          "y": 0,
+          "w": 88,
+          "h": 48,
+          "font": "27px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "sound",
+          "label": "开启声音",
+          "disabled": false,
+          "x": 406,
+          "y": 8,
+          "w": 64,
+          "h": 32,
+          "font": "11px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "sensor",
+          "label": "手动把玩 · 未连接惯性传感器",
+          "disabled": false,
+          "x": 16,
+          "y": 233,
+          "w": 116,
+          "h": 28,
+          "font": "9px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "音符沙盒",
+          "disabled": false,
+          "x": 10,
+          "y": 270,
+          "w": 62,
+          "h": 34,
+          "font": "11px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "瓶中海洋",
+          "disabled": false,
+          "x": 74,
+          "y": 270,
+          "w": 62,
+          "h": 34,
+          "font": "11px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "光之容器",
+          "disabled": false,
+          "x": 138,
+          "y": 270,
+          "w": 62,
+          "h": 34,
+          "font": "11px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "record",
+          "label": "● 录一段",
+          "disabled": false,
+          "x": 310,
+          "y": 270,
+          "w": 64,
+          "h": 34,
+          "font": "11px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "play",
+          "label": "▶ 回放",
+          "disabled": true,
+          "x": 376,
+          "y": 270,
+          "w": 52,
+          "h": 34,
+          "font": "11px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "save",
+          "label": "保存",
+          "disabled": true,
+          "x": 430,
+          "y": 270,
+          "w": 40,
+          "h": 34,
+          "font": "11px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "向左倾斜",
+          "disabled": false,
+          "x": 10,
+          "y": 314,
+          "w": 28,
+          "h": 30,
+          "font": "10px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "向上倾斜",
+          "disabled": false,
+          "x": 39,
+          "y": 314,
+          "w": 28,
+          "h": 30,
+          "font": "10px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "恢复水平",
+          "disabled": false,
+          "x": 68,
+          "y": 314,
+          "w": 34,
+          "h": 30,
+          "font": "10px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "向下倾斜",
+          "disabled": false,
+          "x": 103,
+          "y": 314,
+          "w": 28,
+          "h": 30,
+          "font": "10px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "向右倾斜",
+          "disabled": false,
+          "x": 132,
+          "y": 314,
+          "w": 28,
+          "h": 30,
+          "font": "10px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "pluck",
+          "label": "拨动",
+          "disabled": false,
+          "x": 162,
+          "y": 314,
+          "w": 34,
+          "h": 30,
+          "font": "10px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "reset",
+          "label": "重置场景",
+          "disabled": false,
+          "x": 198,
+          "y": 314,
+          "w": 54,
+          "h": 30,
+          "font": "10px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 133,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "sound",
+      "count": 13,
+      "visited": [
+        "sound",
+        "record",
+        "光之容器",
+        "sensor"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 137,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "music-vision",
+    "round": 1,
+    "home": {
+      "title": "音乐幻境",
+      "text": "音乐幻境\n$$$ Royal - Mashup (197)\n点击播放节拍，或选择本地音乐\n播放节拍\n本地音乐\n换一幅\n自动：关",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "play",
+          "label": "播放节拍",
+          "disabled": false,
+          "x": 12,
+          "y": 304,
+          "w": 110,
+          "h": 44,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "choose",
+          "label": "本地音乐",
+          "disabled": false,
+          "x": 128,
+          "y": 304,
+          "w": 110,
+          "h": 44,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "next",
+          "label": "换一幅",
+          "disabled": false,
+          "x": 243,
+          "y": 304,
+          "w": 110,
+          "h": 44,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "auto",
+          "label": "自动：关",
+          "disabled": false,
+          "x": 359,
+          "y": 304,
+          "w": 110,
+          "h": 44,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 0,
+          "y": 0,
+          "w": 48,
+          "h": 48,
+          "font": "13px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 96,
+      "media": [
+        "suspended"
+      ]
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "play",
+      "count": 5,
+      "visited": [
+        "choose",
+        "choose",
+        "play",
+        "atom-app-back"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 129,
+      "raf": 1,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [
+        "suspended"
+      ],
+      "frameGrowth": 15
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "my-computer",
+    "round": 1,
+    "home": {
+      "title": "我的电脑",
+      "text": "返回\n连接设置\n服务连接\n配对电脑\n连接 ATOM Connect\n\n连接电脑端 ATOM Connect，使用同一个服务地址。\n\n服务地址（HTTPS）\n设备名称\n保存连接",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "返回",
+          "disabled": false,
+          "x": 22,
+          "y": 13,
+          "w": 50,
+          "h": 48,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "服务连接",
+          "disabled": false,
+          "x": 22,
+          "y": 66,
+          "w": 48,
+          "h": 28,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "配对电脑",
+          "disabled": false,
+          "x": 87,
+          "y": 66,
+          "w": 48,
+          "h": 28,
+          "font": "12px"
+        },
+        {
+          "tag": "INPUT",
+          "id": "relay",
+          "label": "https://ldcx.tech/atom",
+          "disabled": false,
+          "x": 36,
+          "y": 192,
+          "w": 408,
+          "h": 36,
+          "font": "12px"
+        },
+        {
+          "tag": "INPUT",
+          "id": "device-name",
+          "label": "",
+          "disabled": false,
+          "x": 36,
+          "y": 254,
+          "w": 408,
+          "h": 36,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "保存连接",
+          "disabled": false,
+          "x": 36,
+          "y": 296,
+          "w": 64,
+          "h": 32,
+          "font": "11px"
+        }
+      ],
+      "canvases": 0,
+      "frames": 2,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": [
+        "atom:computer-launch-ready"
+      ]
+    },
+    "navigation": {
+      "start": "返回",
+      "count": 6,
+      "visited": [
+        "配对电脑",
+        "保存连接",
+        "服务连接",
+        "返回"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 2,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "natal-whispers",
+    "round": 1,
+    "home": {
+      "title": "星盘密语",
+      "text": "星盘密语",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [],
+      "canvases": 0,
+      "frames": 0,
+      "media": []
+    },
+    "fixture": {
+      "ready": false,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "count": 0,
+      "visited": [
+        "星盘密语",
+        "星盘密语",
+        "星盘密语",
+        "星盘密语"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 2,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "oracle-tarot",
+    "round": 1,
+    "home": {
+      "title": "星幕塔罗",
+      "text": "星幕塔罗\nATOM · LITTLE RITUALS\nXVII\n星星\nTHE QUIET ARCANA\n把问题交给\n另一种视角\n\n22 个象征，一次安静的对话。\n\n抽一张牌 三牌展开\n象征阅读 · 娱乐与自我提问",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 54,
+          "y": 3,
+          "w": 48,
+          "h": 48,
+          "font": "16px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "single",
+          "label": "抽一张牌",
+          "disabled": false,
+          "x": 190,
+          "y": 240,
+          "w": 88,
+          "h": 38,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "triple",
+          "label": "三牌展开",
+          "disabled": false,
+          "x": 282,
+          "y": 240,
+          "w": 88,
+          "h": 38,
+          "font": "14px"
+        }
+      ],
+      "canvases": 0,
+      "frames": 2,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "atom-app-back",
+      "count": 3,
+      "visited": [
+        "triple",
+        "triple",
+        "single",
+        "atom-app-back"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 4,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "parametric-maker",
+    "round": 1,
+    "home": {
+      "title": "",
+      "text": "参数造物\n\n拖动旋转 · JSCAD布尔建模 · 单位mm\n\n尺寸 40\n壁厚 3\n28 三角面 · 尺寸 40mm · 实体CSG\n开口盒\n直角支架\n圆孔底座\n生成\n线框\n归位",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "INPUT",
+          "id": "size",
+          "label": "",
+          "disabled": false,
+          "x": 22,
+          "y": 83,
+          "w": 124,
+          "h": 36,
+          "font": "13.3333px"
+        },
+        {
+          "tag": "INPUT",
+          "id": "wall",
+          "label": "",
+          "disabled": false,
+          "x": 22,
+          "y": 141,
+          "w": 124,
+          "h": 36,
+          "font": "13.3333px"
+        },
+        {
+          "tag": "SELECT",
+          "id": "preset",
+          "label": "开口盒直角支架圆孔底座",
+          "disabled": false,
+          "x": 8,
+          "y": 304,
+          "w": 112,
+          "h": 48,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "rebuild",
+          "label": "生成",
+          "disabled": false,
+          "x": 126,
+          "y": 304,
+          "w": 112,
+          "h": 48,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "wire",
+          "label": "线框",
+          "disabled": false,
+          "x": 243,
+          "y": 304,
+          "w": 112,
+          "h": 48,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "fit",
+          "label": "归位",
+          "disabled": false,
+          "x": 361,
+          "y": 304,
+          "w": 112,
+          "h": 48,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 0,
+          "y": 0,
+          "w": 48,
+          "h": 48,
+          "font": "14px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 75,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "size",
+      "count": 7,
+      "visited": [
+        "wire",
+        "wire",
+        "rebuild",
+        "wall"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 106,
+      "raf": 1,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 15
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "particle-lab",
+    "round": 1,
+    "home": {
+      "title": "粒子实验室",
+      "text": "粒子实验室\n60 FPS · 300 粒子\n引力轨道\n星雨\n波场\n暂停\n重置\n120\n300\n600\n1000\n\n移动鼠标改变引力中心 · 帧率是当前实测值",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "SELECT",
+          "id": "mode",
+          "label": "模拟模式",
+          "disabled": false,
+          "x": 14,
+          "y": 274,
+          "w": 80,
+          "h": 44,
+          "font": "16px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "pause",
+          "label": "暂停",
+          "disabled": false,
+          "x": 102,
+          "y": 274,
+          "w": 148,
+          "h": 44,
+          "font": "16px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "reset",
+          "label": "重置",
+          "disabled": false,
+          "x": 258,
+          "y": 274,
+          "w": 148,
+          "h": 44,
+          "font": "16px"
+        },
+        {
+          "tag": "SELECT",
+          "id": "count",
+          "label": "粒子数量",
+          "disabled": false,
+          "x": 413,
+          "y": 274,
+          "w": 53,
+          "h": 44,
+          "font": "16px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 0,
+          "y": 0,
+          "w": 48,
+          "h": 48,
+          "font": "16px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 136,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "mode",
+      "count": 5,
+      "visited": [
+        "pause",
+        "pause",
+        "mode",
+        "atom-app-back"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 166,
+      "raf": 1,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 16
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "personality-planet",
+    "round": 1,
+    "home": {
+      "title": "我的人格星球",
+      "text": "我的人格星球\nYOUR INNER ORBIT\n每个人，都有\n自己的运行轨道\n\n20 道题，认识此刻的自己。\n约 3 分钟 · 五维自我观察\n\n开始探索\n上次结果\n原创自我观察问卷 · 非标准化测验或临床评估 · 图形为示例",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 52,
+          "y": 2,
+          "w": 48,
+          "h": 48,
+          "font": "16px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "begin",
+          "label": "开始探索",
+          "disabled": false,
+          "x": 156,
+          "y": 299,
+          "w": 80,
+          "h": 38,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "last",
+          "label": "上次结果",
+          "disabled": true,
+          "x": 244,
+          "y": 299,
+          "w": 80,
+          "h": 38,
+          "font": "14px"
+        }
+      ],
+      "canvases": 0,
+      "frames": 2,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "atom-app-back",
+      "count": 2,
+      "visited": [
+        "begin",
+        "begin",
+        "atom-app-back",
+        "atom-app-back"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 3,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "photo-album",
+    "round": 1,
+    "home": {
+      "title": "相册",
+      "text": "桌面\n相册\n\n和 ATOM 分享你的生活\n\n创作\n＋ 灵感\n把生活带到桌边\n\n在电脑和 ATOM 登录同一个应用市场账号，\n照片就能出现在这里。\n\n登录账号\n重试\n照片已同步",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "返回桌面",
+          "disabled": false,
+          "x": 12,
+          "y": 13,
+          "w": 60,
+          "h": 48,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "创作",
+          "disabled": true,
+          "x": 368,
+          "y": 19,
+          "w": 40,
+          "h": 36,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "＋ 灵感",
+          "disabled": true,
+          "x": 413,
+          "y": 19,
+          "w": 55,
+          "h": 36,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "登录账号",
+          "disabled": false,
+          "x": 196,
+          "y": 228,
+          "w": 88,
+          "h": 36,
+          "font": "16px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "重试",
+          "disabled": false,
+          "x": 212,
+          "y": 272,
+          "w": 56,
+          "h": 36,
+          "font": "16px"
+        }
+      ],
+      "canvases": 0,
+      "frames": 2,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "桌面",
+      "count": 3,
+      "visited": [
+        "登录账号",
+        "重试",
+        "桌面",
+        "桌面"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 4,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [
+      "Cannot read properties of undefined (reading 'some')"
+    ],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "photon-chip",
+    "round": 1,
+    "home": {
+      "title": "光子芯片",
+      "text": "光子芯片\n光路交互演示 · 数字键 1–6 注入\n声音 关\n4\n光路交互次数\n自动流动\n清空",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 26,
+          "y": 10,
+          "w": 48,
+          "h": 48,
+          "font": "16px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "声音 关",
+          "disabled": false,
+          "x": 399,
+          "y": 13,
+          "w": 63,
+          "h": 42,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "auto",
+          "label": "自动流动",
+          "disabled": false,
+          "x": 328,
+          "y": 305,
+          "w": 80,
+          "h": 42,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "clear",
+          "label": "清空",
+          "disabled": false,
+          "x": 416,
+          "y": 305,
+          "w": 52,
+          "h": 42,
+          "font": "14px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 137,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "atom-app-back",
+      "count": 4,
+      "visited": [
+        "声音 关",
+        "clear",
+        "auto",
+        "声音 关"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 141,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "photon-runner",
+    "round": 1,
+    "home": {
+      "title": "光子快跑",
+      "text": "光子快跑\n点按或 Enter 跃起 · 空格回桌面\n声音 关\n0\n最高纪录 0\n穿过下一道光门\n\n点按画面或按 Enter，让光子跃起\n\n保持轻盈，穿过光门\n开始",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 26,
+          "y": 10,
+          "w": 48,
+          "h": 48,
+          "font": "16px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "声音 关",
+          "disabled": false,
+          "x": 399,
+          "y": 13,
+          "w": 63,
+          "h": 42,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "play",
+          "label": "开始",
+          "disabled": false,
+          "x": 416,
+          "y": 306,
+          "w": 52,
+          "h": 42,
+          "font": "14px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 140,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "atom-app-back",
+      "count": 3,
+      "visited": [
+        "声音 关",
+        "play",
+        "atom-app-back",
+        "atom-app-back"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 143,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "physics-playground",
+    "round": 1,
+    "home": {
+      "title": "",
+      "text": "物理实验台\n40 物体 · 223 碰撞 · 60 FPS\n碰撞\n多米诺\n悬索桥\n弹弓\n拖动任意物体 · 添加形状观察碰撞\n添物体\n重力：开\n暂停\n重置",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "碰撞",
+          "disabled": false,
+          "x": 12,
+          "y": 39,
+          "w": 50,
+          "h": 36,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "多米诺",
+          "disabled": false,
+          "x": 68,
+          "y": 39,
+          "w": 63,
+          "h": 36,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "悬索桥",
+          "disabled": false,
+          "x": 137,
+          "y": 39,
+          "w": 63,
+          "h": 36,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "弹弓",
+          "disabled": false,
+          "x": 206,
+          "y": 39,
+          "w": 50,
+          "h": 36,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "spawn",
+          "label": "添物体",
+          "disabled": false,
+          "x": 12,
+          "y": 314,
+          "w": 110,
+          "h": 36,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "gravity",
+          "label": "重力：开",
+          "disabled": false,
+          "x": 128,
+          "y": 314,
+          "w": 110,
+          "h": 36,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "pause",
+          "label": "暂停",
+          "disabled": false,
+          "x": 243,
+          "y": 314,
+          "w": 110,
+          "h": 36,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "reset",
+          "label": "重置",
+          "disabled": false,
+          "x": 359,
+          "y": 314,
+          "w": 110,
+          "h": 36,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 0,
+          "y": 0,
+          "w": 48,
+          "h": 48,
+          "font": "13px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 140,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "碰撞",
+      "count": 9,
+      "visited": [
+        "多米诺",
+        "spawn",
+        "atom-app-back",
+        "atom-app-back"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 171,
+      "raf": 1,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 15
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "pixel-lab",
+    "round": 1,
+    "home": {
+      "title": "像素实验室",
+      "text": "像素实验室\n存活细胞 79 · 第 18 步\n生命演化\n重力沙粒\n涟漪水面\n暂停\n加入种子\n清空\n撤销\n笔触\n拖动绘制 · 细胞按生命规则演化",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 22,
+          "y": 19,
+          "w": 48,
+          "h": 48,
+          "font": "16px"
+        },
+        {
+          "tag": "SELECT",
+          "id": "mode",
+          "label": "实验模式",
+          "disabled": false,
+          "x": 356,
+          "y": 25,
+          "w": 102,
+          "h": 36,
+          "font": "16px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "pause",
+          "label": "暂停",
+          "disabled": false,
+          "x": 99,
+          "y": 302,
+          "w": 42,
+          "h": 32,
+          "font": "11px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "seed",
+          "label": "加入种子",
+          "disabled": false,
+          "x": 144,
+          "y": 302,
+          "w": 64,
+          "h": 32,
+          "font": "11px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "clear",
+          "label": "清空",
+          "disabled": false,
+          "x": 211,
+          "y": 302,
+          "w": 42,
+          "h": 32,
+          "font": "11px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "undo",
+          "label": "撤销",
+          "disabled": false,
+          "x": 256,
+          "y": 302,
+          "w": 42,
+          "h": 32,
+          "font": "11px"
+        },
+        {
+          "tag": "INPUT",
+          "id": "brush",
+          "label": "笔触大小",
+          "disabled": false,
+          "x": 328,
+          "y": 300,
+          "w": 51,
+          "h": 36,
+          "font": "11px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 139,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "atom-app-back",
+      "count": 7,
+      "visited": [
+        "mode",
+        "brush",
+        "undo",
+        "mode"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 142,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "planetarium",
+    "round": 1,
+    "home": {
+      "title": "",
+      "text": "正在加载天体…\n\nSpacekit · 拖动环绕 · 滚轮缩放\n\n地球\n木星\n土星\n暂停巡航\n60 FPS",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "地球",
+          "disabled": false,
+          "x": 12,
+          "y": 304,
+          "w": 110,
+          "h": 44,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "木星",
+          "disabled": false,
+          "x": 128,
+          "y": 304,
+          "w": 110,
+          "h": 44,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "土星",
+          "disabled": false,
+          "x": 243,
+          "y": 304,
+          "w": 110,
+          "h": 44,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "spin",
+          "label": "暂停巡航",
+          "disabled": false,
+          "x": 359,
+          "y": 304,
+          "w": 110,
+          "h": 44,
+          "font": "14px"
+        }
+      ],
+      "canvases": 0,
+      "frames": 138,
+      "media": []
+    },
+    "fixture": {
+      "ready": false,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "地球",
+      "count": 4,
+      "visited": [
+        "木星",
+        "木星",
+        "地球",
+        "地球"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 167,
+      "raf": 1,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 17
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "pocket-studio",
+    "round": 1,
+    "home": {
+      "title": "",
+      "text": "口袋音乐工作站\n16 步 · 7 轨 · 离线合成\n播放\n110\n夜航\n街机\n空白\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\nC5\nB♭4\nG4\nE♭4\n底鼓\n军鼓\n踩镲\n变奏\n清空\n保存\n恢复\n点击格子编曲，播放后可继续修改",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "play",
+          "label": "播放",
+          "disabled": false,
+          "x": 12,
+          "y": 60,
+          "w": 66,
+          "h": 34,
+          "font": "13px"
+        },
+        {
+          "tag": "INPUT",
+          "id": "tempo",
+          "label": "",
+          "disabled": false,
+          "x": 112,
+          "y": 69,
+          "w": 200,
+          "h": 16,
+          "font": "13.3333px"
+        },
+        {
+          "tag": "SELECT",
+          "id": "preset",
+          "label": "夜航街机空白",
+          "disabled": false,
+          "x": 321,
+          "y": 60,
+          "w": 60,
+          "h": 34,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "C5 第1步",
+          "disabled": false,
+          "x": 57,
+          "y": 125,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "C5 第2步",
+          "disabled": false,
+          "x": 83,
+          "y": 125,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "C5 第3步",
+          "disabled": false,
+          "x": 109,
+          "y": 125,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "C5 第4步",
+          "disabled": false,
+          "x": 135,
+          "y": 125,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "C5 第5步",
+          "disabled": false,
+          "x": 161,
+          "y": 125,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "C5 第6步",
+          "disabled": false,
+          "x": 186,
+          "y": 125,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "C5 第7步",
+          "disabled": false,
+          "x": 212,
+          "y": 125,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "C5 第8步",
+          "disabled": false,
+          "x": 238,
+          "y": 125,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "C5 第9步",
+          "disabled": false,
+          "x": 264,
+          "y": 125,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "C5 第10步",
+          "disabled": false,
+          "x": 290,
+          "y": 125,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "C5 第11步",
+          "disabled": false,
+          "x": 316,
+          "y": 125,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "C5 第12步",
+          "disabled": false,
+          "x": 342,
+          "y": 125,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "C5 第13步",
+          "disabled": false,
+          "x": 368,
+          "y": 125,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "C5 第14步",
+          "disabled": false,
+          "x": 393,
+          "y": 125,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "C5 第15步",
+          "disabled": false,
+          "x": 419,
+          "y": 125,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "C5 第16步",
+          "disabled": false,
+          "x": 445,
+          "y": 125,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "B♭4 第1步",
+          "disabled": false,
+          "x": 57,
+          "y": 146,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "B♭4 第2步",
+          "disabled": false,
+          "x": 83,
+          "y": 146,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "B♭4 第3步",
+          "disabled": false,
+          "x": 109,
+          "y": 146,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "B♭4 第4步",
+          "disabled": false,
+          "x": 135,
+          "y": 146,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "B♭4 第5步",
+          "disabled": false,
+          "x": 161,
+          "y": 146,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "B♭4 第6步",
+          "disabled": false,
+          "x": 186,
+          "y": 146,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "B♭4 第7步",
+          "disabled": false,
+          "x": 212,
+          "y": 146,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "B♭4 第8步",
+          "disabled": false,
+          "x": 238,
+          "y": 146,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "B♭4 第9步",
+          "disabled": false,
+          "x": 264,
+          "y": 146,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "B♭4 第10步",
+          "disabled": false,
+          "x": 290,
+          "y": 146,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "B♭4 第11步",
+          "disabled": false,
+          "x": 316,
+          "y": 146,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "B♭4 第12步",
+          "disabled": false,
+          "x": 342,
+          "y": 146,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "B♭4 第13步",
+          "disabled": false,
+          "x": 368,
+          "y": 146,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "B♭4 第14步",
+          "disabled": false,
+          "x": 393,
+          "y": 146,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "B♭4 第15步",
+          "disabled": false,
+          "x": 419,
+          "y": 146,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "B♭4 第16步",
+          "disabled": false,
+          "x": 445,
+          "y": 146,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "G4 第1步",
+          "disabled": false,
+          "x": 57,
+          "y": 167,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "G4 第2步",
+          "disabled": false,
+          "x": 83,
+          "y": 167,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "G4 第3步",
+          "disabled": false,
+          "x": 109,
+          "y": 167,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "G4 第4步",
+          "disabled": false,
+          "x": 135,
+          "y": 167,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "G4 第5步",
+          "disabled": false,
+          "x": 161,
+          "y": 167,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "G4 第6步",
+          "disabled": false,
+          "x": 186,
+          "y": 167,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "G4 第7步",
+          "disabled": false,
+          "x": 212,
+          "y": 167,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "G4 第8步",
+          "disabled": false,
+          "x": 238,
+          "y": 167,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "G4 第9步",
+          "disabled": false,
+          "x": 264,
+          "y": 167,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "G4 第10步",
+          "disabled": false,
+          "x": 290,
+          "y": 167,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "G4 第11步",
+          "disabled": false,
+          "x": 316,
+          "y": 167,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "G4 第12步",
+          "disabled": false,
+          "x": 342,
+          "y": 167,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "G4 第13步",
+          "disabled": false,
+          "x": 368,
+          "y": 167,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "G4 第14步",
+          "disabled": false,
+          "x": 393,
+          "y": 167,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "G4 第15步",
+          "disabled": false,
+          "x": 419,
+          "y": 167,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "G4 第16步",
+          "disabled": false,
+          "x": 445,
+          "y": 167,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "E♭4 第1步",
+          "disabled": false,
+          "x": 57,
+          "y": 188,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "E♭4 第2步",
+          "disabled": false,
+          "x": 83,
+          "y": 188,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "E♭4 第3步",
+          "disabled": false,
+          "x": 109,
+          "y": 188,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "E♭4 第4步",
+          "disabled": false,
+          "x": 135,
+          "y": 188,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "E♭4 第5步",
+          "disabled": false,
+          "x": 161,
+          "y": 188,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "E♭4 第6步",
+          "disabled": false,
+          "x": 186,
+          "y": 188,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "E♭4 第7步",
+          "disabled": false,
+          "x": 212,
+          "y": 188,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "E♭4 第8步",
+          "disabled": false,
+          "x": 238,
+          "y": 188,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "E♭4 第9步",
+          "disabled": false,
+          "x": 264,
+          "y": 188,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "E♭4 第10步",
+          "disabled": false,
+          "x": 290,
+          "y": 188,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "E♭4 第11步",
+          "disabled": false,
+          "x": 316,
+          "y": 188,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "E♭4 第12步",
+          "disabled": false,
+          "x": 342,
+          "y": 188,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "E♭4 第13步",
+          "disabled": false,
+          "x": 368,
+          "y": 188,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "E♭4 第14步",
+          "disabled": false,
+          "x": 393,
+          "y": 188,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "E♭4 第15步",
+          "disabled": false,
+          "x": 419,
+          "y": 188,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "E♭4 第16步",
+          "disabled": false,
+          "x": 445,
+          "y": 188,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第1步",
+          "disabled": false,
+          "x": 57,
+          "y": 208,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第2步",
+          "disabled": false,
+          "x": 83,
+          "y": 208,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第3步",
+          "disabled": false,
+          "x": 109,
+          "y": 208,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第4步",
+          "disabled": false,
+          "x": 135,
+          "y": 208,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第5步",
+          "disabled": false,
+          "x": 161,
+          "y": 208,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第6步",
+          "disabled": false,
+          "x": 186,
+          "y": 208,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第7步",
+          "disabled": false,
+          "x": 212,
+          "y": 208,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第8步",
+          "disabled": false,
+          "x": 238,
+          "y": 208,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第9步",
+          "disabled": false,
+          "x": 264,
+          "y": 208,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第10步",
+          "disabled": false,
+          "x": 290,
+          "y": 208,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第11步",
+          "disabled": false,
+          "x": 316,
+          "y": 208,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第12步",
+          "disabled": false,
+          "x": 342,
+          "y": 208,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第13步",
+          "disabled": false,
+          "x": 368,
+          "y": 208,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第14步",
+          "disabled": false,
+          "x": 393,
+          "y": 208,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第15步",
+          "disabled": false,
+          "x": 419,
+          "y": 208,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第16步",
+          "disabled": false,
+          "x": 445,
+          "y": 208,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第1步",
+          "disabled": false,
+          "x": 57,
+          "y": 229,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第2步",
+          "disabled": false,
+          "x": 83,
+          "y": 229,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第3步",
+          "disabled": false,
+          "x": 109,
+          "y": 229,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第4步",
+          "disabled": false,
+          "x": 135,
+          "y": 229,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第5步",
+          "disabled": false,
+          "x": 161,
+          "y": 229,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第6步",
+          "disabled": false,
+          "x": 186,
+          "y": 229,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第7步",
+          "disabled": false,
+          "x": 212,
+          "y": 229,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第8步",
+          "disabled": false,
+          "x": 238,
+          "y": 229,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第9步",
+          "disabled": false,
+          "x": 264,
+          "y": 229,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第10步",
+          "disabled": false,
+          "x": 290,
+          "y": 229,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第11步",
+          "disabled": false,
+          "x": 316,
+          "y": 229,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第12步",
+          "disabled": false,
+          "x": 342,
+          "y": 229,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第13步",
+          "disabled": false,
+          "x": 368,
+          "y": 229,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第14步",
+          "disabled": false,
+          "x": 393,
+          "y": 229,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第15步",
+          "disabled": false,
+          "x": 419,
+          "y": 229,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第16步",
+          "disabled": false,
+          "x": 445,
+          "y": 229,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第1步",
+          "disabled": false,
+          "x": 57,
+          "y": 250,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第2步",
+          "disabled": false,
+          "x": 83,
+          "y": 250,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第3步",
+          "disabled": false,
+          "x": 109,
+          "y": 250,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第4步",
+          "disabled": false,
+          "x": 135,
+          "y": 250,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第5步",
+          "disabled": false,
+          "x": 161,
+          "y": 250,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第6步",
+          "disabled": false,
+          "x": 186,
+          "y": 250,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第7步",
+          "disabled": false,
+          "x": 212,
+          "y": 250,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第8步",
+          "disabled": false,
+          "x": 238,
+          "y": 250,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第9步",
+          "disabled": false,
+          "x": 264,
+          "y": 250,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第10步",
+          "disabled": false,
+          "x": 290,
+          "y": 250,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第11步",
+          "disabled": false,
+          "x": 316,
+          "y": 250,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第12步",
+          "disabled": false,
+          "x": 342,
+          "y": 250,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第13步",
+          "disabled": false,
+          "x": 368,
+          "y": 250,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第14步",
+          "disabled": false,
+          "x": 393,
+          "y": 250,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第15步",
+          "disabled": false,
+          "x": 419,
+          "y": 250,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第16步",
+          "disabled": false,
+          "x": 445,
+          "y": 250,
+          "w": 23,
+          "h": 18,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "random",
+          "label": "变奏",
+          "disabled": false,
+          "x": 12,
+          "y": 278,
+          "w": 109,
+          "h": 34,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "clear",
+          "label": "清空",
+          "disabled": false,
+          "x": 128,
+          "y": 278,
+          "w": 109,
+          "h": 34,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "save",
+          "label": "保存",
+          "disabled": false,
+          "x": 244,
+          "y": 278,
+          "w": 109,
+          "h": 34,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "restore",
+          "label": "恢复",
+          "disabled": false,
+          "x": 359,
+          "y": 278,
+          "w": 109,
+          "h": 34,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 0,
+          "y": 0,
+          "w": 48,
+          "h": 48,
+          "font": "13px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 139,
+      "media": [
+        "suspended"
+      ]
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "play",
+      "count": 120,
+      "visited": [
+        "tempo",
+        "",
+        "",
+        "tempo"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 169,
+      "raf": 1,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [
+        "suspended"
+      ],
+      "frameGrowth": 15
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "quick-notes",
+    "round": 1,
+    "home": {
+      "title": "随手记",
+      "text": "随手记\n账号\n连接你的笔记\n\n使用电脑工作台的市场账号。未登录的本机笔记不会自动上传到任何账号。\n\n用户名\n密码\n登录\n注册\n仅查看本机离线笔记",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 22,
+          "y": 14,
+          "w": 48,
+          "h": 48,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "账号",
+          "disabled": false,
+          "x": 276,
+          "y": 22,
+          "w": 124,
+          "h": 32,
+          "font": "12px"
+        },
+        {
+          "tag": "INPUT",
+          "id": "username",
+          "label": "",
+          "disabled": false,
+          "x": 25,
+          "y": 156,
+          "w": 430,
+          "h": 36,
+          "font": "14px"
+        },
+        {
+          "tag": "INPUT",
+          "id": "password",
+          "label": "",
+          "disabled": false,
+          "x": 25,
+          "y": 220,
+          "w": 430,
+          "h": 36,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "登录",
+          "disabled": false,
+          "x": 25,
+          "y": 264,
+          "w": 212,
+          "h": 36,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "注册",
+          "disabled": false,
+          "x": 244,
+          "y": 264,
+          "w": 212,
+          "h": 36,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "仅查看本机离线笔记",
+          "disabled": false,
+          "x": 25,
+          "y": 300,
+          "w": 150,
+          "h": 36,
+          "font": "14px"
+        }
+      ],
+      "canvases": 0,
+      "frames": 2,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "atom-app-back",
+      "count": 7,
+      "visited": [
+        "账号",
+        "注册",
+        "登录",
+        "atom-app-back"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 3,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "rain-radio",
+    "round": 1,
+    "home": {
+      "title": "雨夜电台",
+      "text": "雨夜电台\n窗外，留一场雨\n雨声\n海浪\n炉火\n开始聆听\n定时 30 分\n保存混音\n离线合成声景 · 初始音量较低",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 52,
+          "y": 2,
+          "w": 48,
+          "h": 48,
+          "font": "16px"
+        },
+        {
+          "tag": "INPUT",
+          "id": "mix-0",
+          "label": "雨声音量",
+          "disabled": false,
+          "x": 26,
+          "y": 223,
+          "w": 136,
+          "h": 30,
+          "font": "14px"
+        },
+        {
+          "tag": "INPUT",
+          "id": "mix-1",
+          "label": "海浪音量",
+          "disabled": false,
+          "x": 174,
+          "y": 223,
+          "w": 136,
+          "h": 30,
+          "font": "14px"
+        },
+        {
+          "tag": "INPUT",
+          "id": "mix-2",
+          "label": "炉火音量",
+          "disabled": false,
+          "x": 322,
+          "y": 223,
+          "w": 136,
+          "h": 30,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "play",
+          "label": "开始聆听",
+          "disabled": false,
+          "x": 107,
+          "y": 299,
+          "w": 80,
+          "h": 38,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "sleep",
+          "label": "定时 30 分",
+          "disabled": false,
+          "x": 195,
+          "y": 299,
+          "w": 91,
+          "h": 38,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "save",
+          "label": "保存混音",
+          "disabled": false,
+          "x": 293,
+          "y": 299,
+          "w": 80,
+          "h": 38,
+          "font": "14px"
+        }
+      ],
+      "canvases": 0,
+      "frames": 2,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "atom-app-back",
+      "count": 7,
+      "visited": [
+        "mix-1",
+        "sleep",
+        "play",
+        "mix-0"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 3,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "rhythm-orbits",
+    "round": 1,
+    "home": {
+      "title": "节奏轨道",
+      "text": "节奏轨道\n低鼓 · 4/16 · 偏移 0\n开始演奏\n变换节奏\n静音轨道\nBPM\n步数\n击打\n旋转一格",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "play",
+          "label": "开始演奏",
+          "disabled": false,
+          "x": 12,
+          "y": 252,
+          "w": 119,
+          "h": 44,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "random",
+          "label": "变换节奏",
+          "disabled": false,
+          "x": 137,
+          "y": 252,
+          "w": 119,
+          "h": 44,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "mute",
+          "label": "静音轨道",
+          "disabled": false,
+          "x": 263,
+          "y": 252,
+          "w": 119,
+          "h": 44,
+          "font": "12px"
+        },
+        {
+          "tag": "INPUT",
+          "id": "bpm",
+          "label": "",
+          "disabled": false,
+          "x": 416,
+          "y": 252,
+          "w": 52,
+          "h": 44,
+          "font": "13.3333px"
+        },
+        {
+          "tag": "INPUT",
+          "id": "steps",
+          "label": "",
+          "disabled": false,
+          "x": 40,
+          "y": 304,
+          "w": 90,
+          "h": 44,
+          "font": "13.3333px"
+        },
+        {
+          "tag": "INPUT",
+          "id": "pulses",
+          "label": "",
+          "disabled": false,
+          "x": 166,
+          "y": 304,
+          "w": 90,
+          "h": 44,
+          "font": "13.3333px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "rotate",
+          "label": "旋转一格",
+          "disabled": false,
+          "x": 264,
+          "y": 304,
+          "w": 90,
+          "h": 44,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 0,
+          "y": 0,
+          "w": 48,
+          "h": 48,
+          "font": "12px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 140,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "play",
+      "count": 8,
+      "visited": [
+        "random",
+        "pulses",
+        "steps",
+        "play"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 169,
+      "raf": 1,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 16
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "robo-face",
+    "round": 1,
+    "home": {
+      "title": "机器人眼睛",
+      "text": "···\n移动鼠标，它会看向你 · 点击逗它笑",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "menu",
+          "label": "打开控制",
+          "disabled": false,
+          "x": 426,
+          "y": 10,
+          "w": 44,
+          "h": 44,
+          "font": "22px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 0,
+          "y": 0,
+          "w": 48,
+          "h": 48,
+          "font": "14px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 27,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "menu",
+      "count": 2,
+      "visited": [
+        "menu",
+        "menu",
+        "atom-app-back",
+        "atom-app-back"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 56,
+      "raf": 1,
+      "intervals": 0,
+      "timeouts": 1,
+      "audio": [],
+      "frameGrowth": 16
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "robot",
+    "round": 1,
+    "home": {
+      "title": "机器人",
+      "text": "长按空格开始聊天",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 0,
+          "y": 0,
+          "w": 48,
+          "h": 48,
+          "font": "16px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 140,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "atom-app-back",
+      "count": 1,
+      "visited": [
+        "atom-app-back",
+        "atom-app-back",
+        "atom-app-back",
+        "atom-app-back"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 141,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "sound-lab",
+    "round": 1,
+    "home": {
+      "title": "声音实验室",
+      "text": "声音实验室\n\n四种声音，十六步，让灵感形成节拍。\n\n▶ 演奏\n轻点格子编排声音\n1—8\n9—16\n底鼓\n军鼓\n踩镲\n低音\n速度\n108\n音量\n轻跳\n慢拍\n清空\n点击演奏，听听你的节拍",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 22,
+          "y": 18,
+          "w": 48,
+          "h": 48,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "play",
+          "label": "▶ 演奏",
+          "disabled": false,
+          "x": 374,
+          "y": 22,
+          "w": 84,
+          "h": 40,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "1—8",
+          "disabled": false,
+          "x": 369,
+          "y": 80,
+          "w": 39,
+          "h": 24,
+          "font": "10px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "9—16",
+          "disabled": false,
+          "x": 410,
+          "y": 80,
+          "w": 45,
+          "h": 24,
+          "font": "10px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第1步",
+          "disabled": false,
+          "x": 60,
+          "y": 118,
+          "w": 44,
+          "h": 24,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第2步",
+          "disabled": false,
+          "x": 111,
+          "y": 118,
+          "w": 44,
+          "h": 24,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第3步",
+          "disabled": false,
+          "x": 161,
+          "y": 118,
+          "w": 44,
+          "h": 24,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第4步",
+          "disabled": false,
+          "x": 212,
+          "y": 118,
+          "w": 44,
+          "h": 24,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第5步",
+          "disabled": false,
+          "x": 263,
+          "y": 118,
+          "w": 44,
+          "h": 24,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第6步",
+          "disabled": false,
+          "x": 313,
+          "y": 118,
+          "w": 44,
+          "h": 24,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第7步",
+          "disabled": false,
+          "x": 364,
+          "y": 118,
+          "w": 44,
+          "h": 24,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "底鼓 第8步",
+          "disabled": false,
+          "x": 414,
+          "y": 118,
+          "w": 44,
+          "h": 24,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第1步",
+          "disabled": false,
+          "x": 60,
+          "y": 149,
+          "w": 44,
+          "h": 24,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第2步",
+          "disabled": false,
+          "x": 111,
+          "y": 149,
+          "w": 44,
+          "h": 24,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第3步",
+          "disabled": false,
+          "x": 161,
+          "y": 149,
+          "w": 44,
+          "h": 24,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第4步",
+          "disabled": false,
+          "x": 212,
+          "y": 149,
+          "w": 44,
+          "h": 24,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第5步",
+          "disabled": false,
+          "x": 263,
+          "y": 149,
+          "w": 44,
+          "h": 24,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第6步",
+          "disabled": false,
+          "x": 313,
+          "y": 149,
+          "w": 44,
+          "h": 24,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第7步",
+          "disabled": false,
+          "x": 364,
+          "y": 149,
+          "w": 44,
+          "h": 24,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "军鼓 第8步",
+          "disabled": false,
+          "x": 414,
+          "y": 149,
+          "w": 44,
+          "h": 24,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第1步",
+          "disabled": false,
+          "x": 60,
+          "y": 180,
+          "w": 44,
+          "h": 24,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第2步",
+          "disabled": false,
+          "x": 111,
+          "y": 180,
+          "w": 44,
+          "h": 24,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第3步",
+          "disabled": false,
+          "x": 161,
+          "y": 180,
+          "w": 44,
+          "h": 24,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第4步",
+          "disabled": false,
+          "x": 212,
+          "y": 180,
+          "w": 44,
+          "h": 24,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第5步",
+          "disabled": false,
+          "x": 263,
+          "y": 180,
+          "w": 44,
+          "h": 24,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第6步",
+          "disabled": false,
+          "x": 313,
+          "y": 180,
+          "w": 44,
+          "h": 24,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第7步",
+          "disabled": false,
+          "x": 364,
+          "y": 180,
+          "w": 44,
+          "h": 24,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "踩镲 第8步",
+          "disabled": false,
+          "x": 414,
+          "y": 180,
+          "w": 44,
+          "h": 24,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "低音 第1步",
+          "disabled": false,
+          "x": 60,
+          "y": 210,
+          "w": 44,
+          "h": 24,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "低音 第2步",
+          "disabled": false,
+          "x": 111,
+          "y": 210,
+          "w": 44,
+          "h": 24,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "低音 第3步",
+          "disabled": false,
+          "x": 161,
+          "y": 210,
+          "w": 44,
+          "h": 24,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "低音 第4步",
+          "disabled": false,
+          "x": 212,
+          "y": 210,
+          "w": 44,
+          "h": 24,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "低音 第5步",
+          "disabled": false,
+          "x": 263,
+          "y": 210,
+          "w": 44,
+          "h": 24,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "低音 第6步",
+          "disabled": false,
+          "x": 313,
+          "y": 210,
+          "w": 44,
+          "h": 24,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "低音 第7步",
+          "disabled": false,
+          "x": 364,
+          "y": 210,
+          "w": 44,
+          "h": 24,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "低音 第8步",
+          "disabled": false,
+          "x": 414,
+          "y": 210,
+          "w": 44,
+          "h": 24,
+          "font": "14px"
+        },
+        {
+          "tag": "INPUT",
+          "id": "bpm",
+          "label": "节拍速度",
+          "disabled": false,
+          "x": 64,
+          "y": 256,
+          "w": 133,
+          "h": 36,
+          "font": "14px"
+        },
+        {
+          "tag": "INPUT",
+          "id": "volume",
+          "label": "音量",
+          "disabled": false,
+          "x": 279,
+          "y": 256,
+          "w": 165,
+          "h": 36,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "轻跳",
+          "disabled": false,
+          "x": 22,
+          "y": 314,
+          "w": 38,
+          "h": 28,
+          "font": "11px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "慢拍",
+          "disabled": false,
+          "x": 65,
+          "y": 314,
+          "w": 38,
+          "h": 28,
+          "font": "11px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "清空",
+          "disabled": false,
+          "x": 108,
+          "y": 314,
+          "w": 38,
+          "h": 28,
+          "font": "11px"
+        }
+      ],
+      "canvases": 0,
+      "frames": 2,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "atom-app-back",
+      "count": 41,
+      "visited": [
+        "play",
+        "9—16",
+        "1—8",
+        "play"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 3,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "symbiotic-world",
+    "round": 1,
+    "home": {
+      "title": "共生世界",
+      "text": "‹\nA WORLD OF YOUR OWN\n海边的慢时光\n\n拖动小岛 · 轻触屋舍\n\n昼\n暮\n夜\n晴\n✦ 说出你的世界\n你的世界已就绪",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "world-back",
+          "label": "返回桌面",
+          "disabled": false,
+          "x": 10,
+          "y": 21,
+          "w": 48,
+          "h": 48,
+          "font": "32px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "昼",
+          "disabled": false,
+          "x": 339,
+          "y": 23,
+          "w": 27,
+          "h": 27,
+          "font": "10px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "暮",
+          "disabled": false,
+          "x": 371,
+          "y": 23,
+          "w": 27,
+          "h": 27,
+          "font": "10px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "夜",
+          "disabled": false,
+          "x": 403,
+          "y": 23,
+          "w": 27,
+          "h": 27,
+          "font": "10px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "weather",
+          "label": "晴",
+          "disabled": false,
+          "x": 435,
+          "y": 23,
+          "w": 27,
+          "h": 27,
+          "font": "10px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "compose",
+          "label": "用语言改变世界",
+          "disabled": false,
+          "x": 172,
+          "y": 298,
+          "w": 136,
+          "h": 42,
+          "font": "13px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 140,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "world-back",
+      "count": 6,
+      "visited": [
+        "昼",
+        "compose",
+        "world-back",
+        "昼"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 142,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "today",
+    "round": 1,
+    "home": {
+      "title": "今日",
+      "text": "10月31日星期六\n今日\n＋ 添加\n让今天井井有条\n\n登录 ATOM 账号后，\n和电脑上的日程、待办同步。\n\n去登录\n已登录，刷新",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 22,
+          "y": 21,
+          "w": 48,
+          "h": 48,
+          "font": "15px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "＋ 添加",
+          "disabled": false,
+          "x": 393,
+          "y": 29,
+          "w": 65,
+          "h": 32,
+          "font": "12px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "去登录",
+          "disabled": false,
+          "x": 163,
+          "y": 217,
+          "w": 153,
+          "h": 37,
+          "font": "15px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "已登录，刷新",
+          "disabled": false,
+          "x": 163,
+          "y": 266,
+          "w": 153,
+          "h": 34,
+          "font": "13px"
+        }
+      ],
+      "canvases": 0,
+      "frames": 2,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "atom-app-back",
+      "count": 4,
+      "visited": [
+        "＋ 添加",
+        "去登录",
+        "atom-app-back",
+        "atom-app-back"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 4,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "volume-flow",
+    "round": 1,
+    "home": {
+      "title": "",
+      "text": "体积流场 · 拖动旋转 · 滚轮缩放\n4千粒子\n换色\n变换流场\n暂停",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "quality",
+          "label": "4千粒子",
+          "disabled": false,
+          "x": 12,
+          "y": 310,
+          "w": 110,
+          "h": 40,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "color",
+          "label": "换色",
+          "disabled": false,
+          "x": 128,
+          "y": 310,
+          "w": 110,
+          "h": 40,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "curl",
+          "label": "变换流场",
+          "disabled": false,
+          "x": 243,
+          "y": 310,
+          "w": 110,
+          "h": 40,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "speed",
+          "label": "暂停",
+          "disabled": false,
+          "x": 359,
+          "y": 310,
+          "w": 110,
+          "h": 40,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 0,
+          "y": 0,
+          "w": 48,
+          "h": 48,
+          "font": "14px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 122,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "quality",
+      "count": 5,
+      "visited": [
+        "color",
+        "color",
+        "quality",
+        "atom-app-back"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 151,
+      "raf": 1,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 16
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "water-pool",
+    "round": 1,
+    "home": {
+      "title": "WebGL Water",
+      "text": "鍏夊奖姘存睜 路 鎷ㄥ姩姘撮潰 / 鎷栧姩鐞冧綋\n鏆傚仠\n閲嶅姏锛氬叧\n闆ㄦ淮",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "鏆傚仠",
+          "disabled": false,
+          "x": 12,
+          "y": 308,
+          "w": 70,
+          "h": 40,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "閲嶅姏锛氬叧",
+          "disabled": false,
+          "x": 90,
+          "y": 308,
+          "w": 112,
+          "h": 40,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "闆ㄦ淮",
+          "disabled": false,
+          "x": 210,
+          "y": 308,
+          "w": 70,
+          "h": 40,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "杩斿洖涓婁竴绾�",
+          "disabled": false,
+          "x": 0,
+          "y": 0,
+          "w": 48,
+          "h": 48,
+          "font": "13px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 4,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "鏆傚仠",
+      "count": 4,
+      "visited": [
+        "閲嶅姏锛氬叧",
+        "閲嶅姏锛氬叧",
+        "鏆傚仠",
+        "atom-app-back"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 36,
+      "raf": 1,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 15
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "weather-window",
+    "round": 1,
+    "home": {
+      "title": "天气之窗",
+      "text": "上海\n⌄\n风景\n↻\n\n等一场天气\n\n—°\n\n联网后显示当前天气\n\n晴空\n摄影 Riccardo Di Curti / Unsplash\n暂时连不上天气 · 点击 ↻ 重试\nOpen-Meteo",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 22,
+          "y": 13,
+          "w": 48,
+          "h": 48,
+          "font": "16px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "city",
+          "label": "选择城市",
+          "disabled": false,
+          "x": 78,
+          "y": 15,
+          "w": 71,
+          "h": 44,
+          "font": "15px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "gallery",
+          "label": "浏览天气摄影",
+          "disabled": false,
+          "x": 157,
+          "y": 15,
+          "w": 42,
+          "h": 44,
+          "font": "13px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "refresh",
+          "label": "刷新天气",
+          "disabled": false,
+          "x": 207,
+          "y": 15,
+          "w": 40,
+          "h": 44,
+          "font": "27px"
+        }
+      ],
+      "canvases": 0,
+      "frames": 2,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "atom-app-back",
+      "count": 4,
+      "visited": [
+        "city",
+        "city",
+        "atom-app-back",
+        "atom-app-back"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 3,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [
+      "https://api.open-meteo.com/v1/forecast"
+    ],
+    "status": "reviewed"
+  },
+  {
+    "id": "zodiac-atlas",
+    "round": 1,
+    "home": {
+      "title": "十二星座漫游",
+      "text": "十二星座漫游\nATOM · LITTLE RITUALS\n01 / ZODIAC\n♈︎\n白羊座\n\n沿着星光，走进十二种古老的想象。\n\n‹ 上一个\n星座故事\n下一个 ›\n真实星座连线 · 艺术投影，非实时观测方位",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 54,
+          "y": 3,
+          "w": 48,
+          "h": 48,
+          "font": "16px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "prev",
+          "label": "上一个星座",
+          "disabled": false,
+          "x": 102,
+          "y": 295,
+          "w": 84,
+          "h": 38,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "story",
+          "label": "星座故事",
+          "disabled": false,
+          "x": 196,
+          "y": 295,
+          "w": 88,
+          "h": 38,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "next",
+          "label": "下一个星座",
+          "disabled": false,
+          "x": 294,
+          "y": 295,
+          "w": 84,
+          "h": 38,
+          "font": "14px"
+        }
+      ],
+      "canvases": 0,
+      "frames": 2,
+      "media": []
+    },
+    "fixture": {
+      "ready": true,
+      "saves": 0,
+      "unsupported": []
+    },
+    "navigation": {
+      "start": "atom-app-back",
+      "count": 4,
+      "visited": [
+        "next",
+        "next",
+        "story",
+        "atom-app-back"
+      ]
+    },
+    "afterSuspend": {
+      "frames": 3,
+      "raf": 0,
+      "intervals": 0,
+      "timeouts": 0,
+      "audio": [],
+      "frameGrowth": 0
+    },
+    "errors": [],
+    "requests": [],
+    "status": "reviewed"
+  }
+]

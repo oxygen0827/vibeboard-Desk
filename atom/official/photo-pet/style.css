@@ -1,0 +1,32 @@
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden}body{font:14px system-ui,sans-serif;color:var(--ink,#384331);background:#dce6bc}main{position:relative;width:100%;height:100%}canvas{image-rendering:pixelated}#scene{position:absolute;width:100%;height:100%;inset:0}button{font:inherit;color:inherit;min-height:44px;border:1px solid var(--line,#c6ccaa);border-radius:10px;background:var(--card,#fff8e5);padding:6px 10px}button:disabled{opacity:.55}button[hidden]{display:none}header{position:absolute;top:10px;left:62px;right:14px;display:flex;align-items:center;justify-content:space-between;gap:8px}h1{font-size:19px;margin:0}#inventory{background:#fff8e5df;border-radius:8px;padding:7px;color:#465338}#status{position:absolute;top:44px;left:62px;right:12px;margin:0;color:#485637;font-size:14px;line-height:1.4;background:#fff8e5ed;border-radius:6px;padding:2px 6px}#retry{position:absolute;right:10px;top:70px;z-index:3}.plot{position:absolute;top:65%;width:14%;height:15%;background:transparent;border:0;padding:0;display:flex;align-items:end;justify-content:center}.plot span{font-size:14px;background:#fff8e5ed;border-radius:5px;padding:2px 5px;white-space:nowrap}.plot:nth-child(1){left:5%}.plot:nth-child(2){left:21%}.plot:nth-child(3){left:37%}.plot:nth-child(4){left:53%}footer{position:absolute;bottom:24px;left:0;right:0;display:flex;justify-content:center;gap:8px}footer button{min-width:85px;font-size:16px}#hint{position:absolute;bottom:3px;left:0;right:0;text-align:center;margin:0;font-size:14px;color:#4c5d3f}dialog.atom-scroll{width:min(440px,94vw);max-height:94vh;overflow:auto;padding:14px;border:1px solid var(--line,#c6ccaa);border-radius:16px;background:var(--bg,#fff8e5);color:inherit}dialog::backdrop{background:#26332166}.picker-head{display:flex;justify-content:space-between;align-items:center}.picker-head h2{margin:0;font-size:18px}#pet-list{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}.pet-card{display:flex;flex-direction:column;align-items:center;padding:3px}.pet-card canvas{width:54px;height:54px}.pet-card[aria-pressed=true]{background:var(--line,#dce6bc)}#picker-status{margin:8px 0 0;min-height:20px}
+
+.resident{position:absolute;z-index:1;width:58px;height:64px;background:transparent;border:0;padding:0;display:flex;align-items:end;justify-content:center;transform:translate(-50%,-100%)}.job-body{display:grid;grid-template-columns:120px 1fr;gap:14px;align-items:center}.job-body p{font-size:15px;line-height:1.5;margin:8px 0}#job-portrait{width:120px;height:130px;image-rendering:pixelated}#job-progress{font-weight:650}#job-tools{color:var(--muted,#677555)}#job-action{width:100%;font-size:16px}#job-status{margin:8px 0 0;min-height:20px}#inventory{font-variant-numeric:tabular-nums;font-size:14px}header{pointer-events:none}#hint{background:#fff8e5db;bottom:0;padding:2px}footer{bottom:27px}
+h1{background:#fff8e5ed;padding:5px 9px;border-radius:8px;color:#384331}
+/* Compact visible buttons, with a 44px semantic target for touch and five-way input. */
+footer{bottom:20px;gap:4px}
+footer button,.picker-head button,#job-action{position:relative;isolation:isolate;background:transparent;border:0;min-height:44px;padding:0 9px;font-size:14px}
+footer button{min-width:64px}
+footer button::before,.picker-head button::before,#job-action::before{content:"";position:absolute;inset:6px 0;z-index:-1;border:1px solid var(--line,#c6ccaa);border-radius:7px;background:var(--card,#fff8e5);pointer-events:none}
+#job-action{width:max-content;max-width:100%;min-width:180px;margin:4px auto 0;display:block}
+
+.plot span{padding:1px 4px;border-radius:4px}
+#hint{pointer-events:none}
+
+/* Compact HUD; status occupies only its content width and disappears after normal feedback. */
+header{top:6px;left:56px;right:8px;gap:6px;align-items:center}
+h1{font-size:16px;line-height:20px;padding:2px 6px;border-radius:5px}
+#inventory{font-size:14px;line-height:18px;padding:3px 6px;border-radius:5px}
+#status{top:35px;left:56px;right:auto;width:max-content;max-width:calc(100% - 64px);font-size:14px;line-height:18px;padding:2px 6px;border-radius:4px;pointer-events:none}
+#status[hidden]{display:none}
+
+/* The host theme styles all buttons with !important. Scene hit targets have no surface. */
+body .resident,body .plot,body footer button,body .picker-head button,body #job-action{background:transparent!important;border:0!important;box-shadow:none!important}
+body .resident:active{transform:translate(-50%,-100%)}
+body footer button[aria-pressed=true]::before{background:var(--accent,#dce6bc)}
+body footer button[aria-pressed=true]{color:var(--accent-ink,#384331)!important}
+/* Only the small visible labels follow the theme, never the large transparent targets. */
+.plot span{background:var(--card,#fff8e5);color:var(--ink,#384331)}
+body footer button[aria-pressed]{background:transparent!important}
+
+/* Residents stay clickable over managed plots; footer controls keep their own input layer. */
+footer{z-index:2}

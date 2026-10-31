@@ -1,0 +1,310 @@
+[
+  {
+    "id": "local-music",
+    "exit_code": 0,
+    "errors": [],
+    "warnings": [
+      "WARNING: bundle.json: network references/imports detected; verify offline behavior",
+      "WARNING: index.html: font-size below 14px (13); inspect physical legibility",
+      "WARNING: index.html: marked scroll region has no local height bound; verify inherited/grid bounds on device"
+    ]
+  },
+  {
+    "id": "made-23c2b1193c452dd3adf9",
+    "exit_code": 0,
+    "errors": [],
+    "warnings": [
+      "WARNING: bundle.json: network references/imports detected; verify offline behavior"
+    ]
+  },
+  {
+    "id": "model-viewer",
+    "exit_code": 0,
+    "errors": [],
+    "warnings": [
+      "WARNING: OBJLoader.js: network references/imports detected; verify offline behavior",
+      "WARNING: STLLoader.js: network references/imports detected; verify offline behavior",
+      "WARNING: UPSTREAM.txt: network references/imports detected; verify offline behavior",
+      "WARNING: bundle.json: network references/imports detected; verify offline behavior",
+      "WARNING: index.html: font-size below 14px (11); inspect physical legibility",
+      "WARNING: three.min.js: network references/imports detected; verify offline behavior",
+      "WARNING: random/mock/sample identifiers detected; verify displayed data is labeled or real; this may be legitimate gameplay",
+      "WARNING: recurring updates detected; verify idle CPU and timer lifecycle on device"
+    ]
+  },
+  {
+    "id": "moon-ocean",
+    "exit_code": 0,
+    "errors": [],
+    "warnings": [
+      "WARNING: README.md: network references/imports detected; verify offline behavior",
+      "WARNING: UPSTREAM.txt: network references/imports detected; verify offline behavior",
+      "WARNING: bundle.json: network references/imports detected; verify offline behavior",
+      "WARNING: js/controls/OrbitControls.js: network references/imports detected; verify offline behavior",
+      "WARNING: js/demo.js: network references/imports detected; verify offline behavior",
+      "WARNING: js/effects/MirrorRenderer.js: network references/imports detected; verify offline behavior",
+      "WARNING: js/effects/Ocean.js: network references/imports detected; verify offline behavior",
+      "WARNING: js/libs/dat.gui.min.js: network references/imports detected; verify offline behavior",
+      "WARNING: js/libs/three.min.js: network references/imports detected; verify offline behavior",
+      "WARNING: js/loaders/MTLLoader.js: network references/imports detected; verify offline behavior",
+      "WARNING: js/loaders/OBJMTLLoader.js: network references/imports detected; verify offline behavior",
+      "WARNING: js/shaders/CloudShader2.js: network references/imports detected; verify offline behavior",
+      "WARNING: js/shaders/FFTOceanShader.js: network references/imports detected; verify offline behavior",
+      "WARNING: js/shaders/OceanShader.js: network references/imports detected; verify offline behavior",
+      "WARNING: js/shaders/RainShader.js: network references/imports detected; verify offline behavior",
+      "WARNING: js/shaders/ScreenSpaceShader.js: network references/imports detected; verify offline behavior",
+      "WARNING: js/shaders/sky4.js: network references/imports detected; verify offline behavior",
+      "WARNING: 6 gradient declarations; inspect hierarchy and rendering cost (not an aesthetic verdict)",
+      "WARNING: random/mock/sample identifiers detected; verify displayed data is labeled or real; this may be legitimate gameplay",
+      "WARNING: recurring updates detected; verify idle CPU and timer lifecycle on device"
+    ]
+  },
+  {
+    "id": "music-vision",
+    "exit_code": 0,
+    "errors": [],
+    "warnings": [
+      "WARNING: UPSTREAM-README.md: network references/imports detected; verify offline behavior",
+      "WARNING: UPSTREAM.txt: network references/imports detected; verify offline behavior",
+      "WARNING: bundle.json: network references/imports detected; verify offline behavior",
+      "WARNING: style.css: font-size below 14px (10, 12, 13); inspect physical legibility",
+      "WARNING: upstream-source/butterchurn.js: network references/imports detected; verify offline behavior",
+      "WARNING: upstream-source/package.json: network references/imports detected; verify offline behavior",
+      "WARNING: random/mock/sample identifiers detected; verify displayed data is labeled or real; this may be legitimate gameplay",
+      "WARNING: recurring updates detected; verify idle CPU and timer lifecycle on device"
+    ]
+  },
+  {
+    "id": "parametric-maker",
+    "exit_code": 0,
+    "errors": [],
+    "warnings": [
+      "WARNING: UPSTREAM.txt: network references/imports detected; verify offline behavior",
+      "WARNING: bundle.json: network references/imports detected; verify offline behavior",
+      "WARNING: index.html: font-size below 14px (12); inspect physical legibility",
+      "WARNING: source-modeling/CHANGELOG.md: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/README.md: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/package.json: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/colors/cssColors.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/colors/hexToRgb.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/colors/hslToRgb.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/colors/hsvToRgb.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/colors/rgbToHex.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/colors/rgbToHsl.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/colors/rgbToHsv.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/curves/bezier/tangentAt.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/curves/bezier/valueAt.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/geometries/path2/appendArc.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/geometries/poly2/arePointsInside.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/geometries/poly3/measureArea.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/geometries/poly3/measureSignedVolume.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/geometries/types.d.ts: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/maths/line3/create.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/maths/mat4/fromTaitBryanRotation.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/maths/mat4/fromVectorRotation.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/maths/mat4/invert.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/maths/plane/fromNoisyPoints.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/maths/plane/fromNormalAndPoint.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/maths/rotation.test.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/maths/utils/intersect.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/measurements/measureArea.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/measurements/measureBoundingSphere.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/measurements/measureCenterOfMass.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/operations/extrusions/earcut/eliminateHoles.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/operations/extrusions/earcut/index.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/operations/extrusions/earcut/linkedListSort.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/operations/extrusions/extrudeWalls.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/operations/hulls/hullPoints2.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/operations/hulls/quickhull/Face.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/operations/hulls/quickhull/HalfEdge.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/operations/hulls/quickhull/QuickHull.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/operations/hulls/quickhull/Vertex.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/operations/hulls/quickhull/VertexList.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/operations/hulls/quickhull/get-plane-normal.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/operations/hulls/quickhull/index.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/operations/hulls/quickhull/point-line-distance.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/primitives/ellipse.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/primitives/star.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/primitives/triangle.js: network references/imports detected; verify offline behavior",
+      "WARNING: source-modeling/src/text/fonts/single-line/hershey/simplex.js: network references/imports detected; verify offline behavior",
+      "WARNING: three.min.js: network references/imports detected; verify offline behavior",
+      "WARNING: random/mock/sample identifiers detected; verify displayed data is labeled or real; this may be legitimate gameplay",
+      "WARNING: recurring updates detected; verify idle CPU and timer lifecycle on device"
+    ]
+  },
+  {
+    "id": "particle-lab",
+    "exit_code": 0,
+    "errors": [],
+    "warnings": [
+      "WARNING: bundle.json: network references/imports detected; verify offline behavior",
+      "WARNING: index.html: font-size below 14px (13); inspect physical legibility",
+      "WARNING: index.html: marked scroll region has no local height bound; verify inherited/grid bounds on device",
+      "WARNING: random/mock/sample identifiers detected; verify displayed data is labeled or real; this may be legitimate gameplay",
+      "WARNING: recurring updates detected; verify idle CPU and timer lifecycle on device"
+    ]
+  },
+  {
+    "id": "physics-playground",
+    "exit_code": 0,
+    "errors": [],
+    "warnings": [
+      "WARNING: UPSTREAM.txt: network references/imports detected; verify offline behavior",
+      "WARNING: bundle.json: network references/imports detected; verify offline behavior",
+      "WARNING: index.html: font-size below 14px (11); inspect physical legibility",
+      "WARNING: matter.min.js: network references/imports detected; verify offline behavior",
+      "WARNING: random/mock/sample identifiers detected; verify displayed data is labeled or real; this may be legitimate gameplay",
+      "WARNING: recurring updates detected; verify idle CPU and timer lifecycle on device"
+    ]
+  },
+  {
+    "id": "planetarium",
+    "exit_code": 0,
+    "errors": [],
+    "warnings": [
+      "WARNING: assets/skybox/README.md: network references/imports detected; verify offline behavior",
+      "WARNING: bundle.json: network references/imports detected; verify offline behavior",
+      "WARNING: data/README.md: network references/imports detected; verify offline behavior",
+      "WARNING: data/get_bsc.sh: network references/imports detected; verify offline behavior",
+      "WARNING: data/processed/natural-satellites.json: network references/imports detected; verify offline behavior",
+      "WARNING: index.html: font-size below 14px (11); inspect physical legibility",
+      "WARNING: spacekit.js: network references/imports detected; verify offline behavior",
+      "WARNING: random/mock/sample identifiers detected; verify displayed data is labeled or real; this may be legitimate gameplay",
+      "WARNING: recurring updates detected; verify idle CPU and timer lifecycle on device"
+    ]
+  },
+  {
+    "id": "pocket-studio",
+    "exit_code": 0,
+    "errors": [],
+    "warnings": [
+      "WARNING: Tone.js: network references/imports detected; verify offline behavior",
+      "WARNING: UPSTREAM.txt: network references/imports detected; verify offline behavior",
+      "WARNING: bundle.json: network references/imports detected; verify offline behavior",
+      "WARNING: index.html: font-size below 14px (11, 9); inspect physical legibility",
+      "WARNING: random/mock/sample identifiers detected; verify displayed data is labeled or real; this may be legitimate gameplay",
+      "WARNING: recurring updates detected; verify idle CPU and timer lifecycle on device"
+    ]
+  },
+  {
+    "id": "quick-notes",
+    "exit_code": 0,
+    "errors": [],
+    "warnings": [
+      "WARNING: bundle.json: network references/imports detected; verify offline behavior",
+      "WARNING: device-ui.css: font-size below 14px (10, 11, 12, 13, 9); inspect physical legibility",
+      "WARNING: device-ui.css: root min-height does not bound long content; inspect root scrolling and split views if needed",
+      "WARNING: device-ui.css: scrolling selector not explicitly marked .atom-scroll or [data-atom-scroll]: .content-scroll",
+      "WARNING: device-ui.css: scrolling selector not explicitly marked .atom-scroll or [data-atom-scroll]: body[data-atom-app=my-computer] .screen>.notice",
+      "WARNING: device-ui.css: root height:auto; inspect fullscreen root scrollHeight at 480×360",
+      "WARNING: style.css: font-size below 14px (11, 12, 13); inspect physical legibility",
+      "WARNING: style.css: scrolling selector not explicitly marked .atom-scroll or [data-atom-scroll]: .scroll",
+      "WARNING: no semantic interactive controls detected; may be valid for passive/canvas apps",
+      "WARNING: random/mock/sample identifiers detected; verify displayed data is labeled or real; this may be legitimate gameplay"
+    ]
+  },
+  {
+    "id": "rhythm-orbits",
+    "exit_code": 0,
+    "errors": [],
+    "warnings": [
+      "WARNING: LICENSE: network references/imports detected; verify offline behavior",
+      "WARNING: UPSTREAM-README.md: network references/imports detected; verify offline behavior",
+      "WARNING: UPSTREAM.txt: network references/imports detected; verify offline behavior",
+      "WARNING: bundle.json: network references/imports detected; verify offline behavior",
+      "WARNING: style.css: font-size below 14px (10, 11, 13); inspect physical legibility",
+      "WARNING: upstream-core.js: network references/imports detected; verify offline behavior",
+      "WARNING: upstream-source/src/css/rangeslider.css: network references/imports detected; verify offline behavior",
+      "WARNING: upstream-source/src/css/style.css: font-size below 14px (12); inspect physical legibility",
+      "WARNING: upstream-source/src/css/style.css: scrolling selector not explicitly marked .atom-scroll or [data-atom-scroll]: .panel__viewport",
+      "WARNING: upstream-source/src/css/style.css: scrolling selector not explicitly marked .atom-scroll or [data-atom-scroll]: .help__viewport",
+      "WARNING: upstream-source/src/css/style.css: network references/imports detected; verify offline behavior",
+      "WARNING: upstream-source/src/fonts/Alte-DIN-1451-Mittelschrift.ttf.svg: network references/imports detected; verify offline behavior",
+      "WARNING: upstream-source/src/fonts/Read Me.txt: network references/imports detected; verify offline behavior",
+      "WARNING: upstream-source/src/fonts/icomoon/demo.html: external links/dependencies: https://icomoon.io/app",
+      "WARNING: upstream-source/src/fonts/icomoon/demo.html: network references/imports detected; verify offline behavior",
+      "WARNING: upstream-source/src/fonts/icomoon/fonts/icomoon.svg: network references/imports detected; verify offline behavior",
+      "WARNING: upstream-source/src/index.html: external links/dependencies: https://www.hisschemoller.com, https://github.com/hisschemoller/music-pattern-generator, https://github.com/hisschemoller/music-pattern-generator/releases",
+      "WARNING: upstream-source/src/index.html: absolute local URL may escape bundle: /favicon.ico",
+      "WARNING: upstream-source/src/index.html: network references/imports detected; verify offline behavior",
+      "WARNING: upstream-source/src/js/core/convert_xml.js: network references/imports detected; verify offline behavior",
+      "WARNING: upstream-source/src/js/core/transport.js: network references/imports detected; verify offline behavior",
+      "WARNING: upstream-source/src/js/core/util.js: network references/imports detected; verify offline behavior",
+      "WARNING: upstream-source/src/js/lib/threejs/build/three.module.js: network references/imports detected; verify offline behavior",
+      "WARNING: upstream-source/src/js/main.js: network references/imports detected; verify offline behavior",
+      "WARNING: upstream-source/src/js/midi/midi.js: network references/imports detected; verify offline behavior",
+      "WARNING: upstream-source/src/js/processors/epg/object3dController.js: network references/imports detected; verify offline behavior",
+      "WARNING: upstream-source/src/js/processors/epg/settings.html: missing viewport meta; inspect at 480×360",
+      "WARNING: upstream-source/src/js/processors/epg/utils.js: network references/imports detected; verify offline behavior",
+      "WARNING: upstream-source/src/js/processors/euclidfx/settings.html: missing viewport meta; inspect at 480×360",
+      "WARNING: upstream-source/src/js/processors/euclidfx/utils.js: network references/imports detected; verify offline behavior",
+      "WARNING: upstream-source/src/js/processors/output/settings.html: missing viewport meta; inspect at 480×360",
+      "WARNING: upstream-source/src/js/processors/pitches/settings.html: missing viewport meta; inspect at 480×360",
+      "WARNING: upstream-source/src/js/processors/soundbank/readme.md: network references/imports detected; verify offline behavior",
+      "WARNING: upstream-source/src/js/processors/soundbank/settings.html: missing viewport meta; inspect at 480×360",
+      "WARNING: upstream-source/src/js/view/windowresize.js: network references/imports detected; verify offline behavior",
+      "WARNING: upstream-source/src/js/webgl/interaction3d.js: network references/imports detected; verify offline behavior",
+      "WARNING: 6 gradient declarations; inspect hierarchy and rendering cost (not an aesthetic verdict)",
+      "WARNING: random/mock/sample identifiers detected; verify displayed data is labeled or real; this may be legitimate gameplay",
+      "WARNING: recurring updates detected; verify idle CPU and timer lifecycle on device"
+    ]
+  },
+  {
+    "id": "robo-face",
+    "exit_code": 0,
+    "errors": [],
+    "warnings": [
+      "WARNING: FluxGarage_RoboEyes.h: network references/imports detected; verify offline behavior",
+      "WARNING: LICENSE.txt: network references/imports detected; verify offline behavior",
+      "WARNING: UPSTREAM.txt: network references/imports detected; verify offline behavior",
+      "WARNING: bundle.json: network references/imports detected; verify offline behavior",
+      "WARNING: common.css: font-size below 14px (12); inspect physical legibility",
+      "WARNING: common.css: scrolling selector not explicitly marked .atom-scroll or [data-atom-scroll]: #panel",
+      "WARNING: upstream-source/LICENSE.txt: network references/imports detected; verify offline behavior",
+      "WARNING: upstream-source/README.md: network references/imports detected; verify offline behavior",
+      "WARNING: upstream-source/examples/i2c_SSD1306_ConfigurationBoard/i2c_SSD1306_ConfigurationBoard.ino: network references/imports detected; verify offline behavior",
+      "WARNING: upstream-source/examples/i2c_SSD1306_DHT22-TemperatureSensor/i2c_SSD1306_DHT22-TemperatureSensor.ino: network references/imports detected; verify offline behavior",
+      "WARNING: upstream-source/examples/i2c_SSD1306_SensorPlayground/i2c_SSD1306_SensorPlayground.ino: network references/imports detected; verify offline behavior",
+      "WARNING: upstream-source/examples/spi_SSD1322_Basics/spi_SSD1322_Basics.ino: network references/imports detected; verify offline behavior",
+      "WARNING: upstream-source/library.properties: network references/imports detected; verify offline behavior",
+      "WARNING: upstream-source/src/FluxGarage_RoboEyes.h: network references/imports detected; verify offline behavior",
+      "WARNING: random/mock/sample identifiers detected; verify displayed data is labeled or real; this may be legitimate gameplay",
+      "WARNING: recurring updates detected; verify idle CPU and timer lifecycle on device"
+    ]
+  },
+  {
+    "id": "volume-flow",
+    "exit_code": 0,
+    "errors": [],
+    "warnings": [
+      "WARNING: LICENSE: network references/imports detected; verify offline behavior",
+      "WARNING: README.md: network references/imports detected; verify offline behavior",
+      "WARNING: UPSTREAM.txt: network references/imports detected; verify offline behavior",
+      "WARNING: bundle.json: network references/imports detected; verify offline behavior",
+      "WARNING: index.html: missing viewport meta; inspect at 480×360",
+      "WARNING: random/mock/sample identifiers detected; verify displayed data is labeled or real; this may be legitimate gameplay",
+      "WARNING: recurring updates detected; verify idle CPU and timer lifecycle on device"
+    ]
+  },
+  {
+    "id": "water-pool",
+    "exit_code": 0,
+    "errors": [],
+    "warnings": [
+      "WARNING: README.md: network references/imports detected; verify offline behavior",
+      "WARNING: UPSTREAM.txt: network references/imports detected; verify offline behavior",
+      "WARNING: bundle.json: network references/imports detected; verify offline behavior",
+      "WARNING: cubemap.js: network references/imports detected; verify offline behavior",
+      "WARNING: index.html: external links/dependencies: http://madebyevan.com/, http://youtube.com/watch?v=R0O_9bp3EKQ, https://medium.com/@evanwallace/rendering-realtime-caustics-in-webgl-2a99a29a0b2c, http://www.flickr.com/photos/zooboing/3682834083/",
+      "WARNING: index.html: font-size below 14px (10, 11, 8); inspect physical legibility",
+      "WARNING: index.html: scrolling selector not explicitly marked .atom-scroll or [data-atom-scroll]: #help",
+      "WARNING: index.html: network references/imports detected; verify offline behavior",
+      "WARNING: lightgl.js: network references/imports detected; verify offline behavior",
+      "WARNING: main.js: network references/imports detected; verify offline behavior",
+      "WARNING: renderer.js: network references/imports detected; verify offline behavior",
+      "WARNING: water.js: network references/imports detected; verify offline behavior",
+      "WARNING: random/mock/sample identifiers detected; verify displayed data is labeled or real; this may be legitimate gameplay",
+      "WARNING: recurring updates detected; verify idle CPU and timer lifecycle on device"
+    ]
+  }
+]

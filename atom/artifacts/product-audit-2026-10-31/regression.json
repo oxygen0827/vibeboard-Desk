@@ -1,0 +1,10 @@
+{
+  "checks": [
+    "read failure cannot overwrite original score; retry restores it",
+    "save failure preserves editing and stored score; retry acknowledged once",
+    "legacy score loads unchanged and migrates only on save",
+    "local audio import/play/exit releases playback and object URLs",
+    "breathing light uses real SDK suspend registration"
+  ],
+  "status": "passed"
+}

@@ -1,0 +1,163 @@
+{
+  "id": "water-pool",
+  "steps": [
+    "button:text-is(\"雨滴\")",
+    "#scene-tools",
+    "#scene-action-4",
+    "#scene-tools-close"
+  ],
+  "before": {
+    "title": "光影水池",
+    "text": "光影水池 · 拨动水面 / 拖动球体\n暂停\n重力：关\n雨滴\n移动球与视角",
+    "size": {
+      "width": 480,
+      "height": 360
+    },
+    "controls": [
+      {
+        "tag": "BUTTON",
+        "id": "",
+        "label": "暂停",
+        "disabled": false,
+        "x": 12,
+        "y": 308,
+        "w": 56,
+        "h": 40,
+        "font": "14px"
+      },
+      {
+        "tag": "BUTTON",
+        "id": "",
+        "label": "重力：关",
+        "disabled": false,
+        "x": 76,
+        "y": 308,
+        "w": 84,
+        "h": 40,
+        "font": "14px"
+      },
+      {
+        "tag": "BUTTON",
+        "id": "",
+        "label": "雨滴",
+        "disabled": false,
+        "x": 168,
+        "y": 308,
+        "w": 56,
+        "h": 40,
+        "font": "14px"
+      },
+      {
+        "tag": "BUTTON",
+        "id": "atom-app-back",
+        "label": "返回上一级",
+        "disabled": false,
+        "x": 0,
+        "y": 0,
+        "w": 48,
+        "h": 48,
+        "font": "13px"
+      },
+      {
+        "tag": "BUTTON",
+        "id": "scene-tools",
+        "label": "移动球与视角",
+        "disabled": false,
+        "x": 378,
+        "y": 52,
+        "w": 92,
+        "h": 40,
+        "font": "12px"
+      }
+    ],
+    "canvases": 1,
+    "frames": 143,
+    "media": []
+  },
+  "after": {
+    "title": "光影水池",
+    "text": "光影水池 · 拨动水面 / 拖动球体\n暂停\n重力：关\n雨滴\n移动球与视角",
+    "size": {
+      "width": 480,
+      "height": 360
+    },
+    "controls": [
+      {
+        "tag": "BUTTON",
+        "id": "",
+        "label": "暂停",
+        "disabled": false,
+        "x": 12,
+        "y": 308,
+        "w": 56,
+        "h": 40,
+        "font": "14px"
+      },
+      {
+        "tag": "BUTTON",
+        "id": "",
+        "label": "重力：关",
+        "disabled": false,
+        "x": 76,
+        "y": 308,
+        "w": 84,
+        "h": 40,
+        "font": "14px"
+      },
+      {
+        "tag": "BUTTON",
+        "id": "",
+        "label": "雨滴",
+        "disabled": false,
+        "x": 168,
+        "y": 308,
+        "w": 56,
+        "h": 40,
+        "font": "14px"
+      },
+      {
+        "tag": "BUTTON",
+        "id": "atom-app-back",
+        "label": "返回上一级",
+        "disabled": false,
+        "x": 0,
+        "y": 0,
+        "w": 48,
+        "h": 48,
+        "font": "13px"
+      },
+      {
+        "tag": "BUTTON",
+        "id": "scene-tools",
+        "label": "移动球与视角",
+        "disabled": false,
+        "x": 378,
+        "y": 52,
+        "w": 92,
+        "h": 40,
+        "font": "12px"
+      }
+    ],
+    "canvases": 1,
+    "frames": 236,
+    "media": []
+  },
+  "fixture": {
+    "ready": true,
+    "value": null,
+    "saves": 0,
+    "returned": 0,
+    "unsupported": [
+      "atom:input-mode"
+    ],
+    "calls": []
+  },
+  "suspend": {
+    "frames": 240,
+    "intervals": 0,
+    "audio": [],
+    "growth": 0
+  },
+  "errors": [],
+  "status": "reviewed"
+}

@@ -1,0 +1,317 @@
+[
+  {
+    "id": "motion-music",
+    "home": {
+      "title": "音乐物理沙盒",
+      "text": "‹ 桌面\n音乐物理沙盒\n开启声音\n01 / PENTATONIC\n让碰撞，成为旋律。\n\n拖动小球，松手听见回响\n\n手动把玩 · 未连接惯性传感器\n五声音阶\n音符沙盒\n瓶中海洋\n光之容器\n● 录一段\n▶ 回放\n保存\n←\n↑\n水平\n↓\n→\n拨动\n重置场景\n先拨动小球，再开启声音",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "back",
+          "label": "返回桌面",
+          "disabled": false,
+          "x": 0,
+          "y": 0,
+          "w": 88,
+          "h": 48,
+          "font": "27px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "sound",
+          "label": "开启声音",
+          "disabled": false,
+          "x": 406,
+          "y": 8,
+          "w": 64,
+          "h": 32,
+          "font": "11px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "sensor",
+          "label": "手动把玩 · 未连接惯性传感器",
+          "disabled": false,
+          "x": 16,
+          "y": 233,
+          "w": 116,
+          "h": 28,
+          "font": "9px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "音符沙盒",
+          "disabled": false,
+          "x": 10,
+          "y": 270,
+          "w": 62,
+          "h": 34,
+          "font": "11px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "瓶中海洋",
+          "disabled": false,
+          "x": 74,
+          "y": 270,
+          "w": 62,
+          "h": 34,
+          "font": "11px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "光之容器",
+          "disabled": false,
+          "x": 138,
+          "y": 270,
+          "w": 62,
+          "h": 34,
+          "font": "11px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "record",
+          "label": "● 录一段",
+          "disabled": false,
+          "x": 310,
+          "y": 270,
+          "w": 64,
+          "h": 34,
+          "font": "11px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "play",
+          "label": "▶ 回放",
+          "disabled": true,
+          "x": 376,
+          "y": 270,
+          "w": 52,
+          "h": 34,
+          "font": "11px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "save",
+          "label": "保存",
+          "disabled": true,
+          "x": 430,
+          "y": 270,
+          "w": 40,
+          "h": 34,
+          "font": "11px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "向左倾斜",
+          "disabled": false,
+          "x": 10,
+          "y": 314,
+          "w": 28,
+          "h": 30,
+          "font": "10px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "向上倾斜",
+          "disabled": false,
+          "x": 39,
+          "y": 314,
+          "w": 28,
+          "h": 30,
+          "font": "10px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "恢复水平",
+          "disabled": false,
+          "x": 68,
+          "y": 314,
+          "w": 34,
+          "h": 30,
+          "font": "10px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "向下倾斜",
+          "disabled": false,
+          "x": 103,
+          "y": 314,
+          "w": 28,
+          "h": 30,
+          "font": "10px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "向右倾斜",
+          "disabled": false,
+          "x": 132,
+          "y": 314,
+          "w": 28,
+          "h": 30,
+          "font": "10px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "pluck",
+          "label": "拨动",
+          "disabled": false,
+          "x": 162,
+          "y": 314,
+          "w": 34,
+          "h": 30,
+          "font": "10px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "reset",
+          "label": "重置场景",
+          "disabled": false,
+          "x": 198,
+          "y": 314,
+          "w": 54,
+          "h": 30,
+          "font": "10px"
+        }
+      ],
+      "canvases": 1,
+      "frames": 141,
+      "media": []
+    },
+    "navigation": {
+      "controls": 14,
+      "reachable": 14,
+      "unreachable": [],
+      "overflow": []
+    },
+    "suspend": {
+      "frames": 146,
+      "audio": [],
+      "intervals": 0,
+      "animations": 0,
+      "growth": 0
+    },
+    "errors": [],
+    "status": "reviewed"
+  },
+  {
+    "id": "quick-notes",
+    "home": {
+      "title": "随手记",
+      "text": "随手记\n账号\n连接你的笔记\n\n使用电脑工作台的市场账号。未登录的本机笔记不会自动上传到任何账号。\n\n用户名\n密码\n登录\n注册\n仅查看本机离线笔记",
+      "size": {
+        "width": 480,
+        "height": 360
+      },
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "id": "atom-app-back",
+          "label": "返回上一级",
+          "disabled": false,
+          "x": 22,
+          "y": 14,
+          "w": 48,
+          "h": 48,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "账号",
+          "disabled": false,
+          "x": 276,
+          "y": 22,
+          "w": 124,
+          "h": 32,
+          "font": "12px"
+        },
+        {
+          "tag": "INPUT",
+          "id": "username",
+          "label": "",
+          "disabled": false,
+          "x": 25,
+          "y": 156,
+          "w": 430,
+          "h": 36,
+          "font": "14px"
+        },
+        {
+          "tag": "INPUT",
+          "id": "password",
+          "label": "",
+          "disabled": false,
+          "x": 25,
+          "y": 220,
+          "w": 430,
+          "h": 36,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "登录",
+          "disabled": false,
+          "x": 25,
+          "y": 264,
+          "w": 430,
+          "h": 36,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "注册",
+          "disabled": false,
+          "x": 25,
+          "y": 307,
+          "w": 430,
+          "h": 36,
+          "font": "14px"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "label": "仅查看本机离线笔记",
+          "disabled": false,
+          "x": 25,
+          "y": 343,
+          "w": 150,
+          "h": 36,
+          "font": "14px"
+        }
+      ],
+      "canvases": 0,
+      "frames": 2,
+      "media": []
+    },
+    "navigation": {
+      "controls": 7,
+      "reachable": 7,
+      "unreachable": [],
+      "overflow": []
+    },
+    "suspend": {
+      "frames": 2,
+      "audio": [],
+      "intervals": 0,
+      "animations": 0,
+      "growth": 0
+    },
+    "errors": [],
+    "status": "reviewed"
+  }
+]

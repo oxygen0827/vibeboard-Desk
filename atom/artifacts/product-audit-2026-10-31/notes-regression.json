@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "checks": [
+    "create/save isolated note",
+    "editor back retains note",
+    "trash back restores list",
+    "read failure prevents writes"
+  ]
+}

@@ -3,7 +3,7 @@ const assert=require('node:assert/strict'),http=require('node:http'),fs=require(
 const {chromium,executablePath}=require('../../tools/browser-test-runtime.cjs');
 const image='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aP9sAAAAASUVORK5CYII=';
 const items=Array.from({length:7},(_,i)=>({id:(i+1).toString(16).padStart(32,'0'),name:'Fixture '+i,revision:1,favorite:false,generated:i===0,parent_id:i===0?'00000000000000000000000000000002':null,thumbnail:image}));
-const state={user:{id:'fixture',username:'fixture'},generation_enabled:true,styles:[{id:'clay',name:'黏土世界'},{id:'film',name:'胶片时光'}],templates:[{id:'text-film',name:'胶片早餐',mode:'text',style:'film',prompt:'咖啡和面包的胶片摄影'},{id:'edit-clay',name:'黏土分身',mode:'edit',style:'clay',prompt:'保留参考照片主体，转换为黏土角色'}]};
+const state={user:{id:'fixture',username:'fixture'},generation_enabled:true,styles:[{id:'clay',name:'黏土世界'},{id:'film',name:'胶片时光'},{id:'pet',name:'桌面宠物形象'}],templates:[{id:'text-film',name:'胶片早餐',mode:'text',style:'film',prompt:'咖啡和面包的胶片摄影'},{id:'edit-clay',name:'黏土分身',mode:'edit',style:'clay',prompt:'保留参考照片主体，转换为黏土角色'}]};
 const html=`<meta charset="utf-8"><style>html,body{margin:0;width:100%;height:100%;overflow:hidden}iframe{border:0;width:100%;height:100%}</style><iframe src="/index.html" sandbox="allow-scripts"></iframe><script>
 const items=${JSON.stringify(items)},state=${JSON.stringify(state)},image=${JSON.stringify(image)};window.requests=[];window.uploads=[];
 addEventListener('message',e=>{const d=e.data;if(d?.type!=='atom:photos')return;requests.push(d.action);const x=d.data||{};let result;
@@ -17,8 +17,8 @@ if(d.action==='job'){const status=window.jobStatuses?.length?window.jobStatuses.
 if(d.action==='jobs')result={jobs:[]};
 setTimeout(()=>e.source.postMessage({type:'atom:photos-result',id:d.id,result},'*'),d.action==='get'?500:d.action==='state'?400:0)});</script>`;
 (async()=>{
- const server=http.createServer((req,res)=>{const name=new URL(req.url,'http://localhost').pathname.slice(1);if(!name){res.setHeader('Content-Type','text/html');return res.end(req.url.includes('computer')?html.replace('src="/index.html"','src="/index.html?host=computer"'):html)}if(!['index.html','app.js','style.css','icon.svg'].includes(name)){res.statusCode=404;return res.end()}
-  res.setHeader('Content-Type',name.endsWith('.js')?'text/javascript':name.endsWith('.css')?'text/css':name.endsWith('.svg')?'image/svg+xml':'text/html');res.end(fs.readFileSync(path.join(__dirname,name)))});
+ const server=http.createServer((req,res)=>{const name=new URL(req.url,'http://localhost').pathname.slice(1);if(!name){res.setHeader('Content-Type','text/html');return res.end(req.url.includes('computer')?html.replace('src="/index.html"','src="/index.html?host=computer"'):html)}if(name==='input-navigation.js'){res.setHeader('Content-Type','text/javascript');return res.end(fs.readFileSync(path.join(__dirname,'../../static/input-navigation.js')))}if(!['index.html','app.js','style.css','icon.svg'].includes(name)){res.statusCode=404;return res.end()}
+  res.setHeader('Content-Type',name.endsWith('.js')?'text/javascript':name.endsWith('.css')?'text/css':name.endsWith('.svg')?'image/svg+xml':'text/html');res.end(name==='index.html'?fs.readFileSync(path.join(__dirname,name),'utf8').replace('</head>','<script src="input-navigation.js"></script></head>'):fs.readFileSync(path.join(__dirname,name)))});
  await new Promise(r=>server.listen(0,'127.0.0.1',r));const browser=await chromium.launch({executablePath,headless:true});
  try{for(const size of [{width:480,height:360},{width:960,height:700}]){
   const p=await browser.newPage({viewport:size});const errors=[];p.on('pageerror',e=>errors.push(e.message));
@@ -69,11 +69,19 @@ const left=await f.locator('#photo-prev').boundingBox(),right=await f.locator('#
   await f.locator('.viewer').waitFor();await f.locator('.photo-loading').waitFor({state:'detached'});assert.equal(await f.locator('[data-action="open-result"]').count(),0);
   await f.locator('[data-action="back"]').click();await f.locator('.photo').first().waitFor();
   await p.evaluate(()=>window.jobStatuses=['generating','completed']);await f.locator('[data-action="create"]').click();await f.locator('#photo-prompt').fill('测试离开生成页');await f.locator('[data-action="generate"]').click();await f.locator('.ring').waitFor();await f.locator('[data-action="back"]').click();await f.locator('.photo').first().waitFor();await p.waitForTimeout(2900);assert.equal(await f.locator('.viewer').count(),0,'completed background job must not steal navigation');
+  // 变宠物 starts a reference edit with the pet style; text-only creation never offers it.
+  for(let i=0;i<4&&!(await f.getByRole('button',{name:'＋ 灵感'}).isVisible());i++){await app.evaluate(()=>AtomInput.back());await p.waitForTimeout(300)}await f.getByRole('button',{name:'＋ 灵感'}).waitFor();await app.evaluate(()=>AtomInput.focus(document.querySelector('.photo')));await p.keyboard.press('Space');await f.locator('.viewer').waitFor();await f.getByRole('button',{name:'变宠物',exact:true}).click();await f.getByRole('button',{name:'生成宠物形象',exact:true}).waitFor();await f.getByText(/本次生成静态角色图/).waitFor();assert.equal(await f.locator('#photo-style').inputValue(),'pet');assert.equal(await f.locator('body').evaluate(e=>e.scrollHeight<=e.clientHeight),true);
+  await app.evaluate(()=>AtomInput.back());await f.locator('.viewer').waitFor();await app.evaluate(()=>AtomInput.back());await f.getByRole('button',{name:'＋ 灵感'}).click();assert.equal(await f.locator('#photo-style option[value="pet"]').count(),0);await app.evaluate(()=>AtomInput.back());
   const frame=p.frames()[1];await frame.evaluate(()=>window.suspendFixture());assert.equal(await f.locator('#root').innerText(),'');assert.deepEqual(errors,[]);
   await p.close();
  }
  const p=await browser.newPage({viewport:{width:960,height:700}});
+ // Capture the 20 s library refresh so it can be fired while the native file chooser is open.
+ await p.addInitScript(()=>{const original=setInterval;window.setInterval=(fn,ms,...args)=>{if(ms===20000)window.albumSyncFixture=fn;return original(fn,ms,...args)}});
  await p.goto('http://127.0.0.1:'+server.address().port+'/?computer');const f=p.frameLocator('iframe');await f.locator('.account-loading').waitFor();assert.equal(await f.getByRole('button',{name:'登录账号',exact:true}).count(),0);await f.getByText('照片已同步',{exact:true}).waitFor();
+ // A refresh during file choice must not re-render (and so detach) the input the chooser will fill.
+ await f.locator('#photo-files').evaluate(e=>e.dataset.picker='retained');const chooserEvent=p.waitForEvent('filechooser');await f.getByRole('button',{name:'导入',exact:true}).click();const chooser=await chooserEvent;
+ await p.frames()[1].evaluate(()=>window.albumSyncFixture());assert.equal(await f.locator('#photo-files').getAttribute('data-picker'),'retained');await chooser.setFiles([]);
  await f.locator('#photo-files').setInputFiles({name:'Apple.HEIC',mimeType:'',buffer:Buffer.from('test HEIC selection')});
  await f.getByText('1 张照片已上传并同步',{exact:true}).waitFor();
  assert.equal(await p.evaluate(()=>uploads[0].mime),'data:image/heic');

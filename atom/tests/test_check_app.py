@@ -45,3 +45,19 @@ class BundleChecks(unittest.TestCase):
     def test_paths(self):
         for value in ['../x', '/x', 'a/../b', 'a\\b', 'a//b', 'a/./b']:
             self.assertFalse(checker.valid_path(value))
+
+    def test_complete_port_retains_binary_assets_without_json_limits(self):
+        (self.root/'texture.png').write_bytes(b'\x89PNG\xff'+b'\x00'*(2*1024*1024))
+        for i in range(101): (self.root/('asset-%s.txt'%i)).write_text('source')
+        self.assertTrue(checker.check(self.root)[0])
+        self.assertFalse(checker.check(self.root,full_port=True)[0])
+
+    def test_complete_port_still_checks_source_and_navigation(self):
+        (self.root/'script.js').write_bytes(b'\xffinvalid')
+        manifest=json.loads((self.root/'manifest.json').read_text());del manifest['input']
+        (self.root/'manifest.json').write_text(json.dumps(manifest))
+        errors,_=checker.check(self.root,full_port=True)
+        self.assertTrue(any('UTF-8' in e for e in errors))
+        (self.root/'script.js').unlink()
+        errors,_=checker.check(self.root,full_port=True)
+        self.assertTrue(any('input' in e for e in errors))

@@ -30,6 +30,20 @@ class APITests(unittest.TestCase):
         self.assertIn('manifest.input', body.decode())
         self.assertFalse((self.root / 'demo').exists())
 
+    def test_codex_pet_snapshot_is_same_origin_and_read_only(self):
+        import codex_pet
+        self.assertEqual(self.request('/api/codex-pet/state', {}, origin=False)[0], 403)
+        code, body = self.request('/api/codex-pet/state', {})
+        self.assertEqual(code, 200)
+        self.assertEqual(json.loads(body), dict(tasks=[], error=''))
+        self.assertFalse((self.http.settings_path.parent / 'codex-pet-desktop.json').exists())
+        import time
+        event = dict(hook_event_name='PermissionRequest', session_id='session', timestamp=time.time(), project='Demo')
+        codex_pet.receive(self.http.settings_path.parent, event)
+        result = json.loads(self.request('/api/codex-pet/state', {})[1])
+        self.assertEqual(result['tasks'][0]['status'], 'needs_input')
+        self.assertNotIn('token', result)
+
     def test_legacy_seed_remains_readable_but_updates_need_input_contract(self):
         package = self.package(); del package['manifest']['input']
         server.install_app(self.root, package, require_input=False)

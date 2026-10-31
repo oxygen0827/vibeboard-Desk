@@ -1,0 +1,51 @@
+{
+  "verified_at_utc": "2026-10-31T03:01:28.955750+00:00",
+  "deployment": {
+    "ok": true,
+    "app": "photo-pet",
+    "verified_files": 20,
+    "installed_at_ns": 1793192014984748822,
+    "bundle_sha256": "9a91de0e093a3e734cb2611666b3e95cbf849a4129af4244e9b135fd4a32a1c8",
+    "bundle_bytes": 1645231
+  },
+  "tests": {
+    "architecture": "passed: dependency guards, replaceable ports, acknowledged writes, rollback, suspend and scene priorities",
+    "yard": "passed: full five-way gameplay with actual runtime and device theme",
+    "scene_flow": "passed: working NPC hit areas, modal freeze, resume, visibility, offline completion, animation settings",
+    "gardener": "passed: sequential care and bonus, legacy saves, planted feet, arm continuity",
+    "motion": "passed: idle/ready residents, actual pixel changes, fixed bone lengths, reduced motion"
+  },
+  "admission": {
+    "errors": 0,
+    "warnings": 1,
+    "warning": "Recurring updates require lifecycle and idle CPU verification"
+  },
+  "device": {
+    "resources_verified": 20,
+    "existing_unclaimed_jobs_preserved": true,
+    "desktop_icon_reviewed": true,
+    "five_way_checks": [
+      "close gardener panel",
+      "navigate to smith and open panel",
+      "return via back control to original desktop page",
+      "navigate desktop grid and launch courtyard"
+    ],
+    "final_surface": "courtyard home",
+    "performance": {
+      "after_exit": {
+        "seconds": 4.123791565012652,
+        "chromium_cpu_percent_one_core": 6.78986790640911,
+        "logical_cpus": 4
+      },
+      "active": {
+        "seconds": 4.2637392669857945,
+        "chromium_cpu_percent_one_core": 207.32975087028115,
+        "logical_cpus": 4
+      }
+    }
+  },
+  "limits": [
+    "CPU samples are short aggregate Chromium process measurements, not an FPS benchmark or a controlled before/after comparison.",
+    "No multi-hour exhibition soak test performed."
+  ]
+}

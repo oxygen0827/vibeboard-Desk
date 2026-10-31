@@ -29,7 +29,7 @@ def valid_path(value):
     return isinstance(value, str) and value and '\\' not in value and '\x00' not in value and not PurePosixPath(value).is_absolute() and all(p not in ('', '.', '..') for p in value.split('/'))
 
 
-def check_directory(root):
+def check_directory(root, full_port=False):
     errors = []; warnings = []; root = Path(root)
     if not root.is_dir(): return ['bundle directory does not exist'], warnings
     manifest_file = root / 'manifest.json'
@@ -60,9 +60,12 @@ def check_directory(root):
         name = file.relative_to(root).as_posix()
         if not valid_path(name): errors.append(name + ': unsafe path'); continue
         if name != 'manifest.json': count += 1
-        if file.stat().st_size > 2 * 1024 * 1024: errors.append(name + ': exceeds bundle size limit'); continue
+        if not full_port and file.stat().st_size > 2 * 1024 * 1024: errors.append(name + ': exceeds bundle size limit'); continue
         try: text = file.read_text(encoding='utf-8')
-        except (OSError, UnicodeDecodeError): errors.append(name + ': must be UTF-8 text for JSON deployment'); continue
+        except (OSError, UnicodeDecodeError):
+            if not full_port or file.suffix.lower() in ('.html', '.htm', '.js', '.mjs', '.css', '.json', '.svg'):
+                errors.append(name + ': must be UTF-8 text for JSON deployment/source code')
+            continue
         size += len(text.encode('utf-8')); all_text.append(text)
         if file.suffix.lower() in ('.html', '.htm'):
             scan = HTMLScan(); scan.feed(text); controls += scan.controls
@@ -97,8 +100,8 @@ def check_directory(root):
         validate_input_bundle({'manifest': manifest, 'files': input_files})
     except (ValueError, OSError, UnicodeError) as exc: errors.append(str(exc))
     joined = '\n'.join(all_text)
-    if count > 100: errors.append('more than 100 app files')
-    if size > 2 * 1024 * 1024: errors.append('bundle exceeds 2 MiB')
+    if not full_port and count > 100: errors.append('more than 100 app files')
+    if not full_port and size > 2 * 1024 * 1024: errors.append('bundle exceeds 2 MiB')
     if controls == 0: warnings.append('no semantic interactive controls detected; may be valid for passive/canvas apps')
     gradients = len(re.findall(r'(?:linear|radial|conic)-gradient\s*\(', joined, re.I))
     if gradients > 3: warnings.append(str(gradients) + ' gradient declarations; inspect hierarchy and rendering cost (not an aesthetic verdict)')
@@ -107,9 +110,9 @@ def check_directory(root):
     return errors, list(dict.fromkeys(warnings))
 
 
-def check(source):
+def check(source, full_port=False):
     source = Path(source)
-    if source.is_dir(): return check_directory(source)
+    if source.is_dir(): return check_directory(source, full_port=full_port)
     if not source.is_file(): return ['bundle file or directory does not exist'], []
     if source.is_symlink(): return ['bundle symlink forbidden'], []
     try:
@@ -136,8 +139,8 @@ def check(source):
 
 
 def main():
-    parser = argparse.ArgumentParser(description=__doc__); parser.add_argument('bundle'); args = parser.parse_args()
-    errors, warnings = check(args.bundle)
+    parser = argparse.ArgumentParser(description=__doc__); parser.add_argument('bundle'); parser.add_argument('--full-port', action='store_true', help='Review a complete on-disk port, including binary assets; JSON deployment limits still apply to JSON bundles'); args = parser.parse_args()
+    errors, warnings = check(args.bundle, full_port=args.full_port)
     print('ATOM bundle review: ' + args.bundle)
     for label, items in [('ERROR', errors), ('WARNING', warnings)]:
         for item in items: print(label + ': ' + item)

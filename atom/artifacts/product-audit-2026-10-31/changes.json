@@ -1,0 +1,156 @@
+[
+  {
+    "id": "local-music",
+    "source": "/Users/hsh/vibecoding/vibeboard-Desk/atom/legacy-seeds/local-music",
+    "files": [
+      "index.html",
+      "manifest.json"
+    ]
+  },
+  {
+    "id": "made-23c2b1193c452dd3adf9",
+    "source": "/Users/hsh/vibecoding/vibeboard-Desk/atom/reviewed-apps/made-23c2b1193c452dd3adf9",
+    "files": [
+      "index.html"
+    ]
+  },
+  {
+    "id": "model-viewer",
+    "source": "/Users/hsh/vibecoding/vibeboard-Desk/atom/ports/model-viewer",
+    "files": [
+      "index.html",
+      "scene-controls.js",
+      "main.js",
+      "manifest.json",
+      "scene-session.js"
+    ]
+  },
+  {
+    "id": "moon-ocean",
+    "source": "/Users/hsh/vibecoding/vibeboard-Desk/atom/ports/moon-ocean",
+    "files": [
+      "index.html",
+      "scene-controls.js",
+      "manifest.json",
+      "scene-session.js"
+    ]
+  },
+  {
+    "id": "music-vision",
+    "source": "/Users/hsh/vibecoding/vibeboard-Desk/atom/ports/music-vision",
+    "files": [
+      "index.html",
+      "main.js",
+      "manifest.json",
+      "scene-session.js"
+    ]
+  },
+  {
+    "id": "parametric-maker",
+    "source": "/Users/hsh/vibecoding/vibeboard-Desk/atom/ports/parametric-maker",
+    "files": [
+      "index.html",
+      "scene-controls.js",
+      "main.js",
+      "manifest.json",
+      "scene-session.js"
+    ]
+  },
+  {
+    "id": "particle-lab",
+    "source": "/Users/hsh/vibecoding/vibeboard-Desk/atom/legacy-seeds/particle-lab",
+    "files": [
+      "index.html",
+      "scene-controls.js",
+      "manifest.json",
+      "scene-session.js"
+    ]
+  },
+  {
+    "id": "physics-playground",
+    "source": "/Users/hsh/vibecoding/vibeboard-Desk/atom/ports/physics-playground",
+    "files": [
+      "index.html",
+      "scene-controls.js",
+      "main.js",
+      "manifest.json",
+      "scene-session.js"
+    ]
+  },
+  {
+    "id": "planetarium",
+    "source": "/Users/hsh/vibecoding/vibeboard-Desk/atom/ports/planetarium",
+    "files": [
+      "index.html",
+      "scene-controls.js",
+      "main.js",
+      "manifest.json",
+      "scene-session.js"
+    ]
+  },
+  {
+    "id": "pocket-studio",
+    "source": "/Users/hsh/vibecoding/vibeboard-Desk/atom/ports/pocket-studio",
+    "files": [
+      "index.html",
+      "main.js",
+      "manifest.json",
+      "scene-session.js"
+    ]
+  },
+  {
+    "id": "quick-notes",
+    "source": "/Users/hsh/vibecoding/vibeboard-Desk/atom/notes-app",
+    "files": [
+      "style.css",
+      "manifest.json",
+      "app.js"
+    ]
+  },
+  {
+    "id": "rhythm-orbits",
+    "source": "/Users/hsh/vibecoding/vibeboard-Desk/atom/ports/rhythm-orbits",
+    "files": [
+      "index.html",
+      "scene-controls.js",
+      "main.js",
+      "manifest.json",
+      "scene-session.js"
+    ]
+  },
+  {
+    "id": "robo-face",
+    "source": "/Users/hsh/vibecoding/vibeboard-Desk/atom/ports/robo-face",
+    "files": [
+      "index.html",
+      "common.css",
+      "main.js",
+      "manifest.json",
+      "common.js",
+      "scene-session.js"
+    ]
+  },
+  {
+    "id": "volume-flow",
+    "source": "/Users/hsh/vibecoding/vibeboard-Desk/atom/ports/volume-flow",
+    "files": [
+      "index.html",
+      "flow.js",
+      "scene-controls.js",
+      "main.js",
+      "manifest.json",
+      "scene-session.js"
+    ]
+  },
+  {
+    "id": "water-pool",
+    "source": "/Users/hsh/vibecoding/vibeboard-Desk/atom/ports/water-pool",
+    "files": [
+      "index.html",
+      "scene-controls.js",
+      "main.js",
+      "manifest.json",
+      "scene-session.js"
+    ]
+  }
+]

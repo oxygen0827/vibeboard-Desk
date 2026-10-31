@@ -44,3 +44,6 @@ button.album-back{background:transparent!important;color:var(--action,#007aff)!i
 .frame-status{font-size:14px;color:var(--ink)}.frame-note{font-size:13px;line-height:1.6;color:var(--muted)}
 @media(max-width:600px){.frame-settings{gap:12px}.frame-card{padding:16px;gap:12px;border-radius:18px}.frame-card h2{font-size:19px}.frame-card p,.frame-status{font-size:13px}.frame-note{font-size:12px}.viewer .bottom{gap:4px}.viewer .bottom button{padding:7px 8px}}
 @media(prefers-reduced-motion:reduce){.viewer>img{transition:none}}
+
+/* The viewer gained 变宠物; let its controls wrap and the creation form scroll on small screens. */
+.viewer .bottom{flex-wrap:wrap}.create-form{overflow-y:auto}

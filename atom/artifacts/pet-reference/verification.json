@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-28",
+  "source_url": "https://commons.wikimedia.org/wiki/File:Golden_Retriever_88.JPG",
+  "source_license": "CC0",
+  "source_author": "Mtlchung",
+  "job_id": "379bdd6b39b160cd0b2ca2c3dade59a1",
+  "status": "completed",
+  "photo_id": "5581d97684c81b25a4ca37c8793e471c",
+  "source_id": "a3292f4ea09672ad7ad5c4dbf36830ae",
+  "generation_jobs_seen": 1,
+  "result_sha256": "06b94dee0940fb341bed6b35f237d306fbb092bf3f7e2c2d1404e6dba9447adf",
+  "mac_native_import": true,
+  "mac_native_generation": true,
+  "mac_camera_live_preview": true,
+  "camera_shot_saved": false,
+  "device_sync_verified": true,
+  "device_update_verified": true,
+  "device_account": "oxygen",
+  "device_preview_fetch_verified": true,
+  "device_developer_mode": true,
+  "device_update_method": "/api/apps/update",
+  "device_resources_verified": [
+    "index.html",
+    "style.css",
+    "app.js",
+    "LICENSE"
+  ],
+  "device_icon_verified": "Existing valid photo pictogram preserved and normalized by installer",
+  "physical_screen_and_joystick_verified": false
+}

@@ -45,7 +45,7 @@ for d in ('static','templates'):shutil.copytree(atom/d,device/d,ignore=skip)
 for f in ('simulator.py','simulator.html'):shutil.copy2(atom/'tools'/f,device/'tools'/f)
 subprocess.run(['python3',str(atom/'tools/simulator.py'),'--build-seed',str(device/'seed-apps'),'--strict-seed'],check=True)
 core_version=(atom/'VERSION').read_text().strip()
-info=dict(CFBundleIdentifier='local.atom.connect',CFBundleName='ATOM Connect',CFBundleDisplayName='ATOM Connect',CFBundleExecutable='ATOMConnect',CFBundlePackageType='APPL',CFBundleShortVersionString=a.app_version,CFBundleVersion=a.app_version,ATOMCoreVersion=core_version,LSMinimumSystemVersion='13.0',LSUIElement=True,NSHighResolutionCapable=True,NSAppTransportSecurity={'NSAllowsLocalNetworking':True},CFBundleIconFile='AppIcon')
+info=dict(CFBundleIdentifier='local.atom.connect',CFBundleName='ATOM Connect',CFBundleDisplayName='ATOM Connect',CFBundleExecutable='ATOMConnect',CFBundlePackageType='APPL',CFBundleShortVersionString=a.app_version,CFBundleVersion=a.app_version,ATOMCoreVersion=core_version,LSMinimumSystemVersion='13.0',LSUIElement=True,NSHighResolutionCapable=True,NSCameraUsageDescription='拍摄照片并在确认后保存到 ATOM 私有相册，用于生成宠物形象。',NSAppTransportSecurity={'NSAllowsLocalNetworking':True},CFBundleIconFile='AppIcon')
 (app/'Contents/Info.plist').write_bytes(plistlib.dumps(info))
 subprocess.run(['swiftc','-O','-framework','AppKit','-framework','WebKit',str(base/'ATOMConnect.swift'),'-o',str(mac/'ATOMConnect')],check=True)
 # Original AppKit vector icon; no Apple artwork or external assets.
@@ -58,7 +58,7 @@ if a.sign_identity:
         if item.is_file() and not item.is_symlink() and (item.suffix in ('.so','.dylib') or item.name in ('node','python3')):
             if 'Mach-O' in subprocess.check_output(['file','-b',str(item)],text=True):
                 subprocess.run(['codesign','--force','--options','runtime','--timestamp','--sign',a.sign_identity,'--entitlements',str(entitlements),str(item)],check=True)
-    subprocess.run(['codesign','--force','--options','runtime','--timestamp','--sign',a.sign_identity,str(app)],check=True)
+    subprocess.run(['codesign','--force','--options','runtime','--timestamp','--sign',a.sign_identity,'--entitlements',str(base/'app.entitlements'),str(app)],check=True)
     subprocess.run(['codesign','--verify','--deep','--strict',str(app)],check=True)
 if a.notary_profile:
     archive=app.with_suffix('.zip')

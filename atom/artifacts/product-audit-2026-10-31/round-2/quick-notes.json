@@ -1,0 +1,187 @@
+{
+  "id": "quick-notes",
+  "steps": [
+    "button:text-is(\"仅查看本机离线笔记\")"
+  ],
+  "before": {
+    "title": "随手记",
+    "text": "随手记\n账号\n连接你的笔记\n\n使用电脑工作台的市场账号。未登录的本机笔记不会自动上传到任何账号。\n\n用户名\n密码\n登录\n注册\n仅查看本机离线笔记",
+    "size": {
+      "width": 480,
+      "height": 360
+    },
+    "controls": [
+      {
+        "tag": "BUTTON",
+        "id": "atom-app-back",
+        "label": "返回上一级",
+        "disabled": false,
+        "x": 22,
+        "y": 14,
+        "w": 48,
+        "h": 48,
+        "font": "14px"
+      },
+      {
+        "tag": "BUTTON",
+        "id": "",
+        "label": "账号",
+        "disabled": false,
+        "x": 276,
+        "y": 22,
+        "w": 124,
+        "h": 32,
+        "font": "12px"
+      },
+      {
+        "tag": "INPUT",
+        "id": "username",
+        "label": "",
+        "disabled": false,
+        "x": 25,
+        "y": 156,
+        "w": 430,
+        "h": 36,
+        "font": "14px"
+      },
+      {
+        "tag": "INPUT",
+        "id": "password",
+        "label": "",
+        "disabled": false,
+        "x": 25,
+        "y": 220,
+        "w": 430,
+        "h": 36,
+        "font": "14px"
+      },
+      {
+        "tag": "BUTTON",
+        "id": "",
+        "label": "登录",
+        "disabled": false,
+        "x": 25,
+        "y": 264,
+        "w": 430,
+        "h": 36,
+        "font": "14px"
+      },
+      {
+        "tag": "BUTTON",
+        "id": "",
+        "label": "注册",
+        "disabled": false,
+        "x": 25,
+        "y": 307,
+        "w": 430,
+        "h": 36,
+        "font": "14px"
+      },
+      {
+        "tag": "BUTTON",
+        "id": "",
+        "label": "仅查看本机离线笔记",
+        "disabled": false,
+        "x": 25,
+        "y": 343,
+        "w": 150,
+        "h": 36,
+        "font": "14px"
+      }
+    ],
+    "canvases": 0,
+    "frames": 2,
+    "media": []
+  },
+  "after": {
+    "title": "随手记",
+    "text": "随手记\n账号\n正在查看 本机离线 的本机离线记录；未确认账号，不会上传。\n本机离线 · 仅本机离线\n回收站\n同步\n新建\n留住一个想法\n\n按住空格说话，或新建一条文字笔记。\n\n本机最多缓存 12 条、总量约 55 KiB；未同步内容优先保留。回收站内容可恢复。",
+    "size": {
+      "width": 480,
+      "height": 360
+    },
+    "controls": [
+      {
+        "tag": "BUTTON",
+        "id": "atom-app-back",
+        "label": "返回上一级",
+        "disabled": false,
+        "x": 22,
+        "y": 14,
+        "w": 48,
+        "h": 48,
+        "font": "14px"
+      },
+      {
+        "tag": "BUTTON",
+        "id": "",
+        "label": "账号",
+        "disabled": false,
+        "x": 276,
+        "y": 22,
+        "w": 124,
+        "h": 32,
+        "font": "12px"
+      },
+      {
+        "tag": "BUTTON",
+        "id": "",
+        "label": "回收站",
+        "disabled": false,
+        "x": 306,
+        "y": 92,
+        "w": 52,
+        "h": 30,
+        "font": "12px"
+      },
+      {
+        "tag": "BUTTON",
+        "id": "",
+        "label": "同步",
+        "disabled": false,
+        "x": 363,
+        "y": 92,
+        "w": 40,
+        "h": 30,
+        "font": "12px"
+      },
+      {
+        "tag": "BUTTON",
+        "id": "",
+        "label": "新建",
+        "disabled": false,
+        "x": 408,
+        "y": 92,
+        "w": 50,
+        "h": 30,
+        "font": "12px"
+      }
+    ],
+    "canvases": 0,
+    "frames": 3,
+    "media": []
+  },
+  "fixture": {
+    "ready": true,
+    "value": null,
+    "saves": 0,
+    "returned": 0,
+    "unsupported": [
+      "atom:input-mode"
+    ],
+    "calls": [
+      {
+        "type": "atom:market",
+        "action": "state"
+      }
+    ]
+  },
+  "suspend": {
+    "frames": 3,
+    "intervals": 0,
+    "audio": [],
+    "growth": 0
+  },
+  "errors": [],
+  "status": "reviewed"
+}

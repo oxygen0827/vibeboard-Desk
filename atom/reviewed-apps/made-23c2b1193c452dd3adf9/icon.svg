@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 64 64">
+  <path d="M32 10c-11.05 0-20 8.95-20 20 0 5.53 2.24 10.55 5.88 14.2l.12.12c3.64 3.64 8.66 5.88 14.2 5.88 5.54 0 10.56-2.24 14.2-5.88l.12-.12C49.76 40.55 52 35.53 52 30c0-11.05-8.95-20-20-20zm0 4c8.84 0 16 7.16 16 16 0 4.42-1.79 8.42-4.68 11.31l-.12.12C40.42 46.21 36.42 48 32 48c-4.42 0-8.42-1.79-11.31-4.68l-.12-.12C17.79 40.42 16 36.42 16 30c0-8.84 7.16-16 16-16z" fill="none" stroke="currentColor" stroke-linejoin="round" />
+  <path d="M32 2v8M32 54v8M10 32H2M54 32h8M16.34 16.34l5.66 5.66M42 42l5.66 5.66M16.34 47.66l5.66-5.66M42 22l5.66-5.66" fill="none" stroke="currentColor" stroke-linecap="round" />
+  <path d="M32 30v6M28 34h8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+</svg>
