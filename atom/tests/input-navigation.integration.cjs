@@ -20,6 +20,13 @@ await page.evaluate(()=>{var d=document.createElement('div');d.setAttribute('rol
 await page.evaluate(()=>{document.querySelector('[role=dialog]').remove();AtomInput.focus(document.querySelector('#b'));var b=document.querySelector('#b');b.replaceWith(b.cloneNode(true));});await page.keyboard.press('ArrowRight');assert.equal(await page.evaluate(()=>document.activeElement.id),'b');
 // Range adjustment stays in the control until a second short press.
 await page.evaluate(()=>{var r=document.createElement('input');r.type='range';r.id='volume';r.min='0';r.max='10';r.value='5';r.style.cssText='position:absolute;left:120px;top:200px';document.body.appendChild(r);AtomInput.focus(r);});await page.keyboard.press('Space');await page.keyboard.press('ArrowRight');assert.equal(await page.inputValue('#volume'),'6');await page.keyboard.press('Space');assert.equal(await page.locator('#volume').getAttribute('data-atom-adjusting'),'false');
+// A game that steers with arrows (preventDefault on its focused control) keeps them; unhandled arrows still move focus.
+await page.evaluate(()=>{window.turns=[];const g=document.createElement('button');g.id='game';g.style.cssText='position:absolute;left:10px;top:200px';g.textContent='棋盘';document.body.appendChild(g);window.playing=true;
+ g.addEventListener('keydown',e=>{if(playing&&e.key.startsWith('Arrow')){e.preventDefault();turns.push(e.key);}});AtomInput.focus(g);});
+await page.keyboard.press('ArrowUp');await page.keyboard.press('ArrowRight');
+assert.deepEqual(await page.evaluate(()=>[turns,document.activeElement.id]),[['ArrowUp','ArrowRight'],'game'],'the game receives arrows and focus stays');
+await page.evaluate(()=>{playing=false;});await page.keyboard.press('ArrowUp');assert.notEqual(await page.evaluate(()=>document.activeElement.id),'game','paused game: arrows navigate again');
+await page.evaluate(()=>document.querySelector('#game').remove());
 // A real keyboard: typing into a field switches it to typing mode until focus leaves; the joystick path is unchanged before that.
 await page.evaluate(()=>{events=[];const el=document.querySelector('#text');el.value='原文';AtomInput.focus(el);el.setSelectionRange(2,2);});
 await page.keyboard.press('ArrowLeft');assert.equal(await page.evaluate(()=>document.activeElement.id),'c','before typing, Left moves focus');
