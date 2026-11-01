@@ -15,6 +15,8 @@ class InputContractTests(unittest.TestCase):
         self.assertTrue(any('maxlength' in rule or 'Over-limit' in rule for rule in policy['rules']))
         self.assertTrue(any('listen to input events' in rule for rule in policy['rules']))
         self.assertTrue(any('checking, signed-in, signed-out' in rule for rule in policy['rules']))
+        self.assertTrue(any('Chromium 91' in rule and 'Object.hasOwn' in rule for rule in policy['rules']))
+        self.assertTrue(any('never assign AtomApp to an alias' in rule for rule in policy['rules']))
         expected = 'ATOM REQUIRED INPUT STANDARD v1:\n' + '\n'.join('- ' + rule for rule in policy['rules'])
         self.assertEqual(generation_input_standard(), expected)
         with mock.patch.object(Path, 'read_text', side_effect=OSError('missing')):

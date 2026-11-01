@@ -18,6 +18,13 @@ class BundleChecks(unittest.TestCase):
         (self.root / 'index.html').write_text('<style>p{font-size:10px}</style><script>Math.random()</script>')
         errors, warnings = checker.check(self.root)
         self.assertFalse(errors); self.assertTrue(any('random' in w for w in warnings)); self.assertTrue(any('14px' in w for w in warnings))
+    def test_device_browser_baseline_and_alias_warnings(self):
+        (self.root / 'index.html').write_text('<meta name="viewport" content="width=device-width"><button>Go</button><style>li:has(b){}</style><script>const A=window.AtomApp;Object.hasOwn({},"a");[1].at(-1);[1].at(i)</script>')
+        errors, warnings = checker.check(self.root)
+        self.assertFalse(errors)
+        newer = [w for w in warnings if 'Chromium 91' in w]
+        self.assertEqual(len(newer), 1); self.assertIn('Object.hasOwn', newer[0]); self.assertIn(':has', newer[0]); self.assertIn('.at', newer[0])
+        self.assertTrue(any('alias' in w for w in warnings))
     def test_invalid_structure_and_symlink(self):
         (self.root / 'escape').symlink_to('/etc/passwd')
         errors, warnings = checker.check(self.root)

@@ -37,6 +37,8 @@
 5. 核心页面保持单屏，仅必要的列表、长内容区域滚动，滚动后选中控件仍可见。
 6. 不全局截获 Space/方向事件，不自行重复实现系统长按语音。Canvas/WebGL 的核心操作须暴露可导航 DOM 控件。
 7. 使用 AtomApp 生命周期、保存确认和主题规范，返回后释放音频/计时/GPU任务。
+8. 直接按原名调用 `AtomApp.navigation.setBackHandler(...)`、`AtomApp.home()` 等接口，不要把 `AtomApp` 赋给别名变量：自动准入按原文匹配，别名会被判为未注册返回。
+9. 小电脑浏览器为 Chromium 91。不得使用更新的接口或语法（如 `Object.hasOwn`、`Array.prototype.at`、`findLast`、`toSorted`、`structuredClone`、`Object.groupBy`、CSS `:has()`）；初始化中的异常不得误报为存档读取失败。`check_app.py` 对已知写法给出警告。
 
 ## 4. 自动准入检查与真实验收
 

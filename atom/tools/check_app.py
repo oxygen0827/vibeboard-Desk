@@ -25,6 +25,10 @@ class HTMLScan(HTMLParser):
             elif link and not link.startswith(('#', 'data:', 'mailto:', 'tel:', 'javascript:')): self.links.append(link)
 
 
+POST_91 = re.compile(r'(Object\.hasOwn|structuredClone|\.findLast(?:Index)?|\.toSorted|\.toReversed|\.toSpliced|Object\.groupBy|\.at(?=\s*\(\s*-)|:has(?=\())')
+ALIAS = re.compile(r'(?:const|let|var)\s+[A-Za-z_$][\w$]*\s*=\s*(?:window\s*\.\s*)?AtomApp\s*[;,\n]')
+
+
 def valid_path(value):
     return isinstance(value, str) and value and '\\' not in value and '\x00' not in value and not PurePosixPath(value).is_absolute() and all(p not in ('', '.', '..') for p in value.split('/'))
 
@@ -107,6 +111,12 @@ def check_directory(root, full_port=False):
     if gradients > 3: warnings.append(str(gradients) + ' gradient declarations; inspect hierarchy and rendering cost (not an aesthetic verdict)')
     if re.search(r'Math\.random\s*\(|\b(?:mock|fake|demoData|sampleData)\b', joined, re.I): warnings.append('random/mock/sample identifiers detected; verify displayed data is labeled or real; this may be legitimate gameplay')
     if re.search(r'setInterval\s*\(|requestAnimationFrame\s*\(', joined): warnings.append('recurring updates detected; verify idle CPU and timer lifecycle on device')
+    # The device browser is Chromium 91; these throw (JS) or are ignored (CSS) there.
+    # Only code that ships to the device; docs and test scripts never run there.
+    runtime = '\n'.join(q.read_text(encoding='utf-8', errors='replace') for q in root.rglob('*') if q.is_file() and not q.is_symlink() and q.suffix.lower() in ('.html', '.htm', '.js', '.mjs', '.css') and not re.search(r'\.(?:test|spec|integration)\.', q.name) and q.stat().st_size <= 2*1024*1024)
+    newer = sorted({m.group(1) for m in POST_91.finditer(runtime)})
+    if newer: warnings.append('APIs newer than device Chromium 91: ' + ', '.join(newer) + '; replace them (e.g. Object.prototype.hasOwnProperty.call)')
+    if ALIAS.search(runtime): warnings.append('AtomApp assigned to an alias; admission matches literal AtomApp.navigation.setBackHandler, so call AtomApp APIs by name')
     return errors, list(dict.fromkeys(warnings))
 
 
