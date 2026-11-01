@@ -11,7 +11,7 @@
     let state = domain.defaults(), loaded = false, readFailed = false, disposed = false;
     let client = null, runner = null, conn = {kind: 'checking', text: '检查连接…', computers: []};
     let pollTimer = 0, pollDelay = 1500, frameTimer = 0, raf = 0, lastFrame = 0, motion = true, systemMotion = true;
-    let saveChain = Promise.resolve(), stack = [], goalMode = {mode: 'team', assignee: null}, staffOpen = null, reportOpen = null, cancelArmed = 0, setupDraft = null, focusSpot = null;
+    let saveChain = Promise.resolve(), stack = [], goalMode = {mode: 'team', assignee: null}, staffOpen = null, reportOpen = null, planOpen = null, cancelArmed = {id: null, until: 0}, setupDraft = null, focusSpot = null;
     const media = win.matchMedia('(prefers-reduced-motion: reduce)');
     const newId = () => 'o' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
 
@@ -157,26 +157,30 @@
     function render(id) {
       if (id === 'dlg-staff') renderStaff(); else if (id === 'dlg-goal') renderGoal(); else if (id === 'dlg-plan') renderPlan();
       else if (id === 'dlg-board') renderBoard(); else if (id === 'dlg-reports') renderReports(); else if (id === 'dlg-setup') renderSetup();
+      else if (id === 'dlg-approvals') renderApprovals();
     }
     function refresh() {
       if (disposed) return;
       refreshChip();
       const unread = state.reports.filter(r => !r.read).length;
       $('badge').hidden = !unread; $('badge').textContent = unread;
+      const waiting = domain.pendingApprovals(state).length;
+      $('approvals-badge').hidden = !waiting; $('approvals-badge').textContent = waiting;
       for (const s of stack) if (s.id !== 'dlg-report' && s.id !== 'dlg-goal' && s.id !== 'dlg-setup') render(s.id);
       if (focusSpot) caption(focusSpot);
     }
     function refreshChip() {
       const chip = $('btn-setup');
-      chip.textContent = runner && runner.connection() === 'stale' && !domain.finished(state.mission) ? '状态待同步' : conn.text;
+      chip.textContent = runner && runner.connection() === 'stale' && domain.open(state).length ? '状态待同步' : conn.text;
       chip.dataset.state = conn.kind === 'ready' ? 'ready' : conn.kind === 'demo' ? 'demo' : conn.kind === 'checking' ? '' : 'warn';
     }
 
     /* ---------- staff sheet ---------- */
-    function openStaff(id) { staffOpen = id; renderer.portrait($('portrait'), id); open('dlg-staff'); }
+    // Someone showing "！" opens straight onto their request: focus lands on 允许.
+    function openStaff(id) { staffOpen = id; renderer.portrait($('portrait'), id); sheetSay('staff-status', ''); open('dlg-staff'); if (!$('staff-approval').hidden) focusEl($('staff-allow')); }
     function renderStaff() {
       const id = staffOpen; if (!id) return;
-      const a = domain.staffActivity(state, id, runner.connection()), m = state.mission, p = m && m.packages.find(x => x.staff === id);
+      const a = domain.staffActivity(state, id, runner.connection()), m = domain.missionFor(state, id), p = m && m.packages.find(x => x.staff === id);
       $('staff-title').textContent = state.staff[id].name + ' · ' + R[id].role;
       $('staff-reason').textContent = a.reason;
       const live = p && p.task_id && ['running', 'waiting_approval'].includes(p.status) ? runner.liveText(p.task_id).slice(-160).trim() : '';
@@ -186,14 +190,27 @@
       if (ap) $('staff-approval-text').textContent = ap.title + '：' + ap.detail;
       const latest = state.reports.find(r => r.staff === id);
       $('staff-report').hidden = !latest;
-      $('staff-assign').textContent = '交给' + state.staff[id].name;
+      $('staff-assign').textContent = domain.staffBusy(state, id) ? state.staff[id].name + '正在忙' : '交给' + state.staff[id].name;
+      $('staff-assign').disabled = domain.staffBusy(state, id);
     }
-    async function decide(id, decision) {
-      const m = state.mission, p = m && m.packages.find(x => x.staff === id);
-      if (!p) return;
-      try { await runner.approve(p.id, decision); say(decision === 'accept' ? '已允许，' + state.staff[id].name + '继续工作' : '已拒绝该操作'); }
-      catch (e) { say(e.message); }
+    // Feedback goes inside the dialog that was used: the office status line sits under modal dialogs.
+    function sheetSay(id, text, problem) { const el = $(id); el.textContent = text; el.hidden = !text; el.classList.toggle('problem', !!problem); }
+    async function decide(id, decision, where) {
+      const target = where || (staffOpen === id ? 'staff-status' : null), name = state.staff[id].name;
+      const tell = (text, problem) => target ? sheetSay(target, text, problem) : say(text);
+      try { await runner.approve(id, decision); tell(decision === 'accept' ? '已允许，' + name + '继续工作' : '已拒绝，' + name + '不会执行这个操作'); }
+      catch (e) { tell(name + '的审批没有提交：' + e.message, true); }
       refresh(); schedulePoll(300);
+      // The decided row leaves the 申请表; keep the cursor on the next request.
+      if (target === 'approvals-status') focusEl($('approvals-list').querySelector('[data-allow]') || $('dlg-approvals').querySelector('.back'));
+    }
+    /* ---------- 申请表: every pending request in one place ---------- */
+    function renderApprovals() {
+      const list = domain.pendingApprovals(state);
+      $('approvals-empty').hidden = list.length > 0;
+      setHtml('approvals-list', list.map(({staff, mission, pkg}) => '<li class="card"><h4><span>' + esc(state.staff[staff].name + ' · ' + R[staff].role) + '</span><em>' + esc(mission.goal.slice(0, 16)) + '</em></h4>' +
+        '<p><b>' + esc(pkg.approval.title) + '</b></p><p class="muted approval-detail">' + esc(pkg.approval.detail) + '</p>' +
+        '<div class="row"><button class="primary" data-allow="' + esc(staff) + '">允许</button><button data-deny="' + esc(staff) + '">拒绝</button></div></li>').join(''));
     }
 
     /* ---------- goal input ---------- */
@@ -202,7 +219,8 @@
       $('goal-text').value = state.draft || '';
       $('goal-status').textContent = '';
       open('dlg-goal');
-      if (!domain.finished(state.mission)) $('goal-status').textContent = '当前目标还没结束：可以先保存草稿，完成或停止当前目标后再派发。';
+      const block = domain.assignBlock(state, goalMode.mode, goalMode.assignee);
+      if (block) $('goal-status').textContent = block + '。';
     }
     function renderGoal() {
       const single = goalMode.mode === 'single';
@@ -215,14 +233,15 @@
     async function submitGoal() {
       const goal = $('goal-text').value.trim();
       if (!goal) { $('goal-status').textContent = '请先输入目标'; return; }
-      if (!domain.finished(state.mission)) { $('goal-status').textContent = '同一办公室一次执行一个目标。请先完成或停止当前目标。'; return; }
+      const block = domain.assignBlock(state, goalMode.mode, goalMode.assignee);
+      if (block) { $('goal-status').textContent = block + '。'; return; }
       if (!canDispatch()) { $('goal-status').textContent = '暂时不能派工：' + conn.text + (conn.detail ? '。' + conn.detail : ''); return; }
       const m = domain.newMission(state, {id: newId(), goal, mode: goalMode.mode, assignee: goalMode.assignee, target: Object.assign({}, state.target), demo: state.demo, now: clock.wall()});
-      const previous = {mission: state.mission, draft: state.draft};
-      state.mission = m; state.draft = '';
+      const previous = {missions: state.missions.slice(), draft: state.draft};
+      domain.addMission(state, m); state.draft = '';
       try { await persist(); }
       catch (e) { Object.assign(state, previous); $('goal-status').textContent = '保存失败，没有派工：' + e.message; return; }
-      close('dlg-goal'); open('dlg-plan'); schedulePoll(0);
+      planOpen = m.id; close('dlg-goal'); open('dlg-plan'); schedulePoll(0);
     }
     async function saveDraft() {
       state.draft = $('goal-text').value.slice(0, domain.GOAL_MAX);
@@ -237,17 +256,19 @@
         '<p><b>' + esc(p.title) + '</b></p><p class="muted">交付：' + esc(p.deliverable) + '</p>' +
         (deps.length ? '<p class="muted">依赖：' + esc(deps.map(d => m.staff[d.staff].name + '的「' + d.title + '」').join('、')) + '</p>' : '<p class="muted">无依赖</p>') +
         (!board ? '<p class="muted">' + (p.app ? '交付一个应用：做好后可以试玩，满意再放到桌面' : p.modifies_files ? '方案提到会改文件：本版本只交付文本，不应用文件改动' : '不修改项目文件') + '</p>' : '');
-      if (board && p.status === 'waiting_approval' && p.approval) html += '<div class="approval"><p>' + esc(p.approval.title + '：' + p.approval.detail) + '</p><div class="row"><button data-allow="' + esc(p.staff) + '">允许</button><button data-deny="' + esc(p.staff) + '">拒绝</button></div></div>';
+      if (board && p.status === 'waiting_approval' && p.approval) html += '<div class="approval"><p>' + esc(p.approval.title + '：' + p.approval.detail) + '</p><p class="muted">在「审批」申请表里允许或拒绝</p></div>';
       if (board && p.error && ['failed', 'interrupted', 'blocked'].includes(p.status)) html += '<p>' + esc(p.error) + '</p>';
       return html + '</li>';
     }
+    // The plan page shows one goal: the one just submitted or picked on the task board.
+    const planMission = () => state.missions.find(x => x.id === planOpen) || state.missions.find(x => ['planning', 'awaiting_confirm', 'plan_failed'].includes(x.status));
     function renderPlan() {
-      const m = state.mission; if (!m) return;
+      const m = planMission(); if (!m) return;
       const t = m.planTask;
       let status = '';
       if (m.status === 'planning') status = '协调员正在拟定分工…（' + (t && t.task_id ? domain.packageLabels[t.status] || t.status : '正在派发到电脑') + '）';
       else if (m.status === 'plan_failed') status = '分工拟定失败：' + ((t && t.error) || '未知原因') + '。不会使用未经确认的执行计划。';
-      else if (m.status === 'awaiting_confirm') status = m.plan.summary.replace(/[。.\s]+$/, '') + (state.mission.demo ? '（演示数据）' : '') + (client.parallel > 1 ? '' : '。电脑端一次执行一个任务，工作包将按顺序进行。');
+      else if (m.status === 'awaiting_confirm') status = m.plan.summary.replace(/[。.\s]+$/, '') + (m.demo ? '（演示数据）' : '') + (client.parallel > 1 ? '' : '。电脑端一次执行一个任务，工作包将按顺序进行。');
       else if (m.status === 'cancelled') status = '已取消。';
       else status = '已确认，员工正在工作。可在任务板查看进度。';
       if (runner.lastError() && m.status === 'planning') status += ' 连接问题：' + runner.lastError();
@@ -258,13 +279,13 @@
       $('plan-edit').textContent = m.status === 'awaiting_confirm' || m.status === 'plan_failed' ? '修改需求' : '任务板';
     }
     async function confirmPlan() {
-      const m = state.mission;
-      try { domain.confirm(m, m.plan_version); await persist(); }
+      const m = planMission(); if (!m) return;
+      try { domain.confirm(m, m.plan_version, state); await persist(); }
       catch (e) { say(e.message); return; }
       close('dlg-plan'); say(m.packages.length > 1 ? '已开工：' + m.packages.length + ' 个工作包' : '已开工'); schedulePoll(0); wake();
     }
     async function editPlan() {
-      const m = state.mission;
+      const m = planMission();
       if (m && (m.status === 'awaiting_confirm' || m.status === 'plan_failed')) {
         // Going back to edit abandons this unconfirmed plan; nothing was dispatched for it.
         const goal = m.goal, mode = m.mode, assignee = m.assignee;
@@ -274,41 +295,42 @@
       } else { close('dlg-plan'); open('dlg-board'); }
     }
     async function retryPlan() {
-      const m = state.mission; if (!m || m.status !== 'plan_failed') return;
+      const m = planMission(); if (!m || m.status !== 'plan_failed') return;
       m.status = 'planning'; m.planTask = null;
       try { await persist(); } catch (e) { say(e.message); return; }
       render('dlg-plan'); schedulePoll(0);
     }
 
     /* ---------- board ---------- */
+    // Every goal in one list, open ones first; each carries its own stop / retry / plan actions.
     function renderBoard() {
-      const m = state.mission;
-      if (!m) { $('board-goal').textContent = '还没有目标。'; $('board-status').textContent = '在会议桌或「派任务」发起一个目标。'; setHtml('board-list', ''); }
-      else {
-        $('board-goal').textContent = (m.demo ? '【演示】' : '') + m.goal;
+      const list = domain.open(state).concat(state.missions.filter(m => domain.finished(m)));
+      $('board-goal').textContent = list.length ? '' : '还没有目标。';
+      $('board-status').textContent = list.length ? (client.parallel === 1 ? '电脑一次执行一个任务，其余排队。' : '每名员工各做各的，互不等待。') : '在会议桌或「派任务」发起一个目标；也可以选中某个员工直接交给TA。';
+      const html = list.map(m => {
         const parts = [domain.missionLabels[m.status]];
-        if (m.status === 'running' && client.parallel === 1 && m.packages.length > 1) parts.push('按顺序执行');
         if (m.note) parts.push(m.note);
         if (runner.connection() === 'stale' && !domain.finished(m)) parts.push('状态待同步：' + runner.lastError());
-        $('board-status').textContent = parts.join(' · ');
-        const html = m.packages.map(p => packageCard(m, p, true)).join('');
-        setHtml('board-list', html);
-      }
-      const fin = domain.finished(m);
-      $('board-plan').hidden = !m || !['planning', 'awaiting_confirm', 'plan_failed'].includes(m.status);
-      $('board-retry').hidden = !m || !domain.retryable(m);
-      $('board-cancel').hidden = !m || fin || m.status === 'cancelling';
-      $('board-cancel').textContent = cancelArmed > clock.monotonic() ? '确认停止' : '停止目标';
-      $('board-new').hidden = !fin;
+        const armed = cancelArmed.id === m.id && cancelArmed.until > clock.monotonic(), id = esc(m.id);
+        const actions = (['planning', 'awaiting_confirm', 'plan_failed'].includes(m.status) ? '<button data-plan="' + id + '">查看分工</button>' : '') +
+          (domain.retryable(m) ? '<button data-retry="' + id + '">重试失败</button>' : '') +
+          (!domain.finished(m) && m.status !== 'cancelling' ? '<button data-cancel="' + id + '">' + (armed ? '确认停止' : '停止') + '</button>' : '');
+        return '<li class="goal"><h3>' + esc((m.demo ? '【演示】' : '') + m.goal) + '</h3><p class="muted">' + esc(parts.join(' · ')) + '</p>' +
+          (m.packages.length ? '<ol>' + m.packages.map(p => packageCard(m, p, true)).join('') + '</ol>' : '') + (actions ? '<div class="row">' + actions + '</div>' : '') + '</li>';
+      }).join('');
+      setHtml('board-list', html);
     }
-    async function cancelMission() {
-      if (cancelArmed < clock.monotonic()) { cancelArmed = clock.monotonic() + 5000; renderBoard(); return; }
-      cancelArmed = 0;
-      try { await runner.cancel(); say('正在停止，等电脑确认后显示已取消'); } catch (e) { say(e.message); }
+    async function cancelMission(id) {
+      if (cancelArmed.id !== id || cancelArmed.until < clock.monotonic()) { cancelArmed = {id, until: clock.monotonic() + 5000}; renderBoard(); focusEl($('board-list').querySelector('[data-cancel="' + id + '"]')); return; }
+      cancelArmed = {id: null, until: 0};
+      try { await runner.cancel(id); say('正在停止，等电脑确认后显示已取消'); } catch (e) { say(e.message); }
       refresh(); schedulePoll(300);
     }
-    async function retryMission() {
-      try { domain.retry(state.mission); await persist(); say('重新执行未完成的工作包'); } catch (e) { say(e.message); }
+    async function retryMission(id) {
+      const m = state.missions.find(x => x.id === id); if (!m) return;
+      const taken = m.packages.find(p => ['failed', 'interrupted', 'blocked', 'cancelled'].includes(p.status) && domain.staffBusy(state, p.staff, m));
+      if (taken) { say(m.staff[taken.staff].name + '正在忙另一件事，等TA做完再重试'); return; }
+      try { domain.retry(m); await persist(); say('重新执行未完成的工作包'); } catch (e) { say(e.message); }
       refresh(); schedulePoll(0);
     }
 
@@ -393,14 +415,17 @@
     }
     async function convertReport() {
       const r = openedReport(); if (!r) return;
-      if (!domain.finished(state.mission)) { reportSay('办公室正在执行目标：完成或停止后再做'); return; }
+      const block = domain.assignBlock(state, 'single', 'engineer');
+      if (block) { reportSay(block); return; }
       if (state.demo) { reportSay('演示模式不连接电脑：关闭演示模式后再做'); return; }
       if (!canDispatch()) { reportSay('暂时不能派工：' + conn.text + (conn.detail ? '。' + conn.detail : '')); return; }
-      const previous = state.mission, origin = previous && previous.id === r.mission_id && previous.packages.find(p => p.app);
+      const previous = state.missions.slice(), source = state.missions.find(m => m.id === r.mission_id), origin = source && source.packages.find(p => p.app);
       // Reports made before 重新制作 existed: recover the request from the mission that produced them.
       if (r.app && !r.remake && origin) r.remake = {title: origin.title, deliverable: origin.deliverable, source_task: origin.source_task || null};
-      state.mission = domain.appMission(state, {id: newId(), report: r, target: Object.assign({}, state.target), demo: false, now: clock.wall()});
-      try { await persist(); } catch (e) { state.mission = previous; reportSay('保存失败：' + e.message); return; }
+      const m = domain.appMission(state, {id: newId(), report: r, target: Object.assign({}, state.target), demo: false, now: clock.wall()});
+      domain.addMission(state, m);
+      try { await persist(); } catch (e) { state.missions = previous; reportSay('保存失败：' + e.message); return; }
+      planOpen = m.id;
       close('dlg-report'); if (stack.some(x => x.id === 'dlg-reports')) close('dlg-reports');
       open('dlg-plan');
     }
@@ -419,7 +444,7 @@
       $('setup-demo').setAttribute('aria-pressed', String(d.demo)); $('setup-demo').textContent = '演示模式 · ' + (d.demo ? '开' : '关');
     }
     async function saveSetup() {
-      const d = setupDraft, busy = !domain.finished(state.mission);
+      const d = setupDraft, busy = domain.open(state).length > 0;
       if (d.demo !== state.demo && busy) { $('setup-status').textContent = '当前目标还没结束，不能切换演示模式。'; return; }
       const names = {};
       doc.querySelectorAll('[data-staff]').forEach(i => { names[i.dataset.staff] = i.value.trim().slice(0, 12) || R[i.dataset.staff].name; });
@@ -428,7 +453,7 @@
       if (!d.demo && d.target.computer_id && d.target.project_id && d.target.agent_id) state.target = Object.assign({}, d.target);
       const switching = d.demo !== state.demo;
       state.demo = d.demo;
-      if (switching && state.mission && state.mission.demo !== state.demo) state.mission = null;
+      if (switching) state.missions = state.missions.filter(m => m.demo === state.demo);
       try { await persist(); } catch (e) { Object.assign(state, JSON.parse(prev)); $('setup-status').textContent = '保存失败：' + e.message; return; }
       if (switching) useClient();
       close('dlg-setup'); say('已保存' + (busy ? '；当前目标仍按原配置执行' : '')); checkConnection();
@@ -439,6 +464,9 @@
       $('btn-assign').onclick = () => { scene.walkBoss('meeting'); wake(); openGoal('team'); };
       $('btn-board').onclick = () => open('dlg-board');
       $('btn-reports').onclick = () => { scene.walkBoss('cabinet'); wake(); open('dlg-reports'); };
+      $('btn-approvals').onclick = () => { sheetSay('approvals-status', ''); open('dlg-approvals'); focusEl($('approvals-list').querySelector('[data-allow]') || $('dlg-approvals').querySelector('.back')); };
+      $('approvals-list').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return;
+        if (b.dataset.allow) decide(b.dataset.allow, 'accept', 'approvals-status'); if (b.dataset.deny) decide(b.dataset.deny, 'decline', 'approvals-status'); });
       $('btn-setup').onclick = openSetup;
       doc.querySelectorAll('[data-close]').forEach(b => { b.onclick = () => back(); });
       $('staff-close').onclick = () => close('dlg-staff');
@@ -449,10 +477,9 @@
       $('goal-submit').onclick = submitGoal; $('goal-save').onclick = saveDraft;
       $('goal-target').onclick = openSetup;
       $('plan-confirm').onclick = confirmPlan; $('plan-edit').onclick = editPlan; $('plan-retry').onclick = retryPlan;
-      $('board-cancel').onclick = cancelMission; $('board-retry').onclick = retryMission;
       $('board-new').onclick = () => { close('dlg-board'); openGoal('team'); };
-      $('board-plan').onclick = () => { close('dlg-board'); open('dlg-plan'); };
-      $('board-list').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; if (b.dataset.allow) decide(b.dataset.allow, 'accept'); if (b.dataset.deny) decide(b.dataset.deny, 'decline'); });
+      $('board-list').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; const d = b.dataset;
+        if (d.cancel) cancelMission(d.cancel); if (d.retry) retryMission(d.retry); if (d.plan) { planOpen = d.plan; close('dlg-board'); open('dlg-plan'); } });
       $('report-try').onclick = tryApp; $('report-install').onclick = installApp; $('report-convert').onclick = $('report-remake').onclick = convertReport;
       $('reports-list').addEventListener('click', e => { const b = e.target.closest('[data-report]'); if (b) openReport(b.dataset.report); });
       $('setup-computers').addEventListener('click', e => { const b = e.target.closest('[data-computer]'); if (!b) return; const c = conn.computers.find(x => x.client_id === b.dataset.computer); setupDraft.target = {computer_id: c.client_id, project_id: c.projects.length === 1 ? c.projects[0].id : null, agent_id: (c.agents.find(a => a.available && a.authenticated) || {}).id || null}; renderSetup(); focusEl($('setup-computers').querySelector('[data-computer="' + b.dataset.computer + '"]')); });

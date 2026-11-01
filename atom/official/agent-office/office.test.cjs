@@ -59,19 +59,19 @@ async function run() {
   const spy = {parallel: client.parallel, dispose() {}, send(a, d) { sent.push([a, d]); return client.send(a, d); }};
   let n = 0;
   const runner = Runner.create({domain: D, getState: () => state, persist: async () => { saves++; }, client: spy, clock, newId: () => 'id' + (++n) + 'xxxxxxxx', onReport: r => reports.push(r), onChange() {}});
-  state.mission = D.newMission(state, {id: 'm1', goal: '阅读两份资料、比较结论并生成说明文档', mode: 'team', target: state.target, demo: true, now: 0});
+  D.addMission(state, D.newMission(state, {id: 'm1', goal: '阅读两份资料、比较结论并生成说明文档', mode: 'team', target: state.target, demo: true, now: 0}));
   assert.equal(D.staffActivity(state, 'coordinator', 'ok').kind, 'working');
   const step = async ms => { t += ms; await runner.tick(); };
   await step(0);
   assert.equal(sent.filter(s => s[0] === 'create-task').length, 1, 'plan task created once');
   for (let i = 0; i < 5; i++) await step(1000);
-  assert.equal(state.mission.status, 'awaiting_confirm');
-  assert.equal(state.mission.plan.packages.length, 3);
+  assert.equal(state.missions[0].status, 'awaiting_confirm');
+  assert.equal(state.missions[0].plan.packages.length, 3);
   // Idle staff never look busy before confirmation.
   assert.equal(D.staffActivity(state, 'researcher', 'ok').kind, 'idle');
-  D.confirm(state.mission, state.mission.plan_version);
+  D.confirm(state.missions[0], state.missions[0].plan_version);
   await step(0);
-  const pk = id => state.mission.packages.find(p => p.id === id);
+  const pk = id => state.missions[0].packages.find(p => p.id === id);
   assert.equal(pk('p2').status, 'queued', 'writer waits for research');
   assert.match(D.staffActivity(state, 'writer', 'ok').reason, /等待/);
   assert(['running', 'starting'].includes(pk('p1').status) && ['running', 'starting'].includes(pk('p3').status), 'independent packages overlap (simulated parallel)');
@@ -82,13 +82,13 @@ async function run() {
   for (let i = 0; i < 3; i++) await step(1000);
   assert.equal(pk('p1').status, 'completed');
   assert.equal(reports.filter(r => r.staff === 'researcher').length, 1);
-  await runner.approve('p3', 'accept');
-  await assert.rejects(() => runner.approve('p3', 'accept'), /失效|提交过/);
+  await runner.approve('engineer', 'accept');
+  await assert.rejects(() => runner.approve('engineer', 'accept'), /失效|提交过/);
   for (let i = 0; i < 25; i++) await step(1000);
   assert.equal(pk('p2').status, 'completed');
   assert.equal(pk('p3').status, 'completed');
   for (let i = 0; i < 8; i++) await step(1000);
-  assert.equal(state.mission.status, 'completed');
+  assert.equal(state.missions[0].status, 'completed');
   assert.equal(reports.length, 4, 'three packages + one summary, each reported once');
   for (let i = 0; i < 5; i++) await step(1000);
   assert.equal(reports.length, 4, 'no duplicate reports on later polls');
@@ -101,9 +101,9 @@ async function run() {
   assert.equal(a.task.id, b.task.id);
 
   // Single-staff mode skips the model plan but still needs confirmation; sequential client runs one at a time.
-  state.mission = D.newMission(state, {id: 'm2', goal: '写一段介绍', mode: 'single', assignee: 'writer', target: state.target, demo: true, now: 0});
-  assert.equal(state.mission.status, 'awaiting_confirm');
-  assert.throws(() => D.confirm(state.mission, 99), /变化/);
+  D.addMission(state, D.newMission(state, {id: 'm2', goal: '写一段介绍', mode: 'single', assignee: 'writer', target: state.target, demo: true, now: 0}));
+  assert.equal(state.missions[0].status, 'awaiting_confirm');
+  assert.throws(() => D.confirm(state.missions[0], 99), /变化/);
 
   // Partial failure is reported as partial and retry only re-runs failed nodes.
   const m = {status: 'running', packages: [{id: 'p1', status: 'completed', depends_on: []}, {id: 'p2', status: 'failed', depends_on: [], attempt: 1}], summaryTask: {status: 'completed'}};
@@ -126,6 +126,8 @@ async function run() {
   sc.setMotion(false, now); sc.walkBoss('engineer'); sc.update(now + 100, 100, idle);
   assert.equal(sc.moving(), false);
   await appFlow();
+  await parallelFlow();
+  await approvalsFlow();
   console.log('office tests passed');
 }
 // An app package becomes a Connect `app` task built from the original report, and reports back as an app.
@@ -142,13 +144,13 @@ async function appFlow() {
   }};
   const clock = {wall: () => 5, monotonic: () => 5};
   const runner = Runner.create({domain: D, getState: () => state, persist: async () => {}, client, clock, newId: () => 'req' + (++n) + 'abcdefgh', onReport: r => reports.push(r), onChange() {}});
-  state.mission = D.appMission(state, {id: 'm-app', report: {title: '制作番茄钟', task_id: 't-html'}, target: state.target, now: 1});
-  D.confirm(state.mission, 1);
+  D.addMission(state, D.appMission(state, {id: 'm-app', report: {title: '制作番茄钟', task_id: 't-html'}, target: state.target, now: 1}));
+  D.confirm(state.missions[0], 1);
   await runner.tick();
   const create = calls.find(c => c[0] === 'create-task')[1];
   assert.equal(create.kind, 'app'); assert.match(create.prompt, /<title>番茄钟<\/title>/, 'app prompt carries the original report text');
   status = 'completed'; await runner.tick();
-  assert.equal(state.mission.status, 'completed');
+  assert.equal(state.missions[0].status, 'completed');
   assert.equal(reports.length, 1); assert.equal(reports[0].app, true); assert.equal(reports[0].task_id, 'app-task');
   assert.deepEqual(reports[0].remake.source_task, 't-html', 'the app report keeps its request for 重新制作');
   await runner.previewApp('app-task'); await runner.installApp('app-task');
@@ -156,7 +158,73 @@ async function appFlow() {
   // Ordinary packages still create plain tasks.
   const plain = []; const r2 = Runner.create({domain: D, getState: () => s2, persist: async () => {}, client: {parallel: 1, dispose() {}, async send(a, d) { plain.push(d); return {task: {id: 'x', status: 'queued'}}; }}, clock, newId: () => 'plainreq' + (++n), onReport() {}, onChange() {}});
   const s2 = D.defaults(); s2.target = state.target;
-  s2.mission = D.newMission(s2, {id: 'm2', goal: '写说明', mode: 'single', assignee: 'writer', target: s2.target, now: 1}); D.confirm(s2.mission, 1);
+  D.addMission(s2, D.newMission(s2, {id: 'm2', goal: '写说明', mode: 'single', assignee: 'writer', target: s2.target, now: 1})); D.confirm(s2.missions[0], 1);
   await r2.tick(); assert.equal(plain[0].kind, 'task');
+}
+// Each staff member runs their own goal; an older one-task computer answering busy only delays a package.
+async function parallelFlow() {
+  const target = {computer_id: 'c', project_id: 'p', agent_id: 'codex'};
+  // Saved records from the one-goal version become a one-item list.
+  const migrated = D.normalize(Object.assign(D.defaults(), {missions: undefined, mission: {id: 'old1', status: 'completed', packages: [], staff: D.defaults().staff}}));
+  assert.deepEqual(migrated.missions.map(m => m.id), ['old1']);
+  const state = D.defaults(); state.target = target;
+  let t = 1000, n = 0, k = 0, refuseFirst = true; const created = [], status = {};
+  const client = {parallel: 3, dispose() {}, async send(a, d) {
+    if (a === 'create-task') {
+      const id = 'task' + (++k); created.push([id, d.prompt.split('\n')[1]]);
+      status[id] = refuseFirst && k === 1 ? 'busy' : 'running'; return {task: {id, status: 'queued'}};
+    }
+    if (a === 'task-events') { const st = status[d.task_id];
+      if (st === 'busy') return {task: {id: d.task_id, status: 'failed'}, events: [{seq: 1, type: 'error', status: 'failed', text: '电脑正在执行另一个任务，请稍后重试'}]};
+      return {task: {id: d.task_id, status: st}, events: st === 'completed' ? [{seq: 2, type: 'result', status: 'completed', text: '## 完成内容\n好'}] : []}; }
+    throw Error(a);
+  }};
+  const runner = Runner.create({domain: D, getState: () => state, persist: async () => {}, client, clock: {wall: () => t, monotonic: () => t}, newId: () => 'req' + (++n) + 'abcdefgh', onReport() {}, onChange() {}});
+  const give = (id, assignee, goal) => { const m = D.newMission(state, {id, goal, mode: 'single', assignee, target, now: t}); D.addMission(state, m); D.confirm(m, 1, state); return m; };
+  const write = give('mw', 'writer', '写介绍');
+  assert.match(D.assignBlock(state, 'single', 'writer'), /小文正在忙/); assert.equal(D.assignBlock(state, 'single', 'researcher'), '');
+  const research = give('mr', 'researcher', '查资料');
+  await runner.tick();
+  assert.equal(created.length, 2, 'both staff members start at once');
+  assert.equal(D.staffActivity(state, 'researcher', 'ok').kind, 'working');
+  // The first task met an old computer that was busy: it waits, then goes out again instead of failing.
+  await runner.tick();
+  assert.equal(write.packages[0].status, 'queued'); assert.equal(write.packages[0].error, '');
+  assert.match(D.staffActivity(state, 'writer', 'ok').reason, /电脑正忙/);
+  await runner.tick(); assert.equal(created.length, 2, 'no resend before the retry time');
+  t += D.BUSY_RETRY_MS + 1; await runner.tick();
+  assert.equal(created.length, 3); assert.equal(write.packages[0].status, 'running');
+  // A team plan cannot start someone who is busy elsewhere.
+  const team = D.newMission(state, {id: 'mt', goal: '团队', mode: 'team', target, now: t}); D.addMission(state, team);
+  D.applyPlan(team, D.parsePlan('{"packages":[{"id":"p1","staff":"writer","title":"写","deliverable":"d"}]}'));
+  assert.throws(() => D.confirm(team, team.plan_version, state), /小文正在忙/);
+  // Finishing one goal frees that staff member without touching the other.
+  for (const k of Object.keys(status)) if (status[k] === 'running') status[k] = 'completed';
+  await runner.tick();
+  assert.equal(research.status, 'completed'); assert.equal(write.status, 'completed');
+  assert.doesNotThrow(() => D.confirm(team, team.plan_version, state));
+}
+// Executors number requests per session, so two staff can both be waiting on request "0".
+async function approvalsFlow() {
+  const target = {computer_id: 'c', project_id: 'p', agent_id: 'codex'}, state = D.defaults(); state.target = target;
+  const approvals = {}, sent = []; let k = 0, n = 0;
+  const client = {parallel: 3, dispose() {}, async send(a, d) {
+    if (a === 'create-task') return {task: {id: 'T' + (++k), status: 'queued'}};
+    if (a === 'task-events') { const ap = approvals[d.task_id];
+      return {task: {id: d.task_id, status: ap ? 'waiting_approval' : 'running'}, events: ap && d.after < ap.seq ? [{seq: ap.seq, type: 'approval', status: 'waiting_approval', approval: {request_id: ap.id, title: '允许执行命令？', detail: ap.detail}}] : []}; }
+    if (a === 'approve-task') { sent.push(d.task_id + ':' + d.request_id); delete approvals[d.task_id]; return {ok: true}; }
+    throw Error(a);
+  }};
+  const runner = Runner.create({domain: D, getState: () => state, persist: async () => {}, client, clock: {wall: () => 1, monotonic: () => 1}, newId: () => 'req' + (++n) + 'abcdefgh', onReport() {}, onChange() {}});
+  for (const [id, who] of [['mw', 'writer'], ['mr', 'researcher']]) { const m = D.newMission(state, {id, goal: who, mode: 'single', assignee: who, target, now: 1}); D.addMission(state, m); D.confirm(m, 1, state); }
+  await runner.tick();
+  const task = who => state.missions.find(m => m.assignee === who).packages[0].task_id;
+  approvals[task('writer')] = {seq: 3, id: '0', detail: 'rg A'}; await runner.tick();
+  await runner.approve('writer', 'accept');
+  approvals[task('researcher')] = {seq: 3, id: '0', detail: 'rg B'}; await runner.tick();
+  assert.deepEqual(D.pendingApprovals(state).map(a => a.staff), ['researcher'], 'the second staff member\'s request 0 is not mistaken for the first');
+  await runner.approve('researcher', 'accept');
+  assert.deepEqual(sent, [task('writer') + ':0', task('researcher') + ':0']);
+  assert.deepEqual(D.pendingApprovals(state), []);
 }
 run().catch(e => { console.error(e); process.exit(1); });

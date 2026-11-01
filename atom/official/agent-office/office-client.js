@@ -30,7 +30,8 @@
       });
     }
     function dispose() { win.removeEventListener('message', receive); for (const p of pending.values()) win.clearTimeout(p.timer); pending.clear(); }
-    return {kind: 'host', parallel: 1, send, dispose};
+    // Several staff work at once; a computer whose companion runs one task at a time answers busy and the runner requeues.
+    return {kind: 'host', parallel: 3, send, dispose};
   }
 
   /* Simulated computer. Timeline driven by the injected clock so tests can fast-forward. */

@@ -3,13 +3,14 @@
 <header><h1>像素办公室</h1><button id="btn-setup" class="chip">检查连接…</button></header>
 <p id="status" role="status" hidden></p>
 <div id="spots" aria-label="办公室"></div>
-<footer><button id="btn-assign">派任务</button><button id="btn-board">任务板</button><button id="btn-reports">汇报<span id="badge" hidden></span></button></footer>
+<footer><button id="btn-assign">派任务</button><button id="btn-board">任务板</button><button id="btn-approvals">审批<span id="approvals-badge" class="count" hidden></span></button><button id="btn-reports">汇报<span id="badge" hidden></span></button></footer>
 </main>
 
 <dialog id="dlg-staff" class="sheet" aria-labelledby="staff-title">
   <div class="sheet-head"><canvas id="portrait" width="14" height="18" aria-hidden="true"></canvas><div><h2 id="staff-title"></h2><p id="staff-reason"></p></div></div>
   <p id="staff-live" class="live" hidden></p>
   <div id="staff-approval" class="approval" hidden><p id="staff-approval-text"></p><div class="row"><button id="staff-allow">允许</button><button id="staff-deny">拒绝</button></div></div>
+  <p id="staff-status" class="report-status" role="status" hidden></p>
   <div class="row"><button id="staff-assign">交给TA</button><button id="staff-report" hidden>查看成果</button><button id="staff-close">返回办公室</button></div>
 </dialog>
 
@@ -34,12 +35,18 @@
 <dialog id="dlg-board" class="page" aria-labelledby="board-title">
   <div class="page-head"><button class="back" data-close>办公室</button><h2 id="board-title">任务板</h2></div>
   <div class="page-body atom-scroll"><p id="board-goal"></p><p id="board-status" role="status"></p><ol id="board-list"></ol></div>
-  <div class="page-actions"><button id="board-plan" hidden>查看分工</button><button id="board-retry" hidden>重试失败</button><button id="board-cancel" hidden>停止目标</button><button id="board-new" hidden>新目标</button></div>
+  <div class="page-actions"><button id="board-new">新目标</button></div>
 </dialog>
 
 <dialog id="dlg-reports" class="page" aria-labelledby="reports-title">
   <div class="page-head"><button class="back" data-close>办公室</button><h2 id="reports-title">汇报</h2></div>
   <div class="page-body atom-scroll"><ul id="reports-list"></ul><p id="reports-empty" class="muted">还没有汇报。完成的工作会在这里保留。</p></div>
+</dialog>
+
+<dialog id="dlg-approvals" class="page" aria-labelledby="approvals-title">
+  <div class="page-head"><button class="back" data-close>办公室</button><h2 id="approvals-title">申请表</h2></div>
+  <p id="approvals-status" class="report-status" role="status" hidden></p>
+  <div class="page-body atom-scroll"><ul id="approvals-list"></ul><p id="approvals-empty" class="muted">没有待处理的申请。员工要执行命令、修改文件时，会在这里等你批准。</p></div>
 </dialog>
 
 <dialog id="dlg-report" class="page" aria-labelledby="report-title">

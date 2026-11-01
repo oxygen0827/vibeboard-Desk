@@ -22,8 +22,10 @@ footer{position:absolute;left:0;right:0;bottom:4px;display:flex;justify-content:
 footer button{position:relative;isolation:isolate;min-width:96px;min-height:44px;padding:0 12px;font:inherit;font-size:15px;color:inherit;background:transparent;border:0}
 footer button::before{content:"";position:absolute;inset:5px 0;z-index:-1;border-radius:10px;background:var(--card,#fffaf0);border:1px solid var(--line,#cbb894)}
 body footer button{background:transparent!important;border:0!important;box-shadow:none!important}
-#badge{display:inline-block;min-width:20px;height:20px;margin-left:4px;padding:0 5px;border-radius:9px;background:#d1493f;color:#fff;font-size:14px;line-height:20px;vertical-align:1px}
-#badge[hidden]{display:none}
+#badge,#approvals-badge{display:inline-block;min-width:20px;height:20px;margin-left:4px;padding:0 5px;border-radius:9px;background:#d1493f;color:#fff;font-size:14px;line-height:20px;vertical-align:1px}
+#badge[hidden],#approvals-badge[hidden]{display:none}
+#staff-status{padding:0 2px 4px}
+.approval-detail{word-break:break-all;font-size:14px}
 button{font:inherit;color:inherit}
 button[hidden],[hidden]{display:none!important}
 
@@ -94,3 +96,8 @@ dialog.sheet{position:fixed;left:8px;right:8px;bottom:8px;top:auto;width:auto;ma
 .approval p{font-size:14px;margin:2px 0;max-height:3em;overflow:hidden}
 .sheet .row{justify-content:flex-end}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+.goal{list-style:none;margin:0 0 12px;padding:8px 10px;border-radius:12px;border:1px solid var(--line,#cbb894)}
+.goal h3{margin:0 0 2px;font-size:15px;color:inherit}
+.goal>p{margin:0 0 6px}
+.goal ol{padding:0;margin:0}
+#board-list{padding:0;margin:0}

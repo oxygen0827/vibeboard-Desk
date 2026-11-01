@@ -12,13 +12,13 @@
   const EXECUTORS = ['researcher', 'writer', 'engineer'];
   const TERMINAL = ['completed', 'failed', 'cancelled', 'interrupted'];
   const PKG_DONE = TERMINAL.concat(['blocked']);
-  const MAX_PACKAGES = 3, PREVIEW = 600, GOAL_MAX = 2000;
+  const MAX_PACKAGES = 3, PREVIEW = 600, GOAL_MAX = 2000, MAX_MISSIONS = 6, BUSY_RETRY_MS = 8000;
   const PLAN_MARK = '[ATOM 像素办公室 · 分工拟定]', WORK_MARK = '[ATOM 像素办公室 · 工作包]', SUMMARY_MARK = '[ATOM 像素办公室 · 综合报告]';
 
   function defaults() {
     const staff = {};
     for (const id of STAFF) staff[id] = {name: ROLES[id].name, desc: ROLES[id].desc};
-    return {v: 1, draft: '', staff, target: null, demo: false, mission: null, reports: []};
+    return {v: 1, draft: '', staff, target: null, demo: false, missions: [], reports: []};
   }
   const str = (v, max) => typeof v === 'string' ? v.slice(0, max) : '';
   const ident = v => typeof v === 'string' && /^[A-Za-z0-9_-]{1,128}$/.test(v) ? v : null;
@@ -34,7 +34,9 @@
     }
     const t = saved.target;
     if (t && ident(t.computer_id) && ident(t.project_id) && ident(t.agent_id)) base.target = {computer_id: t.computer_id, project_id: t.project_id, agent_id: t.agent_id};
-    if (saved.mission && typeof saved.mission === 'object' && ident(saved.mission.id)) base.mission = saved.mission;
+    // Each staff member works on their own goal; records from the one-goal version become a one-item list.
+    const missions = Array.isArray(saved.missions) ? saved.missions : saved.mission ? [saved.mission] : [];
+    base.missions = missions.filter(m => m && typeof m === 'object' && ident(m.id)).slice(0, MAX_MISSIONS);
     if (Array.isArray(saved.reports)) base.reports = saved.reports.filter(r => r && ident(r.id)).slice(0, 12);
     // Set just before an app preview so the office reopens on the same report when the preview's back returns here.
     if (saved.resume && ident(saved.resume.report)) base.resume = {report: saved.resume.report};
@@ -146,8 +148,10 @@
     return m;
   }
   function applyPlan(m, plan) { m.plan = plan; m.plan_version += 1; m.status = 'awaiting_confirm'; return m; }
-  function confirm(m, version) {
+  function confirm(m, version, state) {
     if (m.status !== 'awaiting_confirm' || !m.plan || version !== m.plan_version) throw Error('分工已变化，请重新确认');
+    const taken = state ? m.plan.packages.find(p => staffBusy(state, p.staff, m)) : null;
+    if (taken) throw Error(m.staff[taken.staff].name + '正在忙另一件事，等TA做完再开工');
     m.packages = m.plan.packages.map(p => Object.assign({}, p, {status: 'queued', attempt: 1, request_id: null, task_id: null, after: 0, approval: null, preview: '', error: '', reported: false, stopping: false}));
     m.status = 'running';
     return m;
@@ -157,12 +161,13 @@
   function depsBroken(m, p) { return p.depends_on.some(d => pkg(m, d) && ['failed', 'cancelled', 'interrupted', 'blocked'].includes(pkg(m, d).status)); }
   const activeStatus = s => ['starting', 'running', 'waiting_approval'].includes(s);
   // Packages that may start now under the computer's concurrency limit.
-  function dispatchable(m, maxParallel) {
+  // `busy` counts packages already running in other goals; a package the computer refused as busy waits until retry_at.
+  function dispatchable(m, maxParallel, now, busy) {
     if (m.status !== 'running') return [];
     for (const p of m.packages) if (p.status === 'queued' && depsBroken(m, p)) { p.status = 'blocked'; p.error = '上游工作包没有完成'; }
-    let slots = maxParallel - m.packages.filter(p => activeStatus(p.status)).length;
+    let slots = maxParallel - (busy || 0) - m.packages.filter(p => activeStatus(p.status)).length;
     const out = [];
-    for (const p of m.packages) if (slots > 0 && p.status === 'queued' && depsMet(m, p)) { out.push(p); slots--; }
+    for (const p of m.packages) if (slots > 0 && p.status === 'queued' && depsMet(m, p) && !(p.retry_at > (now || 0))) { out.push(p); slots--; }
     return out;
   }
   // Mission status follows its packages; returns 'summarize' when a coordinator summary is due.
@@ -192,9 +197,45 @@
   }
   const finished = m => !m || ['plan_failed', 'completed', 'partial', 'failed', 'cancelled'].includes(m.status);
 
+  /* ---------- several goals at once: one job per staff member ---------- */
+  const open = state => state.missions.filter(m => !finished(m));
+  // Whether goal `m` currently occupies staff `id`. A team plan reserves its staff only once confirmed.
+  function holds(m, id) {
+    if (finished(m)) return false;
+    if (id === 'coordinator') return m.mode === 'team' && ['planning', 'summarizing'].includes(m.status);
+    if (['planning', 'awaiting_confirm'].includes(m.status)) return m.mode === 'single' && m.assignee === id;
+    return m.packages.some(p => p.staff === id && !PKG_DONE.includes(p.status));
+  }
+  const staffBusy = (state, id, except) => state.missions.some(m => m !== except && holds(m, id));
+  // Why a new goal cannot start now, or '' when it can.
+  function assignBlock(state, mode, assignee) {
+    if (mode === 'single') return staffBusy(state, assignee) ? state.staff[assignee].name + '正在忙另一件事，可以先交给别人或保存草稿' : '';
+    return staffBusy(state, 'coordinator') ? state.staff.coordinator.name + '正在拟定另一份分工，请稍后再派给小队' : '';
+  }
+  // Newest first; finished goals beyond the cap are dropped (their reports stay in the report list).
+  function addMission(state, m) {
+    state.missions.unshift(m);
+    let extra = state.missions.length - MAX_MISSIONS;
+    for (let i = state.missions.length - 1; i >= 0 && extra > 0; i--) if (finished(state.missions[i])) { state.missions.splice(i, 1); extra--; }
+  }
+  // The goal a staff member is shown working on: the one holding them, else the latest one they took part in.
+  function missionFor(state, id) {
+    const involved = m => id === 'coordinator' ? m.mode === 'team' : m.packages.some(p => p.staff === id) || m.assignee === id;
+    return state.missions.find(m => holds(m, id)) || state.missions.find(m => !finished(m) && involved(m)) || state.missions.find(involved) || null;
+  }
+  // Every request waiting on the user, across all goals (one per staff member at most).
+  function pendingApprovals(state) {
+    const out = [];
+    for (const m of open(state)) for (const p of m.packages) if (p.status === 'waiting_approval' && p.approval) out.push({staff: p.staff, mission: m, pkg: p});
+    return out;
+  }
+  // Companions from before parallel tasks refuse a second one with this text; such a task is requeued, not failed.
+  const busyRefusal = text => /电脑正在执行另一个任务/.test(String(text || ''));
+  function requeue(p, now) { Object.assign(p, {status: 'queued', request_id: null, task_id: null, after: 0, approval: null, error: '', reported: false, stopping: false, retry_at: now + BUSY_RETRY_MS}); }
+
   /* What each staff member visibly does, derived only from real task facts. */
   function staffActivity(state, id, connection) {
-    const m = state.mission, stale = connection === 'stale';
+    const m = missionFor(state, id), stale = connection === 'stale';
     const tag = (kind, reason) => ({kind: stale && ['working', 'approval', 'waiting'].includes(kind) ? 'stale' : kind, reason: stale && kind !== 'idle' ? '状态待同步：' + reason : reason});
     if (!m || m.status === 'cancelled') return tag('idle', '空闲');
     if (id === 'coordinator') {
@@ -204,10 +245,12 @@
       if (m.status === 'plan_failed') return tag('failed', '分工拟定失败');
     }
     const p = m.packages.find(x => x.staff === id);
+    if (!p && m.status === 'awaiting_confirm' && m.assignee === id) return tag('waiting', '安排已拟好，等待你确认');
     if (!p) return tag('idle', m.status === 'running' ? '这次没有分配工作' : '空闲');
     if (p.stopping && activeStatus(p.status)) return tag('waiting', '正在停止');
     switch (p.status) {
       case 'queued': {
+        if (p.retry_at) return tag('waiting', '电脑正忙，稍后自动派发');
         const wait = p.depends_on.map(d => pkg(m, d)).filter(d => d && d.status !== 'completed');
         return tag('waiting', wait.length ? '等待' + wait.map(d => m.staff[d.staff].name).join('、') + '的成果' : '排队等待开始');
       }
@@ -248,7 +291,7 @@
     completed: '已完成', partial: '部分完成', failed: '未完成', cancelling: '正在停止', cancelled: '已取消'};
   const packageLabels = {queued: '排队', starting: '派发中', running: '执行中', waiting_approval: '等待审批', completed: '已完成', failed: '失败', interrupted: '已中断', cancelled: '已取消', blocked: '未开始'};
   const api = {ROLES, STAFF, EXECUTORS, TERMINAL, MAX_PACKAGES, PREVIEW, GOAL_MAX, defaults, normalize, reportBlocks, planPrompt, packagePrompt, summaryPrompt, parsePlan,
-    newMission, appMission, appPrompt, convertible, applyPlan, confirm, dispatchable, settle, finishSummary, retryable, retry, finished, staffActivity, depsMet, missionLabels, packageLabels, marks: {PLAN_MARK, WORK_MARK, SUMMARY_MARK}};
+    newMission, appMission, addMission, open, pendingApprovals, staffBusy, assignBlock, missionFor, busyRefusal, requeue, BUSY_RETRY_MS, appPrompt, convertible, applyPlan, confirm, dispatchable, settle, finishSummary, retryable, retry, finished, staffActivity, depsMet, missionLabels, packageLabels, marks: {PLAN_MARK, WORK_MARK, SUMMARY_MARK}};
   root.OfficeDomain = api;
   if (typeof module !== 'undefined') module.exports = api;
 })(globalThis);

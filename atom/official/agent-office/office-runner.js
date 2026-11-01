@@ -1,13 +1,15 @@
-/* Drives one mission through real Connect tasks: plan → confirm → packages → summary.
+/* Drives every open goal through real Connect tasks: plan → confirm → packages → summary.
+   Goals run side by side (one per staff member) and share the computer's task slots.
    Request IDs are persisted before sending so network retries never start a model twice. */
 (function(root) {
   'use strict';
   function create({domain, getState, persist, client, clock, newId, onReport, onChange}) {
     const live = new Map();      // task_id -> {text, result} (full text, not persisted)
-    const answered = new Set();  // approval request ids already decided
+    // Approvals already decided, keyed by task: executors number requests per session (0, 1, …), so ids repeat across staff.
+    const answered = new Set();
+    const decided = (taskId, requestId) => answered.has(taskId + ':' + requestId);
     let busy = false, lastOk = clock.wall(), lastError = '', connection = 'ok';
 
-    const mission = () => getState().mission;
     function cacheText(taskId, events) {
       const entry = live.get(taskId) || {text: '', result: ''};
       for (const e of events) {
@@ -21,8 +23,7 @@
       catch (e) { lastError = e.message; if (clock.wall() - lastOk > 20000) connection = 'stale'; throw e; }
     }
     // Create (or idempotently re-find) a task. The request id is saved first.
-    async function startTask(holder, prompt, kind) {
-      const m = mission();
+    async function startTask(m, holder, prompt, kind) {
       if (!holder.request_id) { holder.request_id = newId(); await persist(); }
       const r = await call('create-task', Object.assign({request_id: holder.request_id, prompt, kind: kind === 'app' ? 'app' : 'task'}, m.target));
       if (!r || !r.task || typeof r.task.id !== 'string') throw Error('电脑没有返回任务编号');
@@ -36,7 +37,7 @@
       const entry = cacheText(holder.task_id, events);
       let approval;
       for (const e of events) {
-        if (e.type === 'approval' && e.approval && !answered.has(String(e.approval.request_id))) approval = {request_id: String(e.approval.request_id), title: String(e.approval.title || '需要审批'), detail: String(e.approval.detail || '').slice(0, 600)};
+        if (e.type === 'approval' && e.approval && !decided(holder.task_id, String(e.approval.request_id))) approval = {request_id: String(e.approval.request_id), title: String(e.approval.title || '需要审批'), detail: String(e.approval.detail || '').slice(0, 600)};
         if (e.type === 'status' && e.status === 'running') approval = null;
         if (e.type === 'error' && e.text) holder.error = String(e.text).slice(0, 300);
       }
@@ -58,13 +59,16 @@
 
     async function stepPlan(m) {
       const t = m.planTask || (m.planTask = {request_id: null, task_id: null, after: 0, status: 'starting', error: ''});
-      if (!t.task_id) { await startTask(t, domain.planPrompt(getState(), m.goal)); t.status = 'queued'; return true; }
+      if (!t.task_id) { if (t.retry_at > clock.wall()) return true; await startTask(m, t, domain.planPrompt(getState(), m.goal)); t.status = 'queued'; return true; }
       const r = await pull(t);
       if (r.status) t.status = r.status;
       if (r.status === 'completed' && m.status === 'cancelling') { m.status = 'cancelled'; await persist(); }
       else if (r.status === 'completed') {
         try { domain.applyPlan(m, domain.parsePlan(r.entry.result)); }
         catch (e) { m.status = 'plan_failed'; t.error = e.message + '。没有生成可执行的分工，请重新生成。'; }
+        await persist();
+      } else if (r.status === 'failed' && m.status === 'planning' && domain.busyRefusal(r.entry.result || t.error)) {
+        m.planTask = {request_id: null, task_id: null, after: 0, status: 'starting', error: '', retry_at: clock.wall() + domain.BUSY_RETRY_MS};
         await persist();
       } else if (['failed', 'cancelled', 'interrupted'].includes(r.status)) {
         m.status = m.status === 'cancelling' ? 'cancelled' : 'plan_failed';
@@ -80,16 +84,19 @@
           // "做成应用" carries the original report's full text as the reference.
           const up = upstream(m, p);
           if (p.source_task) up.unshift({title: '原汇报', staff: 'engineer', text: await fullText(p.source_task)});
-          await startTask(p, domain.appPrompt(getState(), m, p, up), 'app');
-        } else await startTask(p, domain.packagePrompt(getState(), m, p, upstream(m, p)));
+          await startTask(m, p, domain.appPrompt(getState(), m, p, up), 'app');
+        } else await startTask(m, p, domain.packagePrompt(getState(), m, p, upstream(m, p)));
+        delete p.retry_at;
         p.status = 'running'; await persist(); return;
       }
       const r = await pull(p);
       const before = p.status;
-      if (r.approval && !answered.has(r.approval.request_id)) p.approval = r.approval;
+      if (r.approval && !decided(p.task_id, r.approval.request_id)) p.approval = r.approval;
       if (r.status === 'waiting_approval' && !p.approval) p.status = 'running';
       else if (r.status && r.status !== 'queued') p.status = r.status;
       if (p.status !== 'waiting_approval') p.approval = null;
+      // An older computer that runs one task at a time refused this one: wait and send it again.
+      if (p.status === 'failed' && m.status === 'running' && domain.busyRefusal(r.entry.result || p.error)) { domain.requeue(p, clock.wall()); await persist(); return; }
       if (domain.TERMINAL.includes(p.status)) {
         p.stopping = false;
         const text = r.entry.result || p.error;
@@ -103,7 +110,7 @@
       const t = m.summaryTask;
       if (!t.task_id) {
         const results = m.packages.map(p => ({title: p.title, staff: p.staff, status: p.status, text: (live.get(p.task_id) || {}).result || p.preview || p.error}));
-        await startTask(t, domain.summaryPrompt(getState(), m, results)); t.status = 'queued'; return;
+        await startTask(m, t, domain.summaryPrompt(getState(), m, results)); t.status = 'queued'; return;
       }
       const r = await pull(t);
       if (r.status) t.status = r.status;
@@ -117,39 +124,54 @@
     }
 
     /* One polling step. Returns whether real work is still in flight (drives poll cadence). */
+    // Tasks this office has on the computer right now, across all goals.
+    function inFlight() {
+      let n = 0;
+      for (const m of getState().missions) {
+        for (const t of [m.planTask, m.summaryTask]) if (t && t.task_id && !domain.TERMINAL.includes(t.status)) n++;
+        n += m.packages.filter(p => p.task_id && ['starting', 'running', 'waiting_approval'].includes(p.status)).length;
+      }
+      return n;
+    }
+    async function step(m) {
+      if (m.status === 'planning' || m.status === 'cancelling' && m.planTask && m.planTask.task_id && !domain.TERMINAL.includes(m.planTask.status)) {
+        if (m.status === 'planning') { await stepPlan(m); return true; }
+        await stepPlan(m); return true;
+      }
+      if (m.status === 'running' || m.status === 'cancelling') {
+        for (const p of m.packages) if (p.task_id && !domain.TERMINAL.includes(p.status)) await stepPackage(m, p);
+        if (m.status === 'running') for (const p of domain.dispatchable(m, client.parallel, clock.wall(), inFlight() - m.packages.filter(x => x.task_id && ['starting', 'running', 'waiting_approval'].includes(x.status)).length)) await stepPackage(m, p);
+        if (m.status === 'cancelling') for (const p of m.packages) if (!p.task_id && !domain.TERMINAL.includes(p.status) && p.status !== 'blocked') { p.status = 'cancelled'; }
+        const next = domain.settle(m);
+        if (next === 'summarize') m.summaryTask = {request_id: null, task_id: null, after: 0, status: 'starting', error: ''};
+        if (next || domain.finished(m)) await persist();
+        return !domain.finished(m);
+      }
+      if (m.status === 'summarizing') { await stepSummary(m); return !domain.finished(m); }
+      return false;
+    }
+    /* One polling step over every open goal. Returns whether real work is still in flight (drives poll cadence). */
     async function tick() {
       if (busy) return true; busy = true;
+      let working = false;
       try {
-        const m = mission(); if (!m) return false;
-        if (m.status === 'planning' || m.status === 'cancelling' && m.planTask && m.planTask.task_id && !domain.TERMINAL.includes(m.planTask.status)) {
-          if (m.status === 'planning') return await stepPlan(m);
-          await stepPlan(m); return true;
-        }
-        if (m.status === 'running' || m.status === 'cancelling') {
-          if (m.status === 'running') for (const p of domain.dispatchable(m, client.parallel)) await stepPackage(m, p);
-          for (const p of m.packages) if (p.task_id && !domain.TERMINAL.includes(p.status)) await stepPackage(m, p);
-          if (m.status === 'cancelling') for (const p of m.packages) if (!p.task_id && !domain.TERMINAL.includes(p.status) && p.status !== 'blocked') { p.status = 'cancelled'; }
-          const next = domain.settle(m);
-          if (next === 'summarize') m.summaryTask = {request_id: null, task_id: null, after: 0, status: 'starting', error: ''};
-          if (next || domain.finished(m)) await persist();
-          return !domain.finished(m);
-        }
-        if (m.status === 'summarizing') { await stepSummary(m); return !domain.finished(m); }
-        return false;
-      } catch (e) { onChange(); return true; }
-      finally { busy = false; }
+        // Oldest first, so earlier goals get the computer's free slots first. One goal's failure does not stall the rest.
+        for (const m of domain.open(getState()).reverse()) { try { if (await step(m)) working = true; } catch (e) { working = true; onChange(); } }
+        return working;
+      } finally { busy = false; }
     }
-    async function approve(pkgId, decision) {
-      const m = mission(), p = m && m.packages.find(x => x.id === pkgId);
+    // Approvals and stops are addressed by staff member and goal: package ids (p1…) repeat across goals.
+    async function approve(staffId, decision) {
+      const m = getState().missions.find(x => x.packages.some(p => p.staff === staffId && p.status === 'waiting_approval')), p = m && m.packages.find(x => x.staff === staffId && x.status === 'waiting_approval');
       if (!p || !p.approval || p.status !== 'waiting_approval') throw Error('这个审批已经失效');
       const requestId = p.approval.request_id;
-      if (answered.has(requestId)) throw Error('已经提交过这个审批');
+      if (decided(p.task_id, requestId)) throw Error('已经提交过这个审批');
       await call('approve-task', {task_id: p.task_id, request_id: requestId, decision});
-      answered.add(requestId); p.approval = null; p.status = 'running';
+      answered.add(p.task_id + ':' + requestId); p.approval = null; p.status = 'running';
       await persist();
     }
-    async function cancel() {
-      const m = mission(); if (!m || domain.finished(m)) return;
+    async function cancel(missionId) {
+      const m = getState().missions.find(x => x.id === missionId); if (!m || domain.finished(m)) return;
       if (m.status === 'awaiting_confirm') { m.status = 'cancelled'; await persist(); return; }
       m.status = 'cancelling';
       for (const p of m.packages) if (p.task_id && !domain.TERMINAL.includes(p.status)) { p.stopping = true; await call('cancel-task', {task_id: p.task_id}).catch(() => {}); }
