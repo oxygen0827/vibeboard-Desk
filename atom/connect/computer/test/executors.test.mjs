@@ -1,5 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import os from 'node:os';import path from 'node:path';import {fileURLToPath} from 'node:url';
-import {EXECUTORS,findBinary,diagnoseExecutors,createAdapter} from '../agents.mjs';import {AcpAgent} from '../acp.mjs';import {PiAgent,PI_TOOLS} from '../pi.mjs';import {Companion} from '../companion.mjs';
+import {EXECUTORS,findBinary,diagnoseExecutors,createAdapter} from '../agents.mjs';import {AcpAgent} from '../acp.mjs';import {PiAgent,PI_TOOLS} from '../pi.mjs';import {Companion,BUSY} from '../companion.mjs';
 const FIX=path.join(path.dirname(fileURLToPath(import.meta.url)),'fixtures'),ACP=path.join(FIX,'fake-acp.mjs'),PI=path.join(FIX,'fake-pi.mjs');
 const live=new Set();test.afterEach(()=>{for(const a of live)a.close();live.clear();});
 const track=a=>(live.add(a),a);
@@ -164,3 +164,18 @@ test('companion shows the executor\'s own failure reason instead of a generic me
  await c.execute(c.store.data.tasks.t,{device_id:'dev',prompt:'hello'});
  for(let i=0;i<100&&c.store.data.tasks.t.status!=='failed';i++)await new Promise(r=>setTimeout(r,20));
  assert.equal(c.store.data.tasks.t.status,'failed');assert.match(c.store.data.outbox.at(-1).event.text,/没有任何响应/);c.stop();});
+
+test('the companion runs up to three tasks at once and refuses a fourth with the stable busy text',async()=>{
+ const {EventEmitter}=await import('node:events');const adapters=[];
+ class Slow extends EventEmitter{async open(){}async account(){return true;}async start(){adapters.push(this);}async interrupt(){this.emit('completed',{status:'interrupted'});}approve(){}close(){}}
+ const d=tmp(),pdir=tmp(),c=new Companion(d,{adapter:()=>new Slow(),diagnoseAgents:async()=>[]});
+ const p=c.addProject({path:pdir});const tasks=['a','b','c','d'].map(id=>(c.store.data.tasks[id]={id,project_id:p.id,agent_id:'codex',status:'queued'}));
+ for(const t of tasks)await c.execute(t,{device_id:'dev',prompt:'x'});
+ assert.equal(c.running.size,3);assert.equal(tasks[3].status,'failed');assert(JSON.stringify(c.store.data.outbox).includes(BUSY));
+ // Finishing or cancelling one task touches only that task.
+ adapters[1].emit('message','done');adapters[1].emit('completed',{status:'completed'});
+ assert.equal(tasks[1].status,'completed');assert.deepEqual([...c.running.keys()],['a','c']);
+ await c.handle({id:'cmd-cancel',type:'task.cancel',task_id:'c'});
+ assert.equal(tasks[2].status,'cancelled');assert.deepEqual([...c.running.keys()],['a']);assert.equal(tasks[0].status,'running');
+ c.stop();
+});

@@ -171,7 +171,7 @@ var voiceHoldActive=false,voiceReleasePending=false;
 function releaseVoice(){if(computerVoice){computerVoice.released=true;finishComputerVoice();return;}if(!voiceHoldActive)return;voiceHoldActive=false;voiceReleasePending=true;flushVoiceRelease();}
 function flushVoiceRelease(){if(!voiceReleasePending||workshop.voiceBusy)return;if(workshop.voicePhase==='error'){voiceReleasePending=false;return;}if(workshop.voice&&workshop.voice.recording&&view==='workshop'){voiceReleasePending=false;toggleVoice();}}
 function wakeVoice(){if(['my-computer','quick-notes','today','robot','symbiotic-world','language-alchemy','ai-duet','agent-studio','photo-album'].indexOf(view)>=0){wakeComputerVoice();return;}if(workshop.busy){navigate('workshop');return;}voiceHoldActive=true;voiceReleasePending=false;workshop.page='voice';workshop.voicePhase='starting';navigate('workshop');request('/api/voice/status').then(function(v){workshop.voice=v;if(view!=='workshop')return;if(!v.recording)toggleVoice();else{workshop.voicePhase='recording';render();flushVoiceRelease();}}).catch(function(e){workshop.voicePhase='error';workshop.message=e.message;workshop.error=true;if(view==='workshop')render();});}
-function handleHomeReturn(){if(pageOverview){closePageOverview();navigate('home');return;}if(appMenu){closeAppMenu();return;}navigate('home');}
+function handleHomeReturn(){if(officePreviewBack())return;if(pageOverview){closePageOverview();navigate('home');return;}if(appMenu){closeAppMenu();return;}navigate('home');}
 window.addEventListener('atom:return-home',handleHomeReturn);
 /* Device capability bridge: only the current reviewed computer app receives access. */
 window.addEventListener('message',function(e){var d=e.data,frame=main.querySelector('iframe');if(view!=='my-computer'||!frame||frame.contentWindow!==e.source||!d||d.type!=='atom:connect'||typeof d.id!=='string'&&typeof d.id!=='number')return;if(String(d.id).length>128)return;var actions=['state','configure','pair-code','pair-confirm','create-task','task-events','cancel-task','approve-task','artifact','preview-app','install-app'];if(actions.indexOf(d.action)<0)return;var payload=d.data&&typeof d.data==='object'&&!Array.isArray(d.data)?d.data:{};post('/api/connect/'+d.action,payload).then(function(result){if(frame.isConnected&&view==='my-computer'){e.source.postMessage({type:'atom:connect-result',id:d.id,result:result},'*');if(d.action==='preview-app'&&result.bundle){connectPreview=result.bundle;connectPreviewTask=String(payload.task_id||'');navigate('connect-preview');showToast('全屏预览 · 空格返回桌面');}if(d.action==='install-app')loadApps();}}).catch(function(error){if(frame.isConnected&&view==='my-computer')e.source.postMessage({type:'atom:connect-result',id:d.id,error:error.message,status:error.status||0,code:error.code||''},'*');});});
@@ -340,11 +340,15 @@ document.addEventListener('click',function(e){if(e.target.closest('[data-welcome
 setTimeout(function(){welcomeStart(false);},600);
 main.addEventListener('click',function(e){var b=e.target.closest('#workshop-cloud');if(!b||!workshop.job||b.disabled)return;b.disabled=true;post('/api/market/workshop-save',{job_id:workshop.job.job_id}).then(function(){showToast('已保存到账号 · 应用市场 → 我的可继续修改和发布');navigate('market');}).catch(function(err){b.disabled=false;showToast(err.message||'保存失败，请先登录市场账号再重试');});});
 
-/* office-control bridge v1 */
+/* office-control bridge v2 */
 /* Office control: capability-gated Connect tasks, scoped to tasks the installed app itself created.
-   No tokens, paths or other apps' tasks cross this bridge. */
-(function(){var ACTIONS=['state','create-task','task-events','cancel-task','approve-task'],KEY='atom.office.tasks.v1',ID=/^[A-Za-z0-9_-]{1,128}$/;
+   No tokens, paths or other apps' tasks cross this bridge. App tasks can be previewed and, after a
+   shell-owned confirmation, installed; the frame never receives the bundle or installs by itself. */
+var officePreview=null;
+function officePreviewBack(){var p=officePreview;officePreview=null;if(!p||view!=='connect-preview'||connectPreviewTask!==p.task)return false;navigate(p.view);return true;}
+(function(){var ACTIONS=['state','create-task','task-events','cancel-task','approve-task','preview-app','install-app'],KEY='atom.office.tasks.v1',ID=/^[A-Za-z0-9_-]{1,128}$/,confirming=false;
 function clean(v,max){return typeof v==='string'?v.slice(0,max):'';}
+function confirmInstall(name){if(confirming)return Promise.resolve(false);confirming=true;return new Promise(function(resolve){var overlay=document.createElement('div');overlay.className='app-action-backdrop';overlay.innerHTML='<section class="app-action-sheet" role="dialog" aria-modal="true"><h2>把「'+esc(name)+'」放到桌面？</h2><p class="app-action-description">这个应用由办公室员工在电脑上生成，安装后出现在桌面最后。可随时长按图标卸载。</p><div class="app-action-buttons"><button id="office-install-yes">放到桌面</button><button id="office-install-no">取消</button></div></section>';document.body.appendChild(overlay);function done(yes){confirming=false;overlay.remove();resolve(yes);}overlay.querySelector('#office-install-yes').onclick=function(){done(true);};overlay.querySelector('#office-install-no').onclick=function(){done(false);};overlay.querySelector('#office-install-no').focus();});}
 window.addEventListener('message',function(e){var d=e.data,frame=main.querySelector('iframe'),originalView=view;
 if(!d||d.type!=='atom:office'||!frame||frame.contentWindow!==e.source||typeof d.id!=='string'||d.id.length>128||ACTIONS.indexOf(d.action)<0||!declaredCapability('office-control'))return;
 var payload=d.data&&typeof d.data==='object'&&!Array.isArray(d.data)?d.data:{},installed=apps.find(function(x){return x.id===originalView;}),owner=originalView+':'+(installed&&installed.installation_id||'legacy');
@@ -359,7 +363,7 @@ allowCapability('office-control',frame,originalView).then(function(granted){
  if(d.action==='create-task'){
   if(typeof payload.request_id!=='string'||!/^[A-Za-z0-9_-]{8,96}$/.test(payload.request_id))throw Error('请求编号无效');
   // A private prefix keeps office request ids apart from other clients' idempotency keys.
-  var body={request_id:'office_'+payload.request_id,computer_id:payload.computer_id,project_id:payload.project_id,agent_id:payload.agent_id,prompt:payload.prompt,kind:'task'};
+  var body={request_id:'office_'+payload.request_id,computer_id:payload.computer_id,project_id:payload.project_id,agent_id:payload.agent_id,prompt:payload.prompt,kind:payload.kind==='app'?'app':'task'};
   return post('/api/connect/create-task',body).then(function(r){var t=r&&r.task,owned=read(KEY,{});if(!t||typeof t.id!=='string'||!ID.test(t.id))throw Error('电脑没有返回任务编号');
    if(owned[t.id]&&owned[t.id]!==owner){var err=Error('这个任务不属于此应用');err.status=403;throw err;}
    owned[t.id]=owner;var ids=Object.keys(owned);if(ids.length>300)ids.slice(0,ids.length-300).forEach(function(k){delete owned[k];});
@@ -369,6 +373,13 @@ allowCapability('office-control',frame,originalView).then(function(granted){
   return {task:{id:t.id,status:t.status,last_seq:t.last_seq||0},events:(r.events||[]).map(function(ev){var o={seq:ev.seq,event_id:ev.event_id,type:ev.type,status:ev.status};if(typeof ev.text==='string')o.text=ev.text;if(ev.approval&&typeof ev.approval==='object')o.approval={request_id:String(ev.approval.request_id||''),title:clean(ev.approval.title,200),detail:clean(ev.approval.detail,3000),choices:['accept','decline']};return o;})};});
  if(d.action==='cancel-task')return post('/api/connect/cancel-task',{task_id:own(payload.task_id)}).then(function(){return {ok:true};});
  if(d.action==='approve-task'){if(['accept','decline'].indexOf(payload.decision)<0)throw Error('审批选项无效');return post('/api/connect/approve-task',{task_id:own(payload.task_id),request_id:String(payload.request_id||''),decision:payload.decision}).then(function(){return {ok:true};});}
+ // Preview runs in the shell's own sandboxed preview view with temporary storage; its back control returns here.
+ if(d.action==='preview-app'){var task=own(payload.task_id);return post('/api/connect/preview-app',{task_id:task}).then(function(r){if(!r||!r.bundle)throw Error('电脑尚未提供可预览的应用');if(!frame.isConnected||view!==originalView)throw Error('应用已关闭');
+  reply({result:{ok:true,name:clean(r.bundle.manifest.name,80)}});connectPreview=r.bundle;connectPreviewTask=task;officePreview={view:originalView,task:task};navigate('connect-preview');showToast('试玩 · 返回键回到办公室');return null;});}
+ if(d.action==='install-app'){var job=own(payload.task_id);return post('/api/connect/preview-app',{task_id:job}).then(function(r){if(!r||!r.bundle)throw Error('电脑尚未提供可安装的应用');var name=clean(r.bundle.manifest.name,80),id=r.bundle.manifest.id;
+  if(apps.some(function(a){return a.id===id;})){var dup=Error('桌面上已经有「'+name+'」了');dup.code='installed';throw dup;}
+  return confirmInstall(name).then(function(yes){try{frame.contentWindow.focus();}catch(_){}if(!yes){var no=Error('已取消安装');no.code='declined';throw no;}
+   return post('/api/connect/install-app',{task_id:job}).then(function(res){loadApps();return {ok:true,app:{id:res.app.id,name:clean(res.app.name,80)}};});});});}
  throw Error('不支持的操作');
-}).then(function(result){reply({result:result});}).catch(function(err){reply({error:err.message||'操作失败',status:err.status||0,code:err.code||''});});});})();
+}).then(function(result){if(result!==null)reply({result:result});}).catch(function(err){reply({error:err.message||'操作失败',status:err.status||0,code:err.code||''});});});})();
 })();
