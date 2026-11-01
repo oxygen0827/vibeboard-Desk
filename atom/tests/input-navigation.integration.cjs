@@ -20,6 +20,31 @@ await page.evaluate(()=>{var d=document.createElement('div');d.setAttribute('rol
 await page.evaluate(()=>{document.querySelector('[role=dialog]').remove();AtomInput.focus(document.querySelector('#b'));var b=document.querySelector('#b');b.replaceWith(b.cloneNode(true));});await page.keyboard.press('ArrowRight');assert.equal(await page.evaluate(()=>document.activeElement.id),'b');
 // Range adjustment stays in the control until a second short press.
 await page.evaluate(()=>{var r=document.createElement('input');r.type='range';r.id='volume';r.min='0';r.max='10';r.value='5';r.style.cssText='position:absolute;left:120px;top:200px';document.body.appendChild(r);AtomInput.focus(r);});await page.keyboard.press('Space');await page.keyboard.press('ArrowRight');assert.equal(await page.inputValue('#volume'),'6');await page.keyboard.press('Space');assert.equal(await page.locator('#volume').getAttribute('data-atom-adjusting'),'false');
+// A game that steers with arrows (preventDefault on its focused control) keeps them; unhandled arrows still move focus.
+await page.evaluate(()=>{window.turns=[];const g=document.createElement('button');g.id='game';g.style.cssText='position:absolute;left:10px;top:200px';g.textContent='棋盘';document.body.appendChild(g);window.playing=true;
+ g.addEventListener('keydown',e=>{if(playing&&e.key.startsWith('Arrow')){e.preventDefault();turns.push(e.key);}});AtomInput.focus(g);});
+await page.keyboard.press('ArrowUp');await page.keyboard.press('ArrowRight');
+assert.deepEqual(await page.evaluate(()=>[turns,document.activeElement.id]),[['ArrowUp','ArrowRight'],'game'],'the game receives arrows and focus stays');
+await page.evaluate(()=>{playing=false;});await page.keyboard.press('ArrowUp');assert.notEqual(await page.evaluate(()=>document.activeElement.id),'game','paused game: arrows navigate again');
+await page.evaluate(()=>document.querySelector('#game').remove());
+// A real keyboard: typing into a field switches it to typing mode until focus leaves; the joystick path is unchanged before that.
+await page.evaluate(()=>{events=[];const el=document.querySelector('#text');el.value='原文';AtomInput.focus(el);el.setSelectionRange(2,2);});
+await page.keyboard.press('ArrowLeft');assert.equal(await page.evaluate(()=>document.activeElement.id),'c','before typing, Left moves focus');
+await page.evaluate(()=>{const el=document.querySelector('#text');AtomInput.focus(el);el.setSelectionRange(2,2);});
+await page.keyboard.type('ab');assert.equal(await page.inputValue('#text'),'原文ab');
+await page.keyboard.press('ArrowLeft');assert.deepEqual(await page.evaluate(()=>[document.activeElement.id,document.activeElement.selectionStart]),['text',3],'Left moves the caret while typing');
+await page.keyboard.press('Space');assert.equal(await page.inputValue('#text'),'原文a b','short Space inserts a space');
+await page.keyboard.down('Space');await page.waitForTimeout(720);await page.keyboard.up('Space');assert.deepEqual(await page.evaluate(()=>events.map(e=>e.mode||'released')),['dictation','released'],'held Space still dictates');
+await page.evaluate(()=>AtomInput.receive({type:'atom:input-voice-result',request_id:events[0].request_id,text:'声'}));assert.equal(await page.inputValue('#text'),'原文a 声b');
+await page.keyboard.press('ArrowDown');assert.notEqual(await page.evaluate(()=>document.activeElement.id),'text','Up/Down leave a single-line field');
+await page.evaluate(()=>{const el=document.querySelector('#text');AtomInput.focus(el);el.setSelectionRange(1,1);});await page.keyboard.press('ArrowLeft');assert.equal(await page.evaluate(()=>document.activeElement.id),'c','typing mode ends when focus leaves');
+await page.evaluate(()=>{const t=document.createElement('textarea');t.id='notes';t.style.cssText='position:absolute;left:10px;top:260px;width:240px;height:60px';document.body.appendChild(t);AtomInput.focus(t);});
+await page.keyboard.type('one');await page.keyboard.press('Enter');await page.keyboard.type('two');await page.keyboard.press('ArrowUp');assert.equal(await page.evaluate(()=>document.activeElement.id),'notes','Up inside a multi-line field moves the caret');
+await page.evaluate(()=>document.querySelector('#notes').setSelectionRange(0,0));await page.keyboard.press('ArrowUp');assert.notEqual(await page.evaluate(()=>document.activeElement.id),'notes','Up from the first position leaves');
+await page.evaluate(()=>{legacyReturns=0;AtomInput.focus(document.querySelector('#notes'));});await page.keyboard.type('x');await page.keyboard.press('Escape');
+assert.deepEqual(await page.evaluate(()=>[legacyReturns,document.activeElement.id,AtomInput.typing()]),[0,'notes',null],'first Esc only ends typing mode');
+await page.keyboard.press('Escape');assert.equal(await page.evaluate(()=>legacyReturns),1,'next Esc goes home as before');
+await page.evaluate(()=>{document.querySelector('#notes').remove();legacyReturns=0;});
 // Blur sends release exactly once for a held recording.
 await page.evaluate(()=>{events=[];AtomInput.focus(document.querySelector('#a'));});await page.keyboard.down('Space');await page.waitForTimeout(720);await page.evaluate(()=>window.dispatchEvent(new Event('blur')));await page.keyboard.up('Space');assert.equal(await page.evaluate(()=>events.filter(e=>e.type==='atom:input-voice-release').length),1);
 await page.evaluate(()=>{var header=document.createElement('header');header.className='scene-head';header.style.cssText='position:absolute;left:12px;top:10px';header.innerHTML='<h1 style="margin:0">旧应用标题</h1>';document.body.appendChild(header);});assert.equal((await page.locator('.scene-head h1').boundingBox()).x,12);assert.equal(await page.evaluate(()=>legacyReturns),0);// Opaque application frames inherit the shell mode and propagate mouse movement back.

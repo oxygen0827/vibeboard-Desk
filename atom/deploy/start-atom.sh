@@ -4,9 +4,14 @@ set -eu
 if [ -r /etc/default/atom-kiosk ]; then . /etc/default/atom-kiosk; fi
 export DISPLAY="${DISPLAY:-:0}"
 export XAUTHORITY="${XAUTHORITY:-$HOME/.Xauthority}"
-export XMODIFIERS=@im=none
-export GTK_IM_MODULE=none
-export QT_IM_MODULE=none
+# Keyboard input method: fcitx pinyin when installed (deploy/install-keyboard-input.sh), otherwise none so nothing
+# intercepts keys. fcitx passes arrows and Space through unless it is composing; Ctrl+Space switches Chinese/English.
+if command -v fcitx >/dev/null 2>&1; then
+    export XMODIFIERS=@im=fcitx GTK_IM_MODULE=fcitx QT_IM_MODULE=fcitx
+    pgrep -u "$(id -u)" -x fcitx >/dev/null 2>&1 || fcitx -d >/dev/null 2>&1 || true
+else
+    export XMODIFIERS=@im=none GTK_IM_MODULE=none QT_IM_MODULE=none
+fi
 mkdir -p "$HOME/.cache/atom-chromium"
 i=0
 until curl -fsS http://127.0.0.1:8770/api/health >/dev/null; do
