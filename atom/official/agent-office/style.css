@@ -67,6 +67,14 @@ ol,ul{list-style:none;margin:0;padding:0}
 .report-text .li{padding-left:20px;position:relative}
 .report-text .li::before{content:"•";position:absolute;left:8px}
 .report-text code{font-size:14px}
+.report-actions{display:flex;gap:8px;padding:0 12px 6px}
+.report-actions[hidden]{display:none}
+.report-actions button{flex:1 1 auto;min-height:44px;padding:0 10px;border-radius:10px;border:1px solid var(--line,#cbb894);background:var(--card,#fffaf0);font-size:15px}
+.report-status{margin:0;padding:0 14px 6px;font-size:14px;color:var(--muted,#7a6a55)}
+.report-status.problem{color:var(--danger,#c0392b)}
+.report-status[hidden]{display:none}
+.report-actions .primary{background:var(--action,#007aff);color:#fff;border-color:transparent}
+.report-actions button[hidden]{display:none}
 #report-meta{padding:0 14px;margin:0}
 .choices{display:flex;flex-direction:column;gap:6px}
 .choices button{min-height:44px;text-align:left;padding:4px 10px;border-radius:10px;border:1px solid var(--line,#cbb894);background:var(--card,#fffaf0);font-size:14px}

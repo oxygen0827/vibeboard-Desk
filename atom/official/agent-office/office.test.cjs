@@ -9,6 +9,34 @@ assert.throws(() => D.parsePlan('{"packages":[{"id":"a","staff":"writer","title"
 assert.throws(() => D.parsePlan(JSON.stringify({packages: [1, 2, 3, 4].map(i => ({id: 'p' + i, staff: 'writer', title: 't', deliverable: 'd'}))})), /超过/);
 const ok = D.parsePlan('说明：{"summary":"s","packages":[{"id":"p1","staff":"researcher","title":"t","deliverable":"d","depends_on":[]}]}');
 assert.equal(ok.packages[0].staff, 'researcher');
+// App packages: only the engineer, at most one per plan; other packages never carry the flag.
+const appPlan = D.parsePlan(JSON.stringify({summary: 's', packages: [{id: 'p1', staff: 'writer', title: '文案', deliverable: 'd'}, {id: 'p2', staff: 'engineer', title: '番茄钟', deliverable: '可运行', depends_on: ['p1'], app: true}]}));
+assert.equal(appPlan.packages[1].app, true); assert.equal('app' in appPlan.packages[0], false);
+assert.throws(() => D.parsePlan('{"packages":[{"id":"p1","staff":"writer","title":"t","deliverable":"d","app":true}]}'), /只有工程师/);
+assert.equal(D.parsePlan('{"packages":[{"id":"p1","staff":"engineer","title":"t","deliverable":"d","app":"yes"}]}').packages[0].app, undefined, 'only a literal true marks an app');
+assert.match(D.planPrompt(D.defaults(), '做个番茄钟'), /"app":true/);
+const ap = D.appPrompt(D.defaults(), {goal: '番茄钟', staff: D.defaults().staff}, {title: '番茄钟', deliverable: '25 分钟'}, [{title: '原汇报', staff: 'engineer', text: '<html>旧代码</html>'}]);
+assert.match(ap, /480×360/); assert.match(ap, /旧代码/); assert.doesNotMatch(ap, /## 完成内容/, 'app tasks return a bundle, not a report');
+// "做成应用": completed real text reports holding a web page; never app or demo reports.
+const htmlReport = {id: 'r1', title: '制作番茄钟', status: 'completed', task_id: 't-html', demo: false};
+assert.equal(D.convertible(htmlReport, '说明\n```html\n<!doctype html><p>x</p>\n```'), true);
+assert.equal(D.convertible(htmlReport, '只有文字说明'), false);
+assert.equal(D.convertible(Object.assign({}, htmlReport, {app: true}), '```html'), false);
+assert.equal(D.convertible(Object.assign({}, htmlReport, {demo: true}), '```html'), false);
+const conv = D.appMission(D.defaults(), {id: 'm-app', report: htmlReport, target: {computer_id: 'c', project_id: 'p', agent_id: 'codex'}, now: 1});
+assert.equal(conv.status, 'awaiting_confirm'); assert.equal(conv.plan.packages.length, 1);
+assert.deepEqual([conv.plan.packages[0].staff, conv.plan.packages[0].app, conv.plan.packages[0].source_task], ['engineer', true, 't-html']);
+assert.equal(D.confirm(conv, 1).packages[0].app, true, 'confirmation keeps the app flag');
+assert.doesNotMatch(D.appPrompt(D.defaults(), conv, conv.packages[0], []), /Chromium 91|别名/, 'shared policy rules are not copied into the office prompt');
+// "重新制作": an app report the device refused is made again from its saved request, with the refusal reason.
+const refusedReport = {id: 'r2', title: '做成应用：制作番茄钟', app: true, status: 'completed', task_id: 'bad', problem: '五向输入规范：多级页面须注册 AtomApp.navigation.setBackHandler',
+  remake: {title: '做成应用：制作番茄钟', deliverable: '改写成完整的 ATOM 应用', source_task: 't-html'}};
+const again = D.appMission(D.defaults(), {id: 'm-again', report: refusedReport, target: {computer_id: 'c', project_id: 'p', agent_id: 'codex'}, now: 2});
+assert.deepEqual([again.plan.packages[0].title, again.plan.packages[0].source_task], ['重新制作：制作番茄钟', 't-html']);
+assert.match(D.appPrompt(D.defaults(), again, again.plan.packages[0], []), /没有通过小电脑检查：五向输入规范/);
+// A saved preview hand-off survives normalisation; junk does not.
+assert.deepEqual(D.normalize(Object.assign(D.defaults(), {resume: {report: 'r1'}})).resume, {report: 'r1'});
+assert.equal(D.normalize(Object.assign(D.defaults(), {resume: {report: '../x'}})).resume, undefined);
 
 // Report text becomes escaped, focusable blocks; only headings, list items and bold are interpreted.
 const blocks = D.reportBlocks('## 完成内容\n\n资料A<b>x</b> **重点**\n第二行\n\n- 一\n- 二\n\n');
@@ -97,6 +125,38 @@ async function run() {
   // Reduced motion: no walking at all.
   sc.setMotion(false, now); sc.walkBoss('engineer'); sc.update(now + 100, 100, idle);
   assert.equal(sc.moving(), false);
+  await appFlow();
   console.log('office tests passed');
+}
+// An app package becomes a Connect `app` task built from the original report, and reports back as an app.
+async function appFlow() {
+  const state = D.defaults(); state.target = {computer_id: 'c', project_id: 'p', agent_id: 'codex'};
+  const calls = [], reports = []; let status = 'running', n = 0;
+  const client = {parallel: 1, dispose() {}, async send(a, d) {
+    calls.push([a, d]);
+    if (a === 'create-task') return {task: {id: 'app-task', status: 'queued', last_seq: 0}};
+    if (a === 'task-events' && d.task_id === 't-html') return {task: {id: 't-html', status: 'completed'}, events: [{seq: 1, type: 'result', status: 'completed', text: '```html\n<!doctype html><title>番茄钟</title>\n```'}]};
+    if (a === 'task-events') return {task: {id: 'app-task', status}, events: status === 'completed' ? [{seq: 2, type: 'result', status: 'completed', text: '应用已生成，可以预览并安装。'}] : []};
+    if (a === 'preview-app' || a === 'install-app') return {ok: true, app: {id: 'pomodoro', name: '番茄钟'}};
+    throw Error(a);
+  }};
+  const clock = {wall: () => 5, monotonic: () => 5};
+  const runner = Runner.create({domain: D, getState: () => state, persist: async () => {}, client, clock, newId: () => 'req' + (++n) + 'abcdefgh', onReport: r => reports.push(r), onChange() {}});
+  state.mission = D.appMission(state, {id: 'm-app', report: {title: '制作番茄钟', task_id: 't-html'}, target: state.target, now: 1});
+  D.confirm(state.mission, 1);
+  await runner.tick();
+  const create = calls.find(c => c[0] === 'create-task')[1];
+  assert.equal(create.kind, 'app'); assert.match(create.prompt, /<title>番茄钟<\/title>/, 'app prompt carries the original report text');
+  status = 'completed'; await runner.tick();
+  assert.equal(state.mission.status, 'completed');
+  assert.equal(reports.length, 1); assert.equal(reports[0].app, true); assert.equal(reports[0].task_id, 'app-task');
+  assert.deepEqual(reports[0].remake.source_task, 't-html', 'the app report keeps its request for 重新制作');
+  await runner.previewApp('app-task'); await runner.installApp('app-task');
+  assert.deepEqual(calls.slice(-2).map(c => [c[0], c[1].task_id]), [['preview-app', 'app-task'], ['install-app', 'app-task']]);
+  // Ordinary packages still create plain tasks.
+  const plain = []; const r2 = Runner.create({domain: D, getState: () => s2, persist: async () => {}, client: {parallel: 1, dispose() {}, async send(a, d) { plain.push(d); return {task: {id: 'x', status: 'queued'}}; }}, clock, newId: () => 'plainreq' + (++n), onReport() {}, onChange() {}});
+  const s2 = D.defaults(); s2.target = state.target;
+  s2.mission = D.newMission(s2, {id: 'm2', goal: '写说明', mode: 'single', assignee: 'writer', target: s2.target, now: 1}); D.confirm(s2.mission, 1);
+  await r2.tick(); assert.equal(plain[0].kind, 'task');
 }
 run().catch(e => { console.error(e); process.exit(1); });

@@ -236,7 +236,7 @@
       let html = '<li class="card"><h4><span>' + esc(m.staff[p.staff].name + ' · ' + R[p.staff].role) + '</span><em>' + esc(status) + '</em></h4>' +
         '<p><b>' + esc(p.title) + '</b></p><p class="muted">交付：' + esc(p.deliverable) + '</p>' +
         (deps.length ? '<p class="muted">依赖：' + esc(deps.map(d => m.staff[d.staff].name + '的「' + d.title + '」').join('、')) + '</p>' : '<p class="muted">无依赖</p>') +
-        (!board ? '<p class="muted">' + (p.modifies_files ? '方案提到会改文件：本版本只交付文本，不应用文件改动' : '不修改项目文件') + '</p>' : '');
+        (!board ? '<p class="muted">' + (p.app ? '交付一个应用：做好后可以试玩，满意再放到桌面' : p.modifies_files ? '方案提到会改文件：本版本只交付文本，不应用文件改动' : '不修改项目文件') + '</p>' : '');
       if (board && p.status === 'waiting_approval' && p.approval) html += '<div class="approval"><p>' + esc(p.approval.title + '：' + p.approval.detail) + '</p><div class="row"><button data-allow="' + esc(p.staff) + '">允许</button><button data-deny="' + esc(p.staff) + '">拒绝</button></div></div>';
       if (board && p.error && ['failed', 'interrupted', 'blocked'].includes(p.status)) html += '<p>' + esc(p.error) + '</p>';
       return html + '</li>';
@@ -331,14 +331,78 @@
       const r = state.reports.find(x => x.id === id); if (!r) return;
       reportOpen = id;
       $('report-title').textContent = (state.staff[r.staff] ? state.staff[r.staff].name : '') + ' · ' + r.title;
-      $('report-meta').textContent = (r.demo ? '演示数据 · ' : '') + ({completed: '完成', partial: '部分完成', failed: '失败', interrupted: '中断'}[r.status] || r.status) + ' · 文件改动不会自动应用';
+      const app = r.app && r.status === 'completed';
+      $('report-meta').textContent = (r.demo ? '演示数据 · ' : '') + (app ? '应用已做好 · 先试玩，满意再放到桌面' : ({completed: '完成', partial: '部分完成', failed: '失败', interrupted: '中断'}[r.status] || r.status) + ' · 文件改动不会自动应用');
       showReport(r.preview + (r.preview.length >= domain.PREVIEW ? '\n\n正在读取完整内容…' : ''));
-      open('dlg-report'); focusEl($('report-text').firstElementChild || $('report-text'));
+      reportActions(r, r.preview);
+      open('dlg-report'); focusEl(app ? $('report-try') : $('report-text').firstElementChild || $('report-text'));
       if (!r.read) { r.read = true; persist().catch(() => {}); }
       if (r.task_id && r.preview.length >= domain.PREVIEW) {
-        try { const full = await runner.fullText(r.task_id); if (reportOpen === id && full) showReport(full, true); }
+        try { const full = await runner.fullText(r.task_id); if (reportOpen === id && full) { showReport(full, true); reportActions(r, full); } }
         catch (e) { if (reportOpen === id) showReport(r.preview + '\n\n完整内容暂时无法读取：' + e.message, true); }
       }
+    }
+    /* App reports offer 试玩 / 放到桌面; a text report holding a web page offers 做成应用 (a new single app package). */
+    function reportActions(r, text) {
+      const app = !!r.app && r.status === 'completed', convert = domain.convertible(r, text);
+      // A bundle the device refused can be made again; trying or installing it would only fail the same way.
+      $('report-try').hidden = $('report-install').hidden = !app || !!r.problem;
+      $('report-remake').hidden = !app;
+      $('report-remake').textContent = r.problem ? '重新制作' : '重做';
+      $('report-remake').classList.toggle('primary', !!r.problem);
+      if (app) $('report-meta').textContent = (r.demo ? '演示数据 · ' : '') + (r.problem ? '应用没通过小电脑检查 · 可以让' + state.staff.engineer.name + '重新制作' : '应用已做好 · 先试玩，满意再放到桌面');
+      $('report-status').hidden = !r.problem; $('report-status').textContent = r.problem ? '小电脑没有接受这个应用：' + r.problem : ''; $('report-status').classList.toggle('problem', !!r.problem);
+      $('report-install').disabled = !!r.installed;
+      $('report-install').textContent = r.installed ? '已在桌面' : '放到桌面';
+      $('report-convert').hidden = !convert;
+      $('report-actions').hidden = !app && !convert;
+    }
+    // Feedback inside the report page: the office status line sits under the modal dialog.
+    function reportSay(text, problem) { const el = $('report-status'); el.textContent = text; el.hidden = !text; el.classList.toggle('problem', !!problem); }
+    // The shell refused the bundle itself (admission rules), not the connection: remember it on the report.
+    const refused = e => !e.retryable && !['timeout', 'declined', 'installed', 'demo', 'unsupported'].includes(e.code) && e.status !== 403;
+    const openedReport = () => state.reports.find(x => x.id === reportOpen);
+    async function tryApp() {
+      const r = openedReport(); if (!r) return;
+      // Remember the report so the office reopens on it when the preview's back control returns here.
+      state.resume = {report: r.id};
+      try { await persist(); } catch (e) { delete state.resume; return; }
+      reportSay('正在从电脑取回应用…');
+      try { await runner.previewApp(r.task_id); }
+      catch (e) { delete state.resume; failed(r, e); }
+    }
+    function failed(r, e) {
+      if (refused(e)) r.problem = String(e.message || '').slice(0, 200);
+      persist().catch(() => {});
+      if (reportOpen !== r.id) return;
+      reportActions(r, ''); if (!r.problem) reportSay(e.message, true);
+      focusEl(r.problem ? $('report-remake') : $('report-try'));
+    }
+    async function installApp() {
+      const r = openedReport(); if (!r || r.installed) return;
+      reportSay('正在从电脑取回应用…');
+      try {
+        const res = await runner.installApp(r.task_id);
+        r.installed = res.app.name; persist().catch(() => {});
+        if (reportOpen === r.id) { reportActions(r, ''); reportSay('「' + res.app.name + '」已放到桌面最后一页'); focusEl($('report-try')); }
+      } catch (e) {
+        if (e.code === 'installed') r.installed = true;
+        if (e.code === 'declined' || e.code === 'installed') { persist().catch(() => {}); if (reportOpen === r.id) { reportActions(r, ''); reportSay(e.code === 'declined' ? '没有安装' : e.message); focusEl($('report-try')); } }
+        else failed(r, e);
+      }
+    }
+    async function convertReport() {
+      const r = openedReport(); if (!r) return;
+      if (!domain.finished(state.mission)) { reportSay('办公室正在执行目标：完成或停止后再做'); return; }
+      if (state.demo) { reportSay('演示模式不连接电脑：关闭演示模式后再做'); return; }
+      if (!canDispatch()) { reportSay('暂时不能派工：' + conn.text + (conn.detail ? '。' + conn.detail : '')); return; }
+      const previous = state.mission, origin = previous && previous.id === r.mission_id && previous.packages.find(p => p.app);
+      // Reports made before 重新制作 existed: recover the request from the mission that produced them.
+      if (r.app && !r.remake && origin) r.remake = {title: origin.title, deliverable: origin.deliverable, source_task: origin.source_task || null};
+      state.mission = domain.appMission(state, {id: newId(), report: r, target: Object.assign({}, state.target), demo: false, now: clock.wall()});
+      try { await persist(); } catch (e) { state.mission = previous; reportSay('保存失败：' + e.message); return; }
+      close('dlg-report'); if (stack.some(x => x.id === 'dlg-reports')) close('dlg-reports');
+      open('dlg-plan');
     }
 
     /* ---------- setup ---------- */
@@ -389,6 +453,7 @@
       $('board-new').onclick = () => { close('dlg-board'); openGoal('team'); };
       $('board-plan').onclick = () => { close('dlg-board'); open('dlg-plan'); };
       $('board-list').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; if (b.dataset.allow) decide(b.dataset.allow, 'accept'); if (b.dataset.deny) decide(b.dataset.deny, 'decline'); });
+      $('report-try').onclick = tryApp; $('report-install').onclick = installApp; $('report-convert').onclick = $('report-remake').onclick = convertReport;
       $('reports-list').addEventListener('click', e => { const b = e.target.closest('[data-report]'); if (b) openReport(b.dataset.report); });
       $('setup-computers').addEventListener('click', e => { const b = e.target.closest('[data-computer]'); if (!b) return; const c = conn.computers.find(x => x.client_id === b.dataset.computer); setupDraft.target = {computer_id: c.client_id, project_id: c.projects.length === 1 ? c.projects[0].id : null, agent_id: (c.agents.find(a => a.available && a.authenticated) || {}).id || null}; renderSetup(); focusEl($('setup-computers').querySelector('[data-computer="' + b.dataset.computer + '"]')); });
       $('setup-projects').addEventListener('click', e => { const b = e.target.closest('[data-project]'); if (!b) return; setupDraft.target.project_id = b.dataset.project; renderSetup(); focusEl($('setup-projects').querySelector('[data-project="' + b.dataset.project + '"]')); });
@@ -429,6 +494,8 @@
       // Re-entering shows unread results once, never replays history.
       const pending = state.reports.filter(r => !r.announced);
       if (pending.length) { if (motion) scene.announce(pending[0].staff, clock.monotonic()); pending.forEach(r => { r.announced = true; }); persist().catch(() => {}); }
+      // Back from an app preview: reopen the report it was started from, once.
+      if (state.resume) { const id = state.resume.report; delete state.resume; persist().catch(() => {}); if (state.reports.some(r => r.id === id)) { open('dlg-reports'); openReport(id); } }
       await checkConnection(); schedulePoll(0);
     }
     async function start() {

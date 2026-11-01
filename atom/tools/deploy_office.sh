@@ -25,7 +25,7 @@ DEV=$(curl -fsS http://127.0.0.1:8770/api/developer)
 echo "developer: $DEV"
 case "$DEV" in *'"enabled": true'*|*'"enabled":true'*) ;; *) echo 'STOP: 开发模式未开启。请在小电脑「设置 → 系统工具 → 开发模式」手动打开后重试。'; exit 3;; esac
 STAMP=$(date +%Y%m%d-%H%M%S)
-if ! grep -q 'office-control bridge v1' static/app.js; then
+if ! grep -q 'office-control bridge v2' static/app.js; then
   cp -p static/app.js "static/app.js.before-office-$STAMP"; cp -p server.py "server.py.before-office-$STAMP"
   echo "backup: *.before-office-$STAMP"
 fi

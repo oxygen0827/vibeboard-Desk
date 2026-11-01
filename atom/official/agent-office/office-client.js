@@ -3,6 +3,8 @@
    - demo: an in-page simulator, always labelled as simulated data. */
 (function(root) {
   'use strict';
+  // Install waits on the shell's confirmation sheet and preview fetches the bundle from the computer.
+  const SLOW = {'install-app': 120000, 'preview-app': 30000};
   function host({window: win, timeoutMs = 9000}) {
     const pending = new Map(); let serial = 0;
     function receive(e) {
@@ -22,7 +24,7 @@
           const e = Error(action === 'state' ? '系统没有响应办公室能力：设备核心可能需要升级' : '设备没有响应，请稍后重试');
           // A permission sheet can hold the first reply past the deadline: the caller may retry.
           e.code = action === 'state' ? 'unsupported' : 'timeout'; e.retryable = true; reject(e);
-        }, timeoutMs);
+        }, SLOW[action] || timeoutMs);
         pending.set(id, {resolve, reject, timer});
         win.parent.postMessage({type: 'atom:office', id, action, data: data || {}}, '*');
       });
@@ -73,6 +75,7 @@
       const t = tasks.get(data.task_id); if (!t) { const e = Error('任务不存在或已失效'); e.status = 404; throw e; }
       if (action === 'task-events') { advance(t); return {task: view(t), events: t.events.filter(e => e.seq > (data.after || 0))}; }
       if (action === 'cancel-task') { if (!t.terminal) { t.terminal = true; t.status = 'cancelled'; t.events.push({seq: ++t.seq, event_id: 'e' + t.seq, type: 'status', status: 'cancelled', text: '任务已停止（模拟）'}); } return {ok: true}; }
+      if (action === 'preview-app' || action === 'install-app') { const e = Error('演示数据没有真实应用：连接电脑后才能试玩和放到桌面'); e.code = 'demo'; throw e; }
       if (action === 'approve-task') {
         if (!t.paused || data.request_id !== 'demo-approval') { const e = Error('审批已失效'); e.status = 409; throw e; }
         t.paused = false; t.shift += clock.monotonic() - t.pausedAt; t.status = 'running';

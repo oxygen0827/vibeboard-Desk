@@ -21,10 +21,10 @@
       catch (e) { lastError = e.message; if (clock.wall() - lastOk > 20000) connection = 'stale'; throw e; }
     }
     // Create (or idempotently re-find) a task. The request id is saved first.
-    async function startTask(holder, prompt) {
+    async function startTask(holder, prompt, kind) {
       const m = mission();
       if (!holder.request_id) { holder.request_id = newId(); await persist(); }
-      const r = await call('create-task', Object.assign({request_id: holder.request_id, prompt}, m.target));
+      const r = await call('create-task', Object.assign({request_id: holder.request_id, prompt, kind: kind === 'app' ? 'app' : 'task'}, m.target));
       if (!r || !r.task || typeof r.task.id !== 'string') throw Error('电脑没有返回任务编号');
       holder.task_id = r.task.id; holder.after = holder.after || 0;
       await persist();
@@ -47,9 +47,11 @@
     function upstream(m, p) {
       return p.depends_on.map(id => m.packages.find(x => x.id === id)).filter(Boolean).map(u => ({title: u.title, staff: u.staff, text: (live.get(u.task_id) || {}).result || u.preview}));
     }
-    function report(m, staff, title, text, status, taskId) {
+    function report(m, staff, title, text, status, taskId, p) {
       const state = getState();
       const r = {id: newId(), mission_id: m.id, staff, title, preview: preview(text), task_id: taskId, status, read: false, announced: false, demo: m.demo, at: clock.wall()};
+      // An app report keeps its request so it can be made again if the device refuses the bundle.
+      if (p && p.app) { r.app = true; r.remake = {title: p.title, deliverable: p.deliverable, source_task: p.source_task || null}; }
       state.reports.unshift(r); state.reports = state.reports.slice(0, 12);
       onReport(r);
     }
@@ -74,7 +76,12 @@
     async function stepPackage(m, p) {
       if (!p.task_id) {
         p.status = 'starting';
-        await startTask(p, domain.packagePrompt(getState(), m, p, upstream(m, p)));
+        if (p.app) {
+          // "做成应用" carries the original report's full text as the reference.
+          const up = upstream(m, p);
+          if (p.source_task) up.unshift({title: '原汇报', staff: 'engineer', text: await fullText(p.source_task)});
+          await startTask(p, domain.appPrompt(getState(), m, p, up), 'app');
+        } else await startTask(p, domain.packagePrompt(getState(), m, p, upstream(m, p)));
         p.status = 'running'; await persist(); return;
       }
       const r = await pull(p);
@@ -87,7 +94,7 @@
         p.stopping = false;
         const text = r.entry.result || p.error;
         p.preview = preview(text);
-        if (p.status === 'completed' && !p.reported) { p.reported = true; report(m, p.staff, p.title, text, 'completed', p.task_id); }
+        if (p.status === 'completed' && !p.reported) { p.reported = true; report(m, p.staff, p.title, text, 'completed', p.task_id, p); }
         else if (['failed', 'interrupted'].includes(p.status) && !p.reported) { p.reported = true; report(m, p.staff, p.title, text || '工作包没有完成', p.status, p.task_id); }
       }
       if (before !== p.status) await persist(); else if (r.changed) onChange();
@@ -158,7 +165,10 @@
       return cacheText(taskId, r.events || []).result;
     }
     const liveText = taskId => (live.get(taskId) || {}).text || '';
-    return {tick, approve, cancel, fullText, liveText, connection: () => connection, lastError: () => lastError, state: () => call('state', {})};
+    // App tasks: the shell previews or (after its own confirmation sheet) installs the bundle the computer produced.
+    const previewApp = taskId => call('preview-app', {task_id: taskId});
+    const installApp = taskId => call('install-app', {task_id: taskId});
+    return {tick, approve, cancel, fullText, liveText, previewApp, installApp, connection: () => connection, lastError: () => lastError, state: () => call('state', {})};
   }
   const api = {create};
   root.OfficeRunner = api;

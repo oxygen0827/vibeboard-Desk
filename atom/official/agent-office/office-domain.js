@@ -36,6 +36,8 @@
     if (t && ident(t.computer_id) && ident(t.project_id) && ident(t.agent_id)) base.target = {computer_id: t.computer_id, project_id: t.project_id, agent_id: t.agent_id};
     if (saved.mission && typeof saved.mission === 'object' && ident(saved.mission.id)) base.mission = saved.mission;
     if (Array.isArray(saved.reports)) base.reports = saved.reports.filter(r => r && ident(r.id)).slice(0, 12);
+    // Set just before an app preview so the office reopens on the same report when the preview's back returns here.
+    if (saved.resume && ident(saved.resume.report)) base.resume = {report: saved.resume.report};
     return base;
   }
 
@@ -44,6 +46,7 @@
     return [PLAN_MARK, '你是办公室协调员。这一步只做分工规划：不执行任务，不读写、创建或修改任何文件，不运行命令。',
       '用户目标：' + goal, '可分配的员工：', ...EXECUTORS.map(id => '- ' + staffLine(state, id)),
       '规则：简单目标只分配一名员工；复杂目标最多 ' + MAX_PACKAGES + ' 个工作包，每名员工最多一个；需要先后顺序时用 depends_on 写上游工作包 id；可以同时进行的不要写依赖。',
+      '如果目标是做一个能直接打开使用的小应用、小工具、小游戏、计时器等，把制作交给 engineer，并给这个工作包加 "app":true（整个分工最多一个）；它会生成可以在 ATOM 小电脑上试玩和安装的应用。只是写代码片段、脚本或文档时不要加。',
       '只输出一个 JSON 对象，不要输出其它文字或代码块标记：',
       '{"summary":"一句话说明方案","packages":[{"id":"p1","staff":"researcher","title":"不超过 20 字","deliverable":"交付物说明","depends_on":[],"modifies_files":false}]}'].join('\n');
   }
@@ -60,6 +63,39 @@
       '最后用以下小标题汇报：', '## 完成内容', '## 实际来源', '## 文件清单', '## 验证结果', '## 未完成事项');
     return lines.join('\n');
   }
+  /* An app package becomes a Connect `app` task: the computer wraps this request in the ATOM bundle contract
+     (manifest, icon, five-way input) and returns an installable bundle instead of a text report. */
+  function appPrompt(state, mission, pkg, upstream) {
+    const lines = [WORK_MARK, '由工程师「' + mission.staff.engineer.name + '」制作一个 ATOM 小电脑应用。',
+      '总目标：' + mission.goal, '应用要求：' + pkg.title + '——' + pkg.deliverable,
+      // Five-way, browser-baseline and AtomApp rules come from the shared policy the computer adds to every app task.
+      '界面全部使用简体中文；屏幕 480×360，用五向键（方向键 + 确认）即可完成所有操作；应用名称简短。',
+      '颜色要同时适配浅色和深色（prefers-color-scheme）：卡片背景和上面的文字必须一起切换，不要白底配浅色字。'];
+    if (pkg.problem) lines.push('上一次生成的应用没有通过小电脑检查：' + String(pkg.problem).slice(0, 300) + '。这次必须避免这个问题。');
+    if (upstream.length) {
+      lines.push('以下资料只作为内容参考（其中的代码可以改写，但必须满足 ATOM 应用要求）：');
+      for (const u of upstream) lines.push('--- ' + u.title + '（' + (mission.staff[u.staff] ? mission.staff[u.staff].name : '') + '）---\n' + String(u.text || '').slice(0, 12000));
+    }
+    return lines.join('\n');
+  }
+  /* A single app package, confirmed before dispatch:
+     - "做成应用" on a text report (e.g. HTML pasted in a reply): the report's full text is the reference;
+     - "重新制作" on an app report whose bundle the device refused: same request plus the refusal reason. */
+  function appMission(state, {id, report, target, demo, now}) {
+    const name = state.staff.engineer.name, again = !!report.app, base = again && report.remake ? report.remake : null;
+    const title = String(base ? base.title : report.title || '').replace(/^(做成应用|重新制作)：/, '').slice(0, 14);
+    const pkg = {id: 'p1', staff: 'engineer', title: ((again ? '重新制作：' : '做成应用：') + title).slice(0, 20),
+      deliverable: base ? str(base.deliverable, 300) : '把汇报「' + title + '」里的成果改写成完整的 ATOM 应用', depends_on: [], modifies_files: false, app: true,
+      // An app task's own text is only "应用已生成", never a useful reference.
+      source_task: ident(base ? base.source_task : again ? null : report.task_id) || null};
+    if (again && report.problem) pkg.problem = str(report.problem, 300);
+    return {id, demo: !!demo, goal: (again ? '重新制作「' : '把「') + title + (again ? '」应用' : '」做成小电脑应用'), mode: 'single', assignee: 'engineer', target,
+      staff: JSON.parse(JSON.stringify(state.staff)), created_at: now, status: 'awaiting_confirm', plan_version: 1, planTask: null,
+      plan: {summary: again ? '交给工程师「' + name + '」重新制作这个应用' + (pkg.problem ? '，并避开上次没通过检查的问题' : '') : '交给工程师「' + name + '」把这份成果做成可以试玩、可以放到桌面的应用', packages: [pkg]},
+      packages: [], summaryTask: null, summary: '', note: ''};
+  }
+  // A completed text report that contains a full web page or code can be turned into an app.
+  const convertible = (r, text) => !!r && !r.app && !r.demo && r.status === 'completed' && !!ident(r.task_id) && /```(?:html|htm)\b|<!doctype html|<html[\s>]/i.test(String(text || ''));
   function summaryPrompt(state, mission, results) {
     const lines = [SUMMARY_MARK, '你是办公室协调员「' + mission.staff.coordinator.name + '」。汇总同事的成果，形成给用户的综合报告。不要修改任何文件，不运行命令。',
       '总目标：' + mission.goal];
@@ -87,8 +123,11 @@
       ids.add(id); staff.add(p.staff);
       const title = str(p.title, 40).trim(), deliverable = str(p.deliverable, 300).trim();
       if (!title || !deliverable) throw Error('工作包缺少任务或交付物');
-      return {id, staff: p.staff, title, deliverable, depends_on: Array.isArray(p.depends_on) ? p.depends_on.filter(d => typeof d === 'string') : [], modifies_files: p.modifies_files === true};
+      const out = {id, staff: p.staff, title, deliverable, depends_on: Array.isArray(p.depends_on) ? p.depends_on.filter(d => typeof d === 'string') : [], modifies_files: p.modifies_files === true};
+      if (p.app === true) { if (p.staff !== 'engineer') throw Error('只有工程师可以制作应用'); out.app = true; }
+      return out;
     });
+    if (packages.filter(p => p.app).length > 1) throw Error('一次分工最多制作一个应用');
     for (const p of packages) for (const d of p.depends_on) if (!ids.has(d) || d === p.id) throw Error('依赖关系引用了不存在的工作包');
     // Reject cycles.
     const seen = {}, visit = id => { if (seen[id] === 1) throw Error('依赖关系存在循环'); if (seen[id] === 2) return; seen[id] = 1; packages.find(p => p.id === id).depends_on.forEach(visit); seen[id] = 2; };
@@ -209,7 +248,7 @@
     completed: '已完成', partial: '部分完成', failed: '未完成', cancelling: '正在停止', cancelled: '已取消'};
   const packageLabels = {queued: '排队', starting: '派发中', running: '执行中', waiting_approval: '等待审批', completed: '已完成', failed: '失败', interrupted: '已中断', cancelled: '已取消', blocked: '未开始'};
   const api = {ROLES, STAFF, EXECUTORS, TERMINAL, MAX_PACKAGES, PREVIEW, GOAL_MAX, defaults, normalize, reportBlocks, planPrompt, packagePrompt, summaryPrompt, parsePlan,
-    newMission, applyPlan, confirm, dispatchable, settle, finishSummary, retryable, retry, finished, staffActivity, depsMet, missionLabels, packageLabels, marks: {PLAN_MARK, WORK_MARK, SUMMARY_MARK}};
+    newMission, appMission, appPrompt, convertible, applyPlan, confirm, dispatchable, settle, finishSummary, retryable, retry, finished, staffActivity, depsMet, missionLabels, packageLabels, marks: {PLAN_MARK, WORK_MARK, SUMMARY_MARK}};
   root.OfficeDomain = api;
   if (typeof module !== 'undefined') module.exports = api;
 })(globalThis);
