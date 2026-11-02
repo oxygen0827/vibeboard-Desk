@@ -11,11 +11,11 @@ const {chromium,webkit,executablePath}=require('../../tools/browser-test-runtime
  const works=Array.from({length:12},(_,i)=>({id:'work-'+i,title:fixtures[i%4][1]+(i>=4?' · 灵感 '+(i+1):''),description:fixtures[i%4][2],cover_id:(i%4+1).toString().repeat(32),author:'ATOM 演示',latest_version_id:'version-'+i,license:'MIT',category:i%2?'play':'sound'}));
  const drafts=works.map((w,i)=>({...w,id:(i+10).toString(16).repeat(32),cover_id:i%3?w.cover_id:null,revision:1,title:i===0?'我的天气窗':w.title,work_id:i%3===1?w.id:null}));
  const library=['work-0','water-pool','moon-ocean','task-pal'].map((id,i)=>({id,name:'资源演示 '+i,description:'完整的场景源码与素材',cover_id:'1'.repeat(32),files:4,archive_bytes:1048576,archive:'/atom/assets/library/'+id+'-'+'a'.repeat(16)+'.zip'}));
- let delayState=false,releaseState;const calls=[];
+ let delayState=false,releaseState,busyDrafts=false;const calls=[],busyChecked=new Set();
  const studio={workspaceView:()=>({draft:drafts[0],bundle}),async handle(method,route){calls.push(route);
   if(route==='/state'){if(delayState)await new Promise(resolve=>releaseState=resolve);return {authenticated:true,user:{id:'demo',username:'演示账号'},jobs:[],encryption:'on'};}
   if(route.startsWith('/catalog?')){const q=new URL(route,'http://fixture').searchParams.get('q')||'';return {works:works.filter(w=>w.title.includes(q)),library:library.filter(a=>a.name.includes(q))};}
-  if(route==='/drafts')return {drafts};
+  if(route==='/drafts'){if(busyDrafts)throw Object.assign(Error('服务器繁忙，请稍后再试；内容已保留'),{status:429,code:'rate_limited'});return {drafts};}
   if(route.startsWith('/works/'))return {work:works.find(w=>w.id===route.split('/')[2]),versions:[{id:'version-0',number:1,changelog:'初次发布'}],derivatives:[]};
   if(route.startsWith('/versions/'))return {bundle};
   if(route==='/community/targets')return {targets:[{id:'fixture-device',name:'演示 ATOM',online:true}]};
@@ -41,6 +41,8 @@ const {chromium,webkit,executablePath}=require('../../tools/browser-test-runtime
      if(action)assert(await ui.getByRole('button',{name:action,exact:true}).evaluate(n=>{const r=n.getBoundingClientRect();const hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return r.top>=0&&r.bottom<=innerHeight&&!!hit&&n.contains(hit)}),name+' action is clipped or covered');
      await page.screenshot({path:`/tmp/atom-task-${engine}-${name}-${size.width}-${color}.png`});
     };
+    // A busy server (edge 429) explains itself and offers a retry instead of a blank list.
+    if(!busyChecked.has(engine)){busyChecked.add(engine);busyDrafts=true;await page.locator('[data-page=creations]').first().click();await ui.getByText('服务器繁忙，请稍后再试；内容已保留').waitFor();busyDrafts=false;await ui.getByRole('button',{name:'重新读取'}).click();await ui.locator('.community-drafts>.community-draft').first().waitFor();}
     for(const [tab,title,selector]of [['market','发现','.community-card'],['creations','我的创作','.community-drafts>.community-draft']]){
      await page.locator(`[data-page=${tab}]`).first().click();await ui.getByRole('heading',{name:title,exact:true}).waitFor();await ui.locator(selector).first().waitFor();
      await page.waitForFunction(()=>[...document.querySelectorAll('#community-studio img')].filter(img=>{const r=img.getBoundingClientRect();return r.top<innerHeight&&r.bottom>0}).every(img=>img.complete&&img.naturalWidth>0));

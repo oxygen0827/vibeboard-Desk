@@ -121,7 +121,17 @@ export class Studio {
  async transportRemote(route,{method='GET',body,publicRead=false,token}={}){
   if(!/^\/(?:community\/(?:suggestions|suggestion|suggest|review|generate|jobs|job|undo|copy|create|save|publish|cover)|register|login|logout|me|keys|email\/(?:start|verify)|password\/(?:forgot|reset|change)|catalog|works(?:\/[A-Za-z0-9_-]+)?|versions\/[A-Za-z0-9_-]+|covers\/[a-f0-9]{32}|forks|drafts(?:\/[A-Za-z0-9_-]+(?:\/(?:save|publish|cover))?)?|photos(?:\/(?:state|generate|jobs(?:\/[a-f0-9]{32})?|[a-f0-9]{32}(?:\/(?:update|delete|original))?))?|notes|agenda|health)(?:\?[^#]*)?$/.test(route))throw problem('不支持的市场接口');
   const relay=this.url();const account=this.account();const auth=token||(publicRead?null:account?.token);if(!publicRead&&!auth&&!['/register','/login','/password/forgot','/password/reset'].includes(route))throw problem('请先登录创作账号',401);
-  let response;try{response=await this.transport(relay+'/market/v1'+route,{method,headers:{'Content-Type':'application/json',...(auth?{Authorization:'Bearer '+auth}:{})},body:body===undefined?undefined:JSON.stringify(body),signal:AbortSignal.timeout(/^\/photos(?:[/?]|$)/.test(route)?120000:20000),redirect:'error'});}catch{throw problem('市场暂时无法连接，内容已保留在本机',503,'offline');}
+  // The edge rate limit (429, an nginx HTML page) is shared by every client behind one public IP. Reads wait and retry
+  // briefly; writes are never repeated here, so a busy server cannot apply them twice.
+  const read=method==='GET'||route==='/community/jobs'||route==='/community/job';
+  let response;
+  for(let attempt=0;;attempt++){
+   try{response=await this.transport(relay+'/market/v1'+route,{method,headers:{'Content-Type':'application/json',...(auth?{Authorization:'Bearer '+auth}:{})},body:body===undefined?undefined:JSON.stringify(body),signal:AbortSignal.timeout(/^\/photos(?:[/?]|$)/.test(route)?120000:20000),redirect:'error'});}catch{throw problem('市场暂时无法连接，内容已保留在本机',503,'offline');}
+   if(response.status!==429)break;
+   if(!read||attempt>=2)throw problem('服务器繁忙，请稍后再试；内容已保留',429,'rate_limited');
+   const header=response.headers?.get?.('retry-after'),wait=header==null||header===''?NaN:Number(header);
+   await new Promise(r=>setTimeout(r,Number.isFinite(wait)&&wait>=0?Math.min(wait,5)*1000:800*(attempt+1)));
+  }
   let result;try{result=await response.json();}catch{throw problem('市场返回无效响应',502);}
   if(this.url()!==relay||(!publicRead&&account?.token!==this.account()?.token))throw problem('账号或服务器已改变，请重新打开内容',409,'account_changed');
   if(!response.ok){const error=problem(String(result.error||'市场操作失败').slice(0,500),response.status,result.code);error.details=result;throw error;}return result;
