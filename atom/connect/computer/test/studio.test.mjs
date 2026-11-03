@@ -74,3 +74,12 @@ test('market piano checkout and local edits preserve full sampled source above a
   assert.equal(fs.readFileSync(path.join(saved.source_path,'samples.js'),'utf8'),piano.files['samples.js']);
  }finally{f.cleanup();}
 });
+test('edge 429 retries reads, never repeats writes, and reports a busy server',async()=>{const f=fixture();try{
+ const busy=()=>({ok:false,status:429,headers:new Headers({'retry-after':'0'}),json:async()=>{throw SyntaxError('nginx html');}});
+ const ok=v=>({ok:true,status:200,headers:new Headers(),json:async()=>v});
+ let calls=0;f.studio.transport=async()=>++calls<3?busy():ok({jobs:[]});
+ assert.deepEqual(await f.studio.handle('POST','/community/jobs',{}),{jobs:[]});assert.equal(calls,3);
+ calls=0;f.studio.transport=async()=>{calls++;return busy();};
+ await assert.rejects(f.studio.handle('GET','/drafts'),e=>e.status===429&&e.code==='rate_limited'&&/繁忙/.test(e.message));assert.equal(calls,3);
+ calls=0;await assert.rejects(f.studio.handle('POST','/community/generate',{draft_id:'d',revision:1,prompt:'x'}),e=>e.status===429);assert.equal(calls,1);
+}finally{f.cleanup();}});

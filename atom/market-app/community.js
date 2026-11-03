@@ -17,6 +17,8 @@ window.AtomCommunity=class {
  async run(fn){if(this.busy)return;this.busy=true;this.root.setAttribute('aria-busy','true');try{await fn();}catch(e){if(this.active)this.message(e.status===401?'请先登录，再继续创作。':e.message||'暂时未完成，请重试',true);if(e.status===401)this.loginNeeded=true;}finally{this.busy=false;this.root.removeAttribute('aria-busy');}}
  message(value,bad=false){const target=this.root.querySelector('.community-status');if(target){target.textContent=value;target.classList.toggle('bad',bad);}}
  async read(route){return this.host.call(route);}
+ // A list that cannot be read says why and offers a retry instead of staying blank (e.g. a busy server).
+ async load(read,box,epoch,again){try{return await read();}catch(e){if(epoch===this.epoch&&this.active){this.message(e.message||'暂时没能读取，请重试',true);box.append(this.button('重新读取',again,'primary'));}return null;}}
  async write(action,body){const key=action+JSON.stringify(body);let request=this.pending.get(key);if(!request){request={...body,request_id:crypto.randomUUID()};this.pending.set(key,request);}try{const result=await this.host.call('/community/'+action,request);this.pending.delete(key);return result;}catch(e){if(e.status===409||e.status===400)this.pending.delete(key);throw e;}}
  async identity(){const state=await this.host.state();const uid=state.user?.id||null;if(this.owner!==uid){this.covers.clear();this.pending.clear();this.ideas.clear();}this.owner=uid;this.account=state;return state;}
  async signedIn(){await this.identity();if(!this.owner){await this.host.login();return false;}return true;}
@@ -66,7 +68,7 @@ window.AtomCommunity=class {
   const form=node('form',{class:'community-search'},search,category,mode,node('button',{type:'submit',text:'查找'}));form.onsubmit=e=>{e.preventDefault();this.search=search.value;this.category=category.value;this.filter=mode.value;this.pageIndex=0;this.run(()=>this.discover());};
   const tools=node('div',{class:'community-discovery-tools'},form);
   if(this.desktop)box.before(tools);else box.append(form,node('p',{text:'先试一试，再把喜欢的作品改成自己的。',class:'community-hint'}));
-  const r=await this.read('/catalog?'+new URLSearchParams({q:this.search,category:this.category}));if(epoch!==this.epoch)return;
+  const r=await this.load(()=>this.read('/catalog?'+new URLSearchParams({q:this.search,category:this.category})),box,epoch,()=>this.discover());if(!r||epoch!==this.epoch)return;
   this.works=(r.works||[]).filter(w=>this.filter!=='remixes'||w.parent_id).sort((a,b)=>(b.updated_at||0)-(a.updated_at||0));
   // Complete resource archives remain discoverable without pretending they support the remix API.
   const published=new Set((r.works||[]).map(w=>w.id.replace(/^official-/,'')));
@@ -137,8 +139,8 @@ window.AtomCommunity=class {
    if(url)frame.src=url;else frame.srcdoc=window.AtomCommunityPreview(bundle);
    stage.replaceChildren(frame);this.previewFrame=frame;
    if(this.desktop){
-    const fit=()=>{if(frame.isConnected)frame.style.transform='scale('+Math.min(1,stage.clientWidth/480)+')';};
-    this.previewObserver?.disconnect();this.previewObserver=new ResizeObserver(fit);this.previewObserver.observe(stage);fit();
+    const fit=()=>{if(frame.isConnected)frame.style.transform='scale('+Math.min(stage.closest('.community-screen-area')?4:1,stage.clientWidth/480)+')';};
+    this.previewObserver?.disconnect();this.previewObserver=new ResizeObserver(fit);this.previewObserver.observe(stage);if(stage.parentElement)this.previewObserver.observe(stage.parentElement);fit();
    }
   }catch(error){
    if(epoch!==this.epoch||!this.active)return;
@@ -161,7 +163,7 @@ window.AtomCommunity=class {
   box.append(form);
  }
  async mine(){
-  this.tab='mine';const box=this.page('我的作品'),epoch=this.epoch;const r=await this.read('/drafts');if(epoch!==this.epoch)return;
+  this.tab='mine';const box=this.page('我的作品'),epoch=this.epoch;const r=await this.load(()=>this.read('/drafts'),box,epoch,()=>this.mine());if(!r||epoch!==this.epoch)return;
   if(!this.desktop)box.append(this.button('＋ 做一个新作品',()=>this.newForm(),'primary'));
   const grid=node('div',{class:'community-drafts'});
   for(const d of r.drafts||[]){
@@ -181,14 +183,16 @@ window.AtomCommunity=class {
   const r=await this.read('/drafts/'+id);if(epoch!==this.epoch)return;this.editing=r;this.root.querySelector('h1').textContent=r.draft.title;
   const prompt=node('textarea',{rows:'3',maxlength:'4000',placeholder:'你想怎么改？长按空格说出来。','aria-label':'修改想法'});
   prompt.value=this.ideas.get(id)||'';prompt.oninput=()=>this.ideas.set(id,prompt.value);
-  const form=node('form',{class:'community-edit-form'},node('label',{class:'community-prompt-label'},'这次想改点什么？',prompt),node('button',{type:'submit',class:'primary',text:'帮我修改'}));
+  const form=node('form',{class:'community-edit-form'},this.desktop?prompt:node('label',{class:'community-prompt-label'},'这次想改点什么？',prompt),node('button',{type:'submit',class:'primary',text:'帮我修改'}));
   form.onsubmit=e=>{e.preventDefault();this.run(()=>this.generate(prompt.value));};
-  const actions=node('div',{class:'community-actions community-editor-actions'},this.button('体验作品',()=>this.preview({draft_id:id},()=>this.edit(id)),'primary'),this.button('添加到桌面',()=>this.install({draft_id:id},()=>this.edit(id))),this.button('分享作品',()=>this.publishForm()));
+  // On Mac the screen itself is the interactive preview, so there is no separate 体验作品 step.
+  const actions=node('div',{class:'community-actions community-editor-actions'},this.desktop?null:this.button('体验作品',()=>this.preview({draft_id:id},()=>this.edit(id)),'primary'),this.button('添加到桌面',()=>this.install({draft_id:id},()=>this.edit(id))),this.button('分享作品',()=>this.publishForm()));
   const job=node('div',{class:'community-job',role:'status'}),more=this.button('更多操作',()=>this.editOptions(r),'secondary');
   if(this.desktop){
-   const stage=node('div',{class:'community-preview-stage'}),preview=node('section',{class:'community-editor-preview'},node('div',{class:'community-pane-head'},node('h2',{text:'当前作品'}),node('span',{class:'community-hint',text:r.draft.creation_pending?'等待创作':'已保存到账号'})),stage,actions,node('p',{class:'community-hint',text:'预览数据临时保存，安装后在设备上使用。'}));
-   const panel=node('section',{class:'community-editor-panel'},node('div',{class:'community-pane-head'},node('h2',{text:'和 AI 一起修改'})),node('p',{class:'community-hint',text:'描述想改的地方，AI 会保留作品原有内容。'}),form,job,node('div',{class:'community-editor-footer'},node('span',{class:'community-hint',text:'修改先存为私人草稿'}),more));
-   box.append(node('div',{class:'community-editor-layout'},preview,panel));
+   // The simulated screen fills the page; the edit bar sits under it.
+   const stage=node('div',{class:'community-preview-stage'}),area=node('div',{class:'community-screen-area'},stage);
+   const bar=node('div',{class:'community-edit-bar'},form,node('div',{class:'community-bar-actions'},actions,more),job);
+   box.append(node('div',{class:'community-editor-layout'},area,r.draft.creation_pending?null:node('p',{class:'community-hint community-screen-hint',text:'点一下屏幕后可用方向键、回车和 Esc 操作；体验中的数据只临时保存。'}),bar));
    if(r.draft.creation_pending)stage.append(node('p',{class:'community-hint',text:'说说你的想法，创作完成后在这里体验。'}));
    else void this.mountPreview(r.bundle,stage,epoch);
   }else box.append(actions,form,job,more);
@@ -204,10 +208,14 @@ window.AtomCommunity=class {
  async generate(prompt){if(!prompt.trim())throw Error('先说说想怎么修改');const d=this.editing.draft;const r=await this.write('generate',{draft_id:d.id,revision:d.revision,prompt:prompt.trim()});this.ideas.delete(d.id);this.jobStatus(r.job,this.epoch);}
  jobStatus(job,epoch){if(epoch!==this.epoch||!this.active)return;const target=this.root.querySelector('.community-job');if(!target)return;const busy=['queued','generating'].includes(job.status);target.replaceChildren(node('p',{text:({queued:'正在排队…',generating:'AI 正在修改，原稿已保留…',completed:'修改完成，已同步到账号。',failed:'修改未完成：'+job.error,interrupted:job.error})[job.status]||job.status}));
   this.root.querySelectorAll('form button').forEach(b=>b.disabled=busy);
-  if(job.status==='completed')target.append(this.button('体验最新结果',()=>this.preview({draft_id:job.draft_id},()=>this.edit(job.draft_id))));
-  if(!busy)return;clearTimeout(this.timer);this.timer=setTimeout(async()=>{try{const r=await this.host.call('/community/job',{id:job.id});if(epoch!==this.epoch)return;if(r.job.status==='completed'){await this.edit(job.draft_id);this.message('修改完成，已同步。可以体验、安装或继续修改。');}else this.jobStatus(r.job,epoch);}catch(e){if(epoch!==this.epoch)return;target.replaceChildren(node('p',{text:'读取进度失败，任务可能仍在运行。'}),this.button('重新读取',async()=>this.jobStatus((await this.host.call('/community/job',{id:job.id})).job,epoch)));}},1500);
+  // On Mac the work page screen already shows the latest version.
+  if(job.status==='completed'&&!this.desktop)target.append(this.button('体验最新结果',()=>this.preview({draft_id:job.draft_id},()=>this.edit(job.draft_id))));
+  if(!busy)return;clearTimeout(this.timer);const poll=async()=>{try{const r=await this.host.call('/community/job',{id:job.id});if(epoch!==this.epoch)return;if(r.job.status==='completed'){await this.edit(job.draft_id);this.message('修改完成，已同步。可以体验、安装或继续修改。');}else this.jobStatus(r.job,epoch);}catch(e){if(epoch!==this.epoch)return;
+   // A busy server is not a failed job: keep waiting and read the progress again later.
+   if(e.status===429){target.replaceChildren(node('p',{text:'服务器繁忙，稍后自动刷新进度；修改仍在进行。'}));clearTimeout(this.timer);this.timer=setTimeout(poll,8000);return;}
+   target.replaceChildren(node('p',{text:'读取进度失败，任务可能仍在运行。'}),this.button('重新读取',async()=>this.jobStatus((await this.host.call('/community/job',{id:job.id})).job,epoch)));}};this.timer=setTimeout(poll,1500);
  }
- async install(ref,back){const box=this.page('添加到桌面',back,'install'),epoch=this.epoch;const value=await this.bundle(ref),targets=await this.host.targets();if(epoch!==this.epoch)return;const select=node('select',{'aria-label':'安装到哪台设备'},...targets.map(t=>new Option(t.name+(t.online===false?' · 离线':''),t.id)));box.append(node('h2',{text:value.bundle.manifest.name}),node('p',{text:'添加后，就能从设备桌面打开。'}),value.bundle.manifest.capabilities?.length?node('p',{text:'需要访问：'+value.bundle.manifest.capabilities.map(c=>({notes:'便签',agenda:'日程','task-state':'电脑任务状态'})[c]||'未知能力（请检查源码）').join('、')}):node('p',{class:'community-hint',text:'无需访问便签、日程或电脑任务。'}),select);
+ async install(ref,back){const box=this.page('添加到桌面',back,'install'),epoch=this.epoch;const value=await this.bundle(ref),targets=await this.host.targets();if(epoch!==this.epoch)return;const select=node('select',{'aria-label':'安装到哪台设备'},...targets.map(t=>new Option(t.name+(t.online===false?' · 离线':''),t.id)));box.append(node('h2',{text:value.bundle.manifest.name}),node('p',{text:'添加后，就能从设备桌面打开。'}),value.bundle.manifest.capabilities?.length?node('p',{text:'需要访问：'+value.bundle.manifest.capabilities.map(c=>({notes:'随手记',agenda:'日程与待办','office-control':'办公室派工','task-state':'电脑任务摘要',photos:'私有相册',sensors:'存在与倾斜感知'})[c]||'未知能力（请检查源码）').join('、')}):node('p',{class:'community-hint',text:'无需访问便签、日程或电脑任务。'}),select);
   if(!targets.length){box.append(node('p',{text:'还没有可用设备。请在小电脑登录同一账号，或启动 Mac 模拟器。'}));return;}
   box.append(this.button('确认添加',async()=>{const key='install:'+select.value+JSON.stringify(ref);if(!this.pending.has(key))this.pending.set(key,crypto.randomUUID());const result=await this.host.install(ref,select.value,this.pending.get(key));this.pending.delete(key);this.message(result.status==='queued'?'已发送，等待设备安装；可以在动态中查看结果。':result.message||'已添加到桌面。');if(result.status==='queued'&&this.host.deliveries)box.replaceChildren(node('h2',{text:'正在送到你的设备'}),node('p',{text:'安装完成后会出现在桌面，离线设备会在重新联网后继续。'}),this.button('查看安装进度',()=>this.activity(),'primary'));},'primary'));
  }
@@ -222,8 +230,8 @@ window.AtomCommunity=class {
  suggestForm(){const d=this.editing.draft,box=this.page('把改进送给原作者',()=>this.edit(d.id),'suggest'),summary=node('textarea',{maxlength:'500',rows:'3',placeholder:'你改进了什么？为什么更好玩或更好用？','aria-label':'改进说明'}),check=node('input',{type:'checkbox'});box.append(summary,node('p',{text:'原作者将收到这一版源码快照，只有他可以采用。你的副本保持独立；这一步不会公开发布。'}),node('label',{class:'community-check'},check,node('span',{text:'我确认源码可以交给原作者，且没有私人信息或密钥。'})),this.button('提交改进建议',async()=>{if(!check.checked)throw Error('请先确认源码可以分享');await this.write('suggest',{draft_id:d.id,revision:d.revision,summary:summary.value,confirm:true});await this.activity();this.message('建议已送出，原作者采用后会出现在这里。');},'primary'));}
  async activity(){
   this.tab='activity';const box=this.page('作品动态'),epoch=this.epoch;
-  const result=await this.host.call('/community/suggestions',{});
-  if(epoch!==this.epoch)return;
+  const result=await this.load(()=>this.host.call('/community/suggestions',{}),box,epoch,()=>this.activity());
+  if(!result||epoch!==this.epoch)return;
   for(const suggestion of result.suggestions||[]){
    const card=this.button('',()=>this.review(suggestion.id),'community-draft');
    const status={open:'等待原作者审阅',accepted:'已采用到私人草稿，等待发布',declined:'暂不采用'}[suggestion.status];

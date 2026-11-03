@@ -1,0 +1,1 @@
+{"id":"progress-light","name":"AI 进度灯","description":"把电脑上 AI 任务的真实状态变成桌边一盏灯：执行中呼吸，等你确认时闪烁，完成时轻响一声。","category":"connect","license":"MIT","author":"ATOM","entry":"index.html","icon":"icon.svg","layout":"fullscreen","theme_ui":"controls","capabilities":["task-state"],"input":{"version":1,"profile":"five-way","back":"root","scene":"none"}}

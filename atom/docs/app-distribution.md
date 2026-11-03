@@ -97,3 +97,11 @@ python3 atom/tools/audit_app_distribution.py --require-all \
 - Chromium/WebKit：发现、创作、完整资源交互预览、主题、身份延迟及私有同步故障恢复通过。设备应用、五向输入、同步入口、场景返回与暂停回归通过。
 - 正在运行的 Mac 服务实际读取新钢琴；WebKit 验证 5 首曲谱与 32 个解码采样。另有五首自动演奏、鼠标滑奏和离线音频回归。
 - 本记录不把浏览器测试等同于实体扬声器听感、摇杆或连续运行性能验收；核心系统 OTA 版本未因应用资源更新而变更。
+
+## 2026-11-03 AI 进度灯
+
+由 Mac「我的创作」草稿发布为社区作品（MIT），源码与提交 `9b2624d` 的 `official/progress-light/bundle.json` 一致；封面为演示模式真实渲染截图 `artifacts/market-covers/progress-light.png`，画面标注“演示 · 不是真实任务”。
+
+- 云端：作品 `bdfe3955bc34eb9fc74f477de3c9b5d3`，第 1 版 `5d2acb15e0a99c0e91afe5220087dd17`，SHA-256 `21ef0d4e…0161e5`；`verify_market_release.py` 通过，封面可读。
+- Mac：运行中的 ATOM Connect `/api/studio/catalog` 已显示该版本及封面。
+- 灰色板：原开发包与公开版逐文件核对，仅差演示模式及设备的 manifest/图标规范化，没有设备独有修改；登记来源后经 `/api/market/install` 更新到第 1 版，`ATOM-SOURCE.json` 记录该版本，`_installed_at_ns` 与桌面位置未变。真机已打开新版（可见「看演示」）；任务摘要读取权限仍待用户在屏幕上选择。
