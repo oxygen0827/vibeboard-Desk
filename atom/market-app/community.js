@@ -139,8 +139,8 @@ window.AtomCommunity=class {
    if(url)frame.src=url;else frame.srcdoc=window.AtomCommunityPreview(bundle);
    stage.replaceChildren(frame);this.previewFrame=frame;
    if(this.desktop){
-    const fit=()=>{if(frame.isConnected)frame.style.transform='scale('+Math.min(1,stage.clientWidth/480)+')';};
-    this.previewObserver?.disconnect();this.previewObserver=new ResizeObserver(fit);this.previewObserver.observe(stage);fit();
+    const fit=()=>{if(frame.isConnected)frame.style.transform='scale('+Math.min(stage.closest('.community-screen-area')?4:1,stage.clientWidth/480)+')';};
+    this.previewObserver?.disconnect();this.previewObserver=new ResizeObserver(fit);this.previewObserver.observe(stage);if(stage.parentElement)this.previewObserver.observe(stage.parentElement);fit();
    }
   }catch(error){
    if(epoch!==this.epoch||!this.active)return;
@@ -183,14 +183,16 @@ window.AtomCommunity=class {
   const r=await this.read('/drafts/'+id);if(epoch!==this.epoch)return;this.editing=r;this.root.querySelector('h1').textContent=r.draft.title;
   const prompt=node('textarea',{rows:'3',maxlength:'4000',placeholder:'你想怎么改？长按空格说出来。','aria-label':'修改想法'});
   prompt.value=this.ideas.get(id)||'';prompt.oninput=()=>this.ideas.set(id,prompt.value);
-  const form=node('form',{class:'community-edit-form'},node('label',{class:'community-prompt-label'},'这次想改点什么？',prompt),node('button',{type:'submit',class:'primary',text:'帮我修改'}));
+  const form=node('form',{class:'community-edit-form'},this.desktop?prompt:node('label',{class:'community-prompt-label'},'这次想改点什么？',prompt),node('button',{type:'submit',class:'primary',text:'帮我修改'}));
   form.onsubmit=e=>{e.preventDefault();this.run(()=>this.generate(prompt.value));};
-  const actions=node('div',{class:'community-actions community-editor-actions'},this.button('体验作品',()=>this.preview({draft_id:id},()=>this.edit(id)),'primary'),this.button('添加到桌面',()=>this.install({draft_id:id},()=>this.edit(id))),this.button('分享作品',()=>this.publishForm()));
+  // On Mac the screen itself is the interactive preview, so there is no separate 体验作品 step.
+  const actions=node('div',{class:'community-actions community-editor-actions'},this.desktop?null:this.button('体验作品',()=>this.preview({draft_id:id},()=>this.edit(id)),'primary'),this.button('添加到桌面',()=>this.install({draft_id:id},()=>this.edit(id))),this.button('分享作品',()=>this.publishForm()));
   const job=node('div',{class:'community-job',role:'status'}),more=this.button('更多操作',()=>this.editOptions(r),'secondary');
   if(this.desktop){
-   const stage=node('div',{class:'community-preview-stage'}),preview=node('section',{class:'community-editor-preview'},node('div',{class:'community-pane-head'},node('h2',{text:'当前作品'}),node('span',{class:'community-hint',text:r.draft.creation_pending?'等待创作':'已保存到账号'})),stage,actions,node('p',{class:'community-hint',text:'预览数据临时保存，安装后在设备上使用。'}));
-   const panel=node('section',{class:'community-editor-panel'},node('div',{class:'community-pane-head'},node('h2',{text:'和 AI 一起修改'})),node('p',{class:'community-hint',text:'描述想改的地方，AI 会保留作品原有内容。'}),form,job,node('div',{class:'community-editor-footer'},node('span',{class:'community-hint',text:'修改先存为私人草稿'}),more));
-   box.append(node('div',{class:'community-editor-layout'},preview,panel));
+   // The simulated screen fills the page; the edit bar sits under it.
+   const stage=node('div',{class:'community-preview-stage'}),area=node('div',{class:'community-screen-area'},stage);
+   const bar=node('div',{class:'community-edit-bar'},form,node('div',{class:'community-bar-actions'},actions,more),job);
+   box.append(node('div',{class:'community-editor-layout'},area,r.draft.creation_pending?null:node('p',{class:'community-hint community-screen-hint',text:'点一下屏幕后可用方向键、回车和 Esc 操作；体验中的数据只临时保存。'}),bar));
    if(r.draft.creation_pending)stage.append(node('p',{class:'community-hint',text:'说说你的想法，创作完成后在这里体验。'}));
    else void this.mountPreview(r.bundle,stage,epoch);
   }else box.append(actions,form,job,more);
@@ -206,7 +208,8 @@ window.AtomCommunity=class {
  async generate(prompt){if(!prompt.trim())throw Error('先说说想怎么修改');const d=this.editing.draft;const r=await this.write('generate',{draft_id:d.id,revision:d.revision,prompt:prompt.trim()});this.ideas.delete(d.id);this.jobStatus(r.job,this.epoch);}
  jobStatus(job,epoch){if(epoch!==this.epoch||!this.active)return;const target=this.root.querySelector('.community-job');if(!target)return;const busy=['queued','generating'].includes(job.status);target.replaceChildren(node('p',{text:({queued:'正在排队…',generating:'AI 正在修改，原稿已保留…',completed:'修改完成，已同步到账号。',failed:'修改未完成：'+job.error,interrupted:job.error})[job.status]||job.status}));
   this.root.querySelectorAll('form button').forEach(b=>b.disabled=busy);
-  if(job.status==='completed')target.append(this.button('体验最新结果',()=>this.preview({draft_id:job.draft_id},()=>this.edit(job.draft_id))));
+  // On Mac the work page screen already shows the latest version.
+  if(job.status==='completed'&&!this.desktop)target.append(this.button('体验最新结果',()=>this.preview({draft_id:job.draft_id},()=>this.edit(job.draft_id))));
   if(!busy)return;clearTimeout(this.timer);const poll=async()=>{try{const r=await this.host.call('/community/job',{id:job.id});if(epoch!==this.epoch)return;if(r.job.status==='completed'){await this.edit(job.draft_id);this.message('修改完成，已同步。可以体验、安装或继续修改。');}else this.jobStatus(r.job,epoch);}catch(e){if(epoch!==this.epoch)return;
    // A busy server is not a failed job: keep waiting and read the progress again later.
    if(e.status===429){target.replaceChildren(node('p',{text:'服务器繁忙，稍后自动刷新进度；修改仍在进行。'}));clearTimeout(this.timer);this.timer=setTimeout(poll,8000);return;}

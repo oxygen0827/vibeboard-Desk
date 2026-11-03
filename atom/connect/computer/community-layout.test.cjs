@@ -82,8 +82,22 @@ const {chromium,webkit,executablePath}=require('../../tools/browser-test-runtime
     await ui.getByLabel('修改想法').fill('这个想法在返回后要保留');
     await ui.getByRole('button',{name:'分享作品',exact:true}).click();await checkTask('publish','确认公开发布');await ui.getByRole('button',{name:'‹ 返回',exact:true}).click();
     assert.equal(await ui.getByLabel('修改想法').inputValue(),'这个想法在返回后要保留');
-    await ui.getByRole('button',{name:'体验作品',exact:true}).click();await checkTask('draft-preview','‹ 返回');await ui.getByRole('button',{name:'‹ 返回',exact:true}).click();
-    assert.equal(await ui.getByLabel('修改想法').inputValue(),'这个想法在返回后要保留');
+    // The work page is the simulated screen: large, 4:3, interactive in place, with the edit bar under it and no separate 体验作品 step.
+    await page.waitForFunction(()=>{const s=document.querySelector('.community-screen-area>.community-preview-stage')?.getBoundingClientRect(),f=document.querySelector('.community-preview')?.getBoundingClientRect();return s&&f&&Math.abs(s.width-f.width)<2},null,{timeout:3000}).catch(()=>{});
+    const screen=await ui.evaluate(el=>{const s=el.querySelector('.community-screen-area>.community-preview-stage').getBoundingClientRect(),f=el.querySelector('.community-preview').getBoundingClientRect(),b=el.querySelector('.community-edit-bar').getBoundingClientRect();return {w:s.width,h:s.height,fw:f.width,fh:f.height,barBottom:b.bottom,screenBottom:s.bottom,barTop:b.top};});
+    assert(screen.w>=(size.width>1000?600:380)&&Math.abs(screen.w/screen.h-4/3)<.02&&Math.abs(screen.fw-screen.w)<2&&Math.abs(screen.fh-screen.h)<2,'screen fills the page '+JSON.stringify(screen));
+    assert(screen.screenBottom<=screen.barTop&&screen.barBottom<=size.height,'edit bar under the screen '+JSON.stringify(screen));
+    assert.equal(await ui.getByRole('button',{name:'体验作品',exact:true}).count(),0);
+    for(const name of ['帮我修改','添加到桌面','分享作品','更多操作'])assert(await ui.getByRole('button',{name,exact:true}).evaluate(n=>{const r=n.getBoundingClientRect(),hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return r.bottom<=innerHeight&&!!hit&&n.contains(hit)}),name+' clipped or covered');
+    // Click at real screen coordinates (as a mouse does) so the scaled-up frame's hit-testing is what gets checked.
+    const sound=ui.frameLocator('.community-preview').getByRole('button',{name:'切换节拍音色',exact:true}),before=await sound.innerText();
+    const target=await page.evaluate(async()=>{const f=document.querySelector('.community-preview'),r=f.getBoundingClientRect(),s=r.width/480;return {x:r.x,y:r.y,s};});
+    const inner=await sound.evaluate(n=>{const r=n.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};});
+    await page.mouse.click(target.x+inner.x*target.s,target.y+inner.y*target.s);
+    await page.waitForFunction(()=>true);assert.notEqual(await sound.innerText(),before,'clicking the scaled screen reaches the app');
+    const focusOf=()=>ui.frameLocator('.community-preview').locator('body').evaluate(()=>document.activeElement?.getAttribute('aria-label')||document.activeElement?.textContent.trim()||document.activeElement?.tagName);
+    const focused=await focusOf();await page.keyboard.press('ArrowDown');await page.waitForTimeout(150);assert.notEqual(await focusOf(),focused,'arrow keys move focus inside the screen');
+    assert.equal(await ui.frameLocator('.community-preview').locator('body').evaluate(()=>innerWidth),480,'app still sees a 480×360 screen');
     await ui.getByRole('button',{name:'更多操作',exact:true}).click();await checkTask('edit-options','高级源码');await ui.getByRole('button',{name:'高级源码',exact:true}).click();await page.locator('#editor-back').click();await ui.getByRole('heading',{name:'我的创作',exact:true}).waitFor();assert.equal(await page.locator('#community-studio').count(),1);
    }
    // Preview failures must leave the editor usable; failed embeds cannot strand navigation.
